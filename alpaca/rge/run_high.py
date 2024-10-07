@@ -18,7 +18,6 @@ Running
 
 import numpy as np
 from . import ALPcouplings, runSM
-import wilson
 from typing import Callable
 from scipy.integrate import solve_ivp
 

@@ -3,8 +3,7 @@
 import numpy as np
 from .runSM import runSM
 
-bases_above = ['derivative_above', 'massbasis_above']
-bases_below = ['kF_below']
+from . import bases_above, bases_below
 class ALPcouplings:
     """Container for ALP couplings.
 
@@ -104,6 +103,28 @@ class ALPcouplings:
                 if not isinstance(values[c], (int, float)):
                      raise TypeError
             self.values = {c: values[c] for c in ['kD', 'kE', 'kNu', 'kd', 'ke', 'kU', 'ku', 'cg', 'cgamma']}
+        elif basis == 'VA_below':
+            self.scale = scale
+            self.basis = basis
+            values = {'cg':0, 'cgamma': 0, 'cuV': 0, 'cuA': 0, 'cdV': 0, 'cdA': 0, 'ceV': 0, 'ceA': 0, 'cnu': 0} | values
+            for c in ['cdV', 'cdA', 'ceV', 'ceA', 'cnu']:
+                if isinstance(values[c], (float, int)):
+                    values[c] = np.matrix(values[c]*np.eye(3))
+                elif isinstance(values[c], (np.ndarray, np.matrix, list)):
+                    values[c] = np.matrix(values[c]).reshape([3,3])
+                else:
+                    raise TypeError
+            for c in ['cuV', 'cuA']:
+                if isinstance(values[c], (float, int)):
+                    values[c] = np.matrix(values[c]*np.eye(2))
+                elif isinstance(values[c], (np.ndarray, np.matrix, list)):
+                    values[c] = np.matrix(values[c]).reshape([2,2])
+                else:
+                    raise TypeError
+            for c in ['cg', 'cgamma']:
+                if not isinstance(values[c], (int, float)):
+                     raise TypeError
+            self.values = {c: values[c] for c in ['cuV', 'cuA', 'cdV', 'cdA', 'ceV', 'ceA', 'cnu', 'cg', 'cgamma']}
         else:
             raise ValueError('Unknown basis')
     
@@ -168,6 +189,22 @@ class ALPcouplings:
             cZ = c2w**2 * self.values['cW'] + s2w**2 *self.values['cB']
 
             return ALPcouplings({'kU': self.values['cqL'], 'ku': self.values['cuR'], 'kD': Vckm.H @ self.values['cqL'] @ Vckm, 'kd': self.values['cdR'], 'kE': self.values['clL'], 'kNu': self.values['clL'], 'ke': self.values['ceR'], 'cgamma': cgamma, 'cW': self.values['cW'], 'cgammaZ': cgammaZ, 'cZ': cZ, 'cg': self.values['cg']}, scale=self.scale, basis='massbasis_above')
+        if self.basis == 'kF_below' and basis == 'VA_below':
+            return ALPcouplings({'cuV': self.values['ku'] + self.values['kU'],
+                                 'cuA': self.values['ku'] - self.values['kU'],
+                                 'cdV': self.values['kd'] + self.values['kD'],
+                                 'cdA': self.values['kd'] - self.values['kD'],
+                                 'ceV': self.values['ke'] + self.values['kE'],
+                                 'ceA': self.values['ke'] - self.values['kE'],
+                                 'cnu': self.values['kNu'], 'cg': self.values['cg'], 'cgamma': self.values['cgamma']}, scale=self.scale, basis='VA_below')
+        if self.basis == 'VA_below' and basis == 'kF_below':
+            return ALPcouplings({'ku': (self.values['cuV'] + self.values['cuA'])/2,
+                                 'kU': (self.values['cuV'] - self.values['cuA'])/2,
+                                 'kd': (self.values['cdV'] + self.values['cdA'])/2,
+                                 'kD': (self.values['cdV'] - self.values['cdA'])/2,
+                                 'ke': (self.values['ceV'] + self.values['ceA'])/2,
+                                 'kE': (self.values['ceV'] - self.values['ceA'])/2,
+                                 'kNu': self.values['cnu'], 'cg': self.values['cg'], 'cgamma': self.values['cgamma']}, scale=self.scale, basis='kF_below')
         else:
             raise ValueError('Unknown basis')
         
@@ -204,15 +241,16 @@ class ALPcouplings:
             return self.translate(basis)
         if self.scale > matching_scale and scale_out < matching_scale:
             if self.basis in bases_above and basis in bases_below:
-                couplings_ew = self.match_run(matching_scale, 'massbasis_above', integrator, beta)
-                return matching.match(couplings_ew, match_2loops).translate(basis).match_run(scale_out, basis, integrator)
+                couplings_ew = self.match_run(matching_scale, 'massbasis_above', integrator, beta, matching_scale)
+                couplings_below = matching.match(couplings_ew, match_2loops)
+                return couplings_below.match_run(scale_out, basis, integrator, beta, matching_scale)
             else:
                 raise KeyError(basis)
         if scale_out < matching_scale:
             if integrator == 'scipy':
-                return run_low.run_scipy(self, scale_out).translate(basis)
+                return run_low.run_scipy(self.translate('kF_below'), scale_out).translate(basis)
             if integrator == 'leadinglog':
-                return run_low.run_leadinglog(self, scale_out).translate(basis)
+                return run_low.run_leadinglog(self.translate('kF_below'), scale_out).translate(basis)
             else:
                 raise KeyError(integrator)
         if basis in bases_above and self.basis in bases_above:

@@ -14,13 +14,13 @@ def gauge_tilde(couplings):
         cgamma = couplings['cgamma'] + dcW + dcB
         return {'cWtilde': cW, 'cZtilde': cZ, 'cgammatilde': cgamma, 'cgammaZtilde': cgammaZ}
 
-def match_FCNC(couplings: ALPcouplings, two_loops = False) -> np.matrix:
-    mtop = particle.literals.t.mass / 1000
+def match_FCNC_d(couplings: ALPcouplings, two_loops = False, loopquark=2) -> np.matrix:
+    mquark = [particle.literals.u.mass,particle.literals.c.mass,particle.literals.t.mass][loopquark]/1000
     mW = particle.literals.W_minus.mass / 1000
 
     parsSM = runSM(couplings.scale)
     s2w = parsSM['s2w']
-    yt = np.real(parsSM['yu'][2,2])
+    yt = np.real(parsSM['yu'][loopquark,loopquark])
     alpha_em = parsSM['alpha_em']
     Vckm = parsSM['CKM']
 
@@ -30,10 +30,10 @@ def match_FCNC(couplings: ALPcouplings, two_loops = False) -> np.matrix:
     else:
         cW = couplings['cW']
 
-    xt = mtop**2/mW**2
-    Vtop = np.einsum('ia,bj->ijab', Vckm.H, Vckm)[:,:,2,2]  # V_{ti}^* V_{tj}
+    xt = mquark**2/mW**2
+    Vtop = np.einsum('ia,bj->ijab', Vckm.H, Vckm)[:,:,loopquark,loopquark]  # V_{ti}^* V_{tj}
     gx = (1-xt+np.log(xt))/(1-xt)**2
-    logm = np.log(couplings.scale**2/mtop**2)
+    logm = np.log(couplings.scale**2/mquark**2)
     kFCNC = 0
     kFCNC += (np.einsum('im,nj,mn->ijm', Vckm.H, Vckm, couplings['kU'])[:,:,2] + np.einsum('im,nj,mn->ijn', Vckm.H, Vckm, couplings['kU'])[:,:,2]) * (-0.25*logm-0.375+0.75*gx)
     kFCNC += Vtop*couplings['kU'][2,2]
@@ -74,6 +74,7 @@ def match(couplings: ALPcouplings, two_loops = False) -> ALPcouplings:
 
     values = {f'k{F}': couplings[f'k{F}'] + 3/(8*np.pi**2)*Delta_kF[F]*np.eye(3) for F in ['Nu', 'E', 'd', 'e']}
     values |= {f'k{F}': couplings[f'k{F}'][0:2,0:2] + 3/(8*np.pi**2)*Delta_kF[F]*np.eye(2) for F in ['U', 'u']}
-    values |= {'kD': couplings['kD'] + 3/(8*np.pi**2)*Delta_kF['D']*np.eye(3) + match_FCNC(couplings, two_loops)}
+    values |= {'kD': couplings['kD'] + 3/(8*np.pi**2)*Delta_kF['D']*np.eye(3) + match_FCNC_d(couplings, two_loops)}
+    values |= {'cg': couplings['cg'], 'cgamma': couplings['cgamma']}
     return ALPcouplings(values, scale=couplings.scale, basis='kF_below')
 
