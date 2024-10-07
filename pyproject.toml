@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "alpio"
+name = "alp-aca"
 version = "0.1.0"
-description = "The ALP phenomenolgy toolbox"
+description = "ALP Automated Computing Algorithm"
 authors = ["Jorge Alda <jorge.alda@pd.infn.it>", "Marta Fuentes Zamoro", "Luca Merlo", "Xavier Ponce Díaz", "Stefano Rigolin"]
 license = "MIT"
 readme = "README.md"
