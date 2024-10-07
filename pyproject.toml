@@ -1,10 +1,11 @@
 [tool.poetry]
-name = "alp-aca"
+name = "alpaca"
 version = "0.1.0"
 description = "ALP Automated Computing Algorithm"
 authors = ["Jorge Alda <jorge.alda@pd.infn.it>", "Marta Fuentes Zamoro", "Luca Merlo", "Xavier Ponce Díaz", "Stefano Rigolin"]
 license = "MIT"
 readme = "README.md"
+packages = [{include = "alpaca"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -12,7 +13,13 @@ numpy = "^2.1.1"
 scipy = "^1.14.1"
 particle = "^0.25.1"
 vegas = "^6.1.3"
+flavio = "^2.6.1"
 
+[tool.poetry.group.tutorial]
+optional = true
+
+[tool.poetry.group.tutorial.dependencies]
+ipykernel = "^6.29.5"
 
 [build-system]
 requires = ["poetry-core"]
