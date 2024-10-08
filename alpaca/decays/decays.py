@@ -1,6 +1,5 @@
 from .mesons import invisible
 from ..rge import ALPcouplings
-from ..constants import GammaB, GammaB0, GammaK
 
 def decay(transition: str, ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
     initial, final = transition.split('->')
@@ -27,6 +26,7 @@ def decay(transition: str, ma: float, couplings: ALPcouplings, fa: float, **kwar
     return decayrate(ma, couplings, fa, **kwargs)
     
 def BR(transition: str, ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
+    from ..constants import GammaB, GammaB0, GammaK
     initial, final = transition.split('->')
     initial = initial.strip()
     products = [f.strip() for f in final.split()]

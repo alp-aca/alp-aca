@@ -2,6 +2,7 @@
 
 import numpy as np
 from .runSM import runSM
+from ..citations import citations
 
 from . import bases_above, bases_below
 class ALPcouplings:
@@ -51,6 +52,7 @@ class ALPcouplings:
         TypeError
             If attempting to assign a non-numeric value
         """
+        citations.register_inspire('Bauer:2020jbp')
         if basis == 'derivative_above':
             self.scale = scale
             self.basis = basis

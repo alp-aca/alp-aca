@@ -2,6 +2,7 @@ import wilson
 import ckmutil
 import numpy as np
 from cmath import phase
+from ..citations import citations
 
 def runSM(scale):
     """SM parameters at an energy scale
@@ -16,7 +17,8 @@ def runSM(scale):
     pars : dict
         dict containing the Yukawa matrices `yu`, `yd` and `ye`, the gauge couplings `alpha_s`, `alpha_1` and `alpha_2`, the sine squared of the Weinberg angle `s2w` and the CKM matrix `CKM`.
     """
-
+    citations.register_inspire('Aebischer:2018bkb') #wilson
+    citations.register_inspire('Straub:2018kue') # ckmutil is inside flavio's repo
     wSM = wilson.classes.SMEFT(wilson.wcxf.WC('SMEFT', 'Warsaw', scale, {})).C_in # For the moment we reuse wilson's code for the SM case, i.e, with all Wilson coefficients set to zero. Maybe at some point we should implement our own version.
 
     UuL, mu, UuR = ckmutil.diag.msvd(wSM['Gu'])

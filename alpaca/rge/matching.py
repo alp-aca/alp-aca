@@ -1,6 +1,7 @@
 import numpy as np
 from . import ALPcouplings, runSM
 import particle.literals
+from ..citations import citations
 
 def gauge_tilde(couplings):
         parsSM = runSM(couplings.scale)
@@ -15,6 +16,7 @@ def gauge_tilde(couplings):
         return {'cWtilde': cW, 'cZtilde': cZ, 'cgammatilde': cgamma, 'cgammaZtilde': cgammaZ}
 
 def match_FCNC_d(couplings: ALPcouplings, two_loops = False, loopquark=2) -> np.matrix:
+    citations.register_particle()
     mquark = [particle.literals.u.mass,particle.literals.c.mass,particle.literals.t.mass][loopquark]/1000
     mW = particle.literals.W_minus.mass / 1000
 
@@ -42,6 +44,7 @@ def match_FCNC_d(couplings: ALPcouplings, two_loops = False, loopquark=2) -> np.
     return yt**2/(16*np.pi**2) * kFCNC
 
 def match(couplings: ALPcouplings, two_loops = False) -> ALPcouplings:
+    citations.register_particle()
     T3f = {'U': 1/2, 'D': -1/2, 'Nu': 1/2, 'E': -1/2, 'u': 0, 'd': 0, 'e': 0}
     Qf = {'U': 2/3, 'D': -1/3, 'Nu': 0, 'E': -1, 'u': 2/3, 'd': -1/3, 'e': -1}
     mtop = particle.literals.t.mass / 1000

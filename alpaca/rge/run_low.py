@@ -3,8 +3,10 @@ import particle.literals
 from . import ALPcouplings, runSM
 from typing import Callable
 from scipy.integrate import solve_ivp
+from ..citations import citations
 
 def cggtilde(couplings: ALPcouplings) -> complex:
+    citations.register_particle()
     cgg = couplings['cg']
     if couplings.scale > particle.literals.u.mass/1000:
         cgg += 0.5*(couplings['ku'][0,0]-couplings['kU'][0,0])
@@ -19,6 +21,7 @@ def cggtilde(couplings: ALPcouplings) -> complex:
     return cgg
 
 def cgammatilde(couplings: ALPcouplings) -> complex:
+    citations.register_particle()
     cgg = couplings['cg']
     if couplings.scale > particle.literals.u.mass/1000:
         cgg += 3*(2/3)**2*(couplings['ku'][0,0]-couplings['kU'][0,0])
@@ -83,6 +86,7 @@ def run_scipy(couplings: ALPcouplings, scale_out: float) -> ALPcouplings:
         Final energy scale, in GeV
     """
 
+    citations.register_inspire('Virtanen:2019joe')
     def fun(t0, y):
         return beta(ALPcouplings._fromarray(y, np.exp(t0), 'kF_below'))._toarray()/(16*np.pi**2)
     

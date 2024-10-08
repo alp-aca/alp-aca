@@ -20,6 +20,7 @@ import numpy as np
 from . import ALPcouplings, runSM
 from typing import Callable
 from scipy.integrate import solve_ivp
+from ..citations import citations
 
 
 def gauge_tilde(couplings: ALPcouplings) -> dict:
@@ -197,7 +198,7 @@ def run_scipy(couplings: ALPcouplings, beta: Callable[[ALPcouplings], ALPcouplin
     scale_out : float
         Final energy scale, in GeV
     """
-
+    citations.register_inspire('Virtanen:2019joe')
     def fun(t0, y):
         return beta(ALPcouplings._fromarray(y, np.exp(t0), 'derivative_above'))._toarray()/(16*np.pi**2)
     
