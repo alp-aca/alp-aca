@@ -1,0 +1,1 @@
+from .decays import decay
