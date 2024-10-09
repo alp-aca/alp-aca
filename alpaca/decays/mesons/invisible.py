@@ -1,6 +1,6 @@
 import numpy as np
 
-from ...common import f0_BK, f0_Kpi, A0_BKst, kallen
+from ...common import f0_BK, f0_Kpi, A0_BKst, alpha_em, kallen
 from ...rge import ALPcouplings
 from ...citations import citations
 
@@ -24,3 +24,10 @@ def B0toKsta(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
     gq_eff = coup_low['kD'][1,2]/f_a
     return mB0**3*abs(gq_eff)**2/(64*np.pi) * A0_BKst(ma**2)**2 * kallen(1, mKst0**2/mB0**2, ma**2/mB0**2)**1.5
+
+def sigmaNR(ma: float, couplings: ALPcouplings, s: float, f_a: float=1000,**kwargs):
+    citations.register_inspire('Merlo:2019anv')
+    citations.register_inspire('DiLuzio:2024jip')
+    coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
+    gaphoton = coup_low['cagamma']*alpha_em(np.sqrt(s))/(np.pi*f_a)
+    return (((alpha_em(np.sqrt(s))*gaphoton**2)/24)*(1-(ma**2)/s)**3)*0.389379*10**9
