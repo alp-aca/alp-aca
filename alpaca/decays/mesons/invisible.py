@@ -31,3 +31,10 @@ def sigmaNR(ma: float, couplings: ALPcouplings, s: float, f_a: float=1000,**kwar
     coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
     gaphoton = coup_low['cgamma']*alpha_em(np.sqrt(s))/(np.pi*f_a)
     return (((alpha_em(np.sqrt(s))*gaphoton**2)/24)*(1-(ma**2)/s)**3)*0.389379e9
+
+def sigmaNR(ma: float, couplings: ALPcouplings, s: float, f_a: float=1000,**kwargs):
+    citations.register_inspire('Merlo:2019anv')
+    citations.register_inspire('DiLuzio:2024jip')
+    coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
+    gaphoton = coup_low['cgamma']*alpha_em(np.sqrt(s))/(np.pi*f_a)
+    return (((alpha_em(np.sqrt(s))*gaphoton**2)/24)*(1-(ma**2)/s)**3)*0.389379e9
