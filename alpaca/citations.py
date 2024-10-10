@@ -131,3 +131,6 @@ class Constant(float):
     def __ge__(self, other):
         self.register()
         return self._value >= other
+    
+    def __hash__(self) -> int:
+        return super().__hash__()
