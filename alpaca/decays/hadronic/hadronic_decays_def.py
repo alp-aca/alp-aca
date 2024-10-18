@@ -3,6 +3,7 @@ import flavio
 import vegas as vegas
 import functools
 from . import threebody_decay
+from ...rge import ALPcouplings, bases_above
 
 
 #IMPORTANT NOTE:
@@ -100,7 +101,7 @@ def alphasbar(ma):
     else: astrong = alphas(ma)
     return astrong
 
-def cgammaVMD(ma, model):
+def cgammaVMD(ma, couplings: ALPcouplings, **kwargs):
     #INPUT:
         #ma: Mass of ALP (GeV)
         #model: Coupling of the model presented
@@ -110,7 +111,7 @@ def cgammaVMD(ma, model):
     if ma < 2.1 :
             #aux = alpVV(ma, model, deltaI)
             #cgvmd = -ffunction(ma)*(3*aux[0]+2*aux[1]+1/3*aux[2]+2/3*aux[3])# 2*alphasbar(ma)/(3*np.sqrt(6))* (4*coup[0]+ coup[1]+ coup[2])
-            aux = calpmixing(ma, model, deltaI)
+            aux = calpmixing(ma, couplings, deltaI, **kwargs)
             cgvmd = -ffunction(ma)*2*alphasbar(ma)/(3*np.sqrt(6))*(4*aux[0] + aux[1] + aux[2])# 2*alphasbar(ma)/(3*np.sqrt(6))* (4*coup[0]+ coup[1]+ coup[2])
     else: cgvmd = 0
     return cgvmd
@@ -146,7 +147,7 @@ def loopB2(ma, m):
     xvar = 4*pow(m/ma,2)
     return 1-(xvar-1)*pow(ftau(xvar),2)
 
-def cgammapQCD(ma, ml, mq, cl, cq, cFF, cWW, cGG,fa):
+def cgammapQCD(ma, couplings: ALPcouplings, fa, **kwargs):
     #INPUT:
         #ma: Mass of ALP (GeV)
         #ml: Array with lepton masses (me, mmu, mtau)
@@ -159,16 +160,28 @@ def cgammapQCD(ma, ml, mq, cl, cq, cFF, cWW, cGG,fa):
         #fa: Scale of ALP (in GeV)
     #OUTPUT:
         #Contribution from pQCD
-    
+
+    if couplings.basis in bases_above:
+        cc = couplings.match_run(ma, 'massbasis_above', **kwargs)
+        cuA = cc['ku'] - cc['kU']
+        cdA = cc['kd'] - cc['kD']
+    else:
+        cc = couplings.match_run(ma, 'VA_below', **kwargs)
+        cdA = cc['cdA']
+        cuA = cc['cuA']
+        np.vstack([np.hstack([cuA, np.zeros([2,1])]), np.zeros([1,3])])
+
+
+    mdown = [md, ms, mbottom]
+    mdlog = [mpi0, mK, mbottom]
+    mup = [mu, mcharm, mtop]
+    mulog = [mpi0, mK, mtop]
+
+    cpQCD = 3*(2/3)**2*sum(cuA[1,1]*loopB1(ma, mup[i]) for i in (1,2)) + 3*(-1/3)**2*cdA[2,2]*loopB1(ma, mbottom)
     if ma> 1.5:
-        clep =(cl[0]*loopB1(ma, ml[0])+cl[1]*loopB1(ma,ml[1])+cl[2]*loopB1(ma,ml[2]))
-        cquarku = (cq[0][0]*loopB1(ma,mq[0][0])+cq[0][1]*loopB1(ma,mq[0][1])+cq[0][2]*loopB1(ma,mq[0][2]))
-        cquarkd = (cq[1][0]*loopB1(ma,mq[1][0])+cq[1][1]*loopB1(ma,mq[1][1])+cq[1][2]*loopB1(ma,mq[1][2]))
-        cferm =  (-1)**2*clep + 3*(2/3)**2*cquarku + 3*(-1/3)**2*cquarkd #Eq.13
-        Lambda = -32*np.pi**2*fa*cGG
-        cglu2loop = (2/3)**2*(loopB1(ma,mq[0][0])*np.log(Lambda**2/mpi0**2)+loopB1(ma,mq[0][1])*np.log(Lambda**2/mq[0][1]**2)+loopB1(ma,mq[0][2])*np.log(Lambda**2/mq[0][2]**2))+\
-        (-1/3)**2*(loopB1(ma,mq[1][0])*np.log(Lambda**2/mpi0**2)+loopB1(ma,mq[1][1])*2*np.log(Lambda**2/mpi0**2)+loopB1(ma,mq[1][2])*2*np.log(Lambda**2/mq[1][2]**2))    #Eq.16
-        cpQCD = cFF + 1/(16*np.pi**2)*cferm + 2*alphaem(ma)/np.pi* cWW/sw2*loopB2(ma,mW) -(3*alphas(ma)**2/np.pi**2*cGG*cglu2loop)
+        Lambda = -32*np.pi**2*fa*cc['cg']
+        cpQCD += 3*(2/3)**2*cuA[0,0]*loopB1(ma, mu) + 3*(-1/3)**2*cdA[0,0]*loopB1(ma, md) + 3*(-1/3)**2*cdA[1,1]*loopB1(ma, ms)
+        cpQCD -= 3*alphas(ma)**2/np.pi**2*cc['cg']*((-1/3)**2 * sum(loopB1(ma, mdown[i])*np.log(Lambda/mdlog[i])*2 for i in range(3)) + (2/3)**2 * sum(loopB1(ma, mup[i])*np.log(Lambda/mulog[i])*2 for i in range(3)) )
     #Lambda = 32*np.pi**2*fa*cGG
     #if ma > 2.1: cpQCD=alphas(ma)**2/(6*np.pi**2)*2*(5*np.log(Lambda/mpi0)+np.log(Lambda/mK))-alphas(ma)**2*ma**2/(72*np.pi**2)*2*(4*np.sqrt(3)/mq[0][1]**2*np.log(Lambda/mq[0][1])+1/mq[1][2]**2*np.log(Lambda/mq[1][2])+4/mq[0][2]**2*np.log(Lambda/mq[1][2]))
     #elif ma>1.6 and ma<2.1: cpQCD=-alphas(ma)**2*ma**2/(72*np.pi**2)*2*(4*np.sqrt(3)/mq[0][1]**2*np.log(Lambda/mq[0][1])+1/mq[1][2]**2*np.log(Lambda/mq[1][2])+4/mq[0][2]**2*np.log(Lambda/mq[1][2]))
@@ -176,7 +189,7 @@ def cgammapQCD(ma, ml, mq, cl, cq, cFF, cWW, cGG,fa):
     return cpQCD
 
 #Decay rate a-> gamma gamma
-def atogammagamma(ma, ml, mq, model, cl, cq, cFF, cWW, cGG, fa):
+def atogammagamma(ma, couplings: ALPcouplings, fa, **kwargs):
     #INPUT:
         #ma: Mass of ALP (GeV)
         #ml: Array with lepton masses (me, mmu, mtau)
@@ -189,9 +202,15 @@ def atogammagamma(ma, ml, mq, model, cl, cq, cFF, cWW, cGG, fa):
         #fa: Scale of ALP (in GeV)
     #OUTPUT:
         #Decay rate (in GeV)
-    cont = cgammachiral(ma) + cgammaVMD(ma, model) + cgammapQCD(ma, ml, mq, cl, cq, cFF, cWW, cGG, fa)
-    #cont = cgammapQCD(ma, ml, mqu, mqd, cl, cqu, cqd, cFF, cWW, cGG, fa)
-    return alphaem(ma)**2*ma**3/(pow(4*np.pi,3)*fa**2)*cont*np.conjugate(cont)
+    if couplings.basis in bases_above:
+        cc = couplings.match_run(ma, 'massbasis_above', **kwargs)
+        ceA = cc['ke'] - cc['kE']
+    else:
+        cc = couplings.match_run(ma, 'VA_below', **kwargs)
+        ceA = cc['ceA']
+    print(cc['cgamma'])
+    cont = cc['cgamma'] + sum(ceA[i,i]*loopB1(ma, mlepton[i]) for i in range(3))+(cgammachiral(ma) + cgammaVMD(ma, couplings, **kwargs))*2*cc['cg'] + cgammapQCD(ma, couplings, fa, **kwargs)
+    return alphaem(ma)**2*ma**3/(pow(4*np.pi,3)*fa**2)*np.abs(cont)**2
 
 ######################################################   HADRONIC CHANNELS    ######################################################
 #Extracted from 1811.03474
@@ -203,7 +222,7 @@ def atogammagamma(ma, ml, mq, model, cl, cq, cFF, cWW, cGG, fa):
 
 ###########################    ALP mixing   ###########################
 
-def u3rep(ma, coup, deltaI):
+def u3rep(ma: float, couplings: ALPcouplings, deltaI: float, **kwargs) -> tuple[float, float, float]:
     #Input
         #ma: Mass of the ALP (GeV)
         #coup: Vector of couplings (cu, cd, cs, cg)
@@ -216,24 +235,29 @@ def u3rep(ma, coup, deltaI):
     
     #Auxiliary functions (needed for easiness)
         #Elements of the kinetic mixing matrix
-    Kapi = (coup[0]-coup[1])/(128*coup[3]*np.pi**2)+ 1/2*ms*(md-mu)/G(mu,md,ms)
-    Kaeta = (coup[0]+coup[1]-coup[2])/(64*np.sqrt(6)*coup[3]*np.pi**2)+1/np.sqrt(6)-2*md*mu/(np.sqrt(6)*G(mu,md,ms))
-    Kaetap = (coup[0]+coup[1]+2*coup[2])/(256*np.sqrt(3)*coup[3]*np.pi**2)+1/(4*np.sqrt(3))+mu*md/(4*np.sqrt(3)*G(mu,md,ms))
+    cc = couplings.match_run(ma, 'VA_below', **kwargs)
+    coup = [cc['cuA'][0,0], cc['cdA'][0,0], cc['cdA'][1,1], cc['cg']]
+    G = lambda x, y, z: x*y + x*z + y*z
 
-    api0 = 1/(ma**2 - mpi**2)*(Mapi2 +ma**2 * Kapi + \
-                               deltaI*(Mpieta2*(Maeta2 + ma**2 *Kaeta)/(ma**2 - meta**2) + Mpietap2 *(Maetap2 + ma**2* Kaetap)/(ma**2 - metaprime**2)))
+    
+    Kapi = 2*(coup[0]-coup[1])/(128*np.pi**2)+ 1/2*ms*(md-mu)/G(mu,md,ms)*2*coup[3]
+    Kaeta = 2*(coup[0]+coup[1]-coup[2])/(64*np.sqrt(6)*np.pi**2)+1/np.sqrt(6)-2*md*mu/(np.sqrt(6)*G(mu,md,ms))*2*coup[3]
+    Kaetap = 2*(coup[0]+coup[1]+2*coup[2])/(256*np.sqrt(3)*np.pi**2)+1/(4*np.sqrt(3))+mu*md/(4*np.sqrt(3)*G(mu,md,ms))*2*coup[3]
+
+    api0 = 1/(ma**2 - mpi0**2)*(Mapi2 +ma**2 * Kapi + \
+                            deltaI*(Mpieta2*(Maeta2 + ma**2 *Kaeta)/(ma**2 - meta**2) + Mpietap2 *(Maetap2 + ma**2* Kaetap)/(ma**2 - metaprime**2)))
     
     
     aeta = 1/(ma**2 - meta**2)* (Maeta2 +ma**2 *Kaeta +\
-                                 deltaI *(Mpieta2* (Mapi2 + ma**2*Kapi)/(ma**2 - mpi**2)+ Metaetap2 *(Maetap2 + ma**2 *Kaetap)/(ma**2 - metaprime**2)))
+                                deltaI *(Mpieta2* (Mapi2 + ma**2*Kapi)/(ma**2 - mpi0**2)+ Metaetap2 *(Maetap2 + ma**2 *Kaetap)/(ma**2 - metaprime**2)))
     
     
     aetaprime = 1/(ma**2-metaprime**2)* (Maetap2+ ma**2*Kaetap +\
-                                        deltaI *(Mpietap2 *(Mapi2 + ma**2*Kapi)/(ma**2 - mpi**2) + Metaetap2* (Maeta2 + ma**2* Kaeta)/(ma**2 - meta**2)))
+                                        deltaI *(Mpietap2 *(Mapi2 + ma**2*Kapi)/(ma**2 - mpi0**2) + Metaetap2* (Maeta2 + ma**2* Kaeta)/(ma**2 - meta**2)))
     
     return api0, aeta, aetaprime
 
-def calpmixing(ma, coup, deltaI):
+def calpmixing(ma, couplings: ALPcouplings, deltaI, **kwargs):
     #INPUT:
         #ma: Mass of the ALP (GeV)
         #coup: Vector of couplings (cu, cd, cs, cg)
@@ -245,23 +269,24 @@ def calpmixing(ma, coup, deltaI):
     etagen =1/np.sqrt(6)*np.array([1, 1, -1])
     etapgen =1/(2*np.sqrt(3))*np.array([1, 1, 2])
     #Mixing elements
-    api0, aeta, aetap = u3rep(ma, coup, deltaI)
+    api0, aeta, aetap = u3rep(ma, couplings, deltaI, **kwargs)
     #C mixing
     Cu = np.sqrt(6)*(api0*pi0gen[0] + aeta*etagen[0] + aetap*etapgen[0])/alphasbar(ma)
     Cd = np.sqrt(6)*(api0*pi0gen[1] + aeta*etagen[1] + aetap*etapgen[1])/alphasbar(ma)
     Cs = np.sqrt(6)*(api0*pi0gen[2] + aeta*etagen[2] + aetap*etapgen[2])/alphasbar(ma)
     return Cu, Cd, Cs
 
-def alpVV(ma, c, deltaI):
+def alpVV(ma: float, c: ALPcouplings, deltaI: float, **kwargs) -> tuple[float, float, float, float]:
     #INPUT:
         #ma: Mass of the ALP (GeV)
         #c: Vector of couplings (cu, cd, cs, cg)
     #OUTPUT:
         #<a rho rho>: Mixing element
-    arhorho = (np.sqrt(2)* u3rep(ma, c, deltaI)[1] + u3rep(ma, c, deltaI)[2])/(2* np.sqrt(3))
-    arhow = u3rep(ma, c, deltaI)[0]/2
-    aww = (np.sqrt(2)* u3rep(ma, c, deltaI)[1] + u3rep(ma, c, deltaI)[2])/(2* np.sqrt(3))
-    aphiphi = -u3rep(ma,c,deltaI)[1]/np.sqrt(6) + u3rep(ma,c,deltaI)[2]/np.sqrt(3)
+    u3 = u3rep(ma, c, deltaI, **kwargs)
+    arhorho = (np.sqrt(2)* u3[1] + u3[2])/(2* np.sqrt(3))
+    arhow = u3[0]/2
+    aww = (np.sqrt(2)* u3[1] + u3[2])/(2* np.sqrt(3))
+    aphiphi = -u3[1]/np.sqrt(6) + u3[2]/np.sqrt(3)
     return arhorho, arhow, aww, aphiphi
 
 def G(x, y, z):
