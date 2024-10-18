@@ -2,7 +2,7 @@
 import os
 import numpy as np
 from scipy.stats import chi2
-from ...citations import citations
+from ..citations import citations
 # Get the directory of the current script
 current_dir = os.path.dirname(__file__)
 
@@ -232,7 +232,7 @@ def babar_psi2stonunu_comb(x):
 
 
 ############ Quarkonia decays ############
-invisible = "Binned_measurement/Invisible/"
+invisible = "invisible/"
 
 #BaBar Upsilon(3S)
     #Experiment: BaBar
@@ -493,7 +493,7 @@ def na62_Ktopigammagamma(x):
     value = [9.65e-7]
     sigmal = [0.63e-7]
     sigmar = sigmal
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmas, sigmas)
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmar)
     return values, sigmals, sigmars
 
 #NA48  KL->pi0 gamma gamma
@@ -552,9 +552,28 @@ def E787_Ktopigammagamma(x):
     return values, sigmals, sigmars
 
 
+### Decays to e e (final state)
+
+#Brookhaven  K+->pi+ a (-> e+ e-) 
+    #Experiment: Brookhaven
+    #arXiv: DOI: 10.1103/PhysRevLett.59.2832
+def _Kptopipee(x):
+    citations.register_inspire('Baker:1987gp')
+    q2min = [0] #ALP mass
+    q2max = [0.100**2] #
+    value = [8e-7]
+    cl = 0.9
+    df = 1 
+    sigmas = sigma(cl, df, value)
+    valuep = [0]
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
+    return values, sigmals, sigmars
+
+
+
 
 ############ Quarkonia decays ############
-visible = "Binned_measurement/Visible/"
+visible = "visible/"
 
 #BaBar Y(2S, 3S)--> Hadrons
     #Experiment: BaBar
