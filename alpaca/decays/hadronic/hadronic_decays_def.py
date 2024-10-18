@@ -1,12 +1,8 @@
 import numpy as np
-import matplotlib.pyplot as plt 
 import flavio
-#import particle.literals as particle
-import warnings
 import vegas as vegas
 import functools
-#import threebody_decay_trial_v3 as body_decay
-import threebody_decay as body_decay
+from . import threebody_decay
 
 
 #IMPORTANT NOTE:
@@ -68,45 +64,6 @@ ms = mstrange
 #   cu  cc  ctop           mu   mc  mtop 
 # C=                    M=
 #   cd  cs  cbot           md   ms  mbot
-
-######################################################
-#FERMIONIC DECAY
-#Decay width to fermions
-def atoff(ma, mf, cf, fa):
-    #INPUT:
-        #ma: Mass of ALP (GeV)
-        #mf: Mass of fermion (GeV)
-        #fa: Scale of U(1)PQ (GeV)
-        #cf: Coefficient of decay to fermions
-    #OUTPUT:
-        #Decay rate to general fermion
-    return cf*np.conjugate(cf)*ma*pow(mf,2)/(8*np.pi*pow(fa,2))*np.sqrt(1-pow(2*mf/ma,2))
-
-
-######################################################   LEPTONIC CHANNELS (a-> lepton lepton)    ######################################################
-#Decay width to leptons
-def atoleptonlepton(ma, ml, cl, fa):
-    #INPUT:
-        #ma: Mass of ALP (GeV)
-        #ml: Array with lepton masses (me, mmu, mtau)
-        #cl: Array with lepton couplings (ce, cmu, ctau)
-        #fa: Scale of U(1)PQ (GeV)
-    #OUTPUT: 
-        #Decay rate to leptons (in GeV)
-        #Decay rate to electrons (in GeV)
-        #Decay rate to muons (in GeV)
-        #Decay rate to tauons (in GeV)
-
-    if ma>2*ml[0] and ma<2*ml[1]:
-        result = [atoff(ma , ml[0], cl[0],fa), atoff(ma , ml[0], cl[0],fa), 0, 0]
-    elif ma>2*ml[1] and ma<2*ml[2]:
-        result = [atoff(ma , ml[0], cl[0],fa) + atoff(ma , ml[1], cl[1],fa), atoff(ma , ml[0], cl[0],fa), atoff(ma , ml[1], cl[1],fa), 0]
-    elif ma>2*ml[2]:
-        result = [atoff(ma , ml[0], cl[0],fa) + atoff(ma , ml[1], cl[1],fa) + atoff(ma , ml[2], cl[2],fa), atoff(ma , ml[0], cl[0],fa), atoff(ma , ml[1], cl[1],fa), atoff(ma , ml[2], cl[2],fa)]
-    else: 
-        result=[0, 0, 0, 0]
-    return result
-
 
 ######################################################   PHOTON CHANNEL (a-> gamma gamma)    ######################################################
 
@@ -460,15 +417,15 @@ def ato3pi(ma, m1, m2, m3, model, fa, c): #Eq. S33
     if c == 0:
         s = 3*2 #Symmetry factor
         if ma > 3*mpi+0.001 and ma<=metaprime: 
-            result, error = body_decay.decay3body(ampato3pi0, ma, m1, m2, m3, model) #Amplitude of decay to 3 neutral pions
+            result, error = threebody_decay.decay3body(ampato3pi0, ma, m1, m2, m3, model) #Amplitude of decay to 3 neutral pions
         else: result, error = [0,0]
-        #result2, error2 = body_decay2.decay3body(ampato3pi0, ma, m1, m2, m3) #Amplitude of decay to 3 neutral pions
+        #result2, error2 = threebody_decay2.decay3body(ampato3pi0, ma, m1, m2, m3) #Amplitude of decay to 3 neutral pions
     elif c == 1:
         s = 1 #Symmetry factor
         if ma > 3*mpi+0.001 and ma<=metaprime:  #mpi0+mpim+mpip
-            result, error = body_decay.decay3body(ampatopicharged, ma, m1, m2, m3, model) #Amplitude of decay to pi+ pi- pi0
+            result, error = threebody_decay.decay3body(ampatopicharged, ma, m1, m2, m3, model) #Amplitude of decay to pi+ pi- pi0
         else: result, error = [0,0] 
-        #result2, error2 = body_decay2.decay3body(ampato3pi0, ma, m1, m2, m3) #Amplitude of decay to 3 neutral pions
+        #result2, error2 = threebody_decay2.decay3body(ampato3pi0, ma, m1, m2, m3) #Amplitude of decay to 3 neutral pions
     return k/(2*ma*s)*1/pow(fpi*fa,2)*result, k/(2*ma*s)*1/pow(fpi*fa,2)*error#,k/(2*ma*s)*1/pow(fpi*fa,2)*result2, k/(2*ma*s)*1/pow(fpi*fa,2)*error2
 
 
@@ -558,13 +515,13 @@ def atoetapipi(ma, m1, m2, m3, model, fa, c): #Eq. S33
     if c == 0:
         s = 2 #Symmetry factor
         if ma > meta + 2*mpi:
-            result, error = body_decay.decay3body(ampatoetapipi, ma, m1, m2, m3, model) #Amplitude of decay to pi+ pi- eta
+            result, error = threebody_decay.decay3body(ampatoetapipi, ma, m1, m2, m3, model) #Amplitude of decay to pi+ pi- eta
         else: result, error = [0, 0]
 
     elif c == 1:
         s = 1 #Symmetry factor
         if ma > meta + 2*mpi:
-            result, error = body_decay.decay3body(ampatoetapipi, ma, m1, m2, m3, model) #Amplitude of decay to pi+ pi- eta
+            result, error = threebody_decay.decay3body(ampatoetapipi, ma, m1, m2, m3, model) #Amplitude of decay to pi+ pi- eta
         else: result, error = [0, 0]
     return 1/(2*ma*s)*pow(fpi/fa,2)*result, 1/(2*ma*s)*pow(fpi/fa,2)*error#, 1/(2*ma*s)*pow(fpi/fa,2)*result2, 1/(2*ma*s)*pow(fpi/fa,2)*error2
 
@@ -618,104 +575,3 @@ def atogluongluon(ma, fa):
         res = alphas(ma)**2*ma**3/(32*np.pi**3*fa**2)* (1 + 83*alphas(ma)/(4*np.pi))
     else: res = 0 
     return res
-
-
-###########################    TRIALS    ###########################
-me = 0.5109989500e-3 #GeV, mass electron
-mmu = 105.6583755e-3 #GeV, mass muon
-mtau= 1.77693 #GeV, mass tau
-mtop = 174 #GeV, top mass
-mcharm=1.27#GeV, charm mass
-mup = 2.16e-3 #GeV, up mass
-
-mbottom = 4.183 #GeV, top mass
-mstrange=93.5e-3#GeV, charm mass
-mdown = 4.70e-3 #GeV, up mass
-mlepton=[me,mmu,mtau]
-mqup=[mup,mcharm,mtop]
-mqdown=[mdown,mstrange,mbottom]
-mquark=[mqup,mqdown]
-clepton=[1,1,1]
-cquark=[[0,0,0],[0,0,0]]
-cboson = [0,0,1] #Coupling to bosons (F, W, G)
-fav=1000
-caux = [0,0,0,1]
-
-mass1=np.linspace(me, 2*mpi-0.00001, 100)
-mass2=np.linspace(2*mpi+0.00001, 3*mpi-0.00001, 100)
-mass3=np.linspace(3*mpi+0.00001, 2*mpi+meta-0.00001, 100)
-mass4=np.linspace(2*mpi+meta+0.00001, 3, 100)
-#mass5=np.linspace(3,10,100)
-mass = np.hstack((mass1, mass2, mass3, mass4))
-#mass = np.hstack((mass1, mass2, mass3, mass4,mass5))
-
-de=[]
-dee=[]
-
-demu=[]
-detau=[]
-de1=[]
-de2=[]
-de3 = []
-de4 = []
-de5 = []
-for ii in range(len(mass)):
-    #de.append(1e9*atoleptonlepton(mass[ii], mlepton, clepton, fav)[0])
-    #dee.append(1e9*atoleptonlepton(mass[ii], mlepton, clepton, fav)[1])
-    #demu.append(1e9*atoleptonlepton(mass[ii], mlepton, clepton, fav)[2])
-    #detau.append(1e9*atoleptonlepton(mass[ii], mlepton, clepton, fav)[3])
-    #de1.append(1e9*np.abs(atogammagamma(mass[ii],mlepton, mquark,caux,clepton, cquark, 0,0,1, fav))*pow(32*np.pi**2*cboson[2],2))
-    #de2.append(1e9*(ato3pi(mass[ii],mpi0,mpi0,mpi0,caux,fav,0)[0]+ato3pi(mass[ii],mpi0,mpi0,mpi0,caux,fav,1)[0])*pow(32*np.pi**2*cboson[2],2))
-    de3.append(1e9*(atoetapipi(mass[ii],mpi0,mpi0,meta,caux,fav,0)[0]+atoetapipi(mass[ii],mpi0,mpi0,meta,caux,fav,1)[0])*32*np.pi**2*cboson[2])
-    #de4.append(1e9*(atogammapipi(mass[ii],mpi,mpi,0,fav,Gammarho,alpVV(mass[ii],caux,0)[0])[0])*32*np.pi**2*cboson[2])
-    #de5.append(1e9*atogluongluon(mass[ii],fav))
-
-###########################    TOTAL CONTRIBUTION    ###########################
-#total = []
-#for ii in range(len(mass)):
-#    if mass[ii] < 1.84:
- #       total.append(de1[ii] + de2[ii] + de3[ii] + de4[ii])
-  #  else: total.append(de5[ii])
-
-###########################    DATA EXTRACTION    ###########################
-data = []
-data1 = []
-data2 = []
-data3 = []
-data4 = []
-data5 = []
-data6 = []
-
-#for ii in range(len(mass)):
-    #data.append([mass[ii],de[ii], dee[ii], demu[ii], detau[ii]])
-    #data1.append([mass[ii],de1[ii]])
-    #data2.append([mass[ii],de2[ii]])
-    #data3.append([mass[ii],de3[ii]])
-    #data4.append([mass[ii],de4[ii]])
-    #data5.append([mass[ii],de5[ii]])
-    #data6.append([mass[ii],total[ii]])
-#np.savetxt("atoleptonlepton.txt", data, delimiter="\t")
-#np.savetxt("atogammagamma.txt", data1, delimiter="\t")
-#np.savetxt("ato3pi.txt", data2, delimiter="\t")
-#np.savetxt("atoetapipi.txt", data3, delimiter="\t")
-#np.savetxt("atogammapipi.txt", data4, delimiter="\t")
-#np.savetxt("atogluongluon.txt", data5, delimiter="\t")
-#np.savetxt("total_a.txt", data6, delimiter="\t")
-
-###########################    PLOTS    ###########################
-#plt.loglog(mass, dee, label=r'$a \rightarrow e e$')
-#plt.loglog(mass, demu, label=r'$a \rightarrow \mu \mu$')
-#plt.loglog(mass, detau, label=r'$a \rightarrow \tau \tau$')
-#plt.loglog(mass, de, label=r'$a \rightarrow l l$')
-#plt.semilogy(mass, de1, label=r'$a \rightarrow \gamma \gamma$')
-#plt.semilogy(mass, de2, label=r'$a \rightarrow  3 \pi$')
-plt.semilogy(mass, de3, label=r'$a \rightarrow  \eta \pi \pi$')
-#plt.semilogy(mass, de4, label=r'$a \rightarrow  \gamma \pi \pi$')
-#plt.semilogy(mass, de5, label=r'$a \rightarrow  g g$')
-#plt.semilogy(mass, total, label=r'$\Gamma_a$', linestyle='dashed', color='black' )
-plt.xlim((0,3))
-
-plt.xlabel(r'$m_a\; $[GeV]', fontsize=18)
-plt.ylabel(r'$\Gamma_{a}\cdot 10^6$ [eV]', fontsize=18)#[GeV]', fontsize=18)
-plt.legend()
-plt.show()
