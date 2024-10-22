@@ -23,10 +23,19 @@ def a_U3_proj(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> np.nda
     return (mass_mixing(ma, couplings, fa, **kwargs)-ma**2*kinetic_mixing(ma, couplings, fa, **kwargs))/(ma**2-m_mesons**2)
 
 def a_U3_repr(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> np.matrix:
-    #if ma > metap:
-    #    raise NotImplementedError
-    components = a_U3_proj(ma, couplings, fa, **kwargs)
-    return components[0]*u3reprs.pi0 + components[1]*u3reprs.eta + components[2]*u3reprs.etap
+    cc = couplings.match_run(ma, 'VA_below', **kwargs)
+    coup_q = ALPcouplings({'cuA': cc['cuA'], 'cdA': cc['cdA']}, ma, 'VA_below')
+    coup_g = ALPcouplings({'cg': cc['cg']}, ma, 'VA_below')
+    components_q = a_U3_proj(ma, coup_q, fa, **kwargs)
+    components_g = a_U3_proj(ma, coup_g, fa, **kwargs)
+    deltaI = (md-mu)/(md+mu)
+    u3repr_q = components_q[0]*u3reprs.pi0*deltaI/2 + components_q[1]*u3reprs.eta + components_q[2]*u3reprs.etap
+    u3repr_g = components_g[0]*u3reprs.pi0*deltaI/2 + components_g[1]*u3reprs.eta + components_g[2]*u3reprs.etap
+    if ma > 1.125:
+        u3repr_g[2,2] = -cc['cg']* fpi/fa*alphas_tilde(ma)/np.sqrt(6)
+    if ma > 1.2:
+        u3repr_g[0,0] = u3repr_g[1,1] = u3repr_g[2,2]
+    return u3repr_q + u3repr_g
 
 def alphas_tilde(ma: float) -> float:
     if ma < 1.0:
