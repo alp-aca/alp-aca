@@ -74,11 +74,12 @@ def pCM(x, y, z):
         #p: Momentum in CM frame of particle with mass x
     return np.sqrt((x**2-(y+z)**2)*(x**2-(y-z)**2))/(2*x)
 
-def integrand(amplitude, M, m1, m2, m3, model, x):
+def integrand(amplitude, M, m1, m2, m3, model, fa, x):
     #INPUT:
         #amplitude: Amplitude expression
         #M: Mass of decaying particle (in GeV)
         #mi: Mass of daughter particles [i=1,2,3] (in GeV)
+        #fa: Scale of U(1)
         #x: Integration variables (for vegas)
     #OUTPUT:
         #Integrand of decay rate
@@ -89,7 +90,7 @@ def integrand(amplitude, M, m1, m2, m3, model, x):
     phiast = x[3] #phi angle, CM frame of system 1-2
     m12 = np.sqrt(M**2+m3**2-2*M*Ener3)
 
-    ampl = amplitude(M, m1, m2, m3, model, x, kinematics(M,m1,m2,m3,Ener3,theta, thetaast, phiast))
+    ampl = amplitude(M, m1, m2, m3, model, fa, x, kinematics(M,m1,m2,m3,Ener3,theta, thetaast, phiast))
 
     return ampl*np.conjugate(ampl) * np.sqrt(Ener3**2-m3**2)* kallen(m12, m1,m2)/m12**2 *np.sin(theta) *np.sin(thetaast)
 
@@ -101,7 +102,7 @@ def kallen(x,y,z):
     return np.sqrt(x**4+y**4+z**4-2*pow(x*y,2)-2*pow(x*z,2)-2*pow(y*z,2))
 
 
-def decay3body(amplitude, M, m1, m2, m3, model):
+def decay3body(amplitude, M, m1, m2, m3, model, fa):
     #INPUT:
         #amplitude: Amplitude expression
         #M: Mass of decaying particle (in GeV)
@@ -112,9 +113,9 @@ def decay3body(amplitude, M, m1, m2, m3, model):
     E3max=np.sqrt(q3max**2+m3**2)
     integrator= vegas.Integrator([[m3,E3max],[0, np.pi], [0, np.pi],[0, 2*np.pi]])#[-1, 1], [-1, 1],[0, 2*np.pi]]) #vegas.Integrator([[(m1+m2)**2,(M-m3)**2],[0, 2*np.pi], [-1, 1],[0, 2*np.pi],[-1, 1]])
     # step 1 -- adapt to integrand; discard results
-    integrator(functools.partial(integrand, amplitude, M, m1, m2, m3, model), nitn=10, neval=10)
+    integrator(functools.partial(integrand, amplitude, M, m1, m2, m3, model, fa), nitn=10, neval=10)
     # step 2 -- integrator has adapted to integrand; keep results
-    resint = integrator(functools.partial(integrand, amplitude, M, m1, m2, m3, model), nitn=10, neval=100)
+    resint = integrator(functools.partial(integrand, amplitude, M, m1, m2, m3, model, fa), nitn=10, neval=100)
     decayrate = 1/((2*np.pi)**4*(32*M))* resint.mean
     edecayrate = 1/((2*np.pi)**4*(32*M))* resint.sdev
     return decayrate, edecayrate
