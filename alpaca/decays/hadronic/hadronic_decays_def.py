@@ -552,12 +552,17 @@ def atogammapipi(M, m1, m2, m3, model, fa, Gamma, **kwargs):
         #edecayrate: Error in decay rate
     
     if M > 2*mpi0:
+        nitn_adapt = kwargs.get('nitn_adapt', 10)
+        neval_adapt = kwargs.get('neval_adapt', 10)
+        nitn = kwargs.get('nitn', 10)
+        neval = kwargs.get('neval', 100)
+        kwargs_integrand = {k: v for k, v in kwargs.items() if k not in ['nitn_adapt', 'neval_adapt', 'nitn', 'neval']}
         #Numerical integration (using vegas integrator)
         integrator= vegas.Integrator([[(m1+m2)**2,(M-m3)**2]])#,[0,1]]) #Second integration is to get mean value easily
         # step 1 -- adapt to integrand; discard results
-        integrator(functools.partial(ampatogammapipi, M, Gamma, mrho, model, fa, **kwargs), nitn=10, neval=1000)
+        integrator(functools.partial(ampatogammapipi, M, Gamma, mrho, model, fa, **kwargs_integrand), nitn=nitn_adapt, neval=neval_adapt)
         # step 2 -- integrator has adapted to integrand; keep results
-        resint = integrator(functools.partial(ampatogammapipi, M, Gamma, mrho, model, fa, **kwargs), nitn=10, neval=1000)
+        resint = integrator(functools.partial(ampatogammapipi, M, Gamma, mrho, model, fa, **kwargs_integrand), nitn=nitn, neval=neval)
         decayrate = 3*alphaem(M)*M**3/(2**11*np.pi**6*fa**2)* resint.mean 
         edecayrate = 3*alphaem(M)*M**3/(2**11*np.pi**6*fa**2)* resint.sdev
     else: decayrate, edecayrate= [0,0]

@@ -109,13 +109,18 @@ def decay3body(amplitude, M, m1, m2, m3, model, fa, **kwargs):
         #mi: Mass of daughter particles [i=1,2,3] (in GeV)
     #OUTPUT:
         #Decay rate
+    nitn_adapt = kwargs.get('nitn_adapt', 10)
+    neval_adapt = kwargs.get('neval_adapt', 10)
+    nitn = kwargs.get('nitn', 10)
+    neval = kwargs.get('neval', 100)
+    kwargs_integrand = {k: v for k, v in kwargs.items() if k not in ['nitn_adapt', 'neval_adapt', 'nitn', 'neval']}
     q3max=kallen(M,m1+m2,m3)/(2*M)
     E3max=np.sqrt(q3max**2+m3**2)
     integrator= vegas.Integrator([[m3,E3max],[0, np.pi], [0, np.pi],[0, 2*np.pi]])#[-1, 1], [-1, 1],[0, 2*np.pi]]) #vegas.Integrator([[(m1+m2)**2,(M-m3)**2],[0, 2*np.pi], [-1, 1],[0, 2*np.pi],[-1, 1]])
     # step 1 -- adapt to integrand; discard results
-    integrator(functools.partial(integrand, amplitude, M, m1, m2, m3, model, fa, **kwargs), nitn=10, neval=10)
+    integrator(functools.partial(integrand, amplitude, M, m1, m2, m3, model, fa, **kwargs_integrand), nitn=nitn_adapt, neval=neval_adapt)
     # step 2 -- integrator has adapted to integrand; keep results
-    resint = integrator(functools.partial(integrand, amplitude, M, m1, m2, m3, model, fa, **kwargs), nitn=10, neval=100)
+    resint = integrator(functools.partial(integrand, amplitude, M, m1, m2, m3, model, fa, **kwargs_integrand), nitn=nitn, neval=neval)
     decayrate = 1/((2*np.pi)**4*(32*M))* resint.mean
     edecayrate = 1/((2*np.pi)**4*(32*M))* resint.sdev
     return decayrate, edecayrate
