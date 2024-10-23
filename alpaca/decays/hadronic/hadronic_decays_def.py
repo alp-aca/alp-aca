@@ -236,7 +236,7 @@ def u3rep(ma: float, couplings: ALPcouplings, deltaI: float, **kwargs) -> tuple[
     #Cs = np.sqrt(6)*(api0*pi0gen[2] + aeta*etagen[2] + aetap*etapgen[2])/chiral.alphas_tilde(ma)
     #return Cu, Cd, Cs
 
-def alp_mixing(M):
+def alp_mixing(M, fa):
     #INPUT:
         #M: Vector of matrices to multiply
     #OUTPUT:
@@ -244,7 +244,7 @@ def alp_mixing(M):
     qaux = np.identity(M[0].shape[0])
     for ii in range(len(M)):
         qaux = np.dot(qaux, M[ii])
-    return np.trace(qaux)
+    return 2*fa/fpi*np.trace(qaux)
 
 
 def alpVV(ma: float, c: ALPcouplings, fa:float, **kwargs) -> tuple[float, float, float, float]:
@@ -253,10 +253,10 @@ def alpVV(ma: float, c: ALPcouplings, fa:float, **kwargs) -> tuple[float, float,
         #c: Vector of couplings (cu, cd, cs, cg)
     #OUTPUT:
         #<a rho rho>: Mixing element
-    arhorho = alp_mixing([chiral.a_U3_repr(ma, c, fa, **kwargs), rho0, rho0])
-    arhow = alp_mixing([chiral.a_U3_repr(ma, c, fa, **kwargs), rho0, omega])
-    aww = alp_mixing([chiral.a_U3_repr(ma, c, fa, **kwargs), omega, omega])
-    aphiphi = alp_mixing([chiral.a_U3_repr(ma, c, fa, **kwargs), phi, phi])
+    arhorho = alp_mixing([chiral.a_U3_repr(ma, c, fa, **kwargs), rho0, rho0], fa)
+    arhow = alp_mixing([chiral.a_U3_repr(ma, c, fa, **kwargs), rho0, omega], fa)
+    aww = alp_mixing([chiral.a_U3_repr(ma, c, fa, **kwargs), omega, omega], fa)
+    aphiphi = alp_mixing([chiral.a_U3_repr(ma, c, fa, **kwargs), phi, phi], fa)
     return arhorho, arhow, aww, aphiphi
 
 def G(x, y, z):
@@ -376,9 +376,9 @@ def ampato3pi0(ma, m1, m2, m3, model, fa, x, kinematics): #Eq. S31
     #OUTPUT
         #Amplitude a->3 pi0 (without prefactor)
     deltaI = 1/3
-    coef = [alp_mixing([chiral.a_U3_repr(ma, model, fa), pi0]),\
-            alp_mixing([chiral.a_U3_repr(ma, model, fa), eta]),\
-            alp_mixing([chiral.a_U3_repr(ma, model, fa), etap])]
+    coef = [alp_mixing([chiral.a_U3_repr(ma, model, fa), pi0], fa),\
+            alp_mixing([chiral.a_U3_repr(ma, model, fa), eta], fa),\
+            alp_mixing([chiral.a_U3_repr(ma, model, fa), etap], fa)]
     #coef = u3rep(ma, model, deltaI)
     aux = coef[0] - deltaI*(1/np.sqrt(3)+np.sqrt(2)*Setapi0+Setappi0)*(np.sqrt(2)*coef[1]+coef[2]) + \
     np.sqrt(3)*deltaI*(mpi0**2-2*meta**2)/(mpi0**2-4*meta**2)*(np.sqrt(2)*Setapi0+Setappi0)
@@ -395,9 +395,9 @@ def ampatopicharged(ma, m1, m2, m3, model, fa, x, kinematics): #Eq.S32
     #OUTPUT
         #Amplitude a->3 pi0 (without prefactor)
     deltaI = 1/3
-    coef = [alp_mixing([chiral.a_U3_repr(ma, model, fa), pi0]),\
-            alp_mixing([chiral.a_U3_repr(ma, model, fa), eta]),\
-            alp_mixing([chiral.a_U3_repr(ma, model, fa), etap])]
+    coef = [alp_mixing([chiral.a_U3_repr(ma, model, fa), pi0], fa),\
+            alp_mixing([chiral.a_U3_repr(ma, model, fa), eta], fa),\
+            alp_mixing([chiral.a_U3_repr(ma, model, fa), etap], fa)]
     mpipipm = x[0]
     aux = (3*mpipipm**2-ma**2-2*mpi0**2)*coef[0] - deltaI*mpi0**2*(1/np.sqrt(3)+np.sqrt(2)*Setapi0+Setappi0)*(np.sqrt(2)*coef[1]+coef[2]) + \
     deltaI*(mpi0**2-2*meta**2)/(mpi0**2-4*meta**2)*(np.sqrt(3)*mpi0**2*(np.sqrt(2)*Setapi0+Setappi0)-3*mpipipm**2+ma**2+3*mpi0**2)
@@ -464,15 +464,15 @@ def ampatoetapipi(ma, m1, m2, m3, model, fa, x, kinematics):
 
 
     ####DECAY a->eta pi pi
-    aetasigma = alp_mixing([chiral.a_U3_repr(ma, model, fa), eta, sigma])
-    aetaf0 = alp_mixing([chiral.a_U3_repr(ma, model, fa), eta, f0])
-    api0a0 = alp_mixing([chiral.a_U3_repr(ma, model, fa), eta, a0])
-    aetaf2 = alp_mixing([chiral.a_U3_repr(ma, model, fa), eta, f2])
+    aetasigma = alp_mixing([chiral.a_U3_repr(ma, model, fa), eta, sigma], fa)
+    aetaf0 = alp_mixing([chiral.a_U3_repr(ma, model, fa), eta, f0], fa)
+    api0a0 = alp_mixing([chiral.a_U3_repr(ma, model, fa), eta, a0], fa)
+    aetaf2 = alp_mixing([chiral.a_U3_repr(ma, model, fa), eta, f2], fa)
 
     ####DECAY a->etaprime pi pi
-    aetapsigma = alp_mixing([chiral.a_U3_repr(ma, model, fa), etap, sigma])
-    aetapf0 = alp_mixing([chiral.a_U3_repr(ma, model, fa), etap, f0])
-    aetapf2 = alp_mixing([chiral.a_U3_repr(ma, model, fa), etap, f2])
+    aetapsigma = alp_mixing([chiral.a_U3_repr(ma, model, fa), etap, sigma], fa)
+    aetapf0 = alp_mixing([chiral.a_U3_repr(ma, model, fa), etap, f0], fa)
+    aetapf2 = alp_mixing([chiral.a_U3_repr(ma, model, fa), etap, f2], fa)
 
 
     #Mix amplitude (Eq.S48)
