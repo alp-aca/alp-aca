@@ -94,6 +94,22 @@ def integrand(amplitude, M, m1, m2, m3, model, fa, x, **kwargs):
 
     return ampl*np.conjugate(ampl) * np.sqrt(Ener3**2-m3**2)* kallen(m12, m1,m2)/m12**2 *np.sin(theta) *np.sin(thetaast)
 
+def integrand_spheric(amplitude, M, m1, m2, m3, model, fa, Ener3, **kwargs):
+    #INPUT:
+        #amplitude: Amplitude expression
+        #M: Mass of decaying particle (in GeV)
+        #mi: Mass of daughter particles [i=1,2,3] (in GeV)
+        #fa: Scale of U(1)
+        #x: Integration variables (for vegas)
+    #OUTPUT:
+        #Integrand of decay rate
+
+    m12 = np.sqrt(M**2+m3**2-2*M*Ener3)
+
+    ampl = amplitude(M, model, fa, Ener3, **kwargs)
+
+    return ampl*np.conjugate(ampl) * np.sqrt(Ener3**2-m3**2)* kallen(m12, m1,m2)/m12**2
+
 def kallen(x,y,z):
     #INPUT:
         #x, y, z: Energy or mass (in GeV)
@@ -125,3 +141,26 @@ def decay3body(amplitude, M, m1, m2, m3, model, fa, **kwargs):
     edecayrate = 1/((2*np.pi)**4*(32*M))* resint.sdev
     return decayrate, edecayrate
 
+
+def decay3body_spheric(amplitude, M, m1, m2, m3, model, fa, **kwargs):
+    #INPUT:
+        #amplitude: Amplitude expression
+        #M: Mass of decaying particle (in GeV)
+        #mi: Mass of daughter particles [i=1,2,3] (in GeV)
+    #OUTPUT:
+        #Decay rate
+    nitn_adapt = kwargs.get('nitn_adapt', 10)
+    neval_adapt = kwargs.get('neval_adapt', 10)
+    nitn = kwargs.get('nitn', 10)
+    neval = kwargs.get('neval', 100)
+    kwargs_integrand = {k: v for k, v in kwargs.items() if k not in ['nitn_adapt', 'neval_adapt', 'nitn', 'neval']}
+    q3max=kallen(M,m1+m2,m3)/(2*M)
+    E3max=np.sqrt(q3max**2+m3**2)
+    integrator= vegas.Integrator([m3,E3max])#[-1, 1], [-1, 1],[0, 2*np.pi]]) #vegas.Integrator([[(m1+m2)**2,(M-m3)**2],[0, 2*np.pi], [-1, 1],[0, 2*np.pi],[-1, 1]])
+    # step 1 -- adapt to integrand; discard results
+    integrator(functools.partial(integrand_spheric, amplitude, M, m1, m2, m3, model, fa, **kwargs_integrand), nitn=nitn_adapt, neval=neval_adapt)
+    # step 2 -- integrator has adapted to integrand; keep results
+    resint = integrator(functools.partial(integrand_spheric, amplitude, M, m1, m2, m3, model, fa, **kwargs_integrand), nitn=nitn, neval=neval)
+    decayrate = 1/((2*np.pi)**4*(32*M))* resint.mean*8*np.pi
+    edecayrate = 1/((2*np.pi)**4*(32*M))* resint.sdev*8*np.pi
+    return decayrate, edecayrate

@@ -3,6 +3,7 @@ import numpy as np
 from ...constants import mu, md, ms, mpi0, meta, metap, fpi
 from ...common import alpha_s
 from . import u3reprs
+from functools import lru_cache
 
 kappa = np.diag([1/m for m in [mu, md, ms]])/sum(1/m for m in [mu, md, ms])
 
@@ -22,6 +23,7 @@ def a_U3_proj(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> np.nda
     m_mesons = np.array([mpi0, meta, metap])
     return (mass_mixing(ma, couplings, fa, **kwargs)-ma**2*kinetic_mixing(ma, couplings, fa, **kwargs))/(ma**2-m_mesons**2)
 
+@lru_cache
 def a_U3_repr(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> np.matrix:
     cc = couplings.match_run(ma, 'VA_below', **kwargs)
     coup_q = ALPcouplings({'cuA': cc['cuA'], 'cdA': cc['cdA']}, ma, 'VA_below')

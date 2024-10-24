@@ -6,7 +6,7 @@ from . import threebody_decay
 from ...rge import ALPcouplings, bases_above
 from . import chiral
 from .u3reprs import pi0, eta, etap, rho0, omega, phi, sigma, f0, a0, f2
-from ...constants import mu, md, ms, mc, mb, mt, me, mmu, mtau, mpi0, meta, metap, mK, mrho, fpi
+from ...constants import mu, md, ms, mc, mb, mt, me, mmu, mtau, mpi0, meta, metap, mK, mrho, fpi, mpi_pm
 
 #IMPORTANT NOTE:
 #Simplification in data-driven function interpolation
@@ -366,7 +366,7 @@ def ffunction(ma):
 
 ###########################    DECAY TO 3 PIONS a-> pi pi pi    ###########################
 #Decay to 3 neutral pions 3 pi0
-def ampato3pi0(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs): #Eq. S31
+def ampato3pi0(ma, model, fa, Ener3, **kwargs): #Eq. S31
     #INPUT
         #ma: Mass of decaying particle (in GeV)
         #mi: Mass of daughter particle [i=1,2,3] (in GeV)
@@ -386,7 +386,7 @@ def ampato3pi0(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs): #Eq. S31
     return mpi0**2*aux
 
 #Decay to pi+ pi- pi0
-def ampatopicharged(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs): #Eq.S32
+def ampatopicharged(ma, model, fa, Ener3, **kwargs): #Eq.S32
     #INPUT
         #ma: Mass of decaying particle (in GeV)
         #mi: Mass of daughter particle [i=1,2,3] (in GeV)
@@ -400,7 +400,7 @@ def ampatopicharged(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs): #Eq.S32
     coef = [alp_mixing([aU3, pi0], fa),\
             alp_mixing([aU3, eta], fa),\
             alp_mixing([aU3, etap], fa)]
-    mpipipm = x[0]
+    mpipipm = Ener3
     aux = (3*mpipipm**2-ma**2-2*mpi0**2)*coef[0] - deltaI*mpi0**2*(1/np.sqrt(3)+np.sqrt(2)*Setapi0+Setappi0)*(np.sqrt(2)*coef[1]+coef[2]) + \
     deltaI*(mpi0**2-2*meta**2)/(mpi0**2-4*meta**2)*(np.sqrt(3)*mpi0**2*(np.sqrt(2)*Setapi0+Setappi0)-3*mpipipm**2+ma**2+3*mpi0**2)
     return 1/3*aux
@@ -417,18 +417,23 @@ def ato3pi(ma, m1, m2, m3, model, fa, c, **kwargs): #Eq. S33
         #Decay rate including symmetry factors
     if c == 0:
         s = 3*2 #Symmetry factor
-        if ma > 3*mpi0+0.001 and ma<=metap: 
-            result, error = threebody_decay.decay3body(ampato3pi0, ma, m1, m2, m3, model, fa, **kwargs) #Amplitude of decay to 3 neutral pions
+        if ma > 3*mpi0+0.001 and ma<metap: 
+            result, error = threebody_decay.decay3body_spheric(ampato3pi0, ma, m1, m2, m3, model, fa, **kwargs) #Amplitude of decay to 3 neutral pions
         else: result, error = [0,0]
         #result2, error2 = threebody_decay2.decay3body(ampato3pi0, ma, m1, m2, m3) #Amplitude of decay to 3 neutral pions
     elif c == 1:
         s = 1 #Symmetry factor
-        if ma > 3*mpi0+0.001 and ma<=metap:  #mpi0+mpim+mpip
-            result, error = threebody_decay.decay3body(ampatopicharged, ma, m1, m2, m3, model, fa, **kwargs) #Amplitude of decay to pi+ pi- pi0
+        if ma > mpi0+2*mpi_pm+0.001 and ma<metap:  #mpi0+mpim+mpip
+            result, error = threebody_decay.decay3body_spheric(ampatopicharged, ma, m1, m2, m3, model, fa, **kwargs) #Amplitude of decay to pi+ pi- pi0
         else: result, error = [0,0] 
         #result2, error2 = threebody_decay2.decay3body(ampato3pi0, ma, m1, m2, m3) #Amplitude of decay to 3 neutral pions
     return k/(2*ma*s)*1/pow(fpi*fa,2)*result, k/(2*ma*s)*1/pow(fpi*fa,2)*error#,k/(2*ma*s)*1/pow(fpi*fa,2)*result2, k/(2*ma*s)*1/pow(fpi*fa,2)*error2
 
+def ato3pi0pm(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
+    return ato3pi(ma, mpi0, mpi_pm, mpi_pm, couplings, fa, 1, **kwargs)[0]
+
+def ato3pi000(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
+    return ato3pi(ma, mpi0, mpi0, mpi0, couplings, fa, 0, **kwargs)[0]
 
 ###########################    DECAY TO  a-> eta pi pi    ###########################
 #It is assumed that Fpppp(m)=Fspp(m)=Ftpp(m)=F(m)
@@ -519,6 +524,11 @@ def atoetapipi(ma, m1, m2, m3, model, fa, c, **kwargs): #Eq. S33
         else: result, error = [0, 0]
     return 1/(2*ma*s)*pow(fpi/fa,2)*result, 1/(2*ma*s)*pow(fpi/fa,2)*error#, 1/(2*ma*s)*pow(fpi/fa,2)*result2, 1/(2*ma*s)*pow(fpi/fa,2)*error2
 
+def atoetapipi00(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
+    return atoetapipi(ma, meta, mpi0, mpi0, couplings, fa, 0, **kwargs)[0]
+
+def atoetapipipm(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
+    return atoetapipi(ma, meta, mpi_pm, mpi_pm, couplings, fa, 1, **kwargs)[0]
 
 ###########################    DECAY TO  a-> pi pi gamma    ###########################
 def ampatogammapipi(ma, Gamma, mrho, model, fa, x, **kwargs):
@@ -539,7 +549,7 @@ def ampatogammapipi(ma, Gamma, mrho, model, fa, x, **kwargs):
     return integrand
 
 
-def atogammapipi(M, m1, m2, m3, model, fa, Gamma, **kwargs):
+def atogammapipi(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
     #INPUT
         #M: Mass of decaying particle (in GeV) [ALP]
         #mi: Mass of daughter particle (in GeV) [pi, pi, photon]
@@ -551,22 +561,22 @@ def atogammapipi(M, m1, m2, m3, model, fa, Gamma, **kwargs):
         #decayrate: Decay rate
         #edecayrate: Error in decay rate
     
-    if M > 2*mpi0:
+    if ma > 2*mpi0:
         nitn_adapt = kwargs.get('nitn_adapt', 10)
         neval_adapt = kwargs.get('neval_adapt', 10)
         nitn = kwargs.get('nitn', 10)
         neval = kwargs.get('neval', 100)
         kwargs_integrand = {k: v for k, v in kwargs.items() if k not in ['nitn_adapt', 'neval_adapt', 'nitn', 'neval']}
         #Numerical integration (using vegas integrator)
-        integrator= vegas.Integrator([[(m1+m2)**2,(M-m3)**2]])#,[0,1]]) #Second integration is to get mean value easily
+        integrator= vegas.Integrator([[(2*mpi0)**2,ma**2]])#,[0,1]]) #Second integration is to get mean value easily
         # step 1 -- adapt to integrand; discard results
-        integrator(functools.partial(ampatogammapipi, M, Gamma, mrho, model, fa, **kwargs_integrand), nitn=nitn_adapt, neval=neval_adapt)
+        integrator(functools.partial(ampatogammapipi, ma, Gammarho, mrho, couplings, fa, **kwargs_integrand), nitn=nitn_adapt, neval=neval_adapt)
         # step 2 -- integrator has adapted to integrand; keep results
-        resint = integrator(functools.partial(ampatogammapipi, M, Gamma, mrho, model, fa, **kwargs_integrand), nitn=nitn, neval=neval)
-        decayrate = 3*alphaem(M)*M**3/(2**11*np.pi**6*fa**2)* resint.mean 
-        edecayrate = 3*alphaem(M)*M**3/(2**11*np.pi**6*fa**2)* resint.sdev
+        resint = integrator(functools.partial(ampatogammapipi, ma, Gammarho, mrho, couplings, fa, **kwargs_integrand), nitn=nitn, neval=neval)
+        decayrate = 3*alphaem(ma)*ma**3/(2**11*np.pi**6*fa**2)* resint.mean 
+        edecayrate = 3*alphaem(ma)*ma**3/(2**11*np.pi**6*fa**2)* resint.sdev
     else: decayrate, edecayrate= [0,0]
-    return decayrate, edecayrate
+    return decayrate
 
 
 
