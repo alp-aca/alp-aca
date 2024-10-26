@@ -7,7 +7,7 @@ from ...rge import ALPcouplings, bases_above
 from . import chiral
 from .chiral import ffunction
 from .u3reprs import pi0, eta, etap, rho0, omega, phi, sigma, f0, a0, f2
-from ...constants import mu, md, ms, mc, mb, mt, me, mmu, mtau, mpi0, meta, metap, mK, mrho, fpi, mpi_pm
+from ...constants import mu, md, ms, mc, mb, mt, me, mmu, mtau, mpi0, meta, metap, mK, mrho, fpi, mpi_pm, ma0, msigma, mf0, mf2, Gammaa0, Gammasigma, Gammaf0, Gammaf2
 
 #IMPORTANT NOTE:
 #Simplification in data-driven function interpolation
@@ -212,13 +212,13 @@ def ato3pi(ma, m1, m2, m3, model, fa, c, **kwargs): #Eq. S33
         s = 3*2 #Symmetry factor
         if ma > 3*mpi0+0.001 and ma<metap: 
             result, error = threebody_decay.decay3body_spheric(ampato3pi0, ma, m1, m2, m3, model, fa, **kwargs) #Amplitude of decay to 3 neutral pions
-        else: result, error = [0,0]
+        else: result, error = [0.0,0.0]
         #result2, error2 = threebody_decay2.decay3body(ampato3pi0, ma, m1, m2, m3) #Amplitude of decay to 3 neutral pions
     elif c == 1:
         s = 1 #Symmetry factor
         if ma > mpi0+2*mpi_pm+0.001 and ma<metap:  #mpi0+mpim+mpip
             result, error = threebody_decay.decay3body_spheric(ampatopicharged, ma, m1, m2, m3, model, fa, **kwargs) #Amplitude of decay to pi+ pi- pi0
-        else: result, error = [0,0] 
+        else: result, error = [0.0,0.0] 
         #result2, error2 = threebody_decay2.decay3body(ampato3pi0, ma, m1, m2, m3) #Amplitude of decay to 3 neutral pions
     return k/(2*ma*s)*1/pow(fpi*fa,2)*result, k/(2*ma*s)*1/pow(fpi*fa,2)*error#,k/(2*ma*s)*1/pow(fpi*fa,2)*result2, k/(2*ma*s)*1/pow(fpi*fa,2)*error2
 
@@ -281,18 +281,18 @@ def ampatoetapipi(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs):
 
     #a-> Sigma (Eq.S49)
     if mpi1pi2< 2*mK: 
-        asigma = -(10)**2* aetasigma* papeta* ppi1ppi2*bw(ma**2, mpi1pi2, Gammasigma, 0)*ffunction(ma)
+        asigma = -(10)**2* aetasigma* papeta* ppi1ppi2*bw(mpi1pi2**2, msigma, Gammasigma, 0)*ffunction(ma)
     else: asigma = 0 #Avoid unitarity violation
 
     #a-> f0 (Eq.S50)
-    af0 = (7.3)**2* aetaf0* papeta* ppi1ppi2* bw(ma**2, mpi1pi2, Gammaf0, 0)*ffunction(ma) 
+    af0 = (7.3)**2* aetaf0* papeta* ppi1ppi2* bw(mpi1pi2**2, mf0, Gammaf0, 0)*ffunction(ma) 
 
     #a-> a0 (Eq.S51)
-    aa0 = (13)**2* api0a0* ffunction(ma)* (pappi2* petappi1*bw(ma**2, metapi1, Gammaa0, 0) + pappi1* petappi2* bw(ma**2, metapi2, Gammaa0,0)) 
+    aa0 = (13)**2* api0a0* ffunction(ma)* (pappi2* petappi1*bw(metapi1**2, ma0, Gammaa0, 0) + pappi1* petappi2* bw(metapi2, ma0, Gammaa0,0)) 
 
     #a-> f2 (Eq.)
     af2 = (16)**2* aetaf2* (petaqpipi**2 - 1/3*qpipi2*(m3**2+ petappipi**2/ppi1ppi2**2- 2*petappipi**2/ppi1ppi2**2))*\
-          bw(ma**2, mpi1pi2, Gammaf2, 0)* ffunction(ma)
+          bw(mpi1pi2**2, mf2, Gammaf2, 0)* ffunction(ma)
     aux = (amix+asigma+af0+aa0+af2) 
     return aux
 
@@ -304,18 +304,11 @@ def atoetapipi(ma, m1, m2, m3, model, fa, c, **kwargs): #Eq. S33
         #c: Control value (c=0-> Neutral pions, c=1-> pi0, pi+, pi-)
     #OUTPUT: 
         #Decay rate including symmetry factors
-    if c == 0:
-        s = 2 #Symmetry factor
-        if ma > meta + 2*mpi0:
-            result, error = threebody_decay.decay3body(ampatoetapipi, ma, m1, m2, m3, model, fa, **kwargs) #Amplitude of decay to pi+ pi- eta
-        else: result, error = [0, 0]
-
-    elif c == 1:
-        s = 1 #Symmetry factor
-        if ma > meta + 2*mpi0:
-            result, error = threebody_decay.decay3body(ampatoetapipi, ma, m1, m2, m3, model, fa, **kwargs) #Amplitude of decay to pi+ pi- eta
-        else: result, error = [0, 0]
-    return 1/(2*ma*s)*pow(fpi/fa,2)*result, 1/(2*ma*s)*pow(fpi/fa,2)*error#, 1/(2*ma*s)*pow(fpi/fa,2)*result2, 1/(2*ma*s)*pow(fpi/fa,2)*error2
+    if ma < m1 + m2 + m3:
+        return [0.0, 0,0]
+    s = 2-c # Symmetry factor: 2 for pi0 pi0, 1 for pi+ pi-
+    result, error = threebody_decay.decay3body(ampatoetapipi, ma, m1, m2, m3, model, fa, **kwargs)
+    return 1/(2*ma*s)*pow(fpi/fa,2)*result, 1/(2*ma*s)*pow(fpi/fa,2)*error
 
 def decay_width_etapipi00(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
     return atoetapipi(ma, meta, mpi0, mpi0, couplings, fa, 0, **kwargs)[0]
@@ -338,7 +331,7 @@ def ampatogammapipi(ma, Gamma, mrho, model, fa, x, **kwargs):
         a = g**2* np.sqrt(x[0])* bw(np.sqrt(x[0]), mrho, Gamma,1)*arhorho*ffunction(ma)
         integrand = np.abs(a*np.conjugate(a)*pow(1-x[0]/ma**2,3)*pow(1-4*mpi0**2/x[0],3/2))
     else:
-        integrand = 0
+        integrand = 0.0
     return integrand
 
 
@@ -368,7 +361,7 @@ def decay_width_gammapipi(ma: float, couplings: ALPcouplings, fa: float, **kwarg
         resint = integrator(functools.partial(ampatogammapipi, ma, Gammarho, mrho, couplings, fa, **kwargs_integrand), nitn=nitn, neval=neval)
         decayrate = 3*alphaem(ma)*ma**3/(2**11*np.pi**6*fa**2)* resint.mean 
         edecayrate = 3*alphaem(ma)*ma**3/(2**11*np.pi**6*fa**2)* resint.sdev
-    else: decayrate, edecayrate= [0,0]
+    else: decayrate, edecayrate= [0.0,0.0]
     return decayrate
 
 
@@ -377,5 +370,5 @@ def decay_width_gammapipi(ma: float, couplings: ALPcouplings, fa: float, **kwarg
 def decay_width_gluongluon(ma, fa):
     if ma > 1.84:
         res = alphas(ma)**2*ma**3/(32*np.pi**3*fa**2)* (1 + 83*alphas(ma)/(4*np.pi))
-    else: res = 0 
+    else: res = 0.0
     return res

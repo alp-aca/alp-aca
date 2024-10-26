@@ -82,6 +82,10 @@ mUpsilon1S = Constant(Particle.from_name("Upsilon(1S)").mass/1000, 'particle')
 mUpsilon2S = Constant(Particle.from_name("Upsilon(2S)").mass/1000, 'particle')
 mUpsilon3S = Constant(Particle.from_name("Upsilon(3S)").mass/1000, 'particle')
 mUpsilon4S = Constant(Particle.from_name("Upsilon(4S)").mass/1000, 'particle')
+ma0 = Constant(Particle.from_name("a(0)(980)0").mass/1000, 'particle')
+msigma = Constant(Particle.from_name("f(0)(500)").mass/1000, 'particle') # f0(500) used to be sigma
+mf0 = Constant(Particle.from_name("f(0)(980)").mass/1000, 'particle')
+mf2 = Constant(Particle.from_name("f(2)(1270)").mass/1000, 'particle')
 
 mq_dict = {'u': mu, 'd': md, 's': ms, 'c': mc, 'b': mb, 't': mt}
 
@@ -97,6 +101,10 @@ GammaUpsilon1S = Constant(Particle.from_name('Upsilon(1S)').width/1000, 'particl
 GammaUpsilon2S = Constant(Particle.from_name('Upsilon(2S)').width/1000, 'particle')
 GammaUpsilon3S = Constant(Particle.from_name('Upsilon(3S)').width/1000, 'particle')
 GammaUpsilon4S = Constant(Particle.from_name('Upsilon(4S)').width/1000, 'particle')
+Gammaa0 = Constant(Particle.from_name("a(0)(980)0").width/1000, 'particle')
+Gammasigma = Constant(Particle.from_name("f(0)(500)").width/1000, 'particle') # f0(500) used to be sigma
+Gammaf0 = Constant(Particle.from_name("f(0)(980)").width/1000, 'particle')
+Gammaf2 = Constant(Particle.from_name("f(2)(1270)").width/1000, 'particle')
 
 # Form factors
 fB = LazyFloat(lambda: pars['f_B+'])

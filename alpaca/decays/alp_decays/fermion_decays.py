@@ -7,7 +7,7 @@ def fermion_decay_width(ma, fa,cf, mf,Nc):
     if mf<ma/2:
         return (Nc*cf*np.conjugate(cf)/fa**2)*np.sqrt(1-pow(2*mf/ma,2))*ma*pow(mf,2)/(8 * np.pi)
     else:
-        return 0
+        return 0.0
 
 def decay_width_electron(ma, couplings: ALPcouplings,fa,**kwargs):
     if couplings.basis in bases_above:
@@ -16,7 +16,7 @@ def decay_width_electron(ma, couplings: ALPcouplings,fa,**kwargs):
     else:
         cc = couplings.match_run(ma, 'VA_below', **kwargs)
         ceA = cc['ceA']
-    return fermion_decay_width(ma, fa, ceA[0,0],me,Nc=1, **kwargs)
+    return fermion_decay_width(ma, fa, ceA[0,0],me,Nc=1)
 
 def decay_width_muon(ma,couplings: ALPcouplings,fa, **kwargs):
     if couplings.basis in bases_above:
