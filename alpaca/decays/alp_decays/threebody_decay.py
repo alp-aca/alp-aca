@@ -92,7 +92,7 @@ def integrand(amplitude, M, m1, m2, m3, model, fa, x, **kwargs):
 
     ampl = amplitude(M, m1, m2, m3, model, fa, x, kinematics(M,m1,m2,m3,Ener3,theta, thetaast, phiast), **kwargs)
 
-    return ampl*np.conjugate(ampl) * np.sqrt(Ener3**2-m3**2)* kallen(m12, m1,m2)/m12**2 *np.sin(theta) *np.sin(thetaast)
+    return np.abs(ampl)**2 * np.sqrt(Ener3**2-m3**2)* kallen(m12, m1,m2)/m12**2 *np.sin(theta) *np.sin(thetaast)
 
 def integrand_spheric(amplitude, M, m1, m2, m3, model, fa, Ener3, **kwargs):
     #INPUT:
@@ -108,7 +108,7 @@ def integrand_spheric(amplitude, M, m1, m2, m3, model, fa, Ener3, **kwargs):
 
     ampl = amplitude(M, model, fa, Ener3, **kwargs)
 
-    return ampl*np.conjugate(ampl) * np.sqrt(Ener3**2-m3**2)* kallen(m12, m1,m2)/m12**2
+    return np.abs(ampl)**2 * np.sqrt(Ener3**2-m3**2)* kallen(m12, m1,m2)/m12**2
 
 def kallen(x,y,z):
     #INPUT:
