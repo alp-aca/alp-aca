@@ -21,16 +21,6 @@ cgluons=1.0
 low_scale=2.0
 # couplings=ALPcouplings({'cgamma': cphoton, 'cuA': cfermi, 'cdA': cfermi, 'ceA': cfermi}, scale=, basis='VA_below')
 
-DW_elec=[]
-DW_muon=[]
-DW_tau=[]
-DW_charm=[]
-DW_bottom=[]
-DW_3pis=[]
-DW_etapipi=[]
-DW_gammapipi=[]
-DW_gluongluon=[]
-DW_2photons=[]
 for m in ma:
     couplings=ALPcouplings({'cgamma': cphoton, 'cg': cgluons, 'cuA': cfermi, 'cdA': cfermi, 'ceA': cfermi}, scale=m, basis='VA_below')
     DW_elec.append(decay_width_electron(m, couplings, fa))
