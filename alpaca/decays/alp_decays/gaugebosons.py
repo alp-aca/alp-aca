@@ -29,7 +29,7 @@ def cgamma_twoloops(ma: float, couplings: ALPcouplings, fa: float) -> float:
     masses_log = [mpi0, mpi0, mc, mK, mt, mb]
     return -3/2*alpha_s(ma)**2/np.pi**2*couplings['cg']*sum(charges[i]**2*B1(4*masses[i]**2/ma**2)*np.log(Lambda**2/masses_log[i]**2) for i in range(6))
 
-def alp2gamma(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
+def decay_width_2gamma(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
     cgamma_eff = 0
     if ma > mW:
         cc = couplings.match_run(ma, 'massbasis_above', **kwargs | {'matching_scale': mW})

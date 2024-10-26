@@ -222,10 +222,10 @@ def ato3pi(ma, m1, m2, m3, model, fa, c, **kwargs): #Eq. S33
         #result2, error2 = threebody_decay2.decay3body(ampato3pi0, ma, m1, m2, m3) #Amplitude of decay to 3 neutral pions
     return k/(2*ma*s)*1/pow(fpi*fa,2)*result, k/(2*ma*s)*1/pow(fpi*fa,2)*error#,k/(2*ma*s)*1/pow(fpi*fa,2)*result2, k/(2*ma*s)*1/pow(fpi*fa,2)*error2
 
-def ato3pi0pm(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
+def decay_width_3pi0pm(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
     return ato3pi(ma, mpi0, mpi_pm, mpi_pm, couplings, fa, 1, **kwargs)[0]
 
-def ato3pi000(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
+def decay_width_3pi000(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
     return ato3pi(ma, mpi0, mpi0, mpi0, couplings, fa, 0, **kwargs)[0]
 
 ###########################    DECAY TO  a-> eta pi pi    ###########################
@@ -317,10 +317,10 @@ def atoetapipi(ma, m1, m2, m3, model, fa, c, **kwargs): #Eq. S33
         else: result, error = [0, 0]
     return 1/(2*ma*s)*pow(fpi/fa,2)*result, 1/(2*ma*s)*pow(fpi/fa,2)*error#, 1/(2*ma*s)*pow(fpi/fa,2)*result2, 1/(2*ma*s)*pow(fpi/fa,2)*error2
 
-def atoetapipi00(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
+def decay_width_etapipi00(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
     return atoetapipi(ma, meta, mpi0, mpi0, couplings, fa, 0, **kwargs)[0]
 
-def atoetapipipm(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
+def decay_width_etapipipm(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
     return atoetapipi(ma, meta, mpi_pm, mpi_pm, couplings, fa, 1, **kwargs)[0]
 
 ###########################    DECAY TO  a-> pi pi gamma    ###########################
@@ -342,7 +342,7 @@ def ampatogammapipi(ma, Gamma, mrho, model, fa, x, **kwargs):
     return integrand
 
 
-def atogammapipi(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
+def decay_width_gammapipi(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
     #INPUT
         #M: Mass of decaying particle (in GeV) [ALP]
         #mi: Mass of daughter particle (in GeV) [pi, pi, photon]
@@ -374,7 +374,7 @@ def atogammapipi(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
 
 
 ######################################################   GLUON CHANNEL (a-> g g)    ######################################################
-def atogluongluon(ma, fa):
+def decay_width_gluongluon(ma, fa):
     if ma > 1.84:
         res = alphas(ma)**2*ma**3/(32*np.pi**3*fa**2)* (1 + 83*alphas(ma)/(4*np.pi))
     else: res = 0 
