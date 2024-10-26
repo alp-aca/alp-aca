@@ -1,10 +1,10 @@
 import numpy as np 
 import matplotlib.pyplot as plt
-from alpaca.decays.alp_decays.fermion_decays import decay_width_electron, decay_width_muon, decay_width_tau, decay_width_charm, decay_width_bottom
-from alpaca.decays.alp_decays.hadronic_decays_def import decay_width_3pi000, decay_width_3pi0pm, decay_width_etapipi00, decay_width_etapipipm, decay_width_gammapipi, decay_width_gluongluon
-from alpaca.decays.alp_decays.gaugebosons import decay_width_2gamma
+# from alpaca.decays.alp_decays.fermion_decays import decay_width_electron, decay_width_muon, decay_width_tau, decay_width_charm, decay_width_bottom
+# from alpaca.decays.alp_decays.hadronic_decays_def import decay_width_3pi000, decay_width_3pi0pm, decay_width_etapipi00, decay_width_etapipipm, decay_width_gammapipi, decay_width_gluongluon
+# from alpaca.decays.alp_decays.gaugebosons import decay_width_2gamma
 from alpaca.rge import ALPcouplings
-
+from alpaca.decays.alp_decays.branching_ratios import BR_2photons, BR_electron, BR_muon, BR_tau, BR_charm, BR_bottom, BR_3pis, BR_etapipi, BR_gammapipi, BR_gluongluon
 
 plt.rcParams.update({
     "text.usetex": True,
@@ -12,42 +12,55 @@ plt.rcParams.update({
 })
 plt.rcParams.update({'font.size': 14})
 
-ma=np.logspace(-1,1,1000)
+#ma=np.logspace(-1,1,1000)
+ma=np.linspace(0.1,10,100)
 fa=1000
 
 cphoton=1.0
 cfermi=1.0
 cgluons=1.0
-low_scale=2.0
+#low_scale=2.0
 # couplings=ALPcouplings({'cgamma': cphoton, 'cuA': cfermi, 'cdA': cfermi, 'ceA': cfermi}, scale=, basis='VA_below')
 
+
+BR_2gamma=[]
+BRelec=[]
+BRmu=[]
+BRtau=[]
+BRcharm=[]
+BRbottom=[]
+BR3pis=[]
+BRetapipi=[]
+BRgammapipi=[]
+BRgluongluon=[]
+
 for m in ma:
-    couplings=ALPcouplings({'cgamma': cphoton, 'cg': cgluons, 'cuA': cfermi, 'cdA': cfermi, 'ceA': cfermi}, scale=m, basis='VA_below')
-    DW_elec.append(decay_width_electron(m, couplings, fa))
-    DW_muon.append(decay_width_muon(m, couplings, fa))
-    DW_tau.append(decay_width_tau(m, couplings, fa))
-    DW_charm.append(decay_width_charm(m, couplings, fa))
-    DW_bottom.append(decay_width_bottom(m, couplings, fa))
-    DW_3pis.append(decay_width_3pi000(m, couplings, fa))
-    DW_etapipi.append(decay_width_etapipi00(m, couplings, fa))
-    DW_gammapipi.append(decay_width_gammapipi(m, couplings, fa))
-    DW_gluongluon.append(decay_width_gluongluon(m, fa))
-    DW_2photons.append(decay_width_2gamma(m, couplings, fa))
+    couplings = ALPcouplings({'cgamma': cphoton, 'cuA': cfermi, 'cdA': cfermi, 'ceA': cfermi}, scale=m, basis='VA_below')
+    BR_2gamma.append(BR_2photons(m, fa, couplings))
+    BRelec.append(BR_electron(m, fa, couplings))
+    BRmu.append(BR_muon(m, fa, couplings))
+    BRtau.append(BR_tau(m, fa, couplings))
+    BRcharm.append(BR_charm(m, fa, couplings))
+    BRbottom.append(BR_bottom(m, fa, couplings))
+    BR3pis.append(BR_3pis(m, fa, couplings))
+    BRetapipi.append(BR_etapipi(m, fa, couplings))
+    BRgammapipi.append(BR_gammapipi(m, fa, couplings))
+    BRgluongluon.append(BR_gluongluon(m, fa, couplings))
+
 
     
 
 fig, ax = plt.subplots() 
 
-ax.plot(ma, DW_elec, label=r"$e e$")
-ax.plot(ma, DW_muon, label=r"$\mu\mu$")
-ax.plot(ma, DW_tau, label=r"$\tau\tau$")
-ax.plot(ma, DW_charm, label=r"$cc$")
-ax.plot(ma, DW_bottom, label=r"$b b$")
-ax.plot(ma, DW_3pis, label=r"$3\pi$")
-ax.plot(ma, DW_etapipi, label=r"$\eta\pi\pi$")
-ax.plot(ma, DW_gammapipi, label=r"$\gamma\pi\pi$")
-ax.plot(ma, DW_gluongluon, label=r"$gg$")
-ax.plot(ma, DW_2photons, label=r"$\gamma\gamma$")
+ax.plot(ma, BR_2gamma, label=r"$\textrm{BR}\left(a\rightarrow \gamma\gamma\right)$")
+ax.plot(ma, BRelec, label=r"$\textrm{BR}\left(a\rightarrow e^+e^-\right)$")
+ax.plot(ma, BRmu, label=r"$\textrm{BR}\left(a\rightarrow \mu^+\mu^-\right)$")
+ax.plot(ma, BRtau, label=r"$\textrm{BR}\left(a\rightarrow \tau^+\tau^-\right)$")
+ax.plot(ma, BRcharm, label=r"$\textrm{BR}\left(a\rightarrow c\bar{c}\right)$")
+ax.plot(ma, BRbottom, label=r"$\textrm{BR}\left(a\rightarrow b\bar{b}\right)$")
+ax.plot(ma, BR3pis, label=r"$\textrm{BR}\left(a\rightarrow 3\pi^0\right)$")
+ax.plot(ma, BRetapipi, label=r"$\textrm{BR}\left(a\rightarrow \eta\pi\pi\right)$")
+ax.plot(ma, BRgammapipi, label=r"$\textrm{BR}\left(a\rightarrow \gamma\pi\pi\right)$")
 
 
 
