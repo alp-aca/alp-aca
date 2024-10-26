@@ -5,6 +5,7 @@ import functools
 from . import threebody_decay
 from ...rge import ALPcouplings, bases_above
 from . import chiral
+from .chiral import ffunction
 from .u3reprs import pi0, eta, etap, rho0, omega, phi, sigma, f0, a0, f2
 from ...constants import mu, md, ms, mc, mb, mt, me, mmu, mtau, mpi0, meta, metap, mK, mrho, fpi, mpi_pm
 
@@ -34,208 +35,12 @@ alphaem = lambda q: flavio.physics.running.running.get_alpha_e(pars, q)
 alphas = lambda q: flavio.physics.running.running.get_alpha_s(pars, q)
 g=np.sqrt(12*np.pi)#0.6 
 
-#Coupling matrix        Mass matrix
-#   cu  cc  ctop           mu   mc  mtop 
-# C=                    M=
-#   cd  cs  cbot           md   ms  mbot
-
-######################################################   PHOTON CHANNEL (a-> gamma gamma)    ######################################################
-
-#Chiral contribution (1811.03474, eq. S26, ,approx) (below mass eta')
-def cgammachiral(ma):
-    #INPUT:
-        #ma: Mass of ALP (GeV)
-    #OUTPUT:
-        #Contribution from chiral transformation
-    if ma <= metap:
-        cgammachi = 1
-    else: cgammachi = 0
-    return cgammachi
-
-#Vector meson dominance (1811.03474, eq. S27) (below 2.1 GeV)
-def ffunction(ma):
-    #INPUT:
-        #ma: Mass of ALP (GeV)
-    #OUTPUT:
-        #Data-driven function 
-    if ma < 1.4: fun = 1
-    elif ma >= 1.4 and ma <= 2: 
-        fun = ((1.4/2)**4-1)/(2-1.4)*(ma-1.4) + 1 #Interpolation (for now I do just straight line) (y2-y1)/(x2-x1)*(x-x1)+y1
-    else: fun = (1.4/ma)**4
-    return fun
-
-
-def cgammaVMD(ma, couplings: ALPcouplings, fa:float, **kwargs):
-    #INPUT:
-        #ma: Mass of ALP (GeV)
-        #model: Coupling of the model presented
-    #OUTPUT:
-        #Contribution from vector meson dominance
-    #deltaI = 0
-    if ma < 2.1 :
-            aux = alpVV(ma, couplings, fa, **kwargs)
-            cgvmd = -ffunction(ma)*(3*aux[0]+2*aux[1]+1/3*aux[2]+2/3*aux[3])# 2*chiral.alphas_tilde(ma)/(3*np.sqrt(6))* (4*coup[0]+ coup[1]+ coup[2])
-            #aux = calpmixing(ma, couplings, deltaI, **kwargs)
-            #cgvmd = -ffunction(ma)*2*chiral.alphas_tilde(ma)/(3*np.sqrt(6))*(4*aux[0] + aux[1] + aux[2])# 2*chiral.alphas_tilde(ma)/(3*np.sqrt(6))* (4*coup[0]+ coup[1]+ coup[2])
-    else: cgvmd = 0
-    return cgvmd
-
-#pQCD-based contribution (from 1708.00443, Eq. 13, 14, 16)
-#Loop functions
-def ftau(xvar):
-    #INPUT:
-        #xvar: Dimensionless variable
-    #OUTPUT:
-        #Loop function (as defined in Eq. 14, 1708.00443)
-    if xvar<1:
-        fres= np.pi/2+1j/2*np.log((1+np.sqrt(1-xvar))/(1-np.sqrt(1-xvar)))
-    else:
-        fres=np.arcsin(1/np.sqrt(xvar))
-    return fres
-
-def loopB1(ma, m):
-    #INPUT:
-        #ma: Mass of ALP (in GeV)
-        #m: Mass of SM particle (in GeV)
-    #OUTPUT:
-        #Loop function B1 (as defined in Eq. 14, 1708.00443)
-    xvar = 4*pow(m/ma,2)
-    return 1-xvar*pow(ftau(xvar),2)
-
-def loopB2(ma, m):
-    #INPUT:
-        #ma: Mass of ALP (in GeV)
-        #m: Mass of particle (in GeV)
-    #OUTPUT:
-        #Loop function B2 (as defined in Eq. 14, 1708.00443)
-    xvar = 4*pow(m/ma,2)
-    return 1-(xvar-1)*pow(ftau(xvar),2)
-
-def cgammapQCD(ma, couplings: ALPcouplings, fa, **kwargs):
-    #INPUT:
-        #ma: Mass of ALP (GeV)
-        #ml: Array with lepton masses (me, mmu, mtau)
-        #mq: Array with quark masses
-        #cl: Array with lepton couplings (ce, cmu, ctau)
-        #cq: Array with quark couplings
-        #cFF: Tree level coupling a-gamma-gamma
-        #cWW: Tree level coupling a-W-W
-        #cGG: Tree level coupling a-G-G
-        #fa: Scale of ALP (in GeV)
-    #OUTPUT:
-        #Contribution from pQCD
-
-    if couplings.basis in bases_above:
-        cc = couplings.match_run(ma, 'massbasis_above', **kwargs)
-        cuA = cc['ku'] - cc['kU']
-        cdA = cc['kd'] - cc['kD']
-    else:
-        cc = couplings.match_run(ma, 'VA_below', **kwargs)
-        cdA = cc['cdA']
-        cuA = cc['cuA']
-        np.vstack([np.hstack([cuA, np.zeros([2,1])]), np.zeros([1,3])])
-
-
-    mdown = [md, ms, mb]
-    mdlog = [mpi0, mK, mb]
-    mup = [mu, mc, mt]
-    mulog = [mpi0, mK, mt]
-
-    cpQCD = 3*(2/3)**2*sum(cuA[1,1]*loopB1(ma, mup[i]) for i in (1,2)) + 3*(-1/3)**2*cdA[2,2]*loopB1(ma, mb)
-    if ma> 1.5:
-        Lambda = -32*np.pi**2*fa*cc['cg']
-        cpQCD += 3*(2/3)**2*cuA[0,0]*loopB1(ma, mu) + 3*(-1/3)**2*cdA[0,0]*loopB1(ma, md) + 3*(-1/3)**2*cdA[1,1]*loopB1(ma, ms)
-        cpQCD -= 3*alphas(ma)**2/np.pi**2*cc['cg']*((-1/3)**2 * sum(loopB1(ma, mdown[i])*np.log(Lambda/mdlog[i])*2 for i in range(3)) + (2/3)**2 * sum(loopB1(ma, mup[i])*np.log(Lambda/mulog[i])*2 for i in range(3)) )
-    #Lambda = 32*np.pi**2*fa*cGG
-    #if ma > 2.1: cpQCD=alphas(ma)**2/(6*np.pi**2)*2*(5*np.log(Lambda/mpi0)+np.log(Lambda/mK))-alphas(ma)**2*ma**2/(72*np.pi**2)*2*(4*np.sqrt(3)/mq[0][1]**2*np.log(Lambda/mq[0][1])+1/mq[1][2]**2*np.log(Lambda/mq[1][2])+4/mq[0][2]**2*np.log(Lambda/mq[1][2]))
-    #elif ma>1.6 and ma<2.1: cpQCD=-alphas(ma)**2*ma**2/(72*np.pi**2)*2*(4*np.sqrt(3)/mq[0][1]**2*np.log(Lambda/mq[0][1])+1/mq[1][2]**2*np.log(Lambda/mq[1][2])+4/mq[0][2]**2*np.log(Lambda/mq[1][2]))
-    else: cpQCD =0 
-    return cpQCD
-
-#Decay rate a-> gamma gamma
-def atogammagamma(ma, couplings: ALPcouplings, fa, **kwargs):
-    #INPUT:
-        #ma: Mass of ALP (GeV)
-        #ml: Array with lepton masses (me, mmu, mtau)
-        #mq: Array with quark masses 
-        #cl: Array with lepton couplings (ce, cmu, ctau)
-        #cq: Array with quark couplings
-        #cFF: Tree level coupling a-gamma-gamma
-        #cWW: Tree level coupling a-W-W
-        #cGG: Tree level coupling a-G-G
-        #fa: Scale of ALP (in GeV)
-    #OUTPUT:
-        #Decay rate (in GeV)
-    if couplings.basis in bases_above:
-        cc = couplings.match_run(ma, 'massbasis_above', **kwargs)
-        ceA = cc['ke'] - cc['kE']
-    else:
-        cc = couplings.match_run(ma, 'VA_below', **kwargs)
-        ceA = cc['ceA']
-    print(cc['cgamma'])
-    cont = cc['cgamma'] + sum(ceA[i,i]*loopB1(ma, mlepton[i]) for i in range(3))+(cgammachiral(ma) + cgammaVMD(ma, couplings, **kwargs))*2*cc['cg'] + cgammapQCD(ma, couplings, fa, **kwargs)
-    return alphaem(ma)**2*ma**3/(pow(4*np.pi,3)*fa**2)*np.abs(cont)**2
 
 ######################################################   HADRONIC CHANNELS    ######################################################
 #Extracted from 1811.03474
 #Following U(3) representation of ALPs 
 
 ###########################    ALP mixing   ###########################
-
-def u3rep(ma: float, couplings: ALPcouplings, deltaI: float, **kwargs) -> tuple[float, float, float]:
-    #Input
-        #ma: Mass of the ALP (GeV)
-        #coup: Vector of couplings (cu, cd, cs, cg)
-        #coup[3]: Coupling to gluons
-        #deltaI: (md-mu)/(md+mu)
-    #Return
-        #api0: Mixing ALP-pi0
-        #aeta: Mixing ALP-eta
-        #aetaprime: Mixing ALP-etaprime
-    
-    #Auxiliary functions (needed for easiness)
-        #Elements of the kinetic mixing matrix
-    cc = couplings.match_run(ma, 'VA_below', **kwargs)
-    coup = [cc['cuA'][0,0], cc['cdA'][0,0], cc['cdA'][1,1], cc['cg']]
-    G = lambda x, y, z: x*y + x*z + y*z
-
-    
-    Kapi = 2*(coup[0]-coup[1])/(128*np.pi**2)+ 1/2*ms*(md-mu)/G(mu,md,ms)*2*coup[3]
-    Kaeta = 2*(coup[0]+coup[1]-coup[2])/(64*np.sqrt(6)*np.pi**2)+1/np.sqrt(6)-2*md*mu/(np.sqrt(6)*G(mu,md,ms))*2*coup[3]
-    Kaetap = 2*(coup[0]+coup[1]+2*coup[2])/(256*np.sqrt(3)*np.pi**2)+1/(4*np.sqrt(3))+mu*md/(4*np.sqrt(3)*G(mu,md,ms))*2*coup[3]
-
-    api0 = 1/(ma**2 - mpi0**2)*(Mapi2 +ma**2 * Kapi + \
-                            deltaI*(Mpieta2*(Maeta2 + ma**2 *Kaeta)/(ma**2 - meta**2) + Mpietap2 *(Maetap2 + ma**2* Kaetap)/(ma**2 - metap**2)))
-    
-    
-    aeta = 1/(ma**2 - meta**2)* (Maeta2 +ma**2 *Kaeta +\
-                                deltaI *(Mpieta2* (Mapi2 + ma**2*Kapi)/(ma**2 - mpi0**2)+ Metaetap2 *(Maetap2 + ma**2 *Kaetap)/(ma**2 - metap**2)))
-    
-    
-    aetaprime = 1/(ma**2-metap**2)* (Maetap2+ ma**2*Kaetap +\
-                                        deltaI *(Mpietap2 *(Mapi2 + ma**2*Kapi)/(ma**2 - mpi0**2) + Metaetap2* (Maeta2 + ma**2* Kaeta)/(ma**2 - meta**2)))
-    
-    return api0, aeta, aetaprime
-
-#def calpmixing(ma, couplings: ALPcouplings, deltaI, **kwargs):
-    #INPUT:
-        #ma: Mass of the ALP (GeV)
-        #coup: Vector of couplings (cu, cd, cs, cg)
-    #OUTPUT:
-        #Cu,Cd,Cd: Mixing
-
-    #Pseudoscalar matrix generators
- #   pi0gen = 1/2*np.array([1, -1, 0])
-  #  etagen =1/np.sqrt(6)*np.array([1, 1, -1])
-   # etapgen =1/(2*np.sqrt(3))*np.array([1, 1, 2])
-    #Mixing elements
-    #api0, aeta, aetap = u3rep(ma, couplings, deltaI, **kwargs)
-    #C mixing
-    #Cu = np.sqrt(6)*(api0*pi0gen[0] + aeta*etagen[0] + aetap*etapgen[0])/chiral.alphas_tilde(ma)
-    #Cd = np.sqrt(6)*(api0*pi0gen[1] + aeta*etagen[1] + aetap*etapgen[1])/chiral.alphas_tilde(ma)
-    #Cs = np.sqrt(6)*(api0*pi0gen[2] + aeta*etagen[2] + aetap*etapgen[2])/chiral.alphas_tilde(ma)
-    #return Cu, Cd, Cs
-
 def alp_mixing(M, fa):
     #INPUT:
         #M: Vector of matrices to multiply
@@ -253,10 +58,11 @@ def alpVV(ma: float, c: ALPcouplings, fa:float, **kwargs) -> tuple[float, float,
         #c: Vector of couplings (cu, cd, cs, cg)
     #OUTPUT:
         #<a rho rho>: Mixing element
-    arhorho = alp_mixing([chiral.a_U3_repr(ma, c, fa, **kwargs), rho0, rho0], fa)
-    arhow = alp_mixing([chiral.a_U3_repr(ma, c, fa, **kwargs), rho0, omega], fa)
-    aww = alp_mixing([chiral.a_U3_repr(ma, c, fa, **kwargs), omega, omega], fa)
-    aphiphi = alp_mixing([chiral.a_U3_repr(ma, c, fa, **kwargs), phi, phi], fa)
+    aU3 = chiral.a_U3_repr(ma, c, fa, **kwargs)
+    arhorho = alp_mixing([aU3, rho0, rho0], fa)
+    arhow = alp_mixing([aU3, rho0, omega], fa)
+    aww = alp_mixing([aU3, omega, omega], fa)
+    aphiphi = alp_mixing([aU3, phi, phi], fa)
     return arhorho, arhow, aww, aphiphi
 
 def G(x, y, z):
@@ -350,19 +156,6 @@ def bw(s, m, Gamma, c):
         print('Wrong control digit in BW function')
         result = 0
     return result
-
-###########################    FUNCTION F (as defined in Eq.14)    ###########################
-
-def ffunction(ma):
-    #INPUT:
-        #ma: Mass of ALP (GeV)
-    #OUTPUT:
-        #Data-driven function 
-    if ma < 1.4: fun = 1
-    elif ma >= 1.4 and ma <= 2: 
-        fun = ((1.4/2)**4-1)/(2-1.4)*(ma-1.4) + 1 #Interpolation (for now I do just straight line) (y2-y1)/(x2-x1)*(x-x1)+y1
-    else: fun = (1.4/ma)**4
-    return fun
 
 ###########################    DECAY TO 3 PIONS a-> pi pi pi    ###########################
 #Decay to 3 neutral pions 3 pi0
