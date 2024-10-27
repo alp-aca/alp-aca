@@ -363,12 +363,3 @@ def decay_width_gammapipi(ma: float, couplings: ALPcouplings, fa: float, **kwarg
         edecayrate = 3*alphaem(ma)*ma**3/(2**11*np.pi**6*fa**2)* resint.sdev
     else: decayrate, edecayrate= [0.0,0.0]
     return decayrate
-
-
-
-######################################################   GLUON CHANNEL (a-> g g)    ######################################################
-def decay_width_gluongluon(ma, fa):
-    if ma > 1.84:
-        res = alphas(ma)**2*ma**3/(32*np.pi**3*fa**2)* (1 + 83*alphas(ma)/(4*np.pi))
-    else: res = 0.0
-    return res

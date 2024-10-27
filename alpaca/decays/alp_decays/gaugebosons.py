@@ -73,3 +73,20 @@ def decay_width_2gamma(ma: float, couplings: ALPcouplings, fa: float, **kwargs) 
         cgamma_eff += cgamma_chiral(ma, couplings) + cgamma_VMD(ma, couplings, fa, **kwargs)
     return alpha_em(ma)**2*ma**3*np.abs(cgamma_eff)**2/((4*np.pi)**3*fa**2)
 
+def decay_width_2gluons(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
+    if ma < 1.84:
+        return 0.0
+
+    match_scale = kwargs.get('matching_scale', mW)
+    if ma > match_scale:
+        cc = couplings.match_run(ma, 'massbasis_above', **kwargs)
+        cuA = cc['ku'] - cc['kU']
+        cdA = cc['kd'] - cc['kD']
+    else:
+        cc = couplings.match_run(ma, 'VA_below', **kwargs)
+        cuA = cc['cuA']
+        cdA = cc['cdA']
+    mq = [mu, md, ms, mc, mb]
+    coupl = [cuA[0,0], cdA[0,0], cdA[1,1], cuA[1,1], cdA[2,2]]
+    cg_eff = cc['cg'] + 0.5 * sum(coupl[i]*B1(4*mq[i]**2/ma**2) for i in range(5))
+    return alpha_s(ma)**2*ma**3/((4*np.pi)**3*fa**2)*np.abs(cg_eff)**2*(1+alpha_s(ma)/np.pi*83/4)#(1+alpha_s(ma)/48/np.pi*(291-sum(14 for i in range(5) if ma > mq[i])))
