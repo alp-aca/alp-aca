@@ -4,6 +4,13 @@ from ...constants import mu, md, ms, mpi0, meta, metap, fpi
 from ...common import alpha_s
 from . import u3reprs
 from functools import lru_cache
+import pickle
+import os
+
+path = os.path.dirname(__file__)
+
+with open(os.path.join(path, 'ffunction.pickle'), 'rb') as f:
+    ffunction_interp = pickle.load(f)
 
 kappa = np.diag([1/m for m in [mu, md, ms]])/sum(1/m for m in [mu, md, ms])
 
@@ -53,6 +60,6 @@ def ffunction(ma):
     #Chiral contribution (1811.03474, eq. S26, ,approx) (below mass eta')
     if ma < 1.4: fun = 1
     elif ma >= 1.4 and ma <= 2: 
-        fun = ((1.4/2)**4-1)/(2-1.4)*(ma-1.4) + 1 #Interpolation (for now I do just straight line) (y2-y1)/(x2-x1)*(x-x1)+y1
+        fun = ffunction_interp(ma)
     else: fun = (1.4/ma)**4
     return fun
