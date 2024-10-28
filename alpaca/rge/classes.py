@@ -251,8 +251,10 @@ class ALPcouplings:
         if scale_out < matching_scale:
             if integrator == 'scipy':
                 return run_low.run_scipy(self.translate('kF_below'), scale_out).translate(basis)
-            if integrator == 'leadinglog':
+            elif integrator == 'leadinglog':
                 return run_low.run_leadinglog(self.translate('kF_below'), scale_out).translate(basis)
+            elif integrator == 'no_rge':
+                return ALPcouplings(self.values, scale_out, self.basis).translate(basis)
             else:
                 raise KeyError(integrator)
         if basis in bases_above and self.basis in bases_above:
@@ -264,8 +266,10 @@ class ALPcouplings:
                 raise KeyError(beta)
             if integrator == 'scipy':
                 return run_high.run_scipy(self, betafunc, scale_out).translate(basis)
-            if integrator == 'leadinglog':
+            elif integrator == 'leadinglog':
                 return run_high.run_leadinglog(self, betafunc, scale_out).translate(basis)
+            elif integrator == 'no_rge':
+                return ALPcouplings(self.values, scale_out, self.basis).translate(basis)
             else:
                 raise KeyError(integrator)
         else:
