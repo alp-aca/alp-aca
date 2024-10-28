@@ -232,7 +232,7 @@ def babar_psi2stonunu_comb(x):
 
 
 ############ Quarkonia decays ############
-invisible = "Binned_measurement/Invisible/"
+invisible = "invisible/"
 
 #BaBar Upsilon(3S)
     #Experiment: BaBar
@@ -794,7 +794,7 @@ def pdg_Kltomumu(x):
 
 
 ############ Quarkonia decays ############
-visible = "Binned_measurement/Visible/"
+visible = "visible/"
 
 #BaBar Y(2S, 3S)--> Hadrons
     #Experiment: BaBar
