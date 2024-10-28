@@ -356,14 +356,15 @@ def decay_width_gammapipi(ma: float, couplings: ALPcouplings, fa: float, **kwarg
   url          = {https://doi.org/10.5281/zenodo.12687656}
 }""")
     citations.register_inspire('Lepage:2020tgj')
-    if ma > 2*mpi0:
+    if ma > 2*mpi_pm:
         nitn_adapt = kwargs.get('nitn_adapt', 10)
         neval_adapt = kwargs.get('neval_adapt', 10)
         nitn = kwargs.get('nitn', 10)
         neval = kwargs.get('neval', 100)
-        kwargs_integrand = {k: v for k, v in kwargs.items() if k not in ['nitn_adapt', 'neval_adapt', 'nitn', 'neval']}
+        cores = kwargs.get('cores', 4)
+        kwargs_integrand = {k: v for k, v in kwargs.items() if k not in ['nitn_adapt', 'neval_adapt', 'nitn', 'neval', 'cores']}
         #Numerical integration (using vegas integrator)
-        integrator= vegas.Integrator([[(2*mpi0)**2,ma**2]])#,[0,1]]) #Second integration is to get mean value easily
+        integrator= vegas.Integrator([[(2*mpi_pm)**2,ma**2]], nproc=cores)#,[0,1]]) #Second integration is to get mean value easily
         # step 1 -- adapt to integrand; discard results
         integrator(functools.partial(ampatogammapipi, ma, Gammarho, mrho, couplings, fa, **kwargs_integrand), nitn=nitn_adapt, neval=neval_adapt)
         # step 2 -- integrator has adapted to integrand; keep results
