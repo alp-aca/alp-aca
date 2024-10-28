@@ -36,7 +36,7 @@ def bin_selection(x, qmin, qmax, value, sigmal, sigmar):
     sigmals = 0
     sigmars = 0 
     for ii in range(len(qmin)):
-        if x>qmin[ii] and x<qmax[ii]:
+        if x**2>qmin[ii] and x**2<qmax[ii]:
             values = value[ii]
             sigmals = sigmal[ii]
             sigmars = sigmar[ii]
