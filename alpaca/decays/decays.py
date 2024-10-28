@@ -29,7 +29,7 @@ def decay_width(transition: str, ma: float, couplings: ALPcouplings, fa: float, 
     elif initial == ['alp'] and (final == sorted(['photon', 'pion', 'pion']) or final == sorted(['photon', 'pion+', 'pion-'])):
         dw = hadronic_decays_def.decay_width_gammapipi
     else:
-        raise NotImplementedError(f'Unkwon decay process {" ".join(initial)} -> {" ".join(final)}')
+        raise NotImplementedError(f'Unknown decay process {" ".join(initial)} -> {" ".join(final)}')
     
     return np.vectorize(dw)(ma, couplings, fa, **kwargs)
 
@@ -39,7 +39,7 @@ def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: flo
         from ..constants import mUpsilon1S, BeeUpsilon1S
         br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['mu']
     else:
-        raise NotImplementedError(f'Unkwown branching ratio process {" ".join(initial)} -> {" ".join(final)}')
+        raise NotImplementedError(f'Unknown branching ratio process {" ".join(initial)} -> {" ".join(final)}')
     
     return np.vectorize(br)(ma, couplings, fa, **kwargs)
 
@@ -48,6 +48,6 @@ def cross_section(transition: str, ma: float, couplings: ALPcouplings, s: float,
     if initial == ['electron', 'electron'] and final == sorted(['alp', 'photon']):
         sigma = invisible.sigmaNR
     else:
-        raise NotImplementedError(f'Unkwown cross section process {" ".join(initial)} -> {" ".join(final)}')
+        raise NotImplementedError(f'Unknown cross section process {" ".join(initial)} -> {" ".join(final)}')
     
     return np.vectorize(sigma)(ma, couplings, s, fa, **kwargs)
