@@ -6,7 +6,7 @@ from . import threebody_decay
 from ...rge import ALPcouplings, bases_above
 from . import chiral
 from .chiral import ffunction
-from .u3reprs import pi0, eta, etap, rho0, omega, phi, sigma, f0, a0, f2
+from .u3reprs import pi0, eta, etap, rho0, omega, phi, sigma, f0, a0, f2, eta0, eta8
 from ...constants import mu, md, ms, mc, mb, mt, me, mmu, mtau, mpi0, meta, metap, mK, mrho, fpi, mpi_pm, ma0, msigma, mf0, mf2, Gammaa0, Gammasigma, Gammaf0, Gammaf2
 
 #IMPORTANT NOTE:
@@ -277,7 +277,8 @@ def ampatoetapipi(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs):
 
 
     #Mix amplitude (Eq.S48)
-    amix = 0 #Approximation --> (np.sqrt(2)*aeta0+aeta8)*mpi**2/(3*fpi**2)*ffunction(ma) 
+    #amix = 0 #Approximation --> (np.sqrt(2)*aeta0+aeta8)*mpi**2/(3*fpi**2)*ffunction(ma) 
+    amix = (np.sqrt(2)*alp_mixing([aU3, eta0], fa) + alp_mixing([aU3, eta8], fa))*m2**2/3/fpi**2*ffunction(ma)
 
     #a-> Sigma (Eq.S49)
     if mpi1pi2< 2*mK: 

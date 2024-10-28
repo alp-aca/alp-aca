@@ -106,6 +106,9 @@ Gammasigma = Constant(Particle.from_name("f(0)(500)").width/1000, 'particle') # 
 Gammaf0 = Constant(Particle.from_name("f(0)(980)").width/1000, 'particle')
 Gammaf2 = Constant(Particle.from_name("f(2)(1270)").width/1000, 'particle')
 
+# Mixing angle
+theta_eta_etap = Constant(-14.1/180*np.pi, 'Christ:2010dd')
+
 # Form factors
 fB = LazyFloat(lambda: pars['f_B+'])
 fBs = LazyFloat(lambda: pars['f_Bs'])

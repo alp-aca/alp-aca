@@ -1,12 +1,19 @@
 import numpy as np
+from ...constants import theta_eta_etap
 
 ###### Pseudoscalar mesons ###################
 pi0 = np.diag([1, -1, 0])/2
 
-# Change with the actual value of the eta-eta' mixing angle
-eta = np.diag([1, 1, -1])/np.sqrt(6)
+eta0 = np.diag([1, 1, 1])/np.sqrt(6)
 
-etap = np.diag([1, 1, 2])/2/np.sqrt(3)
+eta8 = np.diag([1/2, 1/2, -1])/np.sqrt(3)
+# Change with the actual value of the eta-eta' mixing angle
+#eta = np.diag([1, 1, -1])/np.sqrt(6)
+
+#etap = np.diag([1, 1, 2])/2/np.sqrt(3)
+eta = np.cos(theta_eta_etap) * eta8 - np.sin(theta_eta_etap) * eta0
+
+etap = np.sin(theta_eta_etap) * eta8 + np.cos(theta_eta_etap) * eta0
 
 sigma = np.diag([np.sqrt(5), np.sqrt(5), 1])/np.sqrt(22)
 
