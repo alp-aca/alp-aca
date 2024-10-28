@@ -232,7 +232,7 @@ def babar_psi2stonunu_comb(x):
 
 
 ############ Quarkonia decays ############
-invisible = "invisible/"
+invisible = "Binned_measurement/Invisible/"
 
 #BaBar Upsilon(3S)
     #Experiment: BaBar
@@ -425,6 +425,254 @@ def belleII_upsilon4s(x):
 
 #################################### VISIBLE SEARCHES ####################################
 
+###### Decays to gamma gamma ######
+
+#NA62  K+->pi+ gamma gamma
+    #Experiment: NA62
+    #arXiv: 1402.4334
+def na62_Ktopigammagamma(x):
+    citations.register_inspire('NA62:2014ybm')
+    q2min = [0.220**2] #Digamma momentum
+    q2max = [0.354**2] #Digamma momentum
+    value = [9.65e-7]
+    sigmal = [0.63e-7]
+    sigmar = sigmal
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmar)
+    return values, sigmals, sigmars
+
+#E949  K+->pi+ gamma gamma
+    #Experiment: E949
+    #arXiv: hep-ex/0505069
+def E949_Ktopigammagamma(x):
+    citations.register_inspire('E949:2005qiy')
+    q2min = [0**2] #Digamma momentum
+    q2max = [0.108**2] #Digamma momentum
+    value = [8.3e-9]
+    cl = 0.9
+    df = 1 
+    sigmas = sigma(cl, df, value)
+    valuep = [0]
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
+    return values, sigmals, sigmars
+
+#E787 K+->pi+ gamma gamma
+    #Experiment: E787
+    #arXiv: hep-ex/9708011
+def E787_Ktopigammagamma(x):
+    citations.register_inspire('E787:1997abk')
+    q2min = [0.196**2] #Digamma momentum
+    q2max = [0.306**2] #Digamma momentum
+    value = [6.0e-7]
+    sigmal = [np.sqrt((1.5)**2+(0.7)**2)*1e-7]
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmal)
+    return values, sigmals, sigmars
+
+#NA48  KL->pi0 gamma gamma
+    #Experiment: NA48
+    #arXiv: hep-ex/0205010
+def na48_Kltopi0gammagamma(x):
+    citations.register_inspire('NA48:2002xke')
+    q2min = [0.030**2] #Digamma momentum
+    q2max = [0.110**2] #Digamma momentum
+    value = [0.6e-8]
+    cl = 0.9
+    df = 1 
+    sigmas = sigma(cl, df, value)
+    valuep = [0]
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
+    return values, sigmals, sigmars
+
+#KTeV  KL->pi0 gamma gamma
+    #Experiment: KTeV
+    #arXiv: 0805.0031
+def ktev_Kltopi0gammagamma(x):
+    citations.register_inspire('KTeV:2008nqz')
+    q2min = [0,0.160**2] #Digamma momentum
+    q2max = [0.100**2,0.363**2] #Digamma momentum
+    value = [1.29e-6]
+    sigmas = [np.sqrt(0.03**2+0.05**2)*1e-6]
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmas, sigmas)
+    return values, sigmals, sigmars
+
+
+
+###### Decays to e e (final state) ######
+
+#Brookhaven  K+->pi+ a (-> e+ e-) 
+    #Experiment: Brookhaven
+    #arXiv: DOI: 10.1103/PhysRevLett.59.2832
+def brookhaven_Kptopipee(x):
+    citations.register_inspire('Baker:1987gp')
+    q2min = [0] #ALP mass
+    q2max = [0.100**2] #
+    value = [8e-7]
+    cl = 0.9
+    df = 1 
+    sigmas = sigma(cl, df, value)
+    valuep = [0]
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
+    return values, sigmals, sigmars
+
+#KTeV  KL->pi0 e e
+    #Experiment: KTeV
+    #arXiv: hep-ex/0309072
+def ktev_Kltopi0ee(x):
+    citations.register_inspire('KTeV:2003sls')
+    q2min = [0.140**2] #Dielectron momentum
+    q2max = [0.362**2] #Dielectron momentum
+    value = [2.8e-10]
+    cl = 0.9
+    df = 1 
+    sigmas = sigma(cl, df, value)
+    valuep = [0]
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
+    return values, sigmals, sigmars
+
+#NA48/2 K-> pi e e
+    #Experiment: NA48/2
+    #arXiv: 0903.3130
+    #Branching ratio
+def na48_Ktopiee(x):
+    citations.register_inspire('NA482:2009pfe')
+    q2min = [0]
+    q2max = [354**2]
+    value = [3.11e-7]
+    sigmal = [0.12e-7]
+    sigmar = [0.12e-7]
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmar)
+    return values, sigmals, sigmars
+
+#Belle  B+->pi+ e e
+    #Experiment: Belle
+    #arXiv: 0804.3656
+def belle_Bptopipee(x):
+    citations.register_inspire('Belle:2008tjs')
+    q2min = [0.140**2] #Dielectron momentum
+    q2max = [5.140**2] #Dielectron momentum
+    value = [8.0e-8]
+    cl = 0.9
+    df = 1 
+    sigmas = sigma(cl, df, value)
+    valuep = [0]
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
+    return values, sigmals, sigmars
+
+#LHCb B+->K+ e e
+    #Experiment: LHCb
+    #arXiv: 2212.09153
+def LHCb_BptoKpee_dif(x):
+    citations.register_inspire('LHCb:2022vje')
+    q2min = [1.1**2] #q^2
+    q2max = [6.0**2] #q^2
+    value = [25.5e-9]
+    sigmal = [np.sqrt((1.3)**2+(1.1)**2)*1e-9]
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmal)
+    return values, sigmals, sigmars
+
+#LHCb B0->K0* e e
+    #Experiment: LHCb
+    #arXiv: 2212.09153
+def LHCb_B0toK0staree_dif(x):
+    citations.register_inspire('LHCb:2022vje')
+    q2min = [1.1**2] #q^2
+    q2max = [6.0**2] #q^2
+    value = [33.3e-9]
+    sigmal = [np.sqrt((2.7)**2+(2.2)**2)*1e-9]
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmal)
+    return values, sigmals, sigmars
+
+
+#LHCb R(K)
+    #Experiment: LHCb
+    #arXiv: 2212.09153
+def LHCb_Rk(x):
+    citations.register_inspire('LHCb:2022vje')
+    q2min = [0.1, 1.1] #q^2
+    q2max = [1.1, 6.0] #q^2
+    value = [0.994, 0.949]
+    sigmal = [np.sqrt((0.090)**2+(0.029)**2), np.sqrt((0.042)**2+(0.022)**2)]
+    sigmar = [np.sqrt((0.082)**2+(0.027)**2), np.sqrt((0.041)**2+(0.022)**2)]
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmar)
+    return values, sigmals, sigmars
+
+#LHCb R(K*)
+    #Experiment: LHCb
+    #arXiv: 2212.09153
+def LHCb_Rkstar(x):
+    citations.register_inspire('LHCb:2022vje')
+    q2min = [0.1,1.1] #q^2
+    q2max = [1.1, 6.0] #q^2
+    value = [0.927, 1.027]
+    sigmal = [np.sqrt((0.093)**2+(0.036)**2), np.sqrt((0.072)**2+(0.027)**2)]
+    sigmar = [np.sqrt((0.087)**2+(0.035)**2), np.sqrt((0.068)**2+(0.026)**2)]
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmar)
+    return values, sigmals, sigmars
+
+
+#BESIII  D0->pi0 e e
+    #Experiment: BESIII
+    #arXiv: 1802.09752
+def besiii_D0topi0ee(x):
+    citations.register_inspire('BESIII:2018hqu')
+    q2min = [0, 1.053**2] #Dielectron mass
+    q2max = [0.935**2, 1.730**2] #Dielectron mass
+    value = [0.4e-5]
+    cl = 0.9
+    df = 1 
+    sigmas = sigma(cl, df, value)
+    valuep = [0]
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
+    return values, sigmals, sigmars
+
+#BaBar D+->pi+ e e
+    #Experiment: BaBar
+    #arXiv: 1107.4465
+def babar_Dptopipee(x):
+    citations.register_inspire('BaBar:2011ouc')
+    q2min = [0.200**2, 1.050**2] #Dielectron mass
+    q2max = [0.950**2, 1.730**2] #Dielectron mass
+    value = [3.9e-4]
+    cl = 0.9
+    df = 1 
+    sigmas = sigma(cl, df, value)
+    valuep = [0]
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
+    return values, sigmals, sigmars
+
+#BaBar Ds+->K+ e e
+    #Experiment: BaBar
+    #arXiv: 1107.4465
+def babar_DsptoKpee(x):
+    citations.register_inspire('BaBar:2011ouc')
+    q2min = [0.200**2, 1.050**2] #Dielectron mass
+    q2max = [0.950**2, 1.475**2] #Dielectron mass
+    value = [1.6e-4]
+    cl = 0.9
+    df = 1 
+    sigmas = sigma(cl, df, value)
+    valuep = [0]
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
+    return values, sigmals, sigmars
+
+
+
+
+####### Decay to mu mu ######
+#KTeV KL->pi0 mu mu
+    #Experiment: KTeV
+    #arXiv: hep-ex/0001006
+def ktev_KLtopi0mumu(x):
+    citations.register_inspire('KTEV:2000ngj')
+    q2min = [0.210**2] #Dimuon mass
+    q2max = [0.350**2] #Dimuon mass
+    value = [3.8e-10]
+    cl = 0.9
+    df = 1 
+    sigmas = sigma(cl, df, value)
+    valuep = [0]
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
+    return values, sigmals, sigmars
+
 #CMS B+- -> K+- mu mu
     #Experiment: CMS
     #arXiv:2401.07090
@@ -439,32 +687,92 @@ def cms_BchargedtoKchargedmumu(x):
     values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmar)
     return values, sigmals, sigmars
 
-#NA48/2 K-> pi e e
-    #Experiment: NA48/2
-    #arXiv: 0903.3130
-    #Branching ratio
-def na48_Ktopiee(x):
-    citations.register_inspire('NA482:2009pfe')
-    q2min = [0]
-    q2max = [mK**2]
-    value = [3.11e-7]
-    sigmal = [0.12e-7]
-    sigmar = [0.12e-7]
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmar)
-    return values, sigmals, sigmars
-
-
 #LHCb Bs->mu mu
     #Experiment: LHCb
     #arXiv: 1703.05747
     #Branching ratio
 def lhcb_Bstomumu(x):
     citations.register_inspire('LHCb:2017rmj')
-    q2min = [0]
-    q2max = [mBs**2]
+    q2min = [5.320**2]
+    q2max = [6.0**2]
     value = [3.0e-9]
     sigmal = [np.sqrt((0.6)**2+(0.3)**2)*1e-9]
     values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmal)
+    return values, sigmals, sigmars
+
+#Combo Bs->mu mu
+    #Experiment: LHCb + ATLAS + CMS
+    #arXiv: LHCb-CONF-2020-002,CMS PAS BPH-20-003, ATLAS-CONF-2020-049
+    #Branching ratio
+def combo_Bstomumu(x):
+    citations.register_inspire('ATLAS:2020acx')
+    q2min = [5.367**2]
+    q2max = [6.0**2]
+    value = [2.69e-9]
+    sigmal = [0.35e-9]
+    sigmar = [0.37e-9]
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmar)
+    return values, sigmals, sigmars
+
+#Combo B0->mu mu
+    #Experiment: LHCb + ATLAS + CMS
+    #arXiv: LHCb-CONF-2020-002,CMS PAS BPH-20-003, ATLAS-CONF-2020-049
+    #Branching ratio
+def combo_B0tomumu(x):
+    citations.register_inspire('ATLAS:2020acx')
+    q2min = [5.230**2] #Dimuon mass
+    q2max = [6.0**2] #Dimuon mass
+    value = [1.6e-10]
+    cl = 0.9
+    df = 1 
+    sigmas = sigma(cl, df, value)
+    valuep = [0]
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
+    return values, sigmals, sigmars
+
+#LHCb D+->pi+ mu mu
+    #Experiment: LHCb
+    #arXiv: 1304.6365
+def lhcb_Dptopipmumu(x):
+    citations.register_inspire('LHCb:2013hxr')
+    q2min = [0.250**2, 1.250**2] #Dimuonon mass
+    q2max = [0.525**2, 2.000**2] #Dimuon mass
+    value = [2.0e-8, 2.6e-8]
+    cl = 0.9
+    df = 1 
+    sigmas = sigma(cl, df, value)
+    valuep = [0]
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
+    return values, sigmals, sigmars
+
+#LHCb Ds+->pi+ mu mu
+    #Experiment: LHCb
+    #arXiv: 1304.6365
+def lhcb_Dsptopipmumu(x):
+    citations.register_inspire('LHCb:2013hxr')
+    q2min = [0.250**2, 1.250**2] #Dimuonon mass
+    q2max = [0.525**2, 2.000**2] #Dimuon mass
+    value = [6.9e-8, 16.0e-8]
+    cl = 0.9
+    df = 1 
+    sigmas = sigma(cl, df, value)
+    valuep = [0]
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
+    return values, sigmals, sigmars
+
+#BaBar D+->K+ mu mu
+    #Experiment: BaBar
+    #arXiv: 1107.4465
+def babar_Dptokpmumu(x):
+    citations.register_inspire('BaBar:2011ouc')
+    q2min = [0.200**2] #Dimuonon mass
+    q2max = [1.475**2] #Dimuon mass
+    value = [9.1e-4]
+    cl = 0.9
+    df = 1 
+    sigmas = sigma(cl, df, value)
+    valuep = [0]
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
     return values, sigmals, sigmars
 
 
@@ -481,99 +789,12 @@ def pdg_Kltomumu(x):
     values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigma, sigma)
     return values, sigmals, sigmars
 
-### Decays to gamma gamma
-
-#NA62  K+->pi+ gamma gamma
-    #Experiment: NA62
-    #arXiv: 1402.4334
-def na62_Ktopigammagamma(x):
-    citations.register_inspire('NA62:2014ybm')
-    q2min = [0.220**2] #Digamma momentum
-    q2max = [0.354**2] #Digamma momentum
-    value = [9.65e-7]
-    sigmal = [0.63e-7]
-    sigmar = sigmal
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmar)
-    return values, sigmals, sigmars
-
-#NA48  KL->pi0 gamma gamma
-    #Experiment: NA48
-    #arXiv: hep-ex/0205010
-def na48_Kltopi0gammagamma(x):
-    citations.register_inspire('NA48:2002xke')
-    q2min = [0] #Digamma momentum
-    q2max = [0.110**2] #Digamma momentum
-    value = [0.6e-8]
-    cl = 0.9
-    df = 1 
-    sigmas = sigma(cl, df, value)
-    valuep = [0]
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
-    return values, sigmals, sigmars
-
-#KTeV  KL->pi0 gamma gamma
-    #Experiment: KTeV
-    #arXiv: 0805.0031
-def ktev_Kltopi0gammagamma(x):
-    citations.register_inspire('')
-    q2min = [0] #Digamma momentum
-    q2max = [0.363**2] #Digamma momentum
-    value = [1.29e-6]
-    sigmas = [np.sqrt(0.03**2+0.05**2)*1e-6]
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmas, sigmas)
-    return values, sigmals, sigmars
-
-
-#E949  K+->pi+ gamma gamma
-    #Experiment: E949
-    #arXiv: hep-ex/0505069
-def E949_Ktopigammagamma(x):
-    citations.register_inspire('E949:2005qiy')
-    q2min = [0.213**2] #Pion momentum
-    q2max = [0.227**2] #Pion momentum
-    value = [8.3e-9]
-    cl = 0.9
-    df = 1 
-    sigmas = sigma(cl, df, value)
-    valuep = [0]
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
-    return values, sigmals, sigmars
-
-#E787 K+->pi+ gamma gamma
-    #Experiment: E787
-    #arXiv: hep-ex/9708011
-def E787_Ktopigammagamma(x):
-    citations.register_inspire('E787:1997abk')
-    q2min = [0.100**2] #Pion momentum
-    q2max = [0.180**2] #Pion momentum
-    value = [6.0e-7]
-    sigmal = [np.sqrt((1.5)**2+(0.7)**2)*1e-7]
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmal)
-    return values, sigmals, sigmars
-
-
-### Decays to e e (final state)
-
-#Brookhaven  K+->pi+ a (-> e+ e-) 
-    #Experiment: Brookhaven
-    #arXiv: DOI: 10.1103/PhysRevLett.59.2832
-def _Kptopipee(x):
-    citations.register_inspire('Baker:1987gp')
-    q2min = [0] #ALP mass
-    q2max = [0.100**2] #
-    value = [8e-7]
-    cl = 0.9
-    df = 1 
-    sigmas = sigma(cl, df, value)
-    valuep = [0]
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
-    return values, sigmals, sigmars
 
 
 
 
 ############ Quarkonia decays ############
-visible = "visible/"
+visible = "Binned_measurement/Visible/"
 
 #BaBar Y(2S, 3S)--> Hadrons
     #Experiment: BaBar
