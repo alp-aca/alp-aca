@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 # from alpaca.decays.alp_decays.hadronic_decays_def import decay_width_3pi000, decay_width_3pi0pm, decay_width_etapipi00, decay_width_etapipipm, decay_width_gammapipi, decay_width_gluongluon
 # from alpaca.decays.alp_decays.gaugebosons import decay_width_2gamma
 from alpaca.rge import ALPcouplings
-from alpaca.decays.alp_decays.branching_ratios import BRsalp, BR_2photons, BR_electron, BR_muon, BR_tau, BR_charm, BR_bottom, BR_3pis, BR_etapipi, BR_gammapipi, BR_gluongluon
+from alpaca.decays.alp_decays.branching_ratios import BRsalp
 import time
 
 # Empieza a medir el tiempo
@@ -21,8 +21,10 @@ ma=np.logspace(-1,1,1000)
 fa=1000
 
 cphoton=1.0
-cfermi=1.0
-cgluons=1.0
+clept=1.0
+cu=1.0
+cd=1.0 
+cgluons=1,0
 #low_scale=2.0
 # couplings=ALPcouplings({'cgamma': cphoton, 'cuA': cfermi, 'cdA': cfermi, 'ceA': cfermi}, scale=, basis='VA_below')
 
@@ -38,10 +40,11 @@ BRetapipi=[]
 BRgammapipi=[]
 BRgluongluon=[]
 
+
+
 for m in ma:
-    print(m)
-    couplings = ALPcouplings({'cgamma': cphoton, 'cuA': cfermi, 'cdA': cfermi, 'ceA': cfermi}, scale=m, basis='VA_below')
-    BRs=BRsalp(m, fa, couplings)
+    couplings = ALPcouplings({'cgamma': cphoton, 'cuA': cu, 'cdA': cd, 'ceA': clept}, scale=m, basis='VA_below')
+    BRs=BRsalp(m, couplings, fa, cores=6)
     BR_2gamma.append(BRs['2photons'])
     BRelec.append(BRs['e'])
     BRmu.append(BRs['mu'])
