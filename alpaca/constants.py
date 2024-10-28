@@ -105,6 +105,7 @@ Gammaa0 = Constant(Particle.from_name("a(0)(980)0").width/1000, 'particle')
 Gammasigma = Constant(Particle.from_name("f(0)(500)").width/1000, 'particle') # f0(500) used to be sigma
 Gammaf0 = Constant(Particle.from_name("f(0)(980)").width/1000, 'particle')
 Gammaf2 = Constant(Particle.from_name("f(2)(1270)").width/1000, 'particle')
+Gammarho = Constant(Particle.from_name("rho(770)0").width/1000, 'particle')
 
 # Mixing angle
 theta_eta_etap = Constant(-14.1/180*np.pi, 'Christ:2010dd')

@@ -3,22 +3,28 @@ from . import u3reprs
 from ...rge import ALPcouplings
 from ...constants import mpi0, metap, mK, mu, md, ms, mc, mb, mt, mW, s2w, me, mmu, mtau, fpi
 from ...common import alpha_s, alpha_em, B1, B2
+from ...citations import citations
 import numpy as np
 
 
 def cgamma_chiral(ma: float, couplings: ALPcouplings) -> float:
+    citations.register_inspire('Bauer:2017ris')
+    citations.register_inspire('Aloni:2018vki')
     if ma > metap:
         return 0
     charges = np.diag([2/3, -1/3, -1/3])
     return -2*couplings['cg']*3*np.trace(kappa @ charges @ charges)
 
 def cgamma_VMD(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
+    citations.register_inspire('Aloni:2018vki')
+    citations.register_inspire('Fujiwara:1984mp')
     if ma > 3.0:
         return 0
     a = a_U3_repr(ma, couplings, fa, **kwargs)
     return ffunction(ma)*(3*np.trace(a @ u3reprs.rho0 @ u3reprs.rho0) + 1/3*np.trace(a @ u3reprs.omega @ u3reprs.omega) + 2/3*np.trace(a @ u3reprs.phi @ u3reprs.phi) + 2*np.trace(a @ u3reprs.rho0 @ u3reprs.omega))*fa/fpi
 
 def cgamma_twoloops(ma: float, couplings: ALPcouplings, fa: float) -> float:
+    citations.register_inspire('Bauer:2017ris')
     if couplings['cg'] == 0.0:
         return 0
     if ma < metap:
@@ -74,6 +80,7 @@ def decay_width_2gamma(ma: float, couplings: ALPcouplings, fa: float, **kwargs) 
     return alpha_em(ma)**2*ma**3*np.abs(cgamma_eff)**2/((4*np.pi)**3*fa**2)
 
 def decay_width_2gluons(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
+    citations.register_inspire('Bauer:2017ris')
     if ma < 1.84:
         return 0.0
 

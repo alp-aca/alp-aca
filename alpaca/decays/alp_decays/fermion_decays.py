@@ -1,9 +1,11 @@
 import numpy as np
 from ...rge import ALPcouplings, bases_above
 from ...constants import me, mmu, mtau, mc, mb
+from ...citations import citations
 
 
 def fermion_decay_width(ma, fa,cf, mf,Nc):
+    citations.register_inspire('Bauer:2017ris')
     if mf<ma/2:
         return (Nc*cf*np.conjugate(cf)/fa**2)*np.sqrt(1-pow(2*mf/ma,2))*ma*pow(mf,2)/(8 * np.pi)
     else:

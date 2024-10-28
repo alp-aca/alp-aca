@@ -7,22 +7,11 @@ from ...rge import ALPcouplings, bases_above
 from . import chiral
 from .chiral import ffunction
 from .u3reprs import pi0, eta, etap, rho0, omega, phi, sigma, f0, a0, f2, eta0, eta8
-from ...constants import mu, md, ms, mc, mb, mt, me, mmu, mtau, mpi0, meta, metap, mK, mrho, fpi, mpi_pm, ma0, msigma, mf0, mf2, Gammaa0, Gammasigma, Gammaf0, Gammaf2
-
-#IMPORTANT NOTE:
-#Simplification in data-driven function interpolation
+from ...constants import mu, md, ms, mc, mb, mt, me, mmu, mtau, mpi0, meta, metap, mK, mrho, fpi, mpi_pm, ma0, msigma, mf0, mf2, Gammaa0, Gammasigma, Gammaf0, Gammaf2, Gammarho
+from ...citations import citations
 
 #ALP decays to different channels (leptonic, hadronic, photons)
 
-#deltaI = 1/3 #(mu-md)/(mu+md) Parametrises isospin breaking
-
-
-#Decay widths (ESTIMATIONS)
-Gammasigma = 400e-3 #Gamma sigma (in GeV)
-Gammaf0 = 55e-3 #Gamma f0 (in GeV)
-Gammaa0 = 75e-3 #Gamma a0 (in GeV)
-Gammaf2 = 186.6e-3 #Gamma f2 (in GeV)
-Gammarho = 150e-3 #Gamma rho (in GeV)
 
 #Particle masses
 mlepton = [me, mmu, mtau]
@@ -58,6 +47,7 @@ def alpVV(ma: float, c: ALPcouplings, fa:float, **kwargs) -> tuple[float, float,
         #c: Vector of couplings (cu, cd, cs, cg)
     #OUTPUT:
         #<a rho rho>: Mixing element
+    citations.register_inspire('Aloni:2018vki')
     aU3 = chiral.a_U3_repr(ma, c, fa, **kwargs)
     arhorho = alp_mixing([aU3, rho0, rho0], fa)
     arhow = alp_mixing([aU3, rho0, omega], fa)
@@ -148,6 +138,7 @@ def bw(s, m, Gamma, c):
         #c: Control digit (c = 1 for rho, rho', rho'', rho''', c = 0 for the rest)
     #OUTPUT
         #result: Breit-Wigner modified propagator
+    citations.register_inspire('BaBar:2012bdw')
     if c==0:
         result= m**2/(m**2 -s -1.j*m*Gamma)
     elif c==1:
@@ -168,7 +159,8 @@ def ampato3pi0(ma, model, fa, Ener3, **kwargs): #Eq. S31
         #kinematics: Kinematical relationships
     #OUTPUT
         #Amplitude a->3 pi0 (without prefactor)
-    deltaI = 1/3
+    citations.register_inspire('Aloni:2018vki')
+    deltaI = (md-mu)/(md+mu)
     aU3 = chiral.a_U3_repr(ma, model, fa, **kwargs)
     coef = [alp_mixing([aU3, pi0], fa),\
             alp_mixing([aU3, eta], fa),\
@@ -188,7 +180,8 @@ def ampatopicharged(ma, model, fa, Ener3, **kwargs): #Eq.S32
         #kinematics: Kinematical relationships
     #OUTPUT
         #Amplitude a->3 pi0 (without prefactor)
-    deltaI = 1/3
+    citations.register_inspire('Aloni:2018vki')
+    deltaI = (md-mu)/(md+mu)
     aU3 = chiral.a_U3_repr(ma, model, fa, **kwargs)
     coef = [alp_mixing([aU3, pi0], fa),\
             alp_mixing([aU3, eta], fa),\
@@ -208,6 +201,7 @@ def ato3pi(ma, m1, m2, m3, model, fa, c, **kwargs): #Eq. S33
         #c: Control value (c=0-> Neutral pions, c=1-> pi0, pi+, pi-)
     #OUTPUT: 
         #Decay rate including symmetry factors
+    citations.register_inspire('Aloni:2018vki')
     if c == 0:
         s = 3*2 #Symmetry factor
         if ma > 3*mpi0+0.001 and ma<metap: 
@@ -246,6 +240,7 @@ def ampatoetapipi(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs):
     #xf0pipi = 1.47    xf0etaeta = 1.50    xf0etaetap = -10.19    xf0etapetap = 1.04
     #xa0pieta = -6.87    xa0pietap = -8.02
 
+    citations.register_inspire('Aloni:2018vki')
     deltaI = 0
     #Kinematic relations
     mpi1pi2 = np.sqrt(ma**2+m3**2-2*ma*x[0])
@@ -305,6 +300,7 @@ def atoetapipi(ma, m1, m2, m3, model, fa, c, **kwargs): #Eq. S33
         #c: Control value (c=0-> Neutral pions, c=1-> pi0, pi+, pi-)
     #OUTPUT: 
         #Decay rate including symmetry factors
+    citations.register_inspire('Aloni:2018vki')
     if ma < m1 + m2 + m3:
         return [0.0, 0,0]
     s = 2-c # Symmetry factor: 2 for pi0 pi0, 1 for pi+ pi-
@@ -327,6 +323,7 @@ def ampatogammapipi(ma, Gamma, mrho, model, fa, x, **kwargs):
         #kinematics: Kinematical relationships
     #OUTPUT
         #Amplitude a-> eta pi pi (without prefactor)
+    citations.register_inspire('Aloni:2018vki')
     arhorho = alpVV(ma, model, fa, **kwargs)[0]
     if ma > 2*mpi0+0.001:
         a = g**2* np.sqrt(x[0])* bw(np.sqrt(x[0]), mrho, Gamma,1)*arhorho*ffunction(ma)
