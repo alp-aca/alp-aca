@@ -243,7 +243,7 @@ def ampatoetapipi(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs):
     citations.register_inspire('Aloni:2018vki')
     deltaI = 0
     #Kinematic relations
-    mpi1pi2 = np.sqrt(ma**2+m3**2-2*ma*x[0])
+    mpi1pi2 = np.sqrt(ma**2+m3**2-2*ma*x[:,0])
     pappi1 = kinematics[0]
     pappi2 = kinematics[1]
     papeta = kinematics[2]
@@ -276,9 +276,7 @@ def ampatoetapipi(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs):
     amix = (np.sqrt(2)*alp_mixing([aU3, eta0], fa) + alp_mixing([aU3, eta8], fa))*m2**2/3/fpi**2*ffunction(ma)
 
     #a-> Sigma (Eq.S49)
-    if mpi1pi2< 2*mK: 
-        asigma = -(10)**2* aetasigma* papeta* ppi1ppi2*bw(mpi1pi2**2, msigma, Gammasigma, 0)*ffunction(ma)
-    else: asigma = 0 #Avoid unitarity violation
+    asigma = np.where(mpi1pi2 < 2*mK, -(10)**2* aetasigma* papeta* ppi1ppi2*bw(mpi1pi2**2, msigma, Gammasigma, 0)*ffunction(ma), 0)
 
     #a-> f0 (Eq.S50)
     af0 = (7.3)**2* aetaf0* papeta* ppi1ppi2* bw(mpi1pi2**2, mf0, Gammaf0, 0)*ffunction(ma) 
@@ -326,8 +324,8 @@ def ampatogammapipi(ma, Gamma, mrho, model, fa, x, **kwargs):
     citations.register_inspire('Aloni:2018vki')
     arhorho = alpVV(ma, model, fa, **kwargs)[0]
     if ma > 2*mpi0+0.001:
-        a = g**2* np.sqrt(x[0])* bw(np.sqrt(x[0]), mrho, Gamma,1)*arhorho*ffunction(ma)
-        integrand = np.abs(a*np.conjugate(a)*pow(1-x[0]/ma**2,3)*pow(1-4*mpi0**2/x[0],3/2))
+        a = g**2* np.sqrt(x[:,0])* bw(np.sqrt(x[:,0]), mrho, Gamma,1)*arhorho*ffunction(ma)
+        integrand = np.abs(a*np.conjugate(a)*pow(1-x[:,0]/ma**2,3)*pow(1-4*mpi0**2/x[:,0],3/2))
     else:
         integrand = 0.0
     return integrand
@@ -366,9 +364,9 @@ def decay_width_gammapipi(ma: float, couplings: ALPcouplings, fa: float, **kwarg
         #Numerical integration (using vegas integrator)
         integrator= vegas.Integrator([[(2*mpi_pm)**2,ma**2]], nproc=cores)#,[0,1]]) #Second integration is to get mean value easily
         # step 1 -- adapt to integrand; discard results
-        integrator(functools.partial(ampatogammapipi, ma, Gammarho, mrho, couplings, fa, **kwargs_integrand), nitn=nitn_adapt, neval=neval_adapt)
+        integrator(vegas.lbatchintegrand(functools.partial(ampatogammapipi, ma, Gammarho, mrho, couplings, fa, **kwargs_integrand)), nitn=nitn_adapt, neval=neval_adapt)
         # step 2 -- integrator has adapted to integrand; keep results
-        resint = integrator(functools.partial(ampatogammapipi, ma, Gammarho, mrho, couplings, fa, **kwargs_integrand), nitn=nitn, neval=neval)
+        resint = integrator(vegas.lbatchintegrand(functools.partial(ampatogammapipi, ma, Gammarho, mrho, couplings, fa, **kwargs_integrand)), nitn=nitn, neval=neval)
         decayrate = 3*alphaem(ma)*ma**3/(2**11*np.pi**6*fa**2)* resint.mean 
         edecayrate = 3*alphaem(ma)*ma**3/(2**11*np.pi**6*fa**2)* resint.sdev
     else: decayrate, edecayrate= [0.0,0.0]

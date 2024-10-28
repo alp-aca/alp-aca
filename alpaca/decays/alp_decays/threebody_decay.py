@@ -85,10 +85,10 @@ def integrand(amplitude, M, m1, m2, m3, model, fa, x, **kwargs):
     #OUTPUT:
         #Integrand of decay rate
 
-    Ener3 = x[0] #Energy of particle 3 in frame decaying particle
-    theta = x[1] #Angle theta, CM frame of decaying particle
-    thetaast = x[2] #Angle theta, CM frame of system 1-2
-    phiast = x[3] #phi angle, CM frame of system 1-2
+    Ener3 = x[:,0] #Energy of particle 3 in frame decaying particle
+    theta = x[:,1] #Angle theta, CM frame of decaying particle
+    thetaast = x[:,2] #Angle theta, CM frame of system 1-2
+    phiast = x[:,3] #phi angle, CM frame of system 1-2
     m12 = np.sqrt(M**2+m3**2-2*M*Ener3)
 
     ampl = amplitude(M, m1, m2, m3, model, fa, x, kinematics(M,m1,m2,m3,Ener3,theta, thetaast, phiast), **kwargs)
@@ -148,9 +148,9 @@ def decay3body(amplitude, M, m1, m2, m3, model, fa, **kwargs):
     E3max=np.sqrt(q3max**2+m3**2)
     integrator= vegas.Integrator([[m3,E3max],[0, np.pi], [0, np.pi],[0, 2*np.pi]], nproc=cores)#[-1, 1], [-1, 1],[0, 2*np.pi]]) #vegas.Integrator([[(m1+m2)**2,(M-m3)**2],[0, 2*np.pi], [-1, 1],[0, 2*np.pi],[-1, 1]])
     # step 1 -- adapt to integrand; discard results
-    integrator(functools.partial(integrand, amplitude, M, m1, m2, m3, model, fa, **kwargs_integrand), nitn=nitn_adapt, neval=neval_adapt)
+    integrator(vegas.lbatchintegrand(functools.partial(integrand, amplitude, M, m1, m2, m3, model, fa, **kwargs_integrand)), nitn=nitn_adapt, neval=neval_adapt)
     # step 2 -- integrator has adapted to integrand; keep results
-    resint = integrator(functools.partial(integrand, amplitude, M, m1, m2, m3, model, fa, **kwargs_integrand), nitn=nitn, neval=neval)
+    resint = integrator(vegas.lbatchintegrand(functools.partial(integrand, amplitude, M, m1, m2, m3, model, fa, **kwargs_integrand)), nitn=nitn, neval=neval)
     decayrate = 1/((2*np.pi)**4*(32*M))* resint.mean
     edecayrate = 1/((2*np.pi)**4*(32*M))* resint.sdev
     return decayrate, edecayrate
@@ -185,9 +185,9 @@ def decay3body_spheric(amplitude, M, m1, m2, m3, model, fa, **kwargs):
     E3max=np.sqrt(q3max**2+m3**2)
     integrator= vegas.Integrator([m3,E3max], nproc=cores)#[-1, 1], [-1, 1],[0, 2*np.pi]]) #vegas.Integrator([[(m1+m2)**2,(M-m3)**2],[0, 2*np.pi], [-1, 1],[0, 2*np.pi],[-1, 1]])
     # step 1 -- adapt to integrand; discard results
-    integrator(functools.partial(integrand_spheric, amplitude, M, m1, m2, m3, model, fa, **kwargs_integrand), nitn=nitn_adapt, neval=neval_adapt)
+    integrator(vegas.lbatchintegrand(functools.partial(integrand_spheric, amplitude, M, m1, m2, m3, model, fa, **kwargs_integrand)), nitn=nitn_adapt, neval=neval_adapt)
     # step 2 -- integrator has adapted to integrand; keep results
-    resint = integrator(functools.partial(integrand_spheric, amplitude, M, m1, m2, m3, model, fa, **kwargs_integrand), nitn=nitn, neval=neval)
+    resint = integrator(vegas.lbatchintegrand(functools.partial(integrand_spheric, amplitude, M, m1, m2, m3, model, fa, **kwargs_integrand)), nitn=nitn, neval=neval)
     decayrate = 1/((2*np.pi)**4*(32*M))* resint.mean*8*np.pi
     edecayrate = 1/((2*np.pi)**4*(32*M))* resint.sdev*8*np.pi
     return decayrate, edecayrate
