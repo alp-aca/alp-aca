@@ -345,6 +345,17 @@ def decay_width_gammapipi(ma: float, couplings: ALPcouplings, fa: float, **kwarg
         #decayrate: Decay rate
         #edecayrate: Error in decay rate
     
+    citations.register_bibtex('vegas', """@software{peter_lepage_2024_12687656,
+  author       = {Peter Lepage},
+  title        = {gplepage/vegas: vegas version 6.1.3},
+  month        = jul,
+  year         = 2024,
+  publisher    = {Zenodo},
+  version      = {v6.1.3},
+  doi          = {10.5281/zenodo.12687656},
+  url          = {https://doi.org/10.5281/zenodo.12687656}
+}""")
+    citations.register_inspire('Lepage:2020tgj')
     if ma > 2*mpi0:
         nitn_adapt = kwargs.get('nitn_adapt', 10)
         neval_adapt = kwargs.get('neval_adapt', 10)

@@ -4,6 +4,7 @@ import numpy as np
 import vegas as vegas
 import math
 import functools
+from ...citations import citations
 
 #NOTES
 #The input amplitude should have space for all possible kinematic variables
@@ -125,6 +126,18 @@ def decay3body(amplitude, M, m1, m2, m3, model, fa, **kwargs):
         #mi: Mass of daughter particles [i=1,2,3] (in GeV)
     #OUTPUT:
         #Decay rate
+    citations.register_bibtex('romao', "@book{Romao, title={Integration of three body phase space: The 3BodyXSections and 3BodyDecays packages}, url={https://porthos.tecnico.ulisboa.pt/CTQFT/files/ThreeBodyPhaseSpace.pdf}, author={Romao, Jorge C.} }")
+    citations.register_bibtex('vegas', """@software{peter_lepage_2024_12687656,
+  author       = {Peter Lepage},
+  title        = {gplepage/vegas: vegas version 6.1.3},
+  month        = jul,
+  year         = 2024,
+  publisher    = {Zenodo},
+  version      = {v6.1.3},
+  doi          = {10.5281/zenodo.12687656},
+  url          = {https://doi.org/10.5281/zenodo.12687656}
+}""")
+    citations.register_inspire('Lepage:2020tgj')
     nitn_adapt = kwargs.get('nitn_adapt', 10)
     neval_adapt = kwargs.get('neval_adapt', 10)
     nitn = kwargs.get('nitn', 10)
@@ -149,6 +162,18 @@ def decay3body_spheric(amplitude, M, m1, m2, m3, model, fa, **kwargs):
         #mi: Mass of daughter particles [i=1,2,3] (in GeV)
     #OUTPUT:
         #Decay rate
+    citations.register_bibtex('romao', "@book{Romao, title={Integration of three body phase space: The 3BodyXSections and 3BodyDecays packages}, url={https://porthos.tecnico.ulisboa.pt/CTQFT/files/ThreeBodyPhaseSpace.pdf}, author={Romao, Jorge C.} }")
+    citations.register_bibtex('vegas', """@software{peter_lepage_2024_12687656,
+  author       = {Peter Lepage},
+  title        = {gplepage/vegas: vegas version 6.1.3},
+  month        = jul,
+  year         = 2024,
+  publisher    = {Zenodo},
+  version      = {v6.1.3},
+  doi          = {10.5281/zenodo.12687656},
+  url          = {https://doi.org/10.5281/zenodo.12687656}
+}""")
+    citations.register_inspire('Lepage:2020tgj')
     nitn_adapt = kwargs.get('nitn_adapt', 10)
     neval_adapt = kwargs.get('neval_adapt', 10)
     nitn = kwargs.get('nitn', 10)
