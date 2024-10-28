@@ -59,6 +59,12 @@ class Constant(float):
         else:
             citations.register_inspire(self.source)
 
+    def __getnewargs__(self) -> tuple:
+        return (self.__dict__['_value'], self.__dict__['source'])
+    
+    def __reduce__(self) -> tuple:
+        return (self.__class__, self.__getnewargs__(), self.__dict__)
+    
     def __getattribute__(self, name):
         if name == '_value':
             self.register()
