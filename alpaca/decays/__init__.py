@@ -1,1 +1,1 @@
-from .decays import decay
+from .decays import decay_width, branching_ratio, cross_section

@@ -1,89 +1,53 @@
 from .mesons import invisible
+from .alp_decays import hadronic_decays_def, gaugebosons, fermion_decays, branching_ratios
 from ..rge import ALPcouplings
+from .particles import particle_aliases
+import numpy as np
 
-def decay(transition: str, ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
+def parse(transition: str) -> tuple[list[str], list[str]]:
     initial, final = transition.split('->')
-    initial = initial.strip()
-    products = [f.strip() for f in final.split()]
-    if initial == 'B':
-        match products:
-            case ['K', ('a' | 'ALP')]:
-                decayrate = invisible.BtoKa
-            case _:
-                raise KeyError(f"Wrong decay {transition}")
-    elif initial == 'B0':
-        match products:
-            case [('K*0' | 'K0*' | 'K*'), ('a' | 'ALP')]:
-                decayrate = invisible.B0toKsta
-            case _:
-                raise KeyError(f"Wrong decay {transition}")
-    elif initial == 'K+':
-        match products:
-            case [('pi' | 'pi+'), ('a' | 'ALP')]:
-                decayrate = invisible.Ktopia
-            case _:
-                raise KeyError(f"Wrong decay {transition}")
+    initial = sorted([particle_aliases[p.strip()] for p in initial.split()])
+    final = sorted([particle_aliases[p.strip()] for p in final.split()])
+    return initial, final
+
+def decay_width(transition: str, ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
+    initial, final = parse(transition)
+    if initial == ['alp'] and final == ['electron', 'electron']:
+        dw = fermion_decays.decay_width_electron
+    elif initial == ['alp'] and final == ['muon', 'muon']:
+        dw = fermion_decays.decay_width_muon
+    elif initial == ['alp'] and final == ['tau', 'tau']:
+        dw = fermion_decays.decay_width_tau
+    elif initial == ['alp'] and final == ['photon', 'photon']:
+        dw = gaugebosons.decay_width_2gamma
+    elif initial == ['alp'] and final == sorted(['eta', 'pion0', 'pion0']):
+        dw = hadronic_decays_def.decay_width_etapipi00
+    elif initial == ['alp'] and final == sorted(['eta', 'pion+', 'pion-']):
+        dw = hadronic_decays_def.decay_width_etapipipm
+    elif initial == ['alp'] and final == ['eta', 'pion', 'pion']:
+        dw = lambda ma, couplings, fa, **kwargs: hadronic_decays_def.decay_width_etapipi00(ma, couplings, fa, **kwargs) + hadronic_decays_def.decay_width_etapipipm(ma, couplings, fa, **kwargs)
+    elif initial == ['alp'] and (final == sorted(['photon', 'pion', 'pion']) or final == sorted(['photon', 'pion+', 'pion-'])):
+        dw = hadronic_decays_def.decay_width_gammapipi
     else:
-                raise KeyError(f"Wrong decay {transition}")
-    return decayrate(ma, couplings, fa, **kwargs)
+        raise NotImplementedError(f'Unkwon decay process {" ".join(initial)} -> {" ".join(final)}')
     
-def BR(transition: str, ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
-    from ..constants import GammaB, GammaB0, GammaK
-    initial, final = transition.split('->')
-    initial = initial.strip()
-    products = [f.strip() for f in final.split()]
-    if initial == 'B':
-        match products:
-            case ['K', ('a' | 'ALP')]:
-                decayrate = lambda ma, c, fa, **kwargs: invisible.BtoKa(ma, c, fa, **kwargs)/GammaB
-            case _:
-                raise KeyError(f"Wrong decay {transition}")
-    elif initial == 'B0':
-        match products:
-            case [('K*0' | 'K0*' | 'K*'), ('a' | 'ALP')]:
-                decayrate = lambda ma, c, fa, **kwargs: invisible.B0toKsta(ma, c, fa, **kwargs)/GammaB0
-            case _:
-                raise KeyError(f"Wrong decay {transition}")
-    elif initial == 'K+':
-        match products:
-            case [('pi' | 'pi+'), ('a' | 'ALP')]:
-                decayrate = lambda ma, c, fa, **kwargs: invisible.Ktopia(ma, c, fa, **kwargs)/GammaK
-            case _:
-                raise KeyError(f"Wrong decay {transition}")
-    elif initial == 'J/psi':
-        match products:
-            case [('A' | 'gamma' | 'photon'), ('a' | 'ALP')] | [('a' | 'ALP'), ('A' | 'gamma' | 'photon')]:
-                from ..constants import mJpsi, BeeJpsi
-                decayrate = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mJpsi, BeeJpsi, 'c', fa, **kwargs)
-            case _:
-                raise KeyError(f"Wrong decay {transition}")
-    elif initial in ['Upsilon(1S)', 'Y(1S)']:
-        match products:
-            case [('A' | 'gamma' | 'photon'), ('a' | 'ALP')] | [('a' | 'ALP'), ('A' | 'gamma' | 'photon')]:
-                from ..constants import mUpsilon1S, BeeUpsilon1S
-                decayrate = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, 'b', fa, **kwargs)
-            case _:
-                raise KeyError(f"Wrong decay {transition}")
-    elif initial in ['Upsilon(3S)', 'Y(3S)']:
-        match products:
-            case [('A' | 'gamma' | 'photon'), ('a' | 'ALP')] | [('a' | 'ALP'), ('A' | 'gamma' | 'photon')]:
-                from ..constants import mUpsilon3S
-                decayrate = lambda ma, couplings, fa, **kwargs: invisible.Mixed_QuarkoniaSearches(ma, couplings, mUpsilon3S, 'b', fa, **kwargs) 
-            case _:
-                raise KeyError(f"Wrong decay {transition}")
-    else:
-        raise KeyError(f"Wrong decay {transition}")
-    return decayrate(ma, couplings, fa, **kwargs)
+    return np.vectorize(dw)(ma, couplings, fa, **kwargs)
 
-def cross_section(transition: str, ma: float, couplings: ALPcouplings, s:float, fa: float, **kwargs) -> float:
-    initial, final = transition.split('->')
-    initial = [f.strip() for f in initial.split()]
-    products = [f.strip() for f in final.split()]
-    match initial:
-        case ['e', 'e'] | ['e+', 'e-'] | ['e-', 'e+'] | ['electron' | 'positron'] | ['positron' | 'electron']:
-            match products:
-                case [('A' | 'gamma' | 'photon'), ('a' | 'ALP')] | [('a' | 'ALP'), ('A' | 'gamma' | 'photon')]:
-                    sigma = invisible.sigmaNR
-        case _:
-            raise KeyError(f"Wrong decay {transition}")
-    return sigma(ma, couplings, s, fa, **kwargs)
+def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
+    initial, final = parse(transition)
+    if initial == ['Upsilon(1S)'] and final == sorted(['photon', 'muon', 'muon']):
+        from ..constants import mUpsilon1S, BeeUpsilon1S
+        br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['mu']
+    else:
+        raise NotImplementedError(f'Unkwown branching ratio process {" ".join(initial)} -> {" ".join(final)}')
+    
+    return np.vectorize(br)(ma, couplings, fa, **kwargs)
+
+def cross_section(transition: str, ma: float, couplings: ALPcouplings, s: float, fa: float, **kwargs) -> float:
+    initial, final = parse(transition)
+    if initial == ['electron', 'electron'] and final == sorted(['alp', 'photon']):
+        sigma = invisible.sigmaNR
+    else:
+        raise NotImplementedError(f'Unkwown cross section process {" ".join(initial)} -> {" ".join(final)}')
+    
+    return np.vectorize(sigma)(ma, couplings, s, fa, **kwargs)

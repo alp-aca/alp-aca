@@ -3,7 +3,9 @@ from ...rge import ALPcouplings
 from .fermion_decays import decay_width_electron, decay_width_muon, decay_width_tau, decay_width_charm, decay_width_bottom
 from .hadronic_decays_def import decay_width_3pi000, decay_width_3pi0pm, decay_width_etapipi00, decay_width_etapipipm, decay_width_gammapipi
 from .gaugebosons import decay_width_2gamma, decay_width_2gluons
+from functools import lru_cache
 
+@lru_cache
 def total_decay_width (ma, couplings: ALPcouplings, fa, **kwargs):
     kwargs_nointegral = {k: v for k, v in kwargs.items() if k not in ['nitn_adapt', 'neval_adapt', 'nitn', 'neval', 'cores']}
     DW_elec = decay_width_electron(ma, couplings, fa, **kwargs_nointegral)
