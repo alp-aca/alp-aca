@@ -167,7 +167,7 @@ def ampato3pi0(ma, model, fa, Ener3, **kwargs): #Eq. S31
             alp_mixing([aU3, etap], fa)]
     #coef = u3rep(ma, model, deltaI)
     aux = coef[0] - deltaI*(1/np.sqrt(3)+np.sqrt(2)*Setapi0+Setappi0)*(np.sqrt(2)*coef[1]+coef[2]) + \
-    np.sqrt(3)*deltaI*(mpi0**2-2*meta**2)/(mpi0**2-4*meta**2)*(np.sqrt(2)*Setapi0+Setappi0)
+    np.sqrt(3)*model['cg']*deltaI*(mpi0**2-2*meta**2)/(mpi0**2-4*meta**2)*(np.sqrt(2)*Setapi0+Setappi0)
     return mpi0**2*aux
 
 #Decay to pi+ pi- pi0
@@ -188,7 +188,7 @@ def ampatopicharged(ma, model, fa, Ener3, **kwargs): #Eq.S32
             alp_mixing([aU3, etap], fa)]
     mpipipm = Ener3
     aux = (3*mpipipm**2-ma**2-2*mpi_pm**2)*coef[0] - deltaI*mpi_pm**2*(1/np.sqrt(3)+np.sqrt(2)*Setapi0+Setappi0)*(np.sqrt(2)*coef[1]+coef[2]) + \
-    deltaI*(mpi_pm**2-2*meta**2)/(mpi_pm**2-4*meta**2)*(np.sqrt(3)*mpi_pm**2*(np.sqrt(2)*Setapi0+Setappi0)-3*mpipipm**2+ma**2+3*mpi_pm**2)
+    model['cg']*deltaI*(mpi_pm**2-2*meta**2)/(mpi_pm**2-4*meta**2)*(np.sqrt(3)*mpi_pm**2*(np.sqrt(2)*Setapi0+Setappi0)-3*mpipipm**2+ma**2+3*mpi_pm**2)
     return 1/3*aux
 
 #Decay rate (numerical integration)
