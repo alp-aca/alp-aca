@@ -84,7 +84,7 @@ def decay_width_2gluons(ma: float, couplings: ALPcouplings, fa: float, **kwargs)
     if ma < 1.84:
         return 0.0
 
-    match_scale = kwargs.get('matching_scale', mW)
+    match_scale = kwargs.get('matching_scale', 100)
     if ma > match_scale:
         cc = couplings.match_run(ma, 'massbasis_above', **kwargs)
         cuA = cc['ku'] - cc['kU']
