@@ -142,7 +142,7 @@ def decay3body(amplitude, M, m1, m2, m3, model, fa, **kwargs):
     neval_adapt = kwargs.get('neval_adapt', 10)
     nitn = kwargs.get('nitn', 10)
     neval = kwargs.get('neval', 100)
-    cores = kwargs.get('cores', 4)
+    cores = kwargs.get('cores', 1)
     kwargs_integrand = {k: v for k, v in kwargs.items() if k not in ['nitn_adapt', 'neval_adapt', 'nitn', 'neval', 'cores']}
     q3max=kallen(M,m1+m2,m3)/(2*M)
     E3max=np.sqrt(q3max**2+m3**2)
@@ -179,7 +179,7 @@ def decay3body_spheric(amplitude, M, m1, m2, m3, model, fa, **kwargs):
     neval_adapt = kwargs.get('neval_adapt', 10)
     nitn = kwargs.get('nitn', 10)
     neval = kwargs.get('neval', 100)
-    cores = kwargs.get('cores', 4)
+    cores = kwargs.get('cores', 1)
     kwargs_integrand = {k: v for k, v in kwargs.items() if k not in ['nitn_adapt', 'neval_adapt', 'nitn', 'neval', 'cores']}
     q3max=kallen(M,m1+m2,m3)/(2*M)
     E3max=np.sqrt(q3max**2+m3**2)

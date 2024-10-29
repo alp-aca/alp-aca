@@ -359,7 +359,7 @@ def decay_width_gammapipi(ma: float, couplings: ALPcouplings, fa: float, **kwarg
         neval_adapt = kwargs.get('neval_adapt', 10)
         nitn = kwargs.get('nitn', 10)
         neval = kwargs.get('neval', 100)
-        cores = kwargs.get('cores', 4)
+        cores = kwargs.get('cores', 1)
         kwargs_integrand = {k: v for k, v in kwargs.items() if k not in ['nitn_adapt', 'neval_adapt', 'nitn', 'neval', 'cores']}
         #Numerical integration (using vegas integrator)
         integrator= vegas.Integrator([[(2*mpi_pm)**2,ma**2]], nproc=cores)#,[0,1]]) #Second integration is to get mean value easily
