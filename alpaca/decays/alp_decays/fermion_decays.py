@@ -29,7 +29,7 @@ def decay_width_muon(ma,couplings: ALPcouplings,fa, **kwargs):
     else:
         cc = couplings.match_run(ma, 'VA_below', **kwargs)
         ceA = cc['ceA']
-    return fermion_decay_width(ma, fa, ceA[1,1], mmu, Nc=1, **kwargs)
+    return fermion_decay_width(ma, fa, ceA[1,1], mmu, Nc=1)
 
 def decay_width_tau(ma,couplings: ALPcouplings,fa,**kwargs):
     matching_scale = kwargs.get('matching_scale', 100)
@@ -39,7 +39,7 @@ def decay_width_tau(ma,couplings: ALPcouplings,fa,**kwargs):
     else:
         cc = couplings.match_run(ma, 'VA_below', **kwargs)
         ceA = cc['ceA']
-    return fermion_decay_width(ma, fa, ceA[2,2], mtau, Nc=1, **kwargs)
+    return fermion_decay_width(ma, fa, ceA[2,2], mtau, Nc=1)
 
 def decay_width_charm(ma,couplings: ALPcouplings,fa,**kwargs):
     matching_scale = kwargs.get('matching_scale', 100)
@@ -49,7 +49,7 @@ def decay_width_charm(ma,couplings: ALPcouplings,fa,**kwargs):
     else:
         cc = couplings.match_run(ma, 'VA_below', **kwargs)
         cuA = cc['cuA']
-    return fermion_decay_width(ma, fa, cuA[1,1], mc, Nc=3, **kwargs)
+    return fermion_decay_width(ma, fa, cuA[1,1], mc, Nc=3)
 
 def decay_width_bottom(ma,couplings: ALPcouplings,fa,**kwargs):
     matching_scale = kwargs.get('matching_scale', 100)
@@ -59,7 +59,7 @@ def decay_width_bottom(ma,couplings: ALPcouplings,fa,**kwargs):
     else:
         cc = couplings.match_run(ma, 'VA_below', **kwargs)
         cdA = cc['cdA']
-    return fermion_decay_width(ma, fa, cdA[2,2], mb, Nc=3, **kwargs)
+    return fermion_decay_width(ma, fa, cdA[2,2], mb, Nc=3)
 
 
 
