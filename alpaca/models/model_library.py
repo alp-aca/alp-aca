@@ -36,6 +36,7 @@ def group_theory(group: str, representation: str) -> float:
             '1': [0,1],
             '3': [1/2,3],
             '6':[5/2,6],
+            '6_bar': [5/2,6],
             '8': [3,8],
             '15': [10,15]
         }
@@ -88,7 +89,7 @@ class KSVZ_model():
         self.model_name = model_name
         self.couplings = {}
         self.couplings['cg']=sum(i.PQ*i.weak_isospin_dim*i.dynkin_index_color for i in fermions)
-        self.couplings['cgamma']=sum(i.PQ*i.color_dim*i.weak_isospin_dim*((1/12)*(i.weak_isospin_dim**2-1)-i.hypercharge**2) for i in fermions)
+        self.couplings['cgamma']=sum(i.PQ*i.color_dim*i.weak_isospin_dim*((1/12)*(i.weak_isospin_dim**2-1)+i.hypercharge**2) for i in fermions)
 
     def get_couplings(self, substitutions: dict, scale: float, basis: str):
         # Substitute the symbolic variables with numerical values directly into the couplings

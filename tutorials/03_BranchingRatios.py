@@ -41,7 +41,6 @@ BRgammapipi=[]
 BRgluongluon=[]
 
 
-
 for m in ma:
     couplings = ALPcouplings({'cgamma': cphoton, 'cuA': cu, 'cdA': cd, 'ceA': clept}, scale=m, basis='VA_below')
     BRs=BRsalp(m, couplings, fa, cores=6)
@@ -83,3 +82,4 @@ plt.tight_layout()  # Adjust the layout to make room for the legend
 end_time = time.time()
 print(end_time - start_time)
 plt.show()
+
