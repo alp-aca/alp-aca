@@ -801,7 +801,7 @@ visible = "visible/"
     #arXiv:1108.3549
     #Results at 90% confidence level
     #Branching ratio
-def babar_Jpsi_hadrons(x):
+def babar_Y_hadrons(x):
     citations.register_inspire('BaBar:2011kau')
     data_file_path = os.path.join(current_dir, visible, 'Babar_BR_hadrons_binned.txt')
     q2min, q2max, param = data_reading(data_file_path)
@@ -818,7 +818,7 @@ def babar_Jpsi_hadrons(x):
     #arXiv:1210.0287
     #Results at 90% confidence level
     #Branching ratio
-def babar_Jpsi_mumu(x):
+def babar_Y1s_mumu(x):
     citations.register_inspire('BaBar:2012wey')
     data_file_path = os.path.join(current_dir, visible, 'Babar_BR_mumu_binned.txt')
     q2min, q2max, param = data_reading(data_file_path)
@@ -835,7 +835,7 @@ def babar_Jpsi_mumu(x):
     #arXiv:1502.06019
     #Results at 90% confidence level
     #Branching ratio
-def babar_Jpsi_cc(x):
+def babar_Y1s_cc(x):
     citations.register_inspire('BaBar:2015cce')
     data_file_path = os.path.join(current_dir, visible, 'Babar_BR_cc_binned.txt')
     q2min, q2max, param = data_reading(data_file_path)
@@ -882,7 +882,7 @@ def belle_Y1S_tautau(x):
     #arXiv:2109.12625
     #Results at 90% confidence level
     #Branching ratio
-def belle_Y1S_mumu(x):
+def besiii_Jpsi_mumu(x):
     citations.register_inspire('BESIII:2021ges')
     data_file_path = os.path.join(current_dir, visible, 'BES_BR_mumu_binned.txt')
     q2min, q2max, param = data_reading(data_file_path)
