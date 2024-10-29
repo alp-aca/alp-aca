@@ -43,7 +43,7 @@ BRgluongluon=[]
 
 for m in ma:
     couplings = ALPcouplings({'cgamma': cphoton, 'cuA': cu, 'cdA': cd, 'ceA': clept}, scale=m, basis='VA_below')
-    BRs=BRsalp(m, couplings, fa, cores=6)
+    BRs=BRsalp(m, couplings, fa)
     BR_2gamma.append(BRs['2photons'])
     BRelec.append(BRs['e'])
     BRmu.append(BRs['mu'])
