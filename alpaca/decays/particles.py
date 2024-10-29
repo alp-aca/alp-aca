@@ -3,8 +3,8 @@ particle_aliases = {
     'a': 'alp',
     'alp': 'alp',
     'ALP': 'alp',
-    'A': 'photon',
     # Gauge bosons
+    'A': 'photon',
     'photon': 'photon',
     'gamma': 'photon',
     'g': 'gluon',
