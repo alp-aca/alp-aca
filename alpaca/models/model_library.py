@@ -16,6 +16,8 @@ Qleptons = family_universal(-1)
 Ququarks = family_universal(2/3)
 Qdquarks = family_universal(-1/3)
 
+couplings_latex = {'cg': r'c_g', 'cB': 'c_B', 'cW': 'c_W', 'cqL': r'c_{q_L}', 'cuR': r'c_{u_R}', 'cdR': r'c_{d_R}', 'clL': r'c_{\ell_L}', 'ceR': r'c_{e_R}'}
+
 # Dynkin index for common representations
 def group_theory(group: str, representation: str) -> list[float]:
     """
@@ -52,15 +54,22 @@ class ModelBase:
         self.model_name = model_name
         self.couplings = {}
     
-    def get_couplings(self, substitutions: dict, scale: float, basis: str) -> ALPcouplings:
+    def get_couplings(self, substitutions: dict, scale: float) -> ALPcouplings:
         # Substitute the symbolic variables with numerical values directly into the couplings
         substituted_couplings = {key: float(value.subs(substitutions)) for key, value in self.couplings.items()}
-        return ALPcouplings(substituted_couplings, scale, basis)
+        return ALPcouplings(substituted_couplings, scale, 'derivative_above')
+    
+    def couplings_latex(self) -> str:
+        latex = r'\begin{align}' + '\n'
+        for ck, cv in self.couplings.items():
+            latex += couplings_latex[ck] + ' &= ' + sp.latex(cv) + r'\\' + '\n'
+        return latex + r'\end{align}'
     
     def E_over_N(self) -> sp.Rational:
         if self.couplings['cg'] == 0:
             raise ZeroDivisionError('cg = 0')
-        return sp.Rational(sp.simplify(self.couplings['cgamma']/self.couplings['cg'])).limit_denominator()
+        cgamma = self.couplings['cB'] + self.couplings['cW']
+        return sp.Rational(sp.simplify(cgamma/self.couplings['cg'])).limit_denominator()
 
 class model(ModelBase): 
     def __init__(self, model_name: str, charges: dict, nonuniversal: bool = False):
@@ -71,17 +80,13 @@ class model(ModelBase):
         if nonuniversal:
             raise NotImplementedError('function not implemented... yet...')
         else:
-            self.couplings['ceA'] = self.charges['lL'] - self.charges['eR']
-            self.couplings['cuA'] = self.charges['qL'] - self.charges['uR']
-            self.couplings['cdA'] = self.charges['qL'] - self.charges['dR']
-            self.couplings['cgamma'] = sp.simplify(np.trace(
-                (family_universal(self.charges['lL']) - family_universal(self.charges['eR'])) @ Qleptons @ Qleptons +
-                3 * family_universal(self.charges['qL'] - self.charges['uR']) @ Ququarks @ Ququarks +
-                3 * family_universal(self.charges['qL'] - self.charges['dR']) @ Qdquarks @ Qdquarks
-            ))
+            for f in ['qL', 'uR', 'dR', 'lL', 'eR']:
+                self.couplings[f'c{f}'] = self.charges[f]
             self.couplings['cg'] = 1/2 * sp.simplify(np.trace(
                 2 * family_universal(self.charges['qL']) - family_universal(self.charges['dR']) - family_universal(self.charges['uR'])
             ))
+            self.couplings['cW'] = 1/2 * sp.simplify(np.trace(3 * family_universal(self.charges['qL']) + family_universal(self.charges['lL'])))
+            self.couplings['cB'] = sp.simplify(np.trace(1/6 * family_universal(self.charges['qL']) - 4/3 * family_universal(self.charges['uR']) - 1/3 * family_universal(self.charges['dR']) + 1/2 * family_universal(self.charges['lL']) - family_universal(self.charges['eR'])))
 
 
 class fermion:
@@ -96,17 +101,18 @@ class fermion:
 class KSVZ_model(ModelBase):
     def __init__(self, model_name: str, fermions: list[fermion]):
         super().__init__(model_name)
-        self.couplings['cg']=sum(i.PQ*i.weak_isospin_dim*i.dynkin_index_color for i in fermions)
-        self.couplings['cgamma']=sum(i.PQ*i.color_dim*i.weak_isospin_dim*((1/12)*(i.weak_isospin_dim**2-1)+i.hypercharge**2) for i in fermions)
+        self.couplings['cg']=sum(f.PQ * f.weak_isospin_dim * f.dynkin_index_color for f in fermions)
+        self.couplings['cB']=sum(f.PQ * f.color_dim * f.weak_isospin_dim * f.hypercharge**2 for f in fermions)
+        self.couplings['cW']=sum(f.PQ * f.dynkin_index_weak * f.color_dim for f in fermions)
 
 
 # Benchmark Models
 
-b = sp.symbols('b')
+beta = sp.symbols('beta')
 KSVZ_charge=sp.symbols('X')
 
-QED_DFSZ= model('QED-DFSZ', {'lL': 2*sp.cos(b)**2, 'uR': -2*sp.sin(b)**2, 'dR': 2*sp.sin(b)**2})
-u_DFSZ= model('u-DFSZ', {'lL': 2*sp.cos(b)**2, 'uR': -2*sp.sin(b)**2})
-d_DFSZ= model('d-DFSZ', {'lL': 2*sp.cos(b)**2, 'dR': 2*sp.sin(b)**2})
+QED_DFSZ= model('QED-DFSZ', {'lL': 2*sp.cos(beta)**2, 'uR': -2*sp.sin(beta)**2, 'dR': 2*sp.sin(beta)**2})
+u_DFSZ= model('u-DFSZ', {'lL': 2*sp.cos(beta)**2, 'uR': -2*sp.sin(beta)**2})
+d_DFSZ= model('d-DFSZ', {'lL': 2*sp.cos(beta)**2, 'dR': 2*sp.sin(beta)**2})
 Q_KSVZ=KSVZ_model('Q-KSVZ', [fermion('3','1',0,KSVZ_charge)])
 L_KSVZ=KSVZ_model('L-KSVZ', [fermion('1','2',0,KSVZ_charge)])
