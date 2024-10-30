@@ -58,6 +58,8 @@ class ModelBase:
         return ALPcouplings(substituted_couplings, scale, basis)
     
     def E_over_N(self) -> sp.Rational:
+        if self.couplings['cg'] == 0:
+            raise ZeroDivisionError('cg = 0')
         return sp.Rational(sp.simplify(self.couplings['cgamma']/self.couplings['cg'])).limit_denominator()
 
 class model(ModelBase): 
