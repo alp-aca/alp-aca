@@ -85,7 +85,7 @@ class model(ModelBase):
             raise NotImplementedError('function not implemented... yet...')
         else:
             for f in ['qL', 'uR', 'dR', 'lL', 'eR']:
-                self.couplings[f'c{f}'] = self.charges[f]
+                self.couplings[f'c{f}'] = -self.charges[f]
             self.couplings['cg'] = sp.Rational(1/2).limit_denominator() * sp.simplify(np.trace(
                 2 * family_universal(self.charges['qL']) - family_universal(self.charges['dR']) - family_universal(self.charges['uR'])
             ))
