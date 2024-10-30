@@ -41,11 +41,11 @@ def BR_Vagamma(ma: float, couplings: ALPcouplings, mV: float, BeeV: float, quark
     citations.register_inspire('DiLuzio:2024jip')
     citations.register_inspire('Hwang:1997ie') # Eliminate fV in favour of BR(V->ee)
     from ...common import alpha_em
-    coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
+    coup_low = couplings.match_run(ma, 'VA_below', **kwargs)
     if quark == 'b':
-        gaff = 0.5*coup_low['kD'][2,2]/f_a
+        gaff = 0.5*coup_low['cdA'][2,2]/f_a
     elif quark=='c':
-        gaff = 0.5*coup_low['kU'][1,1]/f_a
+        gaff = 0.5*coup_low['cuA'][1,1]/f_a
     else:
         raise ValueError("Q must be -1/3 or 2/3")
     gaphoton = coup_low['cgamma']*alpha_em(np.sqrt(mV))/(np.pi*f_a)
