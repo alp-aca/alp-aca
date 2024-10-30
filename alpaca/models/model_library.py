@@ -31,14 +31,14 @@ def group_theory(group: str, representation: str) -> list[float]:
     indices = {
         'SU(2)': {
             '1': [0,1],
-            '2': [1/2,2],
+            '2': [sp.Rational(1/2).limit_denominator(),2],
             '3': [2,3]
         },
         'SU(3)': {
             '1': [0,1],
-            '3': [1/2,3],
-            '6':[5/2,6],
-            '6_bar': [5/2,6],
+            '3': [sp.Rational(1/2).limit_denominator(),3],
+            '6':[sp.Rational(5/2).limit_denominator(),6],
+            '6_bar': [sp.Rational(5/2).limit_denominator(),6],
             '8': [3,8],
             '15': [10,15]
         }
@@ -59,10 +59,14 @@ class ModelBase:
         substituted_couplings = {key: float(value.subs(substitutions)) for key, value in self.couplings.items()}
         return ALPcouplings(substituted_couplings, scale, 'derivative_above')
     
-    def couplings_latex(self) -> str:
+    def couplings_latex(self, nonumber: bool = False) -> str:
         latex = r'\begin{align}' + '\n'
+        if nonumber:
+            nn = ''
+        else:
+            nn = r' \nonumber '
         for ck, cv in self.couplings.items():
-            latex += couplings_latex[ck] + ' &= ' + sp.latex(cv) + r'\\' + '\n'
+            latex += couplings_latex[ck] + ' &= ' + sp.latex(cv) + nn + r'\\'  + '\n'
         return latex + r'\end{align}'
     
     def E_over_N(self) -> sp.Rational:
@@ -82,11 +86,11 @@ class model(ModelBase):
         else:
             for f in ['qL', 'uR', 'dR', 'lL', 'eR']:
                 self.couplings[f'c{f}'] = self.charges[f]
-            self.couplings['cg'] = 1/2 * sp.simplify(np.trace(
+            self.couplings['cg'] = sp.Rational(1/2).limit_denominator() * sp.simplify(np.trace(
                 2 * family_universal(self.charges['qL']) - family_universal(self.charges['dR']) - family_universal(self.charges['uR'])
             ))
-            self.couplings['cW'] = 1/2 * sp.simplify(np.trace(3 * family_universal(self.charges['qL']) + family_universal(self.charges['lL'])))
-            self.couplings['cB'] = sp.simplify(np.trace(1/6 * family_universal(self.charges['qL']) - 4/3 * family_universal(self.charges['uR']) - 1/3 * family_universal(self.charges['dR']) + 1/2 * family_universal(self.charges['lL']) - family_universal(self.charges['eR'])))
+            self.couplings['cW'] = sp.Rational(1/2).limit_denominator() * sp.simplify(np.trace(3 * family_universal(self.charges['qL']) + family_universal(self.charges['lL'])))
+            self.couplings['cB'] = sp.Rational(1/6).limit_denominator() * sp.simplify(np.trace(family_universal(self.charges['qL']) - 8 * family_universal(self.charges['uR']) - 2 * family_universal(self.charges['dR']) + 3 * family_universal(self.charges['lL']) - 6 * family_universal(self.charges['eR'])))
 
 
 class fermion:
@@ -109,7 +113,7 @@ class KSVZ_model(ModelBase):
 # Benchmark Models
 
 beta = sp.symbols('beta')
-KSVZ_charge=sp.symbols('X')
+KSVZ_charge = sp.symbols(r'\mathcal{X}')
 
 QED_DFSZ= model('QED-DFSZ', {'lL': 2*sp.cos(beta)**2, 'uR': -2*sp.sin(beta)**2, 'dR': 2*sp.sin(beta)**2})
 u_DFSZ= model('u-DFSZ', {'lL': 2*sp.cos(beta)**2, 'uR': -2*sp.sin(beta)**2})
