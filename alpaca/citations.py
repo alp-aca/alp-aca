@@ -140,3 +140,6 @@ class Constant(float):
     
     def __hash__(self) -> int:
         return super().__hash__()
+
+    def __complex__(self) -> complex:
+        return float(self) + 0j
