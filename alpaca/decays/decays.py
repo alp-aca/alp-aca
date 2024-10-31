@@ -35,9 +35,44 @@ def decay_width(transition: str, ma: float, couplings: ALPcouplings, fa: float, 
 
 def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
     initial, final = parse(transition)
-    if initial == ['Upsilon(1S)'] and final == sorted(['photon', 'muon', 'muon']):
+    #Initial resonance Upsilon (1S)
+    if initial == ['Upsilon(1S)'] and final == sorted(['photon', 'alp']):
+        from ..constants import mUpsilon1S, BeeUpsilon1S
+        br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, 'b', fa, **kwargs)
+    elif initial == ['Upsilon(1S)'] and final == sorted(['photon', 'muon', 'muon']):
         from ..constants import mUpsilon1S, BeeUpsilon1S
         br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['mu']
+    elif initial == ['Upsilon(1S)'] and final == sorted(['photon', 'tau', 'tau']):
+        from ..constants import mUpsilon1S, BeeUpsilon1S
+        br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['tau']
+    elif initial == ['Upsilon(1S)'] and final == sorted(['photon', 'charm', 'charm']):
+        from ..constants import mUpsilon1S, BeeUpsilon1S
+        br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['charm']
+    #Initial resonance Upsilon 3S
+    elif initial == ['Upsilon(3S)'] and final == sorted(['photon', 'alp']):
+        from ..constants import mUpsilon3S, BeeUpsilon3S
+        br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon3S, BeeUpsilon3S, 'b', fa, **kwargs)
+    elif initial == ['Upsilon(3S)'] and final == sorted(['photon', 'hadrons']):
+        from ..constants import mUpsilon3S, BeeUpsilon3S
+        br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon3S, BeeUpsilon3S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['hadrons']
+    #Initial resonance Upsilon 4S
+    elif initial == ['Upsilon(4S)'] and final == sorted(['photon', 'alp']):
+        from ..constants import mUpsilon4S, BeeUpsilon4S
+        br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon4S, BeeUpsilon4S, 'b', fa, **kwargs) 
+    elif initial == ['Upsilon(4S)'] and final == sorted(['photon', 'photon', 'photon']):
+        from ..constants import mUpsilon4S, BeeUpsilon4S
+        br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon4S, BeeUpsilon4S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['2photons']
+    #Initial resonance J/psi    
+    elif initial == ['J/psi'] and final == sorted(['photon', 'alp']):
+        from ..constants import mJpsi, BeeJpsi
+        br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mJpsi, BeeJpsi, 'c', fa, **kwargs)
+    elif initial == ['J/psi'] and final == sorted(['photon', 'muon', 'muon']):
+        from ..constants import mJpsi, BeeJpsi
+        br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mJpsi, BeeJpsi, 'c', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['mu']
+    elif initial == ['J/psi'] and final == sorted(['photon', 'photon', 'photon']):
+        from ..constants import mJpsi, BeeJpsi
+        br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mJpsi, BeeJpsi, 'c', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['2photons']
+    
     else:
         raise NotImplementedError(f'Unknown branching ratio process {" ".join(initial)} -> {" ".join(final)}')
     
@@ -47,6 +82,8 @@ def cross_section(transition: str, ma: float, couplings: ALPcouplings, s: float,
     initial, final = parse(transition)
     if initial == ['electron', 'electron'] and final == sorted(['alp', 'photon']):
         sigma = invisible.sigmaNR
+    elif initial == ['electron', 'electron'] and final == sorted(['photon', 'photon', 'photon']):
+        sigma = invisible.sigmaNR(ma, couplings, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['2photons']
     else:
         raise NotImplementedError(f'Unknown cross section process {" ".join(initial)} -> {" ".join(final)}')
     

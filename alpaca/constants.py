@@ -124,6 +124,7 @@ fUpsilon3S = Constant(0.395, 'Chung:2020zqc')
 BeeJpsi = Constant(5.971e-2, 'ParticleDataGroup:2024cfk')
 BeeUpsilon1S = Constant(2.39e-2, 'ParticleDataGroup:2024cfk')
 BeeUpsilon3S = Constant(2.18e-2, 'ParticleDataGroup:2024cfk')
+BeeUpsilon4S = Constant(1.57e-5, 'ParticleDataGroup:2024cfk')
 
 # Units and conversion factors
 h_Js = Constant(6.62607015e-34, 'Mohr:2024kco')
