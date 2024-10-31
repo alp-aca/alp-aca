@@ -36,7 +36,7 @@ def bin_selection(x, qmin, qmax, value, sigmal, sigmar):
     sigmals = 0
     sigmars = 0 
     for ii in range(len(qmin)):
-        if x**2>qmin[ii] and x**2<qmax[ii]:
+        if x>qmin[ii] and x<qmax[ii]:
             values = value[ii]
             sigmals = sigmal[ii]
             sigmars = sigmar[ii]
@@ -66,7 +66,7 @@ def belleII_BtoKnunu(x):
         #x:
     citations.register_inspire('Belle-II:2023esi') 
     q2min = [0]
-    q2max = [mB0**2]
+    q2max = [mB0]
     value = [2.3e-5]
     sigmal = [0.7e-5]
     sigmar = [0.7e-5]
@@ -80,7 +80,7 @@ def belleII_BtoKnunu(x):
 def na62_Ktopinunu(x):
     citations.register_inspire('NA62:2021zjw') 
     q2min = [0]
-    q2max = [mK**2]
+    q2max = [mK]
     value = [10.6e-11]
     sigmal = [4.1e-11]
     sigmar = [3.5e-11]
@@ -309,7 +309,7 @@ def besIII_Jpsivis(x):
 def belle_BchargedtoKchargednunu(x):
     citations.register_inspire('Belle:2017oht')
     q2min = [0]
-    q2max = [mB**2]
+    q2max = [mB]
     value = [4e-5]
     cl = 0.9
     df = 1 
@@ -321,7 +321,7 @@ def belle_BchargedtoKchargednunu(x):
 def belle_Bchargedtorhochargednunu(x):
     citations.register_inspire('Belle:2017oht')
     q2min = [0]
-    q2max = [mB**2]
+    q2max = [mB]
     value = [3e-5]
     cl = 0.9
     df = 1 
@@ -333,7 +333,7 @@ def belle_Bchargedtorhochargednunu(x):
 def belle_Bchargedtopichargednunu(x):
     citations.register_inspire('Belle:2017oht')
     q2min = [0]
-    q2max = [mB**2]
+    q2max = [mB]
     value = [1.4e-5]
     cl = 0.9
     df = 1 
@@ -345,7 +345,7 @@ def belle_Bchargedtopichargednunu(x):
 def belle_B0toK0nunu(x):
     citations.register_inspire('Belle:2017oht')
     q2min = [0]
-    q2max = [mB0**2]
+    q2max = [mB0]
     value = [2.6e-5]
     cl = 0.9
     df = 1 
@@ -357,7 +357,7 @@ def belle_B0toK0nunu(x):
 def belle_B0toK0starnunu(x):
     citations.register_inspire('Belle:2017oht')
     q2min = [0]
-    q2max = [mB0**2]
+    q2max = [mB0]
     value = [1.8e-5]
     cl = 0.9
     df = 1 
@@ -369,7 +369,7 @@ def belle_B0toK0starnunu(x):
 def belle_B0topi0nunu(x):
     citations.register_inspire('Belle:2017oht')
     q2min = [0]
-    q2max = [mB0**2]
+    q2max = [mB0]
     value = [9e-6]
     cl = 0.9
     df = 1 
@@ -381,7 +381,7 @@ def belle_B0topi0nunu(x):
 def belle_B0torho0nunu(x):
     citations.register_inspire('Belle:2017oht')
     q2min = [0]
-    q2max = [mB0**2]
+    q2max = [mB0]
     value = [4e-5]
     cl = 0.9
     df = 1 
@@ -398,7 +398,7 @@ def belle_B0torho0nunu(x):
 def besIII_D0topi0nunu(x):
     citations.register_inspire('BESIII:2021slf')
     q2min = [0]
-    q2max = [mD0**2]
+    q2max = [mD0]
     value = [2.1e-4]
     cl = 0.9
     df = 1 
@@ -432,8 +432,8 @@ def belleII_upsilon4s(x):
     #arXiv: 1402.4334
 def na62_Ktopigammagamma(x):
     citations.register_inspire('NA62:2014ybm')
-    q2min = [0.220**2] #Digamma momentum
-    q2max = [0.354**2] #Digamma momentum
+    q2min = [0.220] #Digamma momentum
+    q2max = [0.354] #Digamma momentum
     value = [9.65e-7]
     sigmal = [0.63e-7]
     sigmar = sigmal
@@ -445,8 +445,8 @@ def na62_Ktopigammagamma(x):
     #arXiv: hep-ex/0505069
 def E949_Ktopigammagamma(x):
     citations.register_inspire('E949:2005qiy')
-    q2min = [0**2] #Digamma momentum
-    q2max = [0.108**2] #Digamma momentum
+    q2min = [0] #Digamma momentum
+    q2max = [0.108] #Digamma momentum
     value = [8.3e-9]
     cl = 0.9
     df = 1 
@@ -460,8 +460,8 @@ def E949_Ktopigammagamma(x):
     #arXiv: hep-ex/9708011
 def E787_Ktopigammagamma(x):
     citations.register_inspire('E787:1997abk')
-    q2min = [0.196**2] #Digamma momentum
-    q2max = [0.306**2] #Digamma momentum
+    q2min = [0.196] #Digamma momentum
+    q2max = [0.306] #Digamma momentum
     value = [6.0e-7]
     sigmal = [np.sqrt((1.5)**2+(0.7)**2)*1e-7]
     values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmal)
@@ -472,8 +472,8 @@ def E787_Ktopigammagamma(x):
     #arXiv: hep-ex/0205010
 def na48_Kltopi0gammagamma(x):
     citations.register_inspire('NA48:2002xke')
-    q2min = [0.030**2] #Digamma momentum
-    q2max = [0.110**2] #Digamma momentum
+    q2min = [0.030] #Digamma momentum
+    q2max = [0.110] #Digamma momentum
     value = [0.6e-8]
     cl = 0.9
     df = 1 
@@ -487,8 +487,8 @@ def na48_Kltopi0gammagamma(x):
     #arXiv: 0805.0031
 def ktev_Kltopi0gammagamma(x):
     citations.register_inspire('KTeV:2008nqz')
-    q2min = [0,0.160**2] #Digamma momentum
-    q2max = [0.100**2,0.363**2] #Digamma momentum
+    q2min = [0,0.160] #Digamma momentum
+    q2max = [0.100,0.363] #Digamma momentum
     value = [1.29e-6]
     sigmas = [np.sqrt(0.03**2+0.05**2)*1e-6]
     values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmas, sigmas)
@@ -504,7 +504,7 @@ def ktev_Kltopi0gammagamma(x):
 def brookhaven_Kptopipee(x):
     citations.register_inspire('Baker:1987gp')
     q2min = [0] #ALP mass
-    q2max = [0.100**2] #
+    q2max = [0.100] #
     value = [8e-7]
     cl = 0.9
     df = 1 
@@ -518,8 +518,8 @@ def brookhaven_Kptopipee(x):
     #arXiv: hep-ex/0309072
 def ktev_Kltopi0ee(x):
     citations.register_inspire('KTeV:2003sls')
-    q2min = [0.140**2] #Dielectron momentum
-    q2max = [0.362**2] #Dielectron momentum
+    q2min = [0.140] #Dielectron momentum
+    q2max = [0.362] #Dielectron momentum
     value = [2.8e-10]
     cl = 0.9
     df = 1 
@@ -535,7 +535,7 @@ def ktev_Kltopi0ee(x):
 def na48_Ktopiee(x):
     citations.register_inspire('NA482:2009pfe')
     q2min = [0]
-    q2max = [354**2]
+    q2max = [0.354]
     value = [3.11e-7]
     sigmal = [0.12e-7]
     sigmar = [0.12e-7]
@@ -547,8 +547,8 @@ def na48_Ktopiee(x):
     #arXiv: 0804.3656
 def belle_Bptopipee(x):
     citations.register_inspire('Belle:2008tjs')
-    q2min = [0.140**2] #Dielectron momentum
-    q2max = [5.140**2] #Dielectron momentum
+    q2min = [0.140] #Dielectron momentum
+    q2max = [5.140] #Dielectron momentum
     value = [8.0e-8]
     cl = 0.9
     df = 1 
@@ -562,11 +562,11 @@ def belle_Bptopipee(x):
     #arXiv: 2212.09153
 def LHCb_BptoKpee_dif(x):
     citations.register_inspire('LHCb:2022vje')
-    q2min = [1.1**2] #q^2
-    q2max = [6.0**2] #q^2
+    q2min = [1.1] #q^2
+    q2max = [6.0] #q^2
     value = [25.5e-9]
     sigmal = [np.sqrt((1.3)**2+(1.1)**2)*1e-9]
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmal)
+    values, sigmals, sigmars = bin_selection(x**2, q2min, q2max, value, sigmal, sigmal)
     return values, sigmals, sigmars
 
 #LHCb B0->K0* e e
@@ -574,11 +574,11 @@ def LHCb_BptoKpee_dif(x):
     #arXiv: 2212.09153
 def LHCb_B0toK0staree_dif(x):
     citations.register_inspire('LHCb:2022vje')
-    q2min = [1.1**2] #q^2
-    q2max = [6.0**2] #q^2
+    q2min = [1.1] #q^2
+    q2max = [6.0] #q^2
     value = [33.3e-9]
     sigmal = [np.sqrt((2.7)**2+(2.2)**2)*1e-9]
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmal)
+    values, sigmals, sigmars = bin_selection(x**2, q2min, q2max, value, sigmal, sigmal)
     return values, sigmals, sigmars
 
 
@@ -592,7 +592,7 @@ def LHCb_Rk(x):
     value = [0.994, 0.949]
     sigmal = [np.sqrt((0.090)**2+(0.029)**2), np.sqrt((0.042)**2+(0.022)**2)]
     sigmar = [np.sqrt((0.082)**2+(0.027)**2), np.sqrt((0.041)**2+(0.022)**2)]
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmar)
+    values, sigmals, sigmars = bin_selection(x**2, q2min, q2max, value, sigmal, sigmar)
     return values, sigmals, sigmars
 
 #LHCb R(K*)
@@ -605,7 +605,7 @@ def LHCb_Rkstar(x):
     value = [0.927, 1.027]
     sigmal = [np.sqrt((0.093)**2+(0.036)**2), np.sqrt((0.072)**2+(0.027)**2)]
     sigmar = [np.sqrt((0.087)**2+(0.035)**2), np.sqrt((0.068)**2+(0.026)**2)]
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmar)
+    values, sigmals, sigmars = bin_selection(x**2, q2min, q2max, value, sigmal, sigmar)
     return values, sigmals, sigmars
 
 
@@ -614,8 +614,8 @@ def LHCb_Rkstar(x):
     #arXiv: 1802.09752
 def besiii_D0topi0ee(x):
     citations.register_inspire('BESIII:2018hqu')
-    q2min = [0, 1.053**2] #Dielectron mass
-    q2max = [0.935**2, 1.730**2] #Dielectron mass
+    q2min = [0, 1.053] #Dielectron mass
+    q2max = [0.935, 1.730] #Dielectron mass
     value = [0.4e-5]
     cl = 0.9
     df = 1 
@@ -629,8 +629,8 @@ def besiii_D0topi0ee(x):
     #arXiv: 1107.4465
 def babar_Dptopipee(x):
     citations.register_inspire('BaBar:2011ouc')
-    q2min = [0.200**2, 1.050**2] #Dielectron mass
-    q2max = [0.950**2, 1.730**2] #Dielectron mass
+    q2min = [0.200, 1.050] #Dielectron mass
+    q2max = [0.950, 1.730] #Dielectron mass
     value = [3.9e-4]
     cl = 0.9
     df = 1 
@@ -644,8 +644,8 @@ def babar_Dptopipee(x):
     #arXiv: 1107.4465
 def babar_DsptoKpee(x):
     citations.register_inspire('BaBar:2011ouc')
-    q2min = [0.200**2, 1.050**2] #Dielectron mass
-    q2max = [0.950**2, 1.475**2] #Dielectron mass
+    q2min = [0.200, 1.050] #Dielectron mass
+    q2max = [0.950, 1.475] #Dielectron mass
     value = [1.6e-4]
     cl = 0.9
     df = 1 
@@ -663,8 +663,8 @@ def babar_DsptoKpee(x):
     #arXiv: hep-ex/0001006
 def ktev_KLtopi0mumu(x):
     citations.register_inspire('KTEV:2000ngj')
-    q2min = [0.210**2] #Dimuon mass
-    q2max = [0.350**2] #Dimuon mass
+    q2min = [0.210] #Dimuon mass
+    q2max = [0.350] #Dimuon mass
     value = [3.8e-10]
     cl = 0.9
     df = 1 
@@ -684,7 +684,7 @@ def cms_BchargedtoKchargedmumu(x):
     value = (1e-8)*np.array([2.91, 1.93, 3.06, 2.54, 2.47, 2.53, 2.50, 2.34, 1.62, 1.26, 1.83, 1.57, 2.11, 1.74, 2.02])
     sigmal = (1e-8)*np.array([0.24, 0.20, 0.25, 0.23, 0.24, 0.27, 0.23, 0.25, 0.18, 0.14, 0.17, 0.15, 0.16, 0.15, 0.30])
     sigmar = sigmal
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmar)
+    values, sigmals, sigmars = bin_selection(x**2, q2min, q2max, value, sigmal, sigmar)
     return values, sigmals, sigmars
 
 #LHCb Bs->mu mu
@@ -693,8 +693,8 @@ def cms_BchargedtoKchargedmumu(x):
     #Branching ratio
 def lhcb_Bstomumu(x):
     citations.register_inspire('LHCb:2017rmj')
-    q2min = [5.320**2]
-    q2max = [6.0**2]
+    q2min = [5.320]
+    q2max = [6.0]
     value = [3.0e-9]
     sigmal = [np.sqrt((0.6)**2+(0.3)**2)*1e-9]
     values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmal)
@@ -706,8 +706,8 @@ def lhcb_Bstomumu(x):
     #Branching ratio
 def combo_Bstomumu(x):
     citations.register_inspire('ATLAS:2020acx')
-    q2min = [5.367**2]
-    q2max = [6.0**2]
+    q2min = [5.367]
+    q2max = [6.0]
     value = [2.69e-9]
     sigmal = [0.35e-9]
     sigmar = [0.37e-9]
@@ -720,8 +720,8 @@ def combo_Bstomumu(x):
     #Branching ratio
 def combo_B0tomumu(x):
     citations.register_inspire('ATLAS:2020acx')
-    q2min = [5.230**2] #Dimuon mass
-    q2max = [6.0**2] #Dimuon mass
+    q2min = [5.230] #Dimuon mass
+    q2max = [6.0] #Dimuon mass
     value = [1.6e-10]
     cl = 0.9
     df = 1 
@@ -735,8 +735,8 @@ def combo_B0tomumu(x):
     #arXiv: 1304.6365
 def lhcb_Dptopipmumu(x):
     citations.register_inspire('LHCb:2013hxr')
-    q2min = [0.250**2, 1.250**2] #Dimuonon mass
-    q2max = [0.525**2, 2.000**2] #Dimuon mass
+    q2min = [0.250, 1.250] #Dimuonon mass
+    q2max = [0.525, 2.000] #Dimuon mass
     value = [2.0e-8, 2.6e-8]
     cl = 0.9
     df = 1 
@@ -750,8 +750,8 @@ def lhcb_Dptopipmumu(x):
     #arXiv: 1304.6365
 def lhcb_Dsptopipmumu(x):
     citations.register_inspire('LHCb:2013hxr')
-    q2min = [0.250**2, 1.250**2] #Dimuonon mass
-    q2max = [0.525**2, 2.000**2] #Dimuon mass
+    q2min = [0.250, 1.250] #Dimuon mass
+    q2max = [0.525, 2.000] #Dimuon mass
     value = [6.9e-8, 16.0e-8]
     cl = 0.9
     df = 1 
@@ -765,8 +765,8 @@ def lhcb_Dsptopipmumu(x):
     #arXiv: 1107.4465
 def babar_Dptokpmumu(x):
     citations.register_inspire('BaBar:2011ouc')
-    q2min = [0.200**2] #Dimuonon mass
-    q2max = [1.475**2] #Dimuon mass
+    q2min = [0.200] #Dimuonon mass
+    q2max = [1.475] #Dimuon mass
     value = [9.1e-4]
     cl = 0.9
     df = 1 
@@ -783,7 +783,7 @@ def babar_Dptokpmumu(x):
 def pdg_Kltomumu(x):
     citations.register_inspire('ParticleDataGroup:2024cfk')
     q2min = [0]
-    q2max = [mKl**2]
+    q2max = [mKl]
     value = [6.84e-9]
     sigma = [0.11e-9]
     values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigma, sigma)
