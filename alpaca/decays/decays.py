@@ -50,11 +50,11 @@ def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: flo
         br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['charm']
     #Initial resonance Upsilon 3S
     elif initial == ['Upsilon(3S)'] and final == sorted(['photon', 'alp']):
-        from ..constants import mUpsilon3S, BeeUpsilon3S
-        br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon3S, BeeUpsilon3S, 'b', fa, **kwargs)
+        from ..constants import mUpsilon3S
+        br = lambda ma, couplings, fa, **kwargs: invisible.Mixed_QuarkoniaSearches(ma, couplings, mUpsilon3S, 'b', fa, **kwargs)
     elif initial == ['Upsilon(3S)'] and final == sorted(['photon', 'hadrons']):
         from ..constants import mUpsilon3S, BeeUpsilon3S
-        br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon3S, BeeUpsilon3S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['hadrons']
+        br = lambda ma, couplings, fa, **kwargs: invisible.Mixed_QuarkoniaSearches(ma, couplings, mUpsilon3S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['hadrons']
     #Initial resonance Upsilon 4S
     elif initial == ['Upsilon(4S)'] and final == sorted(['photon', 'alp']):
         from ..constants import mUpsilon4S, BeeUpsilon4S
@@ -67,8 +67,8 @@ def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: flo
         from ..constants import mJpsi, BeeJpsi
         br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mJpsi, BeeJpsi, 'c', fa, **kwargs)
     elif initial == ['J/psi'] and final == sorted(['photon', 'muon', 'muon']):
-        from ..constants import mJpsi, BeeJpsi
-        br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mJpsi, BeeJpsi, 'c', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['mu']
+        from ..constants import mJpsi
+        br = lambda ma, couplings, fa, **kwargs: invisible.Mixed_QuarkoniaSearches(ma, couplings, mJpsi, 'c', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['mu']
     elif initial == ['J/psi'] and final == sorted(['photon', 'photon', 'photon']):
         from ..constants import mJpsi, BeeJpsi
         br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mJpsi, BeeJpsi, 'c', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['2photons']
