@@ -83,7 +83,7 @@ def cross_section(transition: str, ma: float, couplings: ALPcouplings, s: float,
     if initial == ['electron', 'electron'] and final == sorted(['alp', 'photon']):
         sigma = invisible.sigmaNR
     elif initial == ['electron', 'electron'] and final == sorted(['photon', 'photon', 'photon']):
-        sigma = invisible.sigmaNR(ma, couplings, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['2photons']
+        sigma = lambda ma, couplings, s, fa, **kwargs: invisible.sigmaNR(ma, couplings, s, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['2photons']
     else:
         raise NotImplementedError(f'Unknown cross section process {" ".join(initial)} -> {" ".join(final)}')
     
