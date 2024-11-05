@@ -414,14 +414,14 @@ def besIII_D0topi0nunu(x):
 #BelleII e+e- -> gamma a
     #Experiment: BelleII
     #arXiv: 2007.13071
-    #@90% confidence level
-    #Cross section
+    #@95% confidence level
+    #Cross section (pb)
 def belleII_upsilon4s(x):
     citations.register_inspire('Belle-II:2020jti')
     data_file_path = os.path.join(current_dir, invisible, 'Belle2_gamma_binned.txt')
     q2min, q2max, value = data_reading(data_file_path)
     values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, 0.5*np.array(value), 0.5*np.array(value))
-    return values, sigmals, sigmars
+    return values*1e12, sigmals*1e12, sigmars*1e12
 
 #################################### VISIBLE SEARCHES ####################################
 

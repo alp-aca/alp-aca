@@ -132,7 +132,7 @@ e_C = Constant(1.602176634e-19, 'Mohr:2024kco')
 c_nm_per_ps = Constant(299792.458, 'Mohr:2024kco')
 hbar_GeVps = LazyFloat(lambda: h_Js/(e_C*2*np.pi)*1e3)
 hbarc_GeVnm = LazyFloat(lambda: hbar_GeVps*c_nm_per_ps)
-hbarc2_GeV2pb = LazyFloat(lambda: hbarc_GeVnm**(-2)*1e-22)
+hbarc2_GeV2pb = LazyFloat(lambda: hbarc_GeVnm**2*1e22)
 
 # Collider parameters
 sigmaW_BaBar = Constant(5.5e-3, 'Merlo:2019anv') # See footnote in page 5
