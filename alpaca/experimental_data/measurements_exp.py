@@ -3,6 +3,7 @@ import os
 import numpy as np
 from scipy.stats import chi2
 from ..citations import citations
+from .classes import MeasurementConstantBound, rmax_belle, rmax_besIII
 # Get the directory of the current script
 current_dir = os.path.dirname(__file__)
 
@@ -306,110 +307,82 @@ def besIII_Jpsivis(x):
     #arXiv: 1702.03224
     #Results at 90% confidence level
     #Branching ratio
-def belle_BchargedtoKchargednunu(x):
-    citations.register_inspire('Belle:2017oht')
-    q2min = [0]
-    q2max = [mB]
-    value = [4e-5]
-    cl = 0.9
-    df = 1 
-    sigmas = sigma(cl, df, value)
-    valuep = [0] #Estimated value
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
-    return values, sigmals, sigmars
+belle_BchargedtoKchargednunu = MeasurementConstantBound(
+    inspire_id='Belle:2017oht',
+    type='invisible',
+    bound=4e-5,
+    conf_level=0.9,
+    mass_parent=mB,
+    rmax=rmax_belle
+)
 
-def belle_Bchargedtorhochargednunu(x):
-    citations.register_inspire('Belle:2017oht')
-    q2min = [0]
-    q2max = [mB]
-    value = [3e-5]
-    cl = 0.9
-    df = 1 
-    sigmas = sigma(cl, df, value)
-    valuep = [0] #Estimated value
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
-    return values, sigmals, sigmars
+belle_Bchargedtorhochargednunu = MeasurementConstantBound(
+    inspire_id='Belle:2017oht',
+    type='invisible',
+    bound=3e-5,
+    conf_level=0.9,
+    mass_parent=mB,
+    rmax=rmax_belle
+)
 
-def belle_Bchargedtopichargednunu(x):
-    citations.register_inspire('Belle:2017oht')
-    q2min = [0]
-    q2max = [mB]
-    value = [1.4e-5]
-    cl = 0.9
-    df = 1 
-    sigmas = sigma(cl, df, value)
-    valuep = [0] #Estimated value
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
-    return values, sigmals, sigmars
+belle_Bchargedtopichargednunu = MeasurementConstantBound(
+    inspire_id='Belle:2017oht',
+    type='invisible',
+    bound=1.4e-5,
+    conf_level=0.9,
+    mass_parent=mB,
+    rmax=rmax_belle
+)
 
-def belle_B0toK0nunu(x):
-    citations.register_inspire('Belle:2017oht')
-    q2min = [0]
-    q2max = [mB0]
-    value = [2.6e-5]
-    cl = 0.9
-    df = 1 
-    sigmas = sigma(cl, df, value)
-    valuep = [0] #Estimated value
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
-    return values, sigmals, sigmars
+belle_B0toK0nunu = MeasurementConstantBound(
+    inspire_id='Belle:2017oht',
+    type='invisible',
+    bound=2.6e-5,
+    conf_level=0.9,
+    mass_parent=mB0,
+    rmax=rmax_belle
+)
 
-def belle_B0toK0starnunu(x):
-    citations.register_inspire('Belle:2017oht')
-    q2min = [0]
-    q2max = [mB0]
-    value = [1.8e-5]
-    cl = 0.9
-    df = 1 
-    sigmas = sigma(cl, df, value)
-    valuep = [0] #Estimated value
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
-    return values, sigmals, sigmars
+belle_B0toK0starnunu = MeasurementConstantBound(
+    inspire_id='Belle:2017oht',
+    type='invisible',
+    bound=1.8e-5,
+    conf_level=0.9,
+    mass_parent=mB0,
+    rmax=rmax_belle
+)
 
-def belle_B0topi0nunu(x):
-    citations.register_inspire('Belle:2017oht')
-    q2min = [0]
-    q2max = [mB0]
-    value = [9e-6]
-    cl = 0.9
-    df = 1 
-    sigmas = sigma(cl, df, value)
-    valuep = [0] #Estimated value
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
-    return values, sigmals, sigmars
+belle_B0topi0nunu = MeasurementConstantBound(
+    inspire_id='Belle:2017oht',
+    type='invisible',
+    bound=9e-6,
+    conf_level=0.9,
+    mass_parent=mB0,
+    rmax=rmax_belle
+)
 
-def belle_B0torho0nunu(x):
-    citations.register_inspire('Belle:2017oht')
-    q2min = [0]
-    q2max = [mB0]
-    value = [4e-5]
-    cl = 0.9
-    df = 1 
-    sigmas = sigma(cl, df, value)
-    valuep = [0] #Estimated value
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
-    return values, sigmals, sigmars
+belle_B0torho0nunu = MeasurementConstantBound(
+    inspire_id='Belle:2017oht',
+    type='invisible',
+    bound=4e-5,
+    conf_level=0.9,
+    mass_parent=mB0,
+    rmax=rmax_belle
+)
 
 #BESIII D0->pi0 nu nu 2021 
     #Experiment: BESIII
     #arXiv: 2112.14236
     #@ 90% confidence level
     #Branching ratio
-def besIII_D0topi0nunu(x):
-    citations.register_inspire('BESIII:2021slf')
-    q2min = [0]
-    q2max = [mD0]
-    value = [2.1e-4]
-    cl = 0.9
-    df = 1 
-    sigmas = sigma(cl, df, value)
-    valuep = [0]
-    #sigmal = [4.1e-11]
-    #sigmar = [3.5e-11]
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
-    return values, sigmals, sigmars
-
-
+besIII_D0topi0nunu = MeasurementConstantBound(
+    inspire_id='BESIII:2021slf',
+    type='invisible',
+    bound=2.1e-4,
+    conf_level=0.9,
+    mass_parent=mD0,
+    rmax=rmax_besIII
+)
 
 #BelleII e+e- -> gamma a
     #Experiment: BelleII
