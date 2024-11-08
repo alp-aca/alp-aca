@@ -37,7 +37,7 @@ def bin_selection(x, qmin, qmax, value, sigmal, sigmar):
     sigmals = 0
     sigmars = 0 
     for ii in range(len(qmin)):
-        if x>qmin[ii] and x<qmax[ii]:
+        if x > qmin[ii] and x < qmax[ii]:
             values = value[ii]
             sigmals = sigmal[ii]
             sigmars = sigmar[ii]
@@ -96,9 +96,10 @@ def na62_pi0toinv(x):
     citations.register_inspire('NA62:2020pwi') 
     q2min = [0.110]
     q2max = [0.155]
-    value = [4.4e-9]
-    sigma = sigma(0.9, 1, value)
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigma, sigma)
+    param = [4.4e-9]
+    sigmap = sigma(0.9, 1, param)
+    value = [0] #Estimated value
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmap, sigmap)
     return values, sigmals, sigmars
 
 #J-PARC KOTO KL->pi0 nu nu
@@ -109,9 +110,10 @@ def koto_kltopi0nunu(x):
     citations.register_inspire('KOTO:2018dsc') 
     q2min = [0]
     q2max = [0.261]
-    value = [3.0e-9]
-    sigma = sigma(0.9, 1, value)
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigma, sigma)
+    param = [3.0e-9]
+    sigmap = sigma(0.9, 1, param)
+    value = [0] #Estimated value
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmap, sigmap)
     return values, sigmals, sigmars
 
 #J-PARC KOTO KL->pi0 inv
@@ -122,9 +124,10 @@ def koto_kltopi0inv(x):
     citations.register_inspire('KOTO:2018dsc') 
     q2min = [0]
     q2max = [0.261]
-    value = [2.4e-9]
-    sigma = sigma(0.9, 1, value)
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigma, sigma)
+    param = [2.4e-9]
+    sigmap = sigma(0.9, 1, param)
+    value = [0] #Estimated value
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmap, sigmap)
     return values, sigmals, sigmars
 
 #BaBar B+->K+ nu nu
@@ -135,9 +138,10 @@ def babar_bptokpnunu(x):
     citations.register_inspire('BaBar:2013npw') 
     q2min = [0]
     q2max = [4.785]
-    value = [3.7e-5]
-    sigma = sigma(0.9, 1, value)
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigma, sigma)
+    param = [3.7e-5]
+    sigmap = sigma(0.9, 1, param)
+    value = [0] #Estimated value
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmap, sigmap)
     return values, sigmals, sigmars
 
 #BaBar B+->K*+ nu nu
@@ -148,9 +152,10 @@ def babar_bptokstarpnunu(x):
     citations.register_inspire('BaBar:2013npw') 
     q2min = [0]
     q2max = [4.785]
-    value = [11.6e-5]
-    sigma = sigma(0.9, 1, value)
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigma, sigma)
+    param = [11.6e-5]
+    sigmap = sigma(0.9, 1, param)
+    value = [0] #Estimated value
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmap, sigmap)
     return values, sigmals, sigmars
 
 #BaBar B0->K0 nu nu
@@ -161,9 +166,10 @@ def babar_b0tok0nunu(x):
     citations.register_inspire('BaBar:2013npw') 
     q2min = [0]
     q2max = [4.785]
-    value = [8.1e-5]
-    sigma = sigma(0.9, 1, value)
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigma, sigma)
+    param = [8.1e-5]
+    sigmap = sigma(0.9, 1, param)
+    value = [0] #Estimated value
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmap, sigmap)
     return values, sigmals, sigmars
 
 #BaBar B0->K*0 nu nu
@@ -174,9 +180,10 @@ def babar_b0tokstar0nunu(x):
     citations.register_inspire('BaBar:2013npw') 
     q2min = [0]
     q2max = [4.785]
-    value = [9.3e-5]
-    sigma = sigma(0.9, 1, value)
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigma, sigma)
+    param = [9.3e-5]
+    sigmap = sigma(0.9, 1, param)
+    value = [0] #Estimated value
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmap, sigmap)
     return values, sigmals, sigmars
 
 #BaBar B->K nu nu
@@ -187,9 +194,10 @@ def babar_btoknunu_comb(x):
     citations.register_inspire('BaBar:2013npw') 
     q2min = [0]
     q2max = [4.785]
-    value = [3.2e-5]
-    sigma = sigma(0.9, 1, value)
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigma, sigma)
+    param = [3.2e-5]
+    sigmap = sigma(0.9, 1, param)
+    value = [0] #Estimated value
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmap, sigmap)
     return values, sigmals, sigmars
 
 #BaBar B->K* nu nu
@@ -200,9 +208,10 @@ def babar_btokstarnunu_comb(x):
     citations.register_inspire('BaBar:2013npw') 
     q2min = [0]
     q2max = [4.785]
-    value = [7.9e-5]
-    sigma = sigma(0.9, 1, value)
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigma, sigma)
+    param = [7.9e-5]
+    sigmap = sigma(0.9, 1, param)
+    value = [0] #Estimated value
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmap, sigmap)
     return values, sigmals, sigmars
 
 #BaBar J/psi-> nu nu
@@ -213,9 +222,10 @@ def babar_jpsitonunu_comb(x):
     citations.register_inspire('BaBar:2013npw') 
     q2min = [0]
     q2max = [4.785]
-    value = [3.9e-3]
-    sigma = sigma(0.9, 1, value)
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigma, sigma)
+    param = [3.9e-3]
+    sigmap = sigma(0.9, 1, param)
+    value = [0] #Estimated value
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmap, sigmap)
     return values, sigmals, sigmars
 
 #BaBar psi(2S)-> nu
@@ -226,9 +236,10 @@ def babar_psi2stonunu_comb(x):
     citations.register_inspire('BaBar:2013npw') 
     q2min = [0]
     q2max = [4.785]
-    value = [15.5e-3]
-    sigma = sigma(0.9, 1, value)
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigma, sigma)
+    param = [15.5e-3]
+    sigmap = sigma(0.9, 1, param)
+    value = [0] #Estimated value
+    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmap, sigmap)
     return values, sigmals, sigmars
 
 
