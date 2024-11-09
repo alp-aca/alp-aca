@@ -5,6 +5,7 @@ from .runSM import runSM
 from ..citations import citations
 
 from . import bases_above, bases_below
+from functools import cache
 class ALPcouplings:
     """Container for ALP couplings.
 
@@ -234,8 +235,56 @@ class ALPcouplings:
                 vals |= {c: array[45+4*i:45+4*(i+1)].reshape([2,2])}
             vals |= {'cg': float(array[53]), "cgamma": float(array[54])}
             return ALPcouplings(vals, scale, basis)
-        
+    
     def match_run(self, scale_out: float, basis: str, integrator: str='scipy', beta: str='full', matching_scale: float = 100.0, match_2loops = False) -> 'ALPcouplings':
+        """Match and run the couplings to another basis and energy scale.
+
+        Parameters
+        ----------
+        scale_out : float
+            Energy scale where the couplings are to be evolved, in GeV.
+
+        basis : str
+            Target basis to translate.
+
+        integrator : str, optional
+            Method to use for the RG evolution. The available integrators are:
+
+            - 'scipy':
+                Use the scipy.integrate.odeint function.
+            - 'leadinglog':
+                Use the leading-log approximation.
+            - 'no_rge':
+                Return the couplings at the final scale without running them.
+
+        beta : str, optional
+            Beta function to use for the RG evolution. The available beta functions are:
+
+            - 'ytop':
+                Use the beta function for the top Yukawa coupling.
+            - 'full':
+                Use the full beta function.
+
+        matching_scale : float, optional
+            Energy scale where the matching is performed, in GeV.
+
+        match_2loops : bool, optional
+            Whether to include 2-loop matching corrections.
+
+        Returns
+        -------
+        a : ALPcouplings
+            Evolved couplings.
+
+        Raises
+        ------
+        KeyError
+            If attempting to translate to an unrecognized basis.
+        """
+        return self._match_run(scale_out, basis, integrator, beta, matching_scale, match_2loops)
+    
+    @cache
+    def _match_run(self, scale_out: float, basis: str, integrator: str='scipy', beta: str='full', matching_scale: float = 100.0, match_2loops = False) -> 'ALPcouplings':
         from . import run_high, matching, run_low
         if scale_out > self.scale:
             raise ValueError("The final scale must be smaller than the initial scale.")
