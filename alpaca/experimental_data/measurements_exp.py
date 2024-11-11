@@ -3,7 +3,8 @@ import os
 import numpy as np
 from scipy.stats import chi2
 from ..citations import citations
-from .classes import MeasurementConstantBound, rmax_belle, rmax_besIII
+from ..constants import mUpsilon3S
+from .classes import MeasurementConstantBound, MeasurementInterpolatedBound, rmax_belle, rmax_besIII
 # Get the directory of the current script
 current_dir = os.path.dirname(__file__)
 
@@ -262,6 +263,15 @@ def babar_upsilon3S(x):
     values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmar, sigmar)
     return values, sigmals, sigmars
 
+babar_Y3S_inv = MeasurementInterpolatedBound(
+    'BaBar:2008aby',
+    os.path.join(current_dir, invisible, 'Babar_BR_Y3S_binned.txt'),
+    'invisible',
+    rmax=50,
+    lab_boost=0.469/(1-0.469**2)**0.5, #gamma = 0.469, correspinding to E_electron = 8.6GeV and E_positron = 3.1GeV
+    mass_parent=mUpsilon3S,
+    mass_sibling=0
+    )
 
 #Belle Upsilon(1S)
     #Experiment: Belle
@@ -796,6 +806,16 @@ def babar_Y_hadrons(x):
         sigmar.append(sigma(0.9, 1, param[ii]))
     values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmar, sigmar)
     return values, sigmals, sigmars
+
+babar_Y3S_mumu = MeasurementInterpolatedBound(
+    'BaBar:2009lbr',
+    os.path.join(current_dir, visible, 'babar_Y3S_mumu.txt'),
+    'prompt',
+    rmin=2.0,
+    lab_boost=0.469/(1-0.469**2)**0.5, #gamma = 0.469, correspinding to E_electron = 8.6GeV and E_positron = 3.1GeV
+    mass_parent=mUpsilon3S,
+    mass_sibling=0
+    )
 
 #BaBar Y(1S)--> Muons
     #Experiment: BaBar
