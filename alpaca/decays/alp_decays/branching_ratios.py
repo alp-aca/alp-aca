@@ -3,10 +3,10 @@ from ...rge import ALPcouplings
 from .fermion_decays import decay_width_electron, decay_width_muon, decay_width_tau, decay_width_charm, decay_width_bottom
 from .hadronic_decays_def import decay_width_3pi000, decay_width_3pi0pm, decay_width_etapipi00, decay_width_etapipipm, decay_width_gammapipi
 from .gaugebosons import decay_width_2gamma, decay_width_2gluons
-from functools import lru_cache
+from functools import cache
 
-@lru_cache
-def total_decay_width (ma, couplings: ALPcouplings, fa, **kwargs):
+@cache
+def _total_decay_width (ma, couplings: ALPcouplings, fa, **kwargs):
     kwargs_nointegral = {k: v for k, v in kwargs.items() if k not in ['nitn_adapt', 'neval_adapt', 'nitn', 'neval', 'cores']}
     DW_elec = decay_width_electron(ma, couplings, fa, **kwargs_nointegral)
     DW_muon = decay_width_muon(ma, couplings, fa, **kwargs_nointegral)
@@ -33,7 +33,56 @@ def total_decay_width (ma, couplings: ALPcouplings, fa, **kwargs):
         }
     return DWs
 
+def total_decay_width(ma, couplings: ALPcouplings, fa, **kwargs):
+    """
+    Calculate the total decay width and individual decay widths for various channels.
+
+    Parameters:
+    ma (float): Mass of the ALP (Axion-Like Particle).
+    couplings (ALPcouplings): Couplings of the ALP to different particles.
+    fa (float): Decay constant of the ALP.
+    **kwargs: Additional keyword arguments for decay width calculations.
+
+    Returns:
+    dict: A dictionary containing the decay widths for various channels:
+        - 'e': Decay width to electrons.
+        - 'mu': Decay width to muons.
+        - 'tau': Decay width to taus.
+        - 'charm': Decay width to charm quarks.
+        - 'bottom': Decay width to bottom quarks.
+        - '3pis': Decay width to three pions.
+        - 'etapipi': Decay width to eta and two pions.
+        - 'gammapipi': Decay width to gamma and two pions.
+        - 'gluongluon': Decay width to two gluons.
+        - '2photons': Decay width to two photons.
+        - 'DW_tot': Total decay width.
+    """
+    return _total_decay_width(ma, couplings, fa, **kwargs)
+
 def BRsalp(ma, couplings: ALPcouplings, fa, **kwargs):
+    """
+    Calculate the branching ratios for various decay channels of the ALP.
+
+    Parameters:
+    ma (float): Mass of the ALP (Axion-Like Particle).
+    couplings (ALPcouplings): Couplings of the ALP to different particles.
+    fa (float): Decay constant of the ALP.
+    **kwargs: Additional keyword arguments for decay width calculations.
+
+    Returns:
+    dict: A dictionary containing the branching ratios for various channels:
+        - 'e': Branching ratio to electrons.
+        - 'mu': Branching ratio to muons.
+        - 'tau': Branching ratio to taus.
+        - 'charm': Branching ratio to charm quarks.
+        - 'bottom': Branching ratio to bottom quarks.
+        - '3pis': Branching ratio to three pions.
+        - 'etapipi': Branching ratio to eta and two pions.
+        - 'gammapipi': Branching ratio to gamma and two pions.
+        - 'gluongluon': Branching ratio to two gluons.
+        - '2photons': Branching ratio to two photons.
+        - 'hadrons': Branching ratio to hadrons.
+    """
     DWs = total_decay_width(ma, couplings, fa, **kwargs)
     BRs={
         'e': DWs['e']/DWs['DW_tot'],

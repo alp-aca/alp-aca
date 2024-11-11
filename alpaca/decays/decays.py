@@ -55,6 +55,9 @@ def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: flo
     elif initial == ['Upsilon(3S)'] and final == sorted(['photon', 'hadrons']):
         from ..constants import mUpsilon3S, BeeUpsilon3S
         br = lambda ma, couplings, fa, **kwargs: invisible.Mixed_QuarkoniaSearches(ma, couplings, mUpsilon3S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['hadrons']
+    elif initial == ['Upsilon(3S)'] and final == sorted(['photon', 'muon', 'muon']):
+        from ..constants import mUpsilon3S, BeeUpsilon3S
+        br = lambda ma, couplings, fa, **kwargs: invisible.Mixed_QuarkoniaSearches(ma, couplings, mUpsilon3S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['mu']
     #Initial resonance Upsilon 4S
     elif initial == ['Upsilon(4S)'] and final == sorted(['photon', 'alp']):
         from ..constants import mUpsilon4S, BeeUpsilon4S
