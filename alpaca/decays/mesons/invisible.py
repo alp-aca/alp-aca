@@ -34,7 +34,7 @@ def sigmaNR(ma: float, couplings: ALPcouplings, s: float, f_a: float=1000,**kwar
     from ...constants import hbarc2_GeV2pb
     from ...common import alpha_em
     coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
-    gaphoton = cgamma(ma, couplings, f_a, **kwargs)*alpha_em(np.sqrt(s))/(np.pi*f_a)
+    gaphoton = cgamma(couplings, f_a, **kwargs)*alpha_em(np.sqrt(s))/(np.pi*f_a)
     return hbarc2_GeV2pb*(((alpha_em(np.sqrt(s))*np.abs(gaphoton)**2)/24)*(1-(ma**2)/s)**3)
 
 def BR_Vagamma(ma: float, couplings: ALPcouplings, mV: float, BeeV: float, quark: str, f_a: float=1000, **kwargs):
@@ -49,7 +49,7 @@ def BR_Vagamma(ma: float, couplings: ALPcouplings, mV: float, BeeV: float, quark
         gaff = 0.5*coup_low['cuA'][1,1]/f_a
     else:
         raise ValueError("Q must be -1/3 or 2/3")
-    gaphoton = cgamma(ma, couplings, f_a, **kwargs)*alpha_em(np.sqrt(mV))/(np.pi*f_a)
+    gaphoton = cgamma(couplings, f_a, **kwargs)*alpha_em(np.sqrt(mV))/(np.pi*f_a)
     return mV**2/(32*np.pi*alpha_em(mV))*BeeV*(1-(ma**2)/mV**2)*np.abs((gaphoton)*(1-ma**2/mV**2)-2*gaff)**2
 
 def sigmapeak(mV, BeeV):
