@@ -2,7 +2,7 @@ import numpy as np
 from scipy.stats import chi2
 from ..citations import citations
 from ..common import kallen
-from scipy.integrate import quad
+from scipy.integrate import quad_vec
 import pandas as pd
 from scipy.interpolate import interp1d
 
@@ -77,7 +77,7 @@ class MeasurementBase:
             lab_gamma = np.sqrt(1 + self.lab_boost**2)
             pa = lambda th: np.sqrt((self.lab_boost * Ea_parent + lab_gamma * pa_parent * np.cos(th))**2 + (pa_parent * np.sin(th))**2)
             if theta is None:
-                pa_lab = quad(pa, 0, np.pi)[0]/np.pi
+                pa_lab = quad_vec(pa, 0, np.pi)[0]/np.pi
             else:
                 pa_lab = pa(theta)
         betagamma = pa_lab/ma

@@ -3,6 +3,8 @@ import scipy.stats
 
 def tensor_meshgrid(*arrays):
     dims = [np.array(a).shape for a in arrays]
+    if dims == [(),]*len(arrays):
+        return arrays
     dims_final = [x for xs in dims for x in xs]
     ones = [np.ones_like(d).tolist() for d in dims]
     result = []
@@ -10,8 +12,10 @@ def tensor_meshgrid(*arrays):
         dd = [d for d in ones]
         dd[i] = dims[i]
         dim_reshape = [x for xs in dd for x in xs]
+        if dim_reshape == []:
+            dim_reshape = [1]
         result.append(np.broadcast_to(np.array(a).reshape(*dim_reshape), dims_final))
-    return result
+    return tuple(result)
 
 def nsigmas(chi2, ndof):
     r"""Compute the pull in Gaussian standard deviations corresponding to
