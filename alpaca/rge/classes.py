@@ -28,7 +28,7 @@ class ALPcouplings:
     ValueError
         If attempting to translate to an unrecognized basis.
     """
-    def __init__(self, values: dict, scale:float, basis:str):
+    def __init__(self, values: dict, scale:float, basis:str, ew_scale: float = 100.0):
         """Constructor method
 
         Parameters
@@ -45,6 +45,9 @@ class ALPcouplings:
             - 'derivative_above':
                 Basis with the explicitly shift-symmetric couplings of the fermion currents to the derivative of the ALP; above the EW scale.
 
+        ew_scale : float, optional
+            Energy scale of the electroweak symmetry breaking scale, in GeV. Defaults to 100 GeV
+
         Raises
         ------
         ValueError
@@ -54,6 +57,7 @@ class ALPcouplings:
             If attempting to assign a non-numeric value
         """
         citations.register_inspire('Bauer:2020jbp')
+        self.ew_scale = ew_scale
         if basis == 'derivative_above':
             self.scale = scale
             self.basis = basis
@@ -236,7 +240,7 @@ class ALPcouplings:
             vals |= {'cg': float(array[53]), "cgamma": float(array[54])}
             return ALPcouplings(vals, scale, basis)
     
-    def match_run(self, scale_out: float, basis: str, integrator: str='scipy', beta: str='full', matching_scale: float = 100.0, match_2loops = False) -> 'ALPcouplings':
+    def match_run(self, scale_out: float, basis: str, integrator: str='scipy', beta: str='full', match_2loops = False) -> 'ALPcouplings':
         """Match and run the couplings to another basis and energy scale.
 
         Parameters
@@ -265,9 +269,6 @@ class ALPcouplings:
             - 'full':
                 Use the full beta function.
 
-        matching_scale : float, optional
-            Energy scale where the matching is performed, in GeV.
-
         match_2loops : bool, optional
             Whether to include 2-loop matching corrections.
 
@@ -281,23 +282,23 @@ class ALPcouplings:
         KeyError
             If attempting to translate to an unrecognized basis.
         """
-        return self._match_run(scale_out, basis, integrator, beta, matching_scale, match_2loops)
+        return self._match_run(scale_out, basis, integrator, beta, match_2loops)
     
     @cache
-    def _match_run(self, scale_out: float, basis: str, integrator: str='scipy', beta: str='full', matching_scale: float = 100.0, match_2loops = False) -> 'ALPcouplings':
+    def _match_run(self, scale_out: float, basis: str, integrator: str='scipy', beta: str='full', match_2loops = False) -> 'ALPcouplings':
         from . import run_high, matching, run_low
         if scale_out > self.scale:
             raise ValueError("The final scale must be smaller than the initial scale.")
         if scale_out == self.scale:
             return self.translate(basis)
-        if self.scale > matching_scale and scale_out < matching_scale:
+        if self.scale > self.ew_scale and scale_out < self.ew_scale:
             if self.basis in bases_above and basis in bases_below:
-                couplings_ew = self.match_run(matching_scale, 'massbasis_above', integrator, beta, matching_scale)
+                couplings_ew = self.match_run(self.ew_scale, 'massbasis_above', integrator, beta, self.ew_scale)
                 couplings_below = matching.match(couplings_ew, match_2loops)
-                return couplings_below.match_run(scale_out, basis, integrator, beta, matching_scale)
+                return couplings_below.match_run(scale_out, basis, integrator, beta, self.ew_scale)
             else:
                 raise KeyError(basis)
-        if scale_out < matching_scale:
+        if scale_out < self.ew_scale:
             if integrator == 'scipy':
                 return run_low.run_scipy(self.translate('kF_below'), scale_out).translate(basis)
             elif integrator == 'leadinglog':

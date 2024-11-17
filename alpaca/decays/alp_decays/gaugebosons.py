@@ -1,6 +1,6 @@
 from .chiral import a_U3_repr, kappa, ffunction
 from . import u3reprs
-from ...rge import ALPcouplings
+from ...rge import ALPcouplings, bases_above
 from ...constants import mpi0, metap, mK, mu, md, ms, mc, mb, mt, mW, s2w, me, mmu, mtau, fpi
 from ...common import alpha_s, alpha_em, B1, B2
 from ...citations import citations
@@ -37,8 +37,8 @@ def cgamma_twoloops(ma: float, couplings: ALPcouplings, fa: float) -> float:
 
 def decay_width_2gamma(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
     cgamma_eff = 0
-    if ma > mW:
-        cc = couplings.match_run(ma, 'massbasis_above', **kwargs | {'matching_scale': mW})
+    if couplings.basis in bases_above:
+        cc = couplings.match_run(ma, 'massbasis_above', **kwargs)
         cgamma_eff += 2*alpha_em/np.pi*cc['cW']/s2w*B2(4*mW**2/ma**2)
         cuA = cc['ku'] - cc['kU']
         cdA = cc['kd'] - cc['kD']
@@ -49,7 +49,7 @@ def decay_width_2gamma(ma: float, couplings: ALPcouplings, fa: float, **kwargs) 
         coups = [ceA[0,0], ceA[1,1], ceA[2,2], cuA[1,1], cdA[2,2], cuA[2,2]]
         cgamma_eff += sum(Nc[i]*charges[i]**2*coups[i]*B1(4*masses[i]**2/ma**2) for i in range(6))
     else:
-        cc = couplings.match_run(ma, 'VA_below', **kwargs | {'matching_scale': mW})
+        cc = couplings.match_run(ma, 'VA_below', **kwargs)
         cuA = cc['cuA']
         cdA = cc['cdA']
         ceA = cc['ceA']
@@ -84,7 +84,7 @@ def decay_width_2gluons(ma: float, couplings: ALPcouplings, fa: float, **kwargs)
     if ma < 1.84:
         return 0.0
 
-    match_scale = kwargs.get('matching_scale', 100)
+    match_scale = couplings.ew_scale
     if ma > match_scale:
         cc = couplings.match_run(ma, 'massbasis_above', **kwargs)
         cuA = cc['ku'] - cc['kU']
