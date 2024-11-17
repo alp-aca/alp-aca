@@ -1,11 +1,12 @@
 from ..rge import ALPcouplings, bases_above, bases_below
+from ..rge.runSM import runSM
 from ..constants import mW, s2w, me, mmu, mtau, mc, mb, mu, md, ms, metap, fpi, mt, mb, mpi0, mK, mZ
 from ..common import alpha_em, alpha_s, B1, B2
 from .alp_decays.chiral import a_U3_repr, ffunction, kappa
 from .alp_decays import u3reprs
 from ..citations import citations
 import numpy as np
-from scipy.integrate import quad_vec, quad
+from scipy.integrate import quad
 import pandas as pd
 from scipy.interpolate import interp1d
 import os
@@ -123,17 +124,17 @@ def clepton(couplings: ALPcouplings, **kwargs) -> np.matrix:
     if couplings.basis in bases_above:
         cc = couplings.translate('massbasis_above')
         ceA = cc['ke'] - cc['kE']
-        cWW = cc['cW']
-        cgammaZ = cc['cgammaZ']
-        cZZ = cc['cZ']
-        cgamma = cc['cgamma']
+        cWW = cc['cW']/(16*np.pi**2)
+        cgammaZ = cc['cgammaZ']/(16*np.pi**2)
+        cZZ = cc['cZ']/(16*np.pi**2)
+        cgamma = cc['cgamma']/(16*np.pi**2)
     else:
         cc = couplings.translate('VA_below')
         ceA = cc['ceA']
         cWW = 0
         cgammaZ = 0
         cZZ = 0
-        cgamma = cc['cgamma']
+        cgamma = cc['cgamma']/(16*np.pi**2)
     aem = alpha_em(ma)
     mlep = np.array([me, mmu, mtau], dtype=complex)
     ceff = np.array([0,0,0], dtype=complex)
@@ -148,3 +149,91 @@ def clepton(couplings: ALPcouplings, **kwargs) -> np.matrix:
     if cZZ != 0:
         ceff -= 12*aem**2/s2w**2/(1-s2w)**2*cZZ*(ql**2*s2w**2-t3l*ql*s2w+1/8)*np.array([1,1,1], dtype=complex)*(np.log(ma**2/mZ**2)+deltaI+0.5)
     return np.diag(ceff) + ceA
+
+def cuquark(couplings: ALPcouplings, **kwargs) -> np.matrix:
+    citations.register_inspire('Bauer:2017ris')
+
+    deltaI = kwargs.get('deltaI', -11/3)
+    ma = couplings.scale
+    if couplings.basis in bases_above:
+        cc = couplings.translate('massbasis_above')
+        cuA = cc['ku'] - cc['kU']
+        cWW = cc['cW']/(16*np.pi**2)
+        cgammaZ = cc['cgammaZ']/(16*np.pi**2)
+        cZZ = cc['cZ']/(16*np.pi**2)
+        cgamma = cc['cgamma']/(16*np.pi**2)
+        cg = cc['cg']/(16*np.pi**2)
+        mquark = np.array([mu, mc, mt], dtype=complex)
+        mquark_log = np.array([mpi0, mc, mt], dtype=complex)
+        idmatrix = np.array([1,1,1], dtype=complex)
+        ceff = np.array([0,0,0], dtype=complex)
+    else:
+        cc = couplings.translate('VA_below')
+        cuA = cc['cuA']
+        cWW = 0
+        cgammaZ = 0
+        cZZ = 0
+        cgamma = cc['cgamma']/(16*np.pi**2)
+        cg = cc['cg']/(16*np.pi**2)
+        mquark = np.array([mu, mc], dtype=complex)
+        mquark_log = np.array([mpi0, mc], dtype=complex)
+        idmatrix = np.array([1,1], dtype=complex)
+        ceff = np.array([0,0], dtype=complex)
+    aem = alpha_em(ma)
+    
+    ql = 2/3
+    t3l = 0.5
+    if cgamma != 0:
+        ceff -= 12*aem**2*ql**2*cgamma*(np.log(ma**2/mquark**2) + deltaI*idmatrix + np.array([gloop(4*mq**2/ma**2) for mq in mquark]))
+    if cWW != 0:
+        # If all the loop quarks are light, the contribution is proportional to the identity matrix due to unitarity of the CKM matrix
+        # With heavy quarks there are complicated loop functions that Bauer et al don't provide
+        ceff -= 3*aem**2/s2w**2*cWW*idmatrix*(np.log(ma**2/mW**2)+deltaI+0.5)
+    if cgammaZ != 0:
+        ceff -= 12*aem**2/s2w/(1-s2w)*cgammaZ*(t3l-2*ql*s2w)*idmatrix*(np.log(ma**2/mZ**2)+deltaI+1.5)
+    if cZZ != 0:
+        ceff -= 12*aem**2/s2w**2/(1-s2w)**2*cZZ*(ql**2*s2w**2-t3l*ql*s2w+1/8)*idmatrix*(np.log(ma**2/mZ**2)+deltaI+0.5)
+    if cg != 0 and ma > 1.5:
+        ceff -= 12*4/3*alpha_s(ma)**2*cg*(np.log(ma**2/mquark_log**2) + deltaI*idmatrix + np.array([gloop(4*mq**2/ma**2) for mq in mquark]))
+    return np.diag(ceff) + cuA
+
+def cdquark(couplings: ALPcouplings, **kwargs) -> np.matrix:
+    citations.register_inspire('Bauer:2017ris')
+
+    deltaI = kwargs.get('deltaI', -11/3)
+    ma = couplings.scale
+    if couplings.basis in bases_above:
+        cc = couplings.translate('massbasis_above')
+        cdA = cc['kd'] - cc['kD']
+        cWW = cc['cW']/(16*np.pi**2)
+        cgammaZ = cc['cgammaZ']/(16*np.pi**2)
+        cZZ = cc['cZ']/(16*np.pi**2)
+    else:
+        cc = couplings.translate('VA_below')
+        cdA = cc['cdA']
+        cWW = 0
+        cgammaZ = 0
+        cZZ = 0
+    aem = alpha_em(ma)
+    cgamma = cc['cgamma']/(16*np.pi**2)
+    cg = cc['cg']/(16*np.pi**2)
+    mquark = np.array([md, ms, mb], dtype=complex)
+    mquark_log = np.array([mpi0, mK, mb], dtype=complex)
+    idmatrix = np.array([1,1,1], dtype=complex)
+    ceff = np.array([0,0,0], dtype=complex)
+    
+    ql = -1/3
+    t3l = -0.5
+    if cgamma != 0:
+        ceff -= 12*aem**2*ql**2*cgamma*(np.log(ma**2/mquark**2) + deltaI*idmatrix + np.array([gloop(4*mq**2/ma**2) for mq in mquark]))
+    if cWW != 0:
+        # If all the loop quarks are light, the contribution is proportional to the identity matrix due to unitarity of the CKM matrix
+        # With heavy quarks there are complicated loop functions that Bauer et al don't provide
+        ceff -= 3*aem**2/s2w**2*cWW*idmatrix*(np.log(ma**2/mW**2)+deltaI+0.5)
+    if cgammaZ != 0:
+        ceff -= 12*aem**2/s2w/(1-s2w)*cgammaZ*(t3l-2*ql*s2w)*idmatrix*(np.log(ma**2/mZ**2)+deltaI+1.5)
+    if cZZ != 0:
+        ceff -= 12*aem**2/s2w**2/(1-s2w)**2*cZZ*(ql**2*s2w**2-t3l*ql*s2w+1/8)*idmatrix*(np.log(ma**2/mZ**2)+deltaI+0.5)
+    if cg != 0 and ma > 1.5:
+        ceff -= 12*4/3*alpha_s(ma)**2*cg*(np.log(ma**2/mquark_log**2) + deltaI*idmatrix + np.array([gloop(4*mq**2/ma**2) for mq in mquark]))
+    return np.diag(ceff) + cdA

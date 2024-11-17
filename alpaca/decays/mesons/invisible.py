@@ -2,7 +2,7 @@ import numpy as np
 
 from ...rge import ALPcouplings
 from ...citations import citations
-from ..effective_couplings import cgamma
+from ..effective_couplings import cgamma, cuquark, cdquark
 
 def Ktopia(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     citations.register_inspire('Izaguirre:2016dfi')
@@ -33,8 +33,12 @@ def sigmaNR(ma: float, couplings: ALPcouplings, s: float, f_a: float=1000,**kwar
     citations.register_inspire('DiLuzio:2024jip')
     from ...constants import hbarc2_GeV2pb
     from ...common import alpha_em
-    coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
-    gaphoton = cgamma(couplings, f_a, **kwargs)*alpha_em(np.sqrt(s))/(np.pi*f_a)
+    matching_scale = kwargs.get('matching_scale', 100)
+    if ma > matching_scale:
+        cc = couplings.match_run(ma, 'massbasis_above', **kwargs)
+    else:
+        cc = couplings.match_run(ma, 'VA_below', **kwargs)
+    gaphoton = cgamma(cc, f_a, **kwargs)*alpha_em(np.sqrt(s))/(np.pi*f_a)
     return hbarc2_GeV2pb*(((alpha_em(np.sqrt(s))*np.abs(gaphoton)**2)/24)*(1-(ma**2)/s)**3)
 
 def BR_Vagamma(ma: float, couplings: ALPcouplings, mV: float, BeeV: float, quark: str, f_a: float=1000, **kwargs):
@@ -42,11 +46,15 @@ def BR_Vagamma(ma: float, couplings: ALPcouplings, mV: float, BeeV: float, quark
     citations.register_inspire('DiLuzio:2024jip')
     citations.register_inspire('Hwang:1997ie') # Eliminate fV in favour of BR(V->ee)
     from ...common import alpha_em
-    coup_low = couplings.match_run(ma, 'VA_below', **kwargs)
+    matching_scale = kwargs.get('matching_scale', 100)
+    if ma > matching_scale:
+        cc = couplings.match_run(ma, 'massbasis_above', **kwargs)
+    else:
+        cc = couplings.match_run(ma, 'VA_below', **kwargs)
     if quark == 'b':
-        gaff = 0.5*coup_low['cdA'][2,2]/f_a
+        gaff = 0.5*cdquark(cc)[2,2]/f_a
     elif quark=='c':
-        gaff = 0.5*coup_low['cuA'][1,1]/f_a
+        gaff = 0.5*cuquark(cc)[1,1]/f_a
     else:
         raise ValueError("Q must be -1/3 or 2/3")
     gaphoton = cgamma(couplings, f_a, **kwargs)*alpha_em(np.sqrt(mV))/(np.pi*f_a)

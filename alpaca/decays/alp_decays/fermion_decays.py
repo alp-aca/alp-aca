@@ -2,7 +2,7 @@ import numpy as np
 from ...rge import ALPcouplings, bases_above
 from ...constants import me, mmu, mtau, mc, mb
 from ...citations import citations
-from ..effective_couplings import clepton
+from ..effective_couplings import clepton, cuquark, cdquark
 
 
 def fermion_decay_width(ma, fa,cf, mf,Nc):
@@ -40,11 +40,9 @@ def decay_width_charm(ma,couplings: ALPcouplings,fa,**kwargs):
     matching_scale = kwargs.get('matching_scale', 100)
     if ma > matching_scale:
         cc = couplings.match_run(ma, 'massbasis_above', **kwargs)
-        cuA = cc['ku'] - cc['kU']
     else:
         cc = couplings.match_run(ma, 'VA_below', **kwargs)
-        cuA = cc['cuA']
-    return fermion_decay_width(ma, fa, cuA[1,1], mc, Nc=3)
+    return fermion_decay_width(ma, fa, cuquark(cc)[1,1], mc, Nc=3)
 
 def decay_width_bottom(ma,couplings: ALPcouplings,fa,**kwargs):
     matching_scale = kwargs.get('matching_scale', 100)
@@ -54,7 +52,7 @@ def decay_width_bottom(ma,couplings: ALPcouplings,fa,**kwargs):
     else:
         cc = couplings.match_run(ma, 'VA_below', **kwargs)
         cdA = cc['cdA']
-    return fermion_decay_width(ma, fa, cdA[2,2], mb, Nc=3)
+    return fermion_decay_width(ma, fa, cdquark(cc)[2,2], mb, Nc=3)
 
 
 
