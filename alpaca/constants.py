@@ -86,6 +86,7 @@ ma0 = Constant(Particle.from_name("a(0)(980)0").mass/1000, 'particle')
 msigma = Constant(Particle.from_name("f(0)(500)").mass/1000, 'particle') # f0(500) used to be sigma
 mf0 = Constant(Particle.from_name("f(0)(980)").mass/1000, 'particle')
 mf2 = Constant(Particle.from_name("f(2)(1270)").mass/1000, 'particle')
+momega = Constant(Particle.from_pdgid(223).mass/1000, 'particle')
 
 mq_dict = {'u': mu, 'd': md, 's': ms, 'c': mc, 'b': mb, 't': mt}
 

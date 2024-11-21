@@ -7,7 +7,7 @@ from ...rge import ALPcouplings, bases_above
 from . import chiral
 from .chiral import ffunction
 from .u3reprs import pi0, eta, etap, rho0, omega, phi, sigma, f0, a0, f2, eta0, eta8
-from ...constants import mu, md, ms, mc, mb, mt, me, mmu, mtau, mpi0, meta, metap, mK, mrho, fpi, mpi_pm, ma0, msigma, mf0, mf2, Gammaa0, Gammasigma, Gammaf0, Gammaf2, Gammarho
+from ...constants import mu, md, ms, mc, mb, mt, me, mmu, mtau, mpi0, meta, metap, mK, mrho, fpi, mpi_pm, ma0, msigma, mf0, mf2, momega, Gammaa0, Gammasigma, Gammaf0, Gammaf2, Gammarho
 from ...citations import citations
 
 #ALP decays to different channels (leptonic, hadronic, photons)
@@ -311,6 +311,91 @@ def decay_width_etapipi00(ma: float, couplings: ALPcouplings, fa: float, **kwarg
 def decay_width_etapipipm(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
     return atoetapipi(ma, meta, mpi_pm, mpi_pm, couplings, fa, 1, **kwargs)[0]
 
+###########################    DECAY TO  a-> eta pi pi    ###########################
+#It is assumed that Fpppp(m)=Fspp(m)=Ftpp(m)=F(m)
+
+def ampatoetappipi(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs):
+    #INPUT
+        #ma: Mass of decaying particle (in GeV)
+        #mi: Mass of daughter particle [i=1,2,3] (in GeV) (1,2: pi, 3: eta')
+        #model: Coefficients
+        #x: Integration variables (m12, phi, costheta, phiast, costhetaast)
+        #kinematics: Kinematical relationships
+    #OUTPUT
+        #Amplitude a-> eta pi pi (without prefactor)
+
+    citations.register_inspire('Aloni:2018vki')
+    deltaI = 0
+    #Kinematic relations
+    mpi1pi2 = np.sqrt(ma**2+m3**2-2*ma*x[:,0])
+    pappi1 = kinematics[0]
+    pappi2 = kinematics[1]
+    papeta = kinematics[2]
+    ppi1ppi2 = kinematics[3]
+    petappi1 = kinematics[4]
+    petappi2 = kinematics[5]
+    petaqpipi = petappi1 - petappi2
+    petappipi = petappi1 + petappi2
+    ppipi2 = mpi1pi2**2
+    qpipi2 = m1**2+m2**2-2*ppi1ppi2
+    metapi1 = np.sqrt(m1**2+m3**2+2*kinematics[4])
+    metapi2 = np.sqrt(m2**2+m3**2+2*kinematics[5])
+
+    aU3 = chiral.a_U3_repr(ma, model, fa, **kwargs)
+
+    ####DECAY a->eta pi pi
+    aetapsigma = alp_mixing([aU3, etap, sigma], fa)
+    aetapf0 = alp_mixing([aU3, etap, f0], fa)
+    api0a0p = alp_mixing([aU3, etap, a0], fa)
+    aetapf2 = alp_mixing([aU3, etap, f2], fa)
+
+    ####DECAY a->etaprime pi pi
+    aetapsigma = alp_mixing([aU3, etap, sigma], fa)
+    aetapf0 = alp_mixing([aU3, etap, f0], fa)
+    aetapf2 = alp_mixing([aU3, etap, f2], fa)
+
+
+    #Mix amplitude (Eq.S48)
+    #amix = 0 #Approximation --> (np.sqrt(2)*aeta0+aeta8)*mpi**2/(3*fpi**2)*ffunction(ma) 
+    amix = (np.sqrt(2)*alp_mixing([aU3, eta0], fa) + alp_mixing([aU3, eta8], fa))*m2**2/3/fpi**2*ffunction(ma)
+
+    #a-> Sigma (Eq.S49)
+    asigma = np.where(mpi1pi2 < 2*mK, -(10)**2* aetapsigma* papeta* ppi1ppi2*bw(mpi1pi2**2, msigma, Gammasigma, 0)*ffunction(ma), 0)
+
+    #a-> f0 (Eq.S50)
+    af0 = (7.3)**2* aetapf0* papeta* ppi1ppi2* bw(mpi1pi2**2, mf0, Gammaf0, 0)*ffunction(ma) 
+
+    #a-> a0 (Eq.S51)
+    aa0 = (13)**2* api0a0p* ffunction(ma)* (pappi2* petappi1*bw(metapi1**2, ma0, Gammaa0, 0) + pappi1* petappi2* bw(metapi2, ma0, Gammaa0,0)) 
+
+    #a-> f2 (Eq.)
+    af2 = (16)**2* aetapf2* (petaqpipi**2 - 1/3*qpipi2*(m3**2+ petappipi**2/ppi1ppi2**2- 2*petappipi**2/ppi1ppi2**2))*\
+          bw(mpi1pi2**2, mf2, Gammaf2, 0)* ffunction(ma)
+    aux = (amix+asigma+af0+aa0+af2) 
+    return aux
+
+def atoetappipi(ma, m1, m2, m3, model, fa, c, **kwargs): #Eq. S33
+    #INPUT:
+        #ma: Mass of the ALP (in GeV)
+        #mi: Mass of daughter particle [i=1,2,3] (in GeV) (1,2: pi, 3: eta)
+        #fa: Scale of U(1)PQ (in GeV)
+        #c: Control value (c=0-> Neutral pions, c=1-> pi0, pi+, pi-)
+    #OUTPUT: 
+        #Decay rate including symmetry factors
+    citations.register_inspire('Aloni:2018vki')
+    if ma < m1 + m2 + m3:
+        return [0.0, 0,0]
+    s = 2-c # Symmetry factor: 2 for pi0 pi0, 1 for pi+ pi-
+    result, error = threebody_decay.decay3body(ampatoetappipi, ma, m1, m2, m3, model, fa, **kwargs)
+    return 1/(2*ma*s)*pow(fpi/fa,2)*result, 1/(2*ma*s)*pow(fpi/fa,2)*error
+
+def decay_width_etappipi00(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
+    return atoetappipi(ma, metap, mpi0, mpi0, couplings, fa, 0, **kwargs)[0]
+
+def decay_width_etappipipm(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
+    return atoetappipi(ma, metap, mpi_pm, mpi_pm, couplings, fa, 1, **kwargs)[0]
+
+
 ###########################    DECAY TO  a-> pi pi gamma    ###########################
 def ampatogammapipi(ma, Gamma, mrho, model, fa, x, **kwargs):
     #INPUT
@@ -371,3 +456,11 @@ def decay_width_gammapipi(ma: float, couplings: ALPcouplings, fa: float, **kwarg
         edecayrate = 3*alphaem(ma)*ma**3/(2**11*np.pi**6*fa**2)* resint.sdev
     else: decayrate, edecayrate= [0.0,0.0]
     return decayrate
+
+
+def decay_width_2w(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
+    citations.register_inspire('Aloni:2018vki')
+    aU3 = chiral.a_U3_repr(ma, couplings, fa, **kwargs)
+    aww = alp_mixing([aU3, omega, omega], fa)
+    aux = g**2*ffunction(ma)*aww
+    return 9*ma**3/((4*np.pi)**5*fa**2)*(1-4*momega**2/ma**2)**(3/2)*aux*np.conjugate(aux)

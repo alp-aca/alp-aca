@@ -1,7 +1,7 @@
 import numpy as np
 from ...rge import ALPcouplings
 from .fermion_decays import decay_width_electron, decay_width_muon, decay_width_tau, decay_width_charm, decay_width_bottom
-from .hadronic_decays_def import decay_width_3pi000, decay_width_3pi0pm, decay_width_etapipi00, decay_width_etapipipm, decay_width_gammapipi
+from .hadronic_decays_def import decay_width_3pi000, decay_width_3pi0pm, decay_width_etapipi00, decay_width_etapipipm, decay_width_etappipi00, decay_width_etappipipm, decay_width_gammapipi, decay_width_2w
 from .gaugebosons import decay_width_2gamma, decay_width_2gluons
 from functools import cache
 
@@ -15,6 +15,8 @@ def _total_decay_width (ma, couplings: ALPcouplings, fa, **kwargs):
     DW_bottom = decay_width_bottom(ma, couplings, fa, **kwargs_nointegral)
     DW_3pis = decay_width_3pi000(ma, couplings, fa, **kwargs)+ decay_width_3pi0pm(ma, couplings, fa, **kwargs)
     DW_etapipi = decay_width_etapipi00(ma, couplings, fa, **kwargs) + decay_width_etapipipm(ma, couplings, fa, **kwargs)*int(ma<2.0)
+    DW_etappipi = decay_width_etappipi00(ma, couplings, fa, **kwargs) + decay_width_etappipipm(ma, couplings, fa, **kwargs)*int(ma<2.0)
+    DW_2w = decay_width_2w(ma, couplings, fa, **kwargs_nointegral)
     DW_gammapipi = decay_width_gammapipi(ma, couplings, fa, **kwargs)
     DW_gluongluon = decay_width_2gluons(ma, couplings, fa, **kwargs_nointegral)
     DW_2photons = decay_width_2gamma(ma, couplings, fa, **kwargs_nointegral)
@@ -26,10 +28,12 @@ def _total_decay_width (ma, couplings: ALPcouplings, fa, **kwargs):
         'bottom': DW_bottom,
         '3pis': DW_3pis,
         'etapipi': DW_etapipi,
+        'etappipi': DW_etappipi,
         'gammapipi': DW_gammapipi,
+        '2omega': DW_2w,
         'gluongluon': DW_gluongluon, 
         '2photons': DW_2photons,
-        'DW_tot': DW_elec+DW_muon+DW_tau+DW_charm+DW_bottom+DW_3pis+DW_etapipi*int(ma<2.0)+DW_gammapipi*int(ma<2.0)+DW_gluongluon*int(ma>2.0)+DW_2photons
+        'DW_tot': DW_elec+DW_muon+DW_tau+DW_charm+DW_bottom+DW_3pis+DW_etapipi*int(ma<2.0)+DW_etapipi*int(ma<2.0)+DW_gammapipi*int(ma<2.0)+DW_2w*int(ma<2.0)+DW_gluongluon*int(ma>2.0)+DW_2photons
         }
     return DWs
 
@@ -52,6 +56,8 @@ def total_decay_width(ma, couplings: ALPcouplings, fa, **kwargs):
         - 'bottom': Decay width to bottom quarks.
         - '3pis': Decay width to three pions.
         - 'etapipi': Decay width to eta and two pions.
+        - 'etappipi': Decay width to eta' and two pions.
+        - '2omega': Decay width to two omegas.
         - 'gammapipi': Decay width to gamma and two pions.
         - 'gluongluon': Decay width to two gluons.
         - '2photons': Decay width to two photons.
@@ -78,7 +84,9 @@ def BRsalp(ma, couplings: ALPcouplings, fa, **kwargs):
         - 'bottom': Branching ratio to bottom quarks.
         - '3pis': Branching ratio to three pions.
         - 'etapipi': Branching ratio to eta and two pions.
+        - 'etappipi': Branching ratio to eta' and two pions.
         - 'gammapipi': Branching ratio to gamma and two pions.
+        - '2omega': Branching ratio to two omegas.
         - 'gluongluon': Branching ratio to two gluons.
         - '2photons': Branching ratio to two photons.
         - 'hadrons': Branching ratio to hadrons.
@@ -92,10 +100,12 @@ def BRsalp(ma, couplings: ALPcouplings, fa, **kwargs):
         'bottom': DWs['bottom']/DWs['DW_tot'],
         '3pis': DWs['3pis']/DWs['DW_tot'],
         'etapipi': DWs['etapipi']/DWs['DW_tot'],
+        'etappipi': DWs['etappipi']/DWs['DW_tot'],
         'gammapipi': DWs['gammapipi']/DWs['DW_tot'],
+        '2omega': DWs['2omega']/DWs['DW_tot'],
         'gluongluon': DWs['gluongluon']/DWs['DW_tot'],
         '2photons': DWs['2photons']/DWs['DW_tot'],
-        'hadrons':(DWs['3pis'] + DWs['etapipi']*int(ma<2.0) + DWs['gammapipi']*int(ma<2.0) + DWs['gluongluon']*int(ma>2.0) + DWs['charm'] + DWs['bottom'])/DWs['DW_tot']
+        'hadrons':(DWs['3pis'] + DWs['etapipi']*int(ma<2.0) + DWs['etappipi']*int(ma<2.0) + DWs['gammapipi']*int(ma<2.0) + DWs['2omega']*int(ma<2.0) + DWs['gluongluon']*int(ma>2.0) + DWs['charm'] + DWs['bottom'])/DWs['DW_tot']
         }
     return BRs
 
