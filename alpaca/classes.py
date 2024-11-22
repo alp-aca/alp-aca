@@ -14,48 +14,48 @@ class LazyFloat:
     def __str__(self):
         return str(self._evaluate())
 
-    def __complex__(self):
-        return complex(self._evaluate())
+    def __float__(self):
+        return float(self._evaluate())
 
     def __add__(self, other):
-        return complex(self) + complex(other)
+        return float(self) + other
 
     def __radd__(self, other):
-        return complex(other) + complex(self)
+        return other + float(self)
 
     def __sub__(self, other):
-        return complex(self) - complex(other)
+        return float(self) - other
 
     def __rsub__(self, other):
-        return complex(other) - complex(self)
+        return other - float(self)
 
     def __mul__(self, other):
-        return complex(self) * complex(other)
+        return float(self) * other
 
     def __rmul__(self, other):
-        return complex(other) * complex(self)
+        return other * float(self)
 
     def __truediv__(self, other):
-        return complex(self) / complex(other)
+        return float(self) / other
 
     def __rtruediv__(self, other):
-        return complex(other) / complex(self)
+        return other / float(self)
     
     def __pow__(self, other):
-        return complex(self)**other
+        return float(self)**other
 
     # Comparison operators
     def __eq__(self, other):
-        return complex(self) == complex(other)
+        return float(self) == other
 
     def __lt__(self, other):
-        return complex(self) < complex(other)
+        return float(self) < other
 
     def __le__(self, other):
-        return complex(self) <= complex(other)
+        return float(self) <= other
 
     def __gt__(self, other):
-        return complex(self) > complex(other)
+        return float(self) > other
 
     def __ge__(self, other):
-        return complex(self) >= complex(other)
+        return float(self) >= other
