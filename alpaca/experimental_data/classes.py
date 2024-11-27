@@ -54,7 +54,11 @@ class MeasurementBase:
     def initiate(self):
         if not self.initiated:
             self.initiated = True
-            citations.register_inspire(self.inspire_id)
+            if isinstance(self.inspire_id, str):
+                citations.register_inspire(self.inspire_id)
+            else:
+                for inspire_id in self.inspire_id:
+                    citations.register_inspire(inspire_id)
         
     def get_central(self, ma: float | None = None, ctau: float | None = None) -> float:
         raise NotImplementedError
@@ -141,3 +145,47 @@ class MeasurementInterpolatedBound(MeasurementBase):
         sigmar = np.full_like(ma, np.nan)
         sigmar[valid_ma] = valid_sigmar
         return sigmar
+    
+class MeasurementInterpolated(MeasurementBase):
+    def __init__(self, inspire_id, filepath: str, type: str, rmin = None, rmax = None, lab_boost = 0, mass_parent = 0, mass_sibling = 0):
+        super().__init__(inspire_id, type, rmin, rmax, lab_boost, mass_parent, mass_sibling)
+        self.filepath = filepath
+
+    def initiate(self):
+        super().initiate()
+        df = pd.read_csv(self.filepath, sep='\t', header=None)
+        self.interpolator_central = interp1d(df[0], df[1], kind='linear')
+        self.interpolator_liminf = interp1d(df[0], df[2], kind='linear')
+        self.interpolator_limsup = interp1d(df[0], df[3], kind='linear')
+        self.min_ma = np.min(self.interpolator_central.x)
+        self.max_ma = np.max(self.interpolator_central.x)
+
+    def get_central(self, ma: float, ctau: float | None = None) -> float:
+        self.initiate()
+        valid_ma = np.where((ma >= self.min_ma) & (ma <= self.max_ma))
+        valid_central = self.interpolator_central(ma[valid_ma])
+        central = np.full_like(ma, np.nan)
+        central[valid_ma] = valid_central
+        return central
+    
+    def get_sigma_left(self, ma: float, ctau: float | None = None) -> float:
+        self.initiate()
+        valid_ma = np.where((ma >= self.min_ma) & (ma <= self.max_ma))
+        valid_liminf = self.interpolator_liminf(ma[valid_ma])
+        liminf = np.full_like(ma, np.nan)
+        liminf[valid_ma] = valid_liminf
+        valid_central = self.interpolator_central(ma[valid_ma])
+        central = np.full_like(ma, np.nan)
+        central[valid_ma] = valid_central
+        return central - liminf
+    
+    def get_sigma_right(self, ma: float, ctau: float | None = None) -> float:
+        self.initiate()
+        valid_ma = np.where((ma >= self.min_ma) & (ma <= self.max_ma))
+        valid_limsup = self.interpolator_limsup(ma[valid_ma])
+        limsup = np.full_like(ma, np.nan)
+        limsup[valid_ma] = valid_limsup
+        valid_central = self.interpolator_central(ma[valid_ma])
+        central = np.full_like(ma, np.nan)
+        central[valid_ma] = valid_central
+        return limsup - central

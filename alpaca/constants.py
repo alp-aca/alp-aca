@@ -28,6 +28,12 @@ class PreInitializedDict:
         if not self._is_init:
             self._setup()
         return self._wrapped.get(item, default)
+    
+    __setitem__ = new_method(operator.setitem)
+    def set(self, item, value):
+        if not self._is_init:
+            self._setup()
+        self._wrapped[item] = value
 
 def getpars():
     import flavio

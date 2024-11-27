@@ -4,7 +4,7 @@ import numpy as np
 from scipy.stats import chi2
 from ..citations import citations
 from ..constants import mUpsilon3S
-from .classes import MeasurementConstantBound, MeasurementInterpolatedBound, rmax_belle, rmax_besIII
+from .classes import MeasurementConstantBound, MeasurementInterpolatedBound, MeasurementInterpolated, rmax_belle, rmax_besIII
 # Get the directory of the current script
 current_dir = os.path.dirname(__file__)
 
@@ -59,6 +59,7 @@ def sigma(cl, df, param):
     return param/np.sqrt(chi_squared_value)
 
 #################################### INVISIBLE SEARCHES ####################################
+invisible = "invisible/"
 #BELLEII B+->K+ nu nu 2023
     #Experiment: BELLE II
     #arXiv: 2311.14647
@@ -187,6 +188,11 @@ def babar_b0tokstar0nunu(x):
     values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmap, sigmap)
     return values, sigmals, sigmars
 
+belleII_bptoknunu_lightmediator = MeasurementInterpolated(['Altmannshofer:2023hkn', 'Belle-II:2023esi'], os.path.join(current_dir, invisible, 'BelleII_BtoK_bestfit.txt'), 'invisible', rmax=100, lab_boost=0.28, mass_parent=mB, mass_sibling=mK)
+
+babar_btoksnunu_lightmediator = MeasurementInterpolated(['Altmannshofer:2023hkn', 'BaBar:2013npw'], os.path.join(current_dir, invisible, 'Babar_BtoK_bestfit.txt'), 'invisible', rmax=50, lab_boost=0.469/(1-0.469**2)**0.5, mass_parent=mB, mass_sibling=mK)
+
+
 #BaBar B->K nu nu
     #Experiment: BaBar
     #arXiv: 1303.7465
@@ -245,7 +251,6 @@ def babar_psi2stonunu_comb(x):
 
 
 ############ Quarkonia decays ############
-invisible = "invisible/"
 
 #BaBar Upsilon(3S)
     #Experiment: BaBar
