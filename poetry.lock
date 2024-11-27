@@ -939,6 +939,19 @@ files = [
 tests = ["pytest"]
 
 [[package]]
+name = "pycollier"
+version = "0.3"
+description = "access COLLIER loop functions via python"
+optional = false
+python-versions = ">=3.6, <4"
+files = [
+    {file = "pyCollier-0.3.tar.gz", hash = "sha256:6ff61be05f81b024a4da9d6a7e3b72552fe51dd1c95872742f96f3327fd8957c"},
+]
+
+[package.dependencies]
+numpy = ">=1.13.0"
+
+[[package]]
 name = "pycparser"
 version = "2.22"
 description = "C parser in Python"
@@ -1572,4 +1585,4 @@ testing = ["nose"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "6d83e2aca0ee84f610eaea7e4997253c92fde84b8f1034e5187c5d755ae0b452"
+content-hash = "cebdde682ceed8a30d2ec8d734fe43f2b32fd808ea2c75fcfae3e40365283915"
