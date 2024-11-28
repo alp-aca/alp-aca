@@ -184,7 +184,7 @@ def run_leadinglog(couplings: ALPcouplings, beta: Callable[[ALPcouplings], ALPco
     return result
 
 
-def run_scipy(couplings: ALPcouplings, beta: Callable[[ALPcouplings], ALPcouplings], scale_out: float) -> ALPcouplings:
+def run_scipy(couplings: ALPcouplings, beta: Callable[[ALPcouplings], ALPcouplings], scale_out: float) -> Callable[[float], np.ndarray]:
     """Obtain the ALP couplings at a different scale using scipy's integration
     
     Parameters
@@ -202,5 +202,5 @@ def run_scipy(couplings: ALPcouplings, beta: Callable[[ALPcouplings], ALPcouplin
     def fun(t0, y):
         return beta(ALPcouplings._fromarray(y, np.exp(t0), 'derivative_above'))._toarray()/(16*np.pi**2)
     
-    sol = solve_ivp(fun=fun, t_span=(np.log(couplings.scale), np.log(scale_out)), y0=couplings.translate('derivative_above')._toarray())
-    return ALPcouplings._fromarray(sol.y[:,-1], scale_out, 'derivative_above')
+    sol = solve_ivp(fun=fun, t_span=(np.log(couplings.scale), np.log(scale_out)), y0=couplings.translate('derivative_above')._toarray(), dense_output=True)
+    return sol.sol

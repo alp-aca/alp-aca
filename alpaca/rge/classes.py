@@ -182,6 +182,16 @@ class ALPcouplings:
             self.values = {c: values[c] for c in ['cuV', 'cuA', 'cdV', 'cdA', 'ceV', 'ceA', 'cnu', 'cg', 'cgamma']}
         else:
             raise ValueError(f'Unknown basis {basis}')
+        self.sol_high = None
+        self.sol_low = None
+        self.couplings_ewscale = None
+        if self.min_scale is not None and self.min_scale > self.scale:
+            raise ValueError('The minimum scale must be smaller than the scale')
+        if self.min_scale is not None and self.integrator == 'scipy':
+            if self.min_scale > self.ew_scale:
+                _ = self.match_run(self.min_scale, 'derivative_above')
+            else:
+                _ = self.match_run(self.min_scale, 'kF_below')
     
     def __add__(self, other: 'ALPcouplings') -> 'ALPcouplings':
         if self.basis == other.basis:
@@ -359,15 +369,15 @@ class ALPcouplings:
 
     
     @classmethod
-    def _fromarray(cls, array: np.ndarray, scale: float, basis: str) -> 'ALPcouplings':
+    def _fromarray(cls, array: np.ndarray, scale: float, basis: str, **kwargs) -> 'ALPcouplings':
         if basis == 'derivative_above':
             vals = {}
             for i, c in enumerate(['cqL', 'cuR', 'cdR', 'clL', 'ceR']):
                 vals |= {c: array[9*i:9*(i+1)].reshape([3,3])}
             vals |= {'cg': float(array[45]), "cB": float(array[46]), 'cW': float(array[47])}
-            return ALPcouplings(vals, scale, basis)
+            return ALPcouplings(vals, scale, basis, **kwargs)
         if basis == 'massbasis_above':
-            return cls._fromarray(array, scale, 'derivative_above').translate('massbasis_above')
+            return cls._fromarray(array, scale, 'derivative_above', **kwargs).translate('massbasis_above')
         if basis == 'kF_below':
             vals = {}
             for i, c in enumerate(['kD', 'kE', 'kNu', 'kd', 'ke']):
@@ -377,7 +387,7 @@ class ALPcouplings:
             vals |= {'cg': float(array[53]), "cgamma": float(array[54])}
             return ALPcouplings(vals, scale, basis)
         if basis == 'VA_below':
-            return cls._fromarray(array, scale, 'kF_below').translate('VA_below')
+            return cls._fromarray(array, scale, 'kF_below', **kwargs).translate('VA_below')
     
     def match_run(self, scale_out: float, basis: str) -> 'ALPcouplings':
         """Match and run the couplings to another basis and energy scale.
@@ -404,32 +414,53 @@ class ALPcouplings:
     
     @cache
     def _match_run(self, scale_out: float, basis: str) -> 'ALPcouplings':
+        args = {'ew_scale': self.ew_scale, 'integrator': self.integrator, 'beta': self.beta, 'match_2loops': self.match_2loops, 'min_scale': None}
         from . import run_high, matching, run_low
         if scale_out > self.scale:
             raise ValueError("The final scale must be smaller than the initial scale.")
-        if scale_out == self.scale:
+        elif scale_out == self.scale:
             return self.translate(basis)
-        if self.scale > self.ew_scale and scale_out < self.ew_scale: # Running, then matching and then running again
-            couplings_ew = self.match_run(self.ew_scale, 'massbasis_above', self.integrator, self.beta, self.ew_scale)
-            couplings_below = matching.match(couplings_ew, self.match_2loops)
-            return couplings_below.match_run(scale_out, basis, self.integrator, self.beta, self.ew_scale)
-        if scale_out < self.ew_scale and self.scale < self.ew_scale: # Only running below the EW scale
+        elif self.basis in bases_above and basis in bases_below: # Running, then matching and then running again
+            if self.couplings_ewscale is None:
+                couplings_ew = self.match_run(self.ew_scale, 'massbasis_above')
+                self.couplings_ewscale = matching.match(couplings_ew, self.match_2loops)
+                self.couplings_ewscale.scale = self.ew_scale*(1-1e-10)
+            return self.couplings_ewscale.match_run(scale_out, basis)
+        elif self.basis in bases_below and basis in bases_below: # Only running below the EW scale
             if self.integrator == 'scipy':
-                return run_low.run_scipy(self.translate('kF_below'), scale_out).translate(basis)
+                if (self.min_scale is None) or (self.sol_low is None) or (scale_out < self.min_scale):
+                    self.sol_low = run_low.run_scipy(self, scale_out)
+                    self.min_scale = scale_out
+                result = self._fromarray(self.sol_low(np.log(scale_out)), scale_out, basis, **args)
+                result.sol_high = self.sol_high
+                result.sol_low = self.sol_low
+                result.couplings_ewscale = self.couplings_ewscale
+                result.min_scale = self.min_scale
+                return result
             elif self.integrator == 'leadinglog':
                 return run_low.run_leadinglog(self.translate('kF_below'), scale_out).translate(basis)
             elif self.integrator == 'no_rge':
                 return ALPcouplings(self.values, scale_out, self.basis).translate(basis)
-        if scale_out > self.ew_scale and self.scale > self.ew_scale: # Only running above the EW scale
+        elif self.basis in bases_above and basis in bases_above: # Only running above the EW scale
             if self.beta == 'ytop':
                 betafunc = run_high.beta_ytop
             elif self.beta == 'full':
                 betafunc = run_high.beta_full
             if self.integrator == 'scipy':
-                return run_high.run_scipy(self, betafunc, scale_out).translate(basis)
+                if (self.min_scale is None) or (self.sol_high is None) or (scale_out < self.min_scale):
+                    self.sol_high = run_high.run_scipy(self, betafunc, scale_out)
+                    self.min_scale = scale_out
+                result = self._fromarray(self.sol_high(np.log(scale_out)), scale_out, basis, **args)
+                result.sol_high = self.sol_high
+                result.min_scale = self.min_scale
+                result.sol_low = self.sol_low
+                result.couplings_ewscale = self.couplings_ewscale
+                return result
             elif self.integrator == 'leadinglog':
                 return run_high.run_leadinglog(self, betafunc, scale_out).translate(basis)
             elif self.integrator == 'no_rge':
                 return ALPcouplings(self.values, scale_out, self.basis).translate(basis)
+        else:
+            raise ValueError(f'Unknown basis {basis}')
 
 
