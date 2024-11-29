@@ -6,6 +6,9 @@ from ..experimental_data.classes import MeasurementBase
 
 def chi2_obs(measurement: MeasurementBase, transition: str, ma, couplings, fa, sm_pred=0, sm_uncert=0, **kwargs):
     kwargs_dw = {k: v for k, v in kwargs.items() if k != 'theta'}
+    ma = np.atleast_1d(ma).astype(float)
+    couplings = np.atleast_1d(couplings)
+    fa = np.atleast_1d(fa).astype(float)
     dw = np.vectorize(lambda ma, coupl, fa: total_decay_width(ma, coupl, fa, **kwargs_dw)['DW_tot'])(ma, couplings, fa)
     ctau = 1e-7*hbarc_GeVnm/dw
     prob_decay = measurement.decay_probability(ctau, ma, theta=kwargs.get('theta', None))
