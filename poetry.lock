@@ -617,6 +617,28 @@ files = [
 traitlets = "*"
 
 [[package]]
+name = "metakernel"
+version = "0.30.2"
+description = ""
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "metakernel-0.30.2-py3-none-any.whl", hash = "sha256:5424ac1a9cc5d8e18c439cce1a6f798196732955d64caff6633d3299cc2a1a83"},
+    {file = "metakernel-0.30.2.tar.gz", hash = "sha256:4a27dfd853b849f0128242c55204ee597a5a8d864294f26084baf2fbc814d5a4"},
+]
+
+[package.dependencies]
+ipykernel = ">=5.5.6,<7"
+jedi = ">=0.18"
+jupyter-core = ">=4.9.2"
+pexpect = ">=4.8"
+
+[package.extras]
+activity = ["portalocker"]
+parallel = ["ipyparallel"]
+test = ["jupyter-kernel-test", "pytest", "pytest-cov", "pytest-timeout", "requests"]
+
+[[package]]
 name = "mpmath"
 version = "1.3.0"
 description = "Python library for arbitrary-precision floating-point arithmetic"
@@ -1572,4 +1594,4 @@ testing = ["nose"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "6d83e2aca0ee84f610eaea7e4997253c92fde84b8f1034e5187c5d755ae0b452"
+content-hash = "bca3909d19a84eb03b4e19b8a5425cc34ccf7e09b428da05709194a2235c7664"

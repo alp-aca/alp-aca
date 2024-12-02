@@ -214,21 +214,23 @@ class MeasurementDisplacedVertexBound(MeasurementBase):
     def get_central(self, ma: float, ctau: float) -> float:
         self.initiate()
         tau = ctau*1e7/c_nm_per_ps
-        return np.where((ma >= self.min_ma) & (ma <= self.max_ma) & (tau >= self.min_tau) & (tau <= self.max_tau), 0, np.nan)
+        return np.where((ma >= self.min_ma) & (ma <= self.max_ma), 0, np.nan)
     
     def get_sigma_left(self, ma: float, ctau: float) -> float:
         self.initiate()
         tau = ctau*1e7/c_nm_per_ps
-        return np.where((ma >= self.min_ma) & (ma <= self.max_ma) & (tau >= self.min_tau) & (tau <= self.max_tau), 0, np.nan)
+        return np.where((ma >= self.min_ma) & (ma <= self.max_ma), 0, np.nan)
     
     def get_sigma_right(self, ma: float, ctau: float) -> float:
         self.initiate()
         ma = np.array(ma)
-        tau = np.array(ctau)*1e7/c_nm_per_ps
+        tau0 = np.array(ctau)*1e7/c_nm_per_ps
+        tau = np.where(tau0 <= self.max_tau, np.where(tau0 < self.min_tau, self.min_tau, tau0), self.max_tau)
         points = np.vstack((ma.ravel(), np.log10(tau).ravel())).T
-        return sigma(self.conf_level, 1, 10**self.interpolator(points).reshape(ma.shape))
+        mult = np.where(tau0 <= self.max_tau, 1.0, (1-np.exp(-1))/(1-np.exp(-self.max_tau/tau0)))
+        return sigma(self.conf_level, 1, 10**self.interpolator(points).reshape(ma.shape)*mult)
     
     def decay_probability(self, ctau, ma, theta = None):
         self.initiate()
         tau = ctau*1e7/c_nm_per_ps
-        return np.where((ma >= self.min_ma) & (ma <= self.max_ma) & (tau >= self.min_tau) & (tau <= self.max_tau), 1.0, 0.0)
+        return np.where((ma >= self.min_ma) & (ma <= self.max_ma), 1.0, 0.0)
