@@ -2,9 +2,10 @@ import numpy as np
 from scipy.stats import chi2
 from ..citations import citations
 from ..common import kallen
+from ..constants import c_nm_per_ps
 from scipy.integrate import quad_vec
 import pandas as pd
-from scipy.interpolate import interp1d
+from scipy.interpolate import interp1d, RegularGridInterpolator
 
 rmin_belle = 0.1
 rmax_belle = 100
@@ -126,7 +127,7 @@ class MeasurementInterpolatedBound(MeasurementBase):
     def initiate(self):
         super().initiate()
         df = pd.read_csv(self.filepath, sep='\t', header=None)
-        self.interpolator = interp1d((df[0]+df[1])/2, df[2], kind='linear')
+        self.interpolator = interp1d((df[0]+df[1])/2, sigma(self.conf_level, 1, df[2]), kind='linear')
         self.min_ma = np.min(self.interpolator.x)
         self.max_ma = np.max(self.interpolator.x)
 
@@ -189,3 +190,45 @@ class MeasurementInterpolated(MeasurementBase):
         central = np.full_like(ma, np.nan)
         central[valid_ma] = valid_central
         return limsup - central
+    
+
+class MeasurementDisplacedVertexBound(MeasurementBase):
+    def __init__(self, inspire_id, filepath, conf_level: float = 0.9, rmin = None, rmax = None, lab_boost = 0, mass_parent = 0, mass_sibling = 0):
+        type = 'displaced'
+        super().__init__(inspire_id, type, rmin, rmax, lab_boost, mass_parent, mass_sibling)
+        self.filepath = filepath
+        self.conf_level = conf_level
+
+    def initiate(self):
+        super().initiate()
+        data = np.load(self.filepath)
+        ma = data[-1,:-1]
+        logtau = data[:-1,-1]
+        br = data[:-1,:-1]
+        self.min_ma = np.min(ma)
+        self.max_ma = np.max(ma)
+        self.min_tau = 10**np.min(logtau)
+        self.max_tau = 10**np.max(logtau)
+        self.interpolator = RegularGridInterpolator((ma, logtau), br.T, method='linear', bounds_error=False)
+
+    def get_central(self, ma: float, ctau: float) -> float:
+        self.initiate()
+        tau = ctau*1e7/c_nm_per_ps
+        return np.where((ma >= self.min_ma) & (ma <= self.max_ma) & (tau >= self.min_tau) & (tau <= self.max_tau), 0, np.nan)
+    
+    def get_sigma_left(self, ma: float, ctau: float) -> float:
+        self.initiate()
+        tau = ctau*1e7/c_nm_per_ps
+        return np.where((ma >= self.min_ma) & (ma <= self.max_ma) & (tau >= self.min_tau) & (tau <= self.max_tau), 0, np.nan)
+    
+    def get_sigma_right(self, ma: float, ctau: float) -> float:
+        self.initiate()
+        ma = np.array(ma)
+        tau = np.array(ctau)*1e7/c_nm_per_ps
+        points = np.vstack((ma.ravel(), np.log10(tau).ravel())).T
+        return sigma(self.conf_level, 1, 10**self.interpolator(points).reshape(ma.shape))
+    
+    def decay_probability(self, ctau, ma, theta = None):
+        self.initiate()
+        tau = ctau*1e7/c_nm_per_ps
+        return np.where((ma >= self.min_ma) & (ma <= self.max_ma) & (tau >= self.min_tau) & (tau <= self.max_tau), 1.0, 0.0)
