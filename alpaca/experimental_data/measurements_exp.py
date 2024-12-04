@@ -4,7 +4,7 @@ import numpy as np
 from scipy.stats import chi2
 from ..citations import citations
 from ..constants import mUpsilon3S
-from .classes import MeasurementConstantBound, MeasurementInterpolatedBound, MeasurementInterpolated, rmax_belle, rmax_besIII
+from .classes import MeasurementConstantBound, MeasurementInterpolatedBound, MeasurementInterpolated, MeasurementDisplacedVertexBound, rmax_belle, rmax_besIII
 # Get the directory of the current script
 current_dir = os.path.dirname(__file__)
 
@@ -902,3 +902,13 @@ def besiii_Jpsi_mumu(x):
         sigmar.append(sigma(0.9, 1, param[ii]))
     values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmar, sigmar)
     return values, sigmals, sigmars
+
+lhcb_bkmumu_displvertex = MeasurementDisplacedVertexBound('LHCb:2016awg', os.path.join(current_dir, visible, 'LHCb_BKmumu_displ.npy'), 0.95)
+
+lhcb_bks0mumu_displvertex = MeasurementDisplacedVertexBound('LHCb:2015nkv', os.path.join(current_dir, visible, 'LHCb_BKsmumu_displ.npy'), 0.95)
+
+charm_bkmumu_displvertex = MeasurementDisplacedVertexBound(['Dobrich:2018jyi', 'CHARM:1985anb'], os.path.join(current_dir, visible, 'CHARM_BKmumu_displ.npy'), 0.95)
+
+na62proj_bkmumu_displvertex = MeasurementDisplacedVertexBound('Dobrich:2018jyi', os.path.join(current_dir, visible, 'NA62_BKmumu_displ.npy'), 0.95)
+
+shipproj_bkmumu_displvertex = MeasurementDisplacedVertexBound('Dobrich:2018jyi', os.path.join(current_dir, visible, 'SHiP_BKmumu_displ.npy'), 0.95)
