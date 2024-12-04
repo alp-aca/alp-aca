@@ -87,6 +87,12 @@ def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: flo
     elif initial == ['B0'] and final == sorted(['K*0', 'muon', 'muon']):
         from ..constants import GammaB0
         br = lambda ma, couplings, fa, **kwargs: invisible.B0toKsta(ma, couplings, fa, **kwargs)/GammaB0 * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['mu']
+    elif initial == ['B+'] and final == sorted(['K+', 'electron', 'electron']):
+        from ..constants import GammaB
+        br = lambda ma, couplings, fa, **kwargs: invisible.BtoKa(ma, couplings, fa, **kwargs)/GammaB * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['e']
+    elif initial == ['B0'] and final == sorted(['K*0', 'electron', 'electron']):
+        from ..constants import GammaB0
+        br = lambda ma, couplings, fa, **kwargs: invisible.B0toKsta(ma, couplings, fa, **kwargs)/GammaB0 * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['e']
     
     else:
         raise NotImplementedError(f'Unknown branching ratio process {" ".join(initial)} -> {" ".join(final)}')

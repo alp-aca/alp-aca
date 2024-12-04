@@ -912,3 +912,11 @@ charm_bkmumu_displvertex = MeasurementDisplacedVertexBound(['Dobrich:2018jyi', '
 na62proj_bkmumu_displvertex = MeasurementDisplacedVertexBound('Dobrich:2018jyi', os.path.join(current_dir, visible, 'NA62_BKmumu_displ.npy'), 0.95)
 
 shipproj_bkmumu_displvertex = MeasurementDisplacedVertexBound('Dobrich:2018jyi', os.path.join(current_dir, visible, 'SHiP_BKmumu_displ.npy'), 0.95)
+
+belleII_bkmumu_displvertex = MeasurementDisplacedVertexBound('Belle-II:2023ueh', os.path.join(current_dir, visible, 'belleII_BKmumu_displ.npy'), 0.95)
+
+belleII_bks0mumu_displvertex = MeasurementDisplacedVertexBound('Belle-II:2023ueh', os.path.join(current_dir, visible, 'belleII_B0K0smumu_displ.npy'), 0.95)
+
+belleII_bkee_displvertex = MeasurementDisplacedVertexBound('Belle-II:2023ueh', os.path.join(current_dir, visible, 'belleII_BKee_displ.npy'), 0.95)
+
+belleII_bks0ee_displvertex = MeasurementDisplacedVertexBound('Belle-II:2023ueh', os.path.join(current_dir, visible, 'belleII_B0K0see_displ.npy'), 0.95)
