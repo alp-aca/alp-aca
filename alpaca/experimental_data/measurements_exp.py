@@ -4,7 +4,9 @@ import numpy as np
 from scipy.stats import chi2
 from ..citations import citations
 from ..constants import mUpsilon3S
-from .classes import MeasurementConstantBound, MeasurementInterpolatedBound, MeasurementInterpolated, MeasurementDisplacedVertexBound, rmax_belle, rmax_besIII
+from .classes import MeasurementBase, MeasurementConstantBound, MeasurementInterpolatedBound, MeasurementInterpolated, MeasurementDisplacedVertexBound, rmax_belle, rmax_besIII
+from ..decays.particles import particle_aliases
+from ..decays.decays import parse
 # Get the directory of the current script
 current_dir = os.path.dirname(__file__)
 
@@ -920,3 +922,49 @@ belleII_bks0mumu_displvertex = MeasurementDisplacedVertexBound('Belle-II:2023ueh
 belleII_bkee_displvertex = MeasurementDisplacedVertexBound('Belle-II:2023ueh', os.path.join(current_dir, visible, 'belleII_BKee_displ.npy'), 0.95)
 
 belleII_bks0ee_displvertex = MeasurementDisplacedVertexBound('Belle-II:2023ueh', os.path.join(current_dir, visible, 'belleII_B0K0see_displ.npy'), 0.95)
+
+babar_bkphotons_displvertex = MeasurementDisplacedVertexBound('BaBar:2021ich', os.path.join(current_dir, visible, 'babar_BKphotons_displ.npy'), 0.95)
+
+def get_measurements(transition: str, exclude_projections: bool = True) -> dict[str, MeasurementBase]:
+    """Retrieve measurements based on the given transition.
+
+    Parameters
+    ----------
+    transition : str
+        The particle transition in the format 'initial -> final'.
+
+    exclude_projections : bool
+        Flag to exclude projection measurements. Defaults to True.
+
+    Returns
+    -------
+    measurements : dict[str, MeasurementBase]
+        A dictionary mapping experiment names to their corresponding measurement data.
+
+    Raises
+    ------
+    KeyError
+        If no measurements are found for the given transition.
+    """
+
+    initial, final = parse(transition)
+    if initial == ['B+'] and final == ['K+', 'alp']:
+        return {'Belle II': belleII_bptoknunu_lightmediator}
+    elif initial == ['B0'] and final == ['K*0', 'alp']:
+        return {'BaBar': babar_btoksnunu_lightmediator}
+    elif initial == ['B+'] and final == ['K+', 'electron', 'electron']:
+        return {'Belle II': belleII_bkee_displvertex}
+    elif initial == ['B0'] and final == ['K*0', 'electron', 'electron']:
+        return {'Belle II': belleII_bks0ee_displvertex}
+    elif initial == ['B+'] and final == ['K+', 'muon', 'muon']:
+        if exclude_projections:
+            return {'LHCb': lhcb_bkmumu_displvertex, 'Belle II': belleII_bkmumu_displvertex, 'CHARM': charm_bkmumu_displvertex}
+        else:
+            return {'LHCb': lhcb_bkmumu_displvertex, 'Belle II': belleII_bkmumu_displvertex, 'CHARM': charm_bkmumu_displvertex, 'NA62': na62proj_bkmumu_displvertex, 'SHiP': shipproj_bkmumu_displvertex}
+    elif initial == ['B0'] and final == ['K*0', 'muon', 'muon']:
+        return {'LHCb': lhcb_bks0mumu_displvertex, 'Belle II': belleII_bks0mumu_displvertex}
+    elif initial == ['B+'] and final == ['K+', 'photon', 'photon']:
+        return {'BaBar': babar_bkphotons_displvertex}
+    
+    else:
+        raise KeyError(f"No measurements for {transition}")
