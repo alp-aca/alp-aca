@@ -21,7 +21,7 @@ def combine_chi2(*chi2):
     ndof = np.sum(np.where(np.isnan(m), 0, 1) for m in chi2)
     return np.where(ndof == 0, np.nan, sum(np.nan_to_num(m) for m in chi2))/ndof
 
-def get_chi2(transitions: list[str], ma: np.ndarray[float], couplings: np.ndarray[ALPcouplings], fa: np[float], sm_pred=0, sm_uncert=0, exclude_projections=True, **kwargs) -> dict[tuple[str, str], np.array]:
+def get_chi2(transitions: list[str], ma: np.ndarray[float], couplings: np.ndarray[ALPcouplings], fa: np.ndarray[float], sm_pred=0, sm_uncert=0, exclude_projections=True, **kwargs) -> dict[tuple[str, str], np.array]:
     """Calculate the chi-squared values for a set of transitions.
 
     Parameters
