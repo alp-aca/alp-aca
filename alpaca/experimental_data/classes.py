@@ -74,7 +74,9 @@ class MeasurementBase:
         self.initiate()
         if self.type == 'flat':
             return 1
-        pa_parent = np.sqrt(kallen(self.mass_parent**2, ma**2, self.mass_sibling**2))/(2*self.mass_parent)
+        kallen_M = kallen(self.mass_parent**2, ma**2, self.mass_sibling**2)
+        kallen_M = np.where(kallen_M >0, kallen_M, np.nan)
+        pa_parent = np.sqrt(kallen_M)/(2*self.mass_parent)
         if self.lab_boost == 0:
             pa_lab = pa_parent
         else:
@@ -86,13 +88,16 @@ class MeasurementBase:
             else:
                 pa_lab = pa(theta)
         betagamma = pa_lab/ma
+        underflow_error = np.geterr()['under']
+        np.seterr(under='ignore')
         if self.type == 'prompt':
-            return 1 - np.exp(-self.rmin/ctau/betagamma)
+            result = 1 - np.exp(-self.rmin/ctau/betagamma)
         elif self.type == 'displaced':
-            return np.exp(-self.rmin/ctau/betagamma) - np.exp(-self.rmax/ctau/betagamma)
+            result = np.exp(-self.rmin/ctau/betagamma) - np.exp(-self.rmax/ctau/betagamma)
         elif self.type == 'invisible':
-            return np.exp(-self.rmax/ctau/betagamma)
-        
+            result = np.exp(-self.rmax/ctau/betagamma)
+        np.seterr(under=underflow_error)
+        return result
 class MeasurementConstant(MeasurementBase):
     def __init__(self, inspire_id: str, type: str, value: float, sigma_left: float, sigma_right: float, min_ma: float=0, rmin: float|None = None, rmax: float|None = None, lab_boost: float = 0.0, mass_parent: float = 0.0, mass_sibling: float = 0.0):
         super().__init__(inspire_id, type, rmin, rmax, lab_boost, mass_parent, mass_sibling)
@@ -163,6 +168,7 @@ class MeasurementInterpolated(MeasurementBase):
 
     def get_central(self, ma: float, ctau: float | None = None) -> float:
         self.initiate()
+        ma = np.atleast_1d(ma)
         valid_ma = np.where((ma >= self.min_ma) & (ma <= self.max_ma))
         valid_central = self.interpolator_central(ma[valid_ma])
         central = np.full_like(ma, np.nan)
@@ -171,6 +177,7 @@ class MeasurementInterpolated(MeasurementBase):
     
     def get_sigma_left(self, ma: float, ctau: float | None = None) -> float:
         self.initiate()
+        ma = np.atleast_1d(ma)
         valid_ma = np.where((ma >= self.min_ma) & (ma <= self.max_ma))
         valid_liminf = self.interpolator_liminf(ma[valid_ma])
         liminf = np.full_like(ma, np.nan)
@@ -182,6 +189,7 @@ class MeasurementInterpolated(MeasurementBase):
     
     def get_sigma_right(self, ma: float, ctau: float | None = None) -> float:
         self.initiate()
+        ma = np.atleast_1d(ma)
         valid_ma = np.where((ma >= self.min_ma) & (ma <= self.max_ma))
         valid_limsup = self.interpolator_limsup(ma[valid_ma])
         limsup = np.full_like(ma, np.nan)
@@ -223,8 +231,11 @@ class MeasurementDisplacedVertexBound(MeasurementBase):
     
     def get_sigma_right(self, ma: float, ctau: float) -> float:
         self.initiate()
-        ma = np.array(ma)
-        tau0 = np.array(ctau)*1e7/c_nm_per_ps
+        ma = np.atleast_1d(ma)
+        tau0 = np.atleast_1d(ctau)*1e7/c_nm_per_ps
+        shape = np.broadcast_shapes(ma.shape, tau0.shape)
+        ma = np.broadcast_to(ma, shape)
+        tau0 = np.broadcast_to(tau0, shape)
         tau = np.where(tau0 <= self.max_tau, np.where(tau0 < self.min_tau, self.min_tau, tau0), self.max_tau)
         points = np.vstack((ma.ravel(), np.log10(tau).ravel())).T
         mult = np.where(tau0 <= self.max_tau, 1.0, (1-np.exp(-1))/(1-np.exp(-self.max_tau/tau0)))
