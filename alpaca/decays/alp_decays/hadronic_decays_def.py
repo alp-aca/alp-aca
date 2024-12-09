@@ -464,6 +464,6 @@ def decay_width_2w(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
         aU3 = chiral.a_U3_repr(ma, couplings, fa, **kwargs)
         aww = alp_mixing([aU3, omega, omega], fa)
         aux = g**2*ffunction(ma)*aww
-        decayrate = 9*ma**3/((4*np.pi)**5*fa**2)*(1-4*momega**2/ma**2)**(3/2)*aux*np.conjugate(aux)
+        decayrate = 9*ma**3/((4*np.pi)**5*fa**2)*(1-4*momega**2/ma**2)**(3/2)*np.abs(aux)**2
     else: decayrate= 0.0
     return decayrate
