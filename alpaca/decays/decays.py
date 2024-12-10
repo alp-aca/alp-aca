@@ -33,85 +33,85 @@ def decay_width(transition: str, ma: float, couplings: ALPcouplings, fa: float, 
     
     return np.vectorize(dw)(ma, couplings, fa, **kwargs)
 
-def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
+def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: float, br_dark: float = 0, **kwargs) -> float:
     initial, final = parse(transition)
     #Initial resonance Upsilon (1S)
     if initial == ['Upsilon(1S)'] and final == sorted(['photon', 'alp']):
         from ..constants import mUpsilon1S, BeeUpsilon1S
-        br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, 'b', fa, **kwargs)
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, 'b', fa, **kwargs)
     elif initial == ['Upsilon(1S)'] and final == sorted(['photon', 'muon', 'muon']):
         from ..constants import mUpsilon1S, BeeUpsilon1S
-        br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['mu']
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['mu']
     elif initial == ['Upsilon(1S)'] and final == sorted(['photon', 'tau', 'tau']):
         from ..constants import mUpsilon1S, BeeUpsilon1S
-        br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['tau']
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['tau']
     elif initial == ['Upsilon(1S)'] and final == sorted(['photon', 'charm', 'charm']):
         from ..constants import mUpsilon1S, BeeUpsilon1S
-        br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['charm']
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['charm']
     #Initial resonance Upsilon 3S
     elif initial == ['Upsilon(3S)'] and final == sorted(['photon', 'alp']):
         from ..constants import mUpsilon3S
-        br = lambda ma, couplings, fa, **kwargs: invisible.Mixed_QuarkoniaSearches(ma, couplings, mUpsilon3S, 'b', fa, **kwargs)
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.Mixed_QuarkoniaSearches(ma, couplings, mUpsilon3S, 'b', fa, **kwargs)
     elif initial == ['Upsilon(3S)'] and final == sorted(['photon', 'hadrons']):
         from ..constants import mUpsilon3S, BeeUpsilon3S
-        br = lambda ma, couplings, fa, **kwargs: invisible.Mixed_QuarkoniaSearches(ma, couplings, mUpsilon3S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['hadrons']
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.Mixed_QuarkoniaSearches(ma, couplings, mUpsilon3S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['hadrons']
     elif initial == ['Upsilon(3S)'] and final == sorted(['photon', 'muon', 'muon']):
         from ..constants import mUpsilon3S, BeeUpsilon3S
-        br = lambda ma, couplings, fa, **kwargs: invisible.Mixed_QuarkoniaSearches(ma, couplings, mUpsilon3S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['mu']
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.Mixed_QuarkoniaSearches(ma, couplings, mUpsilon3S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['mu']
     #Initial resonance Upsilon 4S
     elif initial == ['Upsilon(4S)'] and final == sorted(['photon', 'alp']):
         from ..constants import mUpsilon4S, BeeUpsilon4S
-        br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon4S, BeeUpsilon4S, 'b', fa, **kwargs) 
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon4S, BeeUpsilon4S, 'b', fa, **kwargs) 
     elif initial == ['Upsilon(4S)'] and final == sorted(['photon', 'photon', 'photon']):
         from ..constants import mUpsilon4S, BeeUpsilon4S
-        br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon4S, BeeUpsilon4S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['2photons']
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon4S, BeeUpsilon4S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['2photons']
     #Initial resonance J/psi    
     elif initial == ['J/psi'] and final == sorted(['photon', 'alp']):
         from ..constants import mJpsi, BeeJpsi
-        br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mJpsi, BeeJpsi, 'c', fa, **kwargs)
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BR_Vagamma(ma, couplings, mJpsi, BeeJpsi, 'c', fa, **kwargs)
     elif initial == ['J/psi'] and final == sorted(['photon', 'muon', 'muon']):
         from ..constants import mJpsi
-        br = lambda ma, couplings, fa, **kwargs: invisible.Mixed_QuarkoniaSearches(ma, couplings, mJpsi, 'c', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['mu']
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.Mixed_QuarkoniaSearches(ma, couplings, mJpsi, 'c', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['mu']
     elif initial == ['J/psi'] and final == sorted(['photon', 'photon', 'photon']):
         from ..constants import mJpsi, BeeJpsi
-        br = lambda ma, couplings, fa, **kwargs: invisible.BR_Vagamma(ma, couplings, mJpsi, BeeJpsi, 'c', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['2photons']
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BR_Vagamma(ma, couplings, mJpsi, BeeJpsi, 'c', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['2photons']
     elif initial == ['B+'] and final == sorted(['alp', 'K+']):
         from ..constants import GammaB
-        br = lambda ma, couplings, fa, **kwargs: invisible.BtoKa(ma, couplings, fa, **kwargs)/GammaB
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BtoKa(ma, couplings, fa, **kwargs)/GammaB
     elif initial == ['B0'] and final == sorted(['alp', 'K*0']):
         from ..constants import GammaB0
-        br = lambda ma, couplings, fa, **kwargs: invisible.B0toKsta(ma, couplings, fa, **kwargs)/GammaB0
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.B0toKsta(ma, couplings, fa, **kwargs)/GammaB0
     elif initial == ['B+'] and final == sorted(['K+', 'muon', 'muon']):
         from ..constants import GammaB
-        br = lambda ma, couplings, fa, **kwargs: invisible.BtoKa(ma, couplings, fa, **kwargs)/GammaB * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['mu']
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BtoKa(ma, couplings, fa, **kwargs)/GammaB * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['mu']
     elif initial == ['B0'] and final == sorted(['K*0', 'muon', 'muon']):
         from ..constants import GammaB0
-        br = lambda ma, couplings, fa, **kwargs: invisible.B0toKsta(ma, couplings, fa, **kwargs)/GammaB0 * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['mu']
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.B0toKsta(ma, couplings, fa, **kwargs)/GammaB0 * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['mu']
     elif initial == ['B+'] and final == sorted(['K+', 'electron', 'electron']):
         from ..constants import GammaB
-        br = lambda ma, couplings, fa, **kwargs: invisible.BtoKa(ma, couplings, fa, **kwargs)/GammaB * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['e']
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BtoKa(ma, couplings, fa, **kwargs)/GammaB * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['e']
     elif initial == ['B0'] and final == sorted(['K*0', 'electron', 'electron']):
         from ..constants import GammaB0
-        br = lambda ma, couplings, fa, **kwargs: invisible.B0toKsta(ma, couplings, fa, **kwargs)/GammaB0 * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['e']
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.B0toKsta(ma, couplings, fa, **kwargs)/GammaB0 * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['e']
     elif initial == ['B+'] and final == sorted(['K+', 'photon', 'photon']):
         from ..constants import GammaB
-        br = lambda ma, couplings, fa, **kwargs: invisible.BtoKa(ma, couplings, fa, **kwargs)/GammaB * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['2photons']
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BtoKa(ma, couplings, fa, **kwargs)/GammaB * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['2photons']
     elif initial == ['B0'] and final == sorted(['K*0', 'photon', 'photon']):
         from ..constants import GammaB0
-        br = lambda ma, couplings, fa, **kwargs: invisible.B0toKsta(ma, couplings, fa, **kwargs)/GammaB0 * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['2photons']
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.B0toKsta(ma, couplings, fa, **kwargs)/GammaB0 * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['2photons']
     
     else:
         raise NotImplementedError(f'Unknown branching ratio process {" ".join(initial)} -> {" ".join(final)}')
     
-    return np.vectorize(br)(ma, couplings, fa, **kwargs)
+    return np.vectorize(br)(ma, couplings, fa, br_dark, **kwargs)
 
-def cross_section(transition: str, ma: float, couplings: ALPcouplings, s: float, fa: float, **kwargs) -> float:
+def cross_section(transition: str, ma: float, couplings: ALPcouplings, s: float, fa: float, br_dark=0, **kwargs) -> float:
     initial, final = parse(transition)
     if initial == ['electron', 'electron'] and final == sorted(['alp', 'photon']):
         sigma = invisible.sigmaNR
     elif initial == ['electron', 'electron'] and final == sorted(['photon', 'photon', 'photon']):
-        sigma = lambda ma, couplings, s, fa, **kwargs: invisible.sigmaNR(ma, couplings, s, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, **kwargs)['2photons']
+        sigma = lambda ma, couplings, s, fa, **kwargs: invisible.sigmaNR(ma, couplings, s, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['2photons']
     else:
         raise NotImplementedError(f'Unknown cross section process {" ".join(initial)} -> {" ".join(final)}')
     
-    return np.vectorize(sigma)(ma, couplings, s, fa, **kwargs)
+    return np.vectorize(sigma)(ma, couplings, s, fa, br_dark, **kwargs)

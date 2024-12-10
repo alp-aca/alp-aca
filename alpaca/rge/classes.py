@@ -240,7 +240,7 @@ class ALPcouplings:
             vals |= {'cg': float(array[53]), "cgamma": float(array[54])}
             return ALPcouplings(vals, scale, basis)
     
-    def match_run(self, scale_out: float, basis: str, integrator: str='scipy', beta: str='full', match_2loops = False) -> 'ALPcouplings':
+    def match_run(self, scale_out: float, basis: str, integrator: str='scipy', beta: str='full', match_2loops = False, **kwargs) -> 'ALPcouplings':
         """Match and run the couplings to another basis and energy scale.
 
         Parameters

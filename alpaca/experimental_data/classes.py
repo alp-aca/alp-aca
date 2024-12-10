@@ -70,7 +70,7 @@ class MeasurementBase:
     def get_sigma_right(self, ma: float | None = None, ctau: float | None = None) -> float:
         raise NotImplementedError
     
-    def decay_probability(self, ctau: float | None = None, ma: float | None = None, theta: float | None = None) -> float:
+    def decay_probability(self, ctau: float | None = None, ma: float | None = None, theta: float | None = None, br_dark = 0) -> float:
         self.initiate()
         if self.type == 'flat':
             return 1
@@ -95,7 +95,9 @@ class MeasurementBase:
         elif self.type == 'displaced':
             result = np.exp(-self.rmin/ctau/betagamma) - np.exp(-self.rmax/ctau/betagamma)
         elif self.type == 'invisible':
-            result = np.exp(-self.rmax/ctau/betagamma)
+            br_dark = np.atleast_1d(br_dark)
+            prob = np.exp(-self.rmax/ctau/betagamma)
+            result = prob + (1 - prob)*br_dark
         np.seterr(under=underflow_error)
         return result
 class MeasurementConstant(MeasurementBase):
@@ -241,7 +243,7 @@ class MeasurementDisplacedVertexBound(MeasurementBase):
         mult = np.where(tau0 <= self.max_tau, 1.0, (1-np.exp(-1))/(1-np.exp(-self.max_tau/tau0)))
         return sigma(self.conf_level, 1, 10**self.interpolator(points).reshape(ma.shape)*mult)
     
-    def decay_probability(self, ctau, ma, theta = None):
+    def decay_probability(self, ctau, ma, theta = None, br_dark = 0):
         self.initiate()
         tau = ctau*1e7/c_nm_per_ps
         return np.where((ma >= self.min_ma) & (ma <= self.max_ma), 1.0, 0.0)
