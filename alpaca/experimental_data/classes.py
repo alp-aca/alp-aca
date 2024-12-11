@@ -240,10 +240,13 @@ class MeasurementDisplacedVertexBound(MeasurementBase):
         tau0 = np.broadcast_to(tau0, shape)
         tau = np.where(tau0 <= self.max_tau, np.where(tau0 < self.min_tau, self.min_tau, tau0), self.max_tau)
         points = np.vstack((ma.ravel(), np.log10(tau).ravel())).T
-        mult = np.where(tau0 <= self.max_tau, 1.0, (1-np.exp(-1))/(1-np.exp(-self.max_tau/tau0)))
-        return sigma(self.conf_level, 1, 10**self.interpolator(points).reshape(ma.shape)*mult)
+        return sigma(self.conf_level, 1, 10**self.interpolator(points).reshape(shape))
     
     def decay_probability(self, ctau, ma, theta = None, br_dark = 0):
         self.initiate()
-        tau = ctau*1e7/c_nm_per_ps
-        return np.where((ma >= self.min_ma) & (ma <= self.max_ma), 1.0, 0.0)
+        tau = np.atleast_1d(ctau)*1e7/c_nm_per_ps
+        shape = np.broadcast_shapes(ma.shape, tau.shape)
+        ma = np.broadcast_to(ma, shape)
+        tau = np.broadcast_to(tau, shape)
+        prob = np.where(tau <= self.max_tau, 1.0, (1-np.exp(-self.max_tau/tau))/(1-np.exp(-1)))
+        return np.where((ma >= self.min_ma) & (ma <= self.max_ma), prob, 0.0)

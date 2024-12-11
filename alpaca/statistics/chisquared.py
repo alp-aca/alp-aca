@@ -6,7 +6,7 @@ from ..experimental_data.classes import MeasurementBase
 from ..experimental_data.measurements_exp import get_measurements
 from ..rge import ALPcouplings
 
-def chi2_obs(measurement: MeasurementBase, transition: str, ma, couplings, fa, br_dark = 0.0, sm_pred=0, sm_uncert=0, **kwargs):
+def chi2_obs(measurement: MeasurementBase, transition: str, ma, couplings, fa, min_probability=1e-3, br_dark = 0.0, sm_pred=0, sm_uncert=0, **kwargs):
     kwargs_dw = {k: v for k, v in kwargs.items() if k != 'theta'}
     ma = np.atleast_1d(ma).astype(float)
     couplings = np.atleast_1d(couplings)
@@ -15,14 +15,18 @@ def chi2_obs(measurement: MeasurementBase, transition: str, ma, couplings, fa, b
     dw = np.vectorize(lambda ma, coupl, fa, br_dark: total_decay_width(ma, coupl, fa, br_dark, **kwargs_dw)['DW_SM'])(ma, couplings, fa, br_dark)
     ctau = np.where(br_dark == 1.0, np.inf, 1e-7*hbarc_GeVnm/dw)
     prob_decay = measurement.decay_probability(ctau, ma, theta=kwargs.get('theta', None), br_dark=br_dark)
+    prob_decay = np.where(prob_decay < min_probability, np.nan, prob_decay)
     br = branching_ratio(transition, ma, couplings, fa, br_dark, **kwargs_dw)
-    return (measurement.get_central(ma, ctau) - prob_decay*br - sm_pred)**2/((measurement.get_sigma_left(ma, ctau)+measurement.get_sigma_right(ma, ctau))**2+ sm_uncert**2)
+    sigma_left = measurement.get_sigma_left(ma, ctau)
+    sigma_right = measurement.get_sigma_right(ma, ctau)
+    sigma = np.where(sigma_left == 0, sigma_right, (sigma_left+sigma_right)/2)
+    return (measurement.get_central(ma, ctau) - prob_decay*br - sm_pred)**2/(sigma**2 + sm_uncert**2)
 
 def combine_chi2(*chi2):
     ndof = np.sum(np.where(np.isnan(m), 0, 1) for m in chi2)
     return np.where(ndof == 0, np.nan, sum(np.nan_to_num(m) for m in chi2))/ndof
 
-def get_chi2(transitions: list[str], ma: np.ndarray[float], couplings: np.ndarray[ALPcouplings], fa: np.ndarray[float], sm_pred=0, sm_uncert=0, exclude_projections=True, **kwargs) -> dict[tuple[str, str], np.array]:
+def get_chi2(transitions: list[str], ma: np.ndarray[float], couplings: np.ndarray[ALPcouplings], fa: np.ndarray[float], min_probability = 1e-3, sm_pred=0, sm_uncert=0, exclude_projections=True, **kwargs) -> dict[tuple[str, str], np.array]:
     """Calculate the chi-squared values for a set of transitions.
 
     Parameters
@@ -62,6 +66,6 @@ def get_chi2(transitions: list[str], ma: np.ndarray[float], couplings: np.ndarra
     for t in transitions:
         measurements = get_measurements(t, exclude_projections=exclude_projections)
         for experiment, measurement in measurements.items():
-            dict_chi2[(t, experiment)] = chi2_obs(measurement, t, ma, couplings, fa, sm_pred=sm_pred, sm_uncert=sm_uncert, **kwargs)
+            dict_chi2[(t, experiment)] = chi2_obs(measurement, t, ma, couplings, fa, min_probability=min_probability, sm_pred=sm_pred, sm_uncert=sm_uncert, **kwargs)
     dict_chi2[('', 'Global')] = combine_chi2(*dict_chi2.values())
     return dict_chi2
