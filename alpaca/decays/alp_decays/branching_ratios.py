@@ -48,7 +48,7 @@ def _total_decay_width (ma, couplings: ALPcouplings, fa, br_dark = 0.0, **kwargs
         }
     return DWs
 
-def total_decay_width(ma, couplings: ALPcouplings, fa, br_dark, **kwargs):
+def total_decay_width(ma, couplings: ALPcouplings, fa, br_dark=0, **kwargs):
     """
     Calculate the total decay width and individual decay widths for various channels.
 

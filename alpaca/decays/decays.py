@@ -58,6 +58,9 @@ def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: flo
     elif initial == ['Upsilon(3S)'] and final == sorted(['photon', 'muon', 'muon']):
         from ..constants import mUpsilon3S, BeeUpsilon3S
         br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.Mixed_QuarkoniaSearches(ma, couplings, mUpsilon3S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['mu']
+    elif initial == ['Upsilon(3S)'] and final == sorted(['photon', 'tau', 'tau']):
+        from ..constants import mUpsilon3S, BeeUpsilon3S
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.Mixed_QuarkoniaSearches(ma, couplings, mUpsilon3S, 'b', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['tau']
     #Initial resonance Upsilon 4S
     elif initial == ['Upsilon(4S)'] and final == sorted(['photon', 'alp']):
         from ..constants import mUpsilon4S, BeeUpsilon4S
@@ -116,7 +119,7 @@ def cross_section(transition: str, ma: float, couplings: ALPcouplings, s: float,
     if initial == ['electron', 'electron'] and final == sorted(['alp', 'photon']):
         sigma = invisible.sigmaNR
     elif initial == ['electron', 'electron'] and final == sorted(['photon', 'photon', 'photon']):
-        sigma = lambda ma, couplings, s, fa, **kwargs: invisible.sigmaNR(ma, couplings, s, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['2photons']
+        sigma = lambda ma, couplings, s, fa, br_dark, **kwargs: invisible.sigmaNR(ma, couplings, s, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['2photons']
     else:
         raise NotImplementedError(f'Unknown cross section process {" ".join(initial)} -> {" ".join(final)}')
     
