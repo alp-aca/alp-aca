@@ -926,6 +926,9 @@ babar_bktautau = MeasurementConstantBound('BaBar:2016wgb', 'prompt', 2.25e-3, mi
 
 belle_B0toK0stautau = MeasurementConstantBound('Belle:2021ecr', 'prompt', 3.1e-3, conf_level=0.9, min_ma=2*mtau, lab_boost=0.28, mass_parent=mB0, mass_sibling=mKst0, rmin=100)
 
+#belle_Y1S_tautau = MeasurementInterpolatedBound('Belle:2021rcl', os.path.join(current_dir, visible, 'Belle_BR_tautau_binned.txt'), 'prompt', conf_level=0.9, min_ma=2*mtau, lab_boost=0.42, mass_parent=mUpsilon1S, mass_sibling=0, rmin=100)
+babar_Y3S_tautau = MeasurementInterpolatedBound('BaBar:2009oxm', os.path.join(current_dir, visible, 'babar_Y3S_tautau.txt'), 'prompt', conf_level=0.9, lab_boost=0.469/(1-0.469**2)**0.5, mass_parent=mUpsilon3S, mass_sibling=0, rmin=10)
+
 def get_measurements(transition: str, exclude_projections: bool = True) -> dict[str, MeasurementBase]:
     """Retrieve measurements based on the given transition.
 
@@ -970,5 +973,7 @@ def get_measurements(transition: str, exclude_projections: bool = True) -> dict[
         return {'BaBar': babar_bktautau}
     elif initial == ['B0'] and final == sorted(['K*0', 'tau', 'tau']):
         return {'Belle': belle_B0toK0stautau}
+    elif initial == ['Upsilon(3S)'] and final == sorted(['photon', 'tau', 'tau']):
+        return {'BaBar': babar_Y3S_tautau}
     else:
         raise KeyError(f"No measurements for {transition}")
