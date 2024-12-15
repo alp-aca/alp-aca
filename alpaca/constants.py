@@ -150,3 +150,7 @@ sigmaW_BESIII = Constant(3.686*5e-4, 'Song:2022umk')
 #for i in range(3):
 #    for j in range(3):
 #        Vckm[i,j] = ComplexConstant(Vckm[i,j], 'flavio')
+
+g8 = Constant(3.61, 'Cirigliano:2011ny')
+epsilonKaon = Constant(2.228e-3, 'ParticleDataGroup:2024cfk')
+phiepsilonKaon = Constant(43.52/180*np.pi, 'ParticleDataGroup:2024cfk')

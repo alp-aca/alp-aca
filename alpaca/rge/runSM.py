@@ -44,5 +44,7 @@ def _runSM(scale):
         'alpha_2': np.real(wSM['g']**2/(4*np.pi)),
         'alpha_em': np.real(wSM['g']**2*wSM['gp']**2/(wSM['g']**2+wSM['gp']**2))/(4*np.pi),
         's2w': np.real(wSM['gp']**2/(wSM['g']**2+wSM['gp']**2)),
-        'CKM': np.matrix(Vckm)
+        'CKM': np.matrix(Vckm),
+        'vev': np.sqrt(2*wSM['m2']/wSM['Lambda']),
+        'GF': 1/(2*wSM['m2']/(wSM['Lambda']))/2**0.5
     }
