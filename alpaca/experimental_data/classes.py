@@ -30,13 +30,13 @@ def sigma(cl, df, param):
 
 
 class MeasurementBase:
-    def __init__(self, inspire_id: str, type: str, rmin: float|None = None, rmax: float|None = None, lab_boost: float = 0.0, mass_parent: float = 0.0, mass_sibling: float = 0.0):
+    def __init__(self, inspire_id: str, decay_type: str, rmin: float|None = None, rmax: float|None = None, lab_boost: float = 0.0, mass_parent: float = 0.0, mass_sibling: float = 0.0):
         """
         Initialize an instance of the class.
 
         Parameters:
         inspire_id (str): Inspire-HEP reference of the measurement.
-        type (str): The type of the instance.
+        decay_type (str): The decay_type of the instance.
         rmin (float, optional): The minimum radius. Defaults to None.
         rmax (float, optional): The maximum radius. Defaults to None.
         lab_boost (float): The laboratory boost value. Defaults to 0.0.
@@ -44,7 +44,7 @@ class MeasurementBase:
         mass_sibling (float): The mass of the sibling. Defaults to 0.0.
         """
         self.inspire_id = inspire_id
-        self.type = type
+        self.decay_type = decay_type
         self.rmin = rmin
         self.rmax = rmax
         self.initiated = False
@@ -72,7 +72,7 @@ class MeasurementBase:
     
     def decay_probability(self, ctau: float | None = None, ma: float | None = None, theta: float | None = None, br_dark = 0) -> float:
         self.initiate()
-        if self.type == 'flat':
+        if self.decay_type == 'flat':
             return 1
         kallen_M = kallen(self.mass_parent**2, ma**2, self.mass_sibling**2)
         kallen_M = np.where(kallen_M >0, kallen_M, np.nan)
@@ -90,19 +90,19 @@ class MeasurementBase:
         betagamma = pa_lab/ma
         underflow_error = np.geterr()['under']
         np.seterr(under='ignore')
-        if self.type == 'prompt':
+        if self.decay_type == 'prompt':
             result = 1 - np.exp(-self.rmin/ctau/betagamma)
-        elif self.type == 'displaced':
+        elif self.decay_type == 'displaced':
             result = np.exp(-self.rmin/ctau/betagamma) - np.exp(-self.rmax/ctau/betagamma)
-        elif self.type == 'invisible':
+        elif self.decay_type == 'invisible':
             br_dark = np.atleast_1d(br_dark)
             prob = np.exp(-self.rmax/ctau/betagamma)
             result = prob + (1 - prob)*br_dark
         np.seterr(under=underflow_error)
         return result
 class MeasurementConstant(MeasurementBase):
-    def __init__(self, inspire_id: str, type: str, value: float, sigma_left: float, sigma_right: float, min_ma: float=0, rmin: float|None = None, rmax: float|None = None, lab_boost: float = 0.0, mass_parent: float = 0.0, mass_sibling: float = 0.0):
-        super().__init__(inspire_id, type, rmin, rmax, lab_boost, mass_parent, mass_sibling)
+    def __init__(self, inspire_id: str, decay_type: str, value: float, sigma_left: float, sigma_right: float, min_ma: float=0, rmin: float|None = None, rmax: float|None = None, lab_boost: float = 0.0, mass_parent: float = 0.0, mass_sibling: float = 0.0):
+        super().__init__(inspire_id, decay_type, rmin, rmax, lab_boost, mass_parent, mass_sibling)
         self.value = value
         self.sigma_left = sigma_left
         self.sigma_right = sigma_right
@@ -122,12 +122,12 @@ class MeasurementConstant(MeasurementBase):
         return np.where((ma >= self.min_ma) & (ma <= self.max_ma), self.sigma_right, np.nan)
     
 class MeasurementConstantBound(MeasurementConstant):
-    def __init__(self, inspire_id: str, type: str, bound: float, min_ma: float = 0, conf_level: float = 0.9, rmin: float | None = None, rmax: float | None = None, lab_boost: float = 0, mass_parent: float = 0, mass_sibling: float = 0):
-        super().__init__(inspire_id, type, 0, 0, sigma(conf_level, 1, bound), min_ma, rmin, rmax, lab_boost, mass_parent, mass_sibling)
+    def __init__(self, inspire_id: str, decay_type: str, bound: float, min_ma: float = 0, conf_level: float = 0.9, rmin: float | None = None, rmax: float | None = None, lab_boost: float = 0, mass_parent: float = 0, mass_sibling: float = 0):
+        super().__init__(inspire_id, decay_type, 0, 0, sigma(conf_level, 1, bound), min_ma, rmin, rmax, lab_boost, mass_parent, mass_sibling)
 
 class MeasurementInterpolatedBound(MeasurementBase):
-    def __init__(self, inspire_id, filepath: str, type: str, conf_level: float = 0.9, rmin = None, rmax = None, lab_boost = 0, mass_parent = 0, mass_sibling = 0):
-        super().__init__(inspire_id, type, rmin, rmax, lab_boost, mass_parent, mass_sibling)
+    def __init__(self, inspire_id, filepath: str, decay_type: str, conf_level: float = 0.9, rmin = None, rmax = None, lab_boost = 0, mass_parent = 0, mass_sibling = 0):
+        super().__init__(inspire_id, decay_type, rmin, rmax, lab_boost, mass_parent, mass_sibling)
         self.filepath = filepath
         self.conf_level = conf_level
 
@@ -155,8 +155,8 @@ class MeasurementInterpolatedBound(MeasurementBase):
         return sigmar
     
 class MeasurementInterpolated(MeasurementBase):
-    def __init__(self, inspire_id, filepath: str, type: str, rmin = None, rmax = None, lab_boost = 0, mass_parent = 0, mass_sibling = 0):
-        super().__init__(inspire_id, type, rmin, rmax, lab_boost, mass_parent, mass_sibling)
+    def __init__(self, inspire_id, filepath: str, decay_type: str, rmin = None, rmax = None, lab_boost = 0, mass_parent = 0, mass_sibling = 0):
+        super().__init__(inspire_id, decay_type, rmin, rmax, lab_boost, mass_parent, mass_sibling)
         self.filepath = filepath
 
     def initiate(self):
@@ -203,9 +203,9 @@ class MeasurementInterpolated(MeasurementBase):
     
 
 class MeasurementDisplacedVertexBound(MeasurementBase):
-    def __init__(self, inspire_id, filepath, conf_level: float = 0.9, rmin = None, rmax = None, lab_boost = 0, mass_parent = 0, mass_sibling = 0):
-        type = 'displaced'
-        super().__init__(inspire_id, type, rmin, rmax, lab_boost, mass_parent, mass_sibling)
+    def __init__(self, inspire_id, filepath, conf_level: float = 0.9, rmin = None, rmax = None, lab_boost = 0, mass_parent = 0, mass_sibling = 0, decay_type = 'displaced'):
+        decay_type = decay_type
+        super().__init__(inspire_id, decay_type, rmin, rmax, lab_boost, mass_parent, mass_sibling)
         self.filepath = filepath
         self.conf_level = conf_level
 
@@ -248,5 +248,10 @@ class MeasurementDisplacedVertexBound(MeasurementBase):
         shape = np.broadcast_shapes(ma.shape, tau.shape)
         ma = np.broadcast_to(ma, shape)
         tau = np.broadcast_to(tau, shape)
-        prob = np.where(tau <= self.max_tau, 1.0, (1-np.exp(-self.max_tau/tau))/(1-np.exp(-1)))
-        return np.where((ma >= self.min_ma) & (ma <= self.max_ma), prob, 0.0)
+        if self.decay_type == 'displaced':
+            prob = np.where(tau <= self.max_tau, 1.0, (1-np.exp(-self.max_tau/tau))/(1-np.exp(-1)))
+            return np.where((ma >= self.min_ma) & (ma <= self.max_ma), prob, 0.0)
+        elif self.decay_type == 'invisible':
+            br_dark = np.atleast_1d(br_dark)
+            prob = np.where(tau >= self.min_tau, 1.0, np.exp(-self.min_tau/tau)/np.exp(-1))
+            return np.where((ma >= self.min_ma) & (ma <= self.max_ma), prob + (1 - prob)*br_dark, 0.0)

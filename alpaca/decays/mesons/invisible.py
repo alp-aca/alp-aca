@@ -5,7 +5,7 @@ from ...rge.runSM import runSM
 from ...citations import citations
 
 def Kminustopia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **kwargs):
-    from ...constants import mK, mpi_pm, g8, fpi
+    from ...constants import mK, mpi_pm, g8, fpi, GammaK
     from ... common import kallen
     if ma > mK-mpi_pm:
         return 0
@@ -30,10 +30,10 @@ def Kminustopia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, *
     chiral_contrib += (kd+kD-ks-kS)*(mK**2+mpi_pm**2-ma**2)
 
     amp = N8*chiral_contrib/(4*f_a)-(mK**2-mpi_pm**2)/(2*f_a)*(coupl_low['kd'][0,1]+coupl_low['kD'][0,1])
-    return np.abs(amp)**2/(16*np.pi*mK)*np.sqrt(kallen(1, mpi_pm**2/mK**2, ma**2/mK**2))
+    return np.abs(amp)**2/(16*np.pi*mK)*np.sqrt(kallen(1, mpi_pm**2/mK**2, ma**2/mK**2))/GammaK
 
 def Kplustopia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **kwargs):
-    from ...constants import mK, mpi_pm, g8, fpi
+    from ...constants import mK, mpi_pm, g8, fpi, GammaK
     from ... common import kallen
     if ma > mK-mpi_pm:
         return 0
@@ -58,12 +58,12 @@ def Kplustopia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **
     chiral_contrib += (kd+kD-ks-kS)*(mK**2+mpi_pm**2-ma**2)
 
     amp = N8*chiral_contrib/(4*f_a)-(mK**2-mpi_pm**2)/(2*f_a)*(coupl_low['kd'][1,0]+coupl_low['kD'][1,0])
-    return np.abs(amp)**2/(16*np.pi*mK)*np.sqrt(kallen(1, mpi_pm**2/mK**2, ma**2/mK**2))
+    return np.abs(amp)**2/(16*np.pi*mK)*np.sqrt(kallen(1, mpi_pm**2/mK**2, ma**2/mK**2))/GammaK
 
 def KLtopia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **kwargs):
-    from ...constants import mK, mpi_pm, g8, fpi, epsilonKaon, phiepsilonKaon
+    from ...constants import mKL, mpi0, g8, fpi, epsilonKaon, phiepsilonKaon, GammaKL
     from ... common import kallen
-    if ma > mK-mpi_pm:
+    if ma > mKL-mpi0:
         return 0
     citations.register_inspire('Bauer:2021mvw')
     coupl_low = couplings.match_run(ma, 'kF_below', **kwargs)
@@ -81,16 +81,16 @@ def KLtopia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **kwa
     N8 = -GF/np.sqrt(2)*g8*np.conj(Vckm[0,0])*Vckm[0,1]*fpi**2*(np.cos(delta8)+1j*np.sin(delta8))
     eps = epsilonKaon*(np.cos(phiepsilonKaon)+1j*np.sin(phiepsilonKaon))
 
-    chiral_contrib = 16*cg*(mK**2-mpi_pm**2)*(mK**2-ma**2)/(4*mK**2-mpi_pm**2-3*ma**2)
-    chiral_contrib -= 2*(cuu+cdd-2*css)*ma**2*(mK**2-ma**2)/(4*mK**2-mpi_pm**2-3*ma**2)
-    chiral_contrib += (3*cdd+css)*(mK**2-mpi_pm**2)+(2*cuu-cdd-css)*ma**2
-    chiral_contrib -= 2*(cuu-cdd)*ma**2*(mK**2-ma**2)/(mpi_pm**2-ma**2)
-    chiral_contrib += (kd+kD-ks-kS)*(mK**2+mpi_pm**2-ma**2)
+    chiral_contrib = 16*cg*(mKL**2-mpi0**2)*(mKL**2-ma**2)/(4*mKL**2-mpi0**2-3*ma**2)
+    chiral_contrib -= 2*(cuu+cdd-2*css)*ma**2*(mKL**2-ma**2)/(4*mKL**2-mpi0**2-3*ma**2)
+    chiral_contrib += (3*cdd+css)*(mKL**2-mpi0**2)+(2*cuu-cdd-css)*ma**2
+    chiral_contrib -= 2*(cuu-cdd)*ma**2*(mKL**2-ma**2)/(mpi0**2-ma**2)
+    chiral_contrib += (kd+kD-ks-kS)*(mKL**2+mpi0**2-ma**2)
 
-    amp_K0bar = N8*chiral_contrib/(4*f_a*2**0.5)-(mK**2-mpi_pm**2)/(2*f_a*2**0.5)*(coupl_low['kd'][0,1]+coupl_low['kD'][0,1])
-    amp_K0 = -N8*chiral_contrib/(4*f_a*2**0.5)+(mK**2-mpi_pm**2)/(2*f_a*2**0.5)*(coupl_low['kd'][1,0]+coupl_low['kD'][1,0])
+    amp_K0bar = N8*chiral_contrib/(4*f_a*2**0.5)-(mKL**2-mpi0**2)/(2*f_a*2**0.5)*(coupl_low['kd'][0,1]+coupl_low['kD'][0,1])
+    amp_K0 = -N8*chiral_contrib/(4*f_a*2**0.5)+(mKL**2-mpi0**2)/(2*f_a*2**0.5)*(coupl_low['kd'][1,0]+coupl_low['kD'][1,0])
     amp = ((1+eps)*amp_K0+(1-eps)*amp_K0bar)/np.sqrt(2*(1+np.abs(eps)**2))
-    return np.abs(amp)**2/(16*np.pi*mK)*np.sqrt(kallen(1, mpi_pm**2/mK**2, ma**2/mK**2))
+    return np.abs(amp)**2/(16*np.pi*mKL)*np.sqrt(kallen(1, mpi0**2/mKL**2, ma**2/mKL**2))/GammaKL
 
 def BtoKa(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     from ...constants import mK, mB

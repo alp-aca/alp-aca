@@ -108,6 +108,8 @@ def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: flo
     elif initial == ['B0'] and final == sorted(['K*0', 'photon', 'photon']):
         from ..constants import GammaB0
         br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.B0toKsta(ma, couplings, fa, **kwargs)/GammaB0 * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['2photons']
+    elif initial == ['K+'] and final == sorted(['alp', 'pion+']):
+        br = invisible.Kplustopia
     
     else:
         raise NotImplementedError(f'Unknown branching ratio process {" ".join(initial)} -> {" ".join(final)}')
