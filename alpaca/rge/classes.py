@@ -6,6 +6,7 @@ from ..citations import citations
 
 from . import bases_above, bases_below
 from functools import cache
+from json import JSONEncoder, JSONDecoder
 class ALPcouplings:
     """Container for ALP couplings.
 
@@ -361,3 +362,18 @@ class ALPcouplings:
         values = {k[:-3]: unflatten(np.array(data['values'][k]) + 1j*np.array(data['values'][k[:-3]+'_Im'])) for k in data['values'] if k[-3:] == '_Re'}
         return ALPcouplings(values, data['scale'], data['basis'])
 
+class ALPcouplingsEncoder(JSONEncoder):
+    def default(self, o):
+        if isinstance(o, ALPcouplings):
+            return {'__class__': 'ALPcouplings'} | o.to_dict()
+        return super().default(o)
+    
+class ALPcouplingsDecoder(JSONDecoder):
+    def __init__(self, *args, **kwargs):
+        super().__init__(object_hook=self.object_hook, *args, **kwargs)
+    
+    @staticmethod
+    def object_hook(o):
+        if o.get('__class__') == 'ALPcouplings':
+            return ALPcouplings.from_dict(o)
+        return o
