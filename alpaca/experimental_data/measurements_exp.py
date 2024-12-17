@@ -7,7 +7,7 @@ from ..constants import mUpsilon3S
 from .classes import MeasurementBase, MeasurementConstantBound, MeasurementInterpolatedBound, MeasurementInterpolated, MeasurementDisplacedVertexBound, rmax_belle, rmax_besIII
 from ..decays.particles import particle_aliases
 from ..decays.decays import parse
-from ..constants import mB, mB0, mBs, mK, mtau, mKst0
+from ..constants import mB, mB0, mBs, mK, mtau, mKst0, mKL, mpi0
 # Get the directory of the current script
 current_dir = os.path.dirname(__file__)
 
@@ -79,57 +79,74 @@ def belleII_BtoKnunu(x):
     #Experiment: NA62
     #arXiv: 2103.15389
     #Branching ratio
-def na62_Ktopinunu(x):
-    citations.register_inspire('NA62:2021zjw') 
-    q2min = [0]
-    q2max = [mK]
-    value = [10.6e-11]
-    sigmal = [4.1e-11]
-    sigmar = [3.5e-11]
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmar)
-    return values, sigmals, sigmars
+# def na62_Ktopinunu(x):
+#     citations.register_inspire('NA62:2021zjw') 
+#     q2min = [0]
+#     q2max = [mK]
+#     value = [10.6e-11]
+#     sigmal = [4.1e-11]
+#     sigmar = [3.5e-11]
+#     values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmar)
+#     return values, sigmals, sigmars
 
-#NA62 K+->pi+ pi0(->X) 2020 
-    #Experiment: NA62
-    #arXiv: 2010.07644
-    #Branching ratio
-def na62_pi0toinv(x):
-    citations.register_inspire('NA62:2020pwi') 
-    q2min = [0.110]
-    q2max = [0.155]
-    param = [4.4e-9]
-    sigmap = sigma(0.9, 1, param)
-    value = [0] #Estimated value
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmap, sigmap)
-    return values, sigmals, sigmars
+# #NA62 K+->pi+ pi0(->X) 2020 
+#     #Experiment: NA62
+#     #arXiv: 2010.07644
+#     #Branching ratio
+# def na62_pi0toinv(x):
+#     citations.register_inspire('NA62:2020pwi') 
+#     q2min = [0.110]
+#     q2max = [0.155]
+#     param = [4.4e-9]
+#     sigmap = sigma(0.9, 1, param)
+#     value = [0] #Estimated value
+#     values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmap, sigmap)
+#     return values, sigmals, sigmars
+
+na62_Ktopiinv = MeasurementDisplacedVertexBound(
+    'NA62:2020pwi',
+    os.path.join(current_dir, invisible, 'na62_kpiInv.npy'),
+    decay_type = 'invisible'
+)
 
 #J-PARC KOTO KL->pi0 nu nu
     #Experiment: KOTO
     #arXiv: 1810.09655
     #Branching ratio
-def koto_kltopi0nunu(x):
-    citations.register_inspire('KOTO:2018dsc') 
-    q2min = [0]
-    q2max = [0.261]
-    param = [3.0e-9]
-    sigmap = sigma(0.9, 1, param)
-    value = [0] #Estimated value
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmap, sigmap)
-    return values, sigmals, sigmars
+
+# def koto_kltopi0nunu(x):
+#     citations.register_inspire('KOTO:2018dsc') 
+#     q2min = [0]
+#     q2max = [0.261]
+#     param = [3.0e-9]
+#     sigmap = sigma(0.9, 1, param)
+#     value = [0] #Estimated value
+#     values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmap, sigmap)
+#     return values, sigmals, sigmars
+koto_kltopi0inv = MeasurementInterpolatedBound(
+    '1810.09655',
+    os.path.join(current_dir, invisible, 'koto_KLpiInv.txt'),
+    'invisible',
+    conf_level=0.9,
+    rmax=414.8,
+    lab_boost=1.5/mK,
+    mass_parent=mKL,
+    mass_sibling=mpi0
+)
 
 #J-PARC KOTO KL->pi0 inv
     #Experiment: KOTO
     #arXiv: 1810.09655
     #Branching ratio
-def koto_kltopi0inv(x):
-    citations.register_inspire('KOTO:2018dsc') 
-    q2min = [0]
-    q2max = [0.261]
-    param = [2.4e-9]
-    sigmap = sigma(0.9, 1, param)
-    value = [0] #Estimated value
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmap, sigmap)
-    return values, sigmals, sigmars
+# def koto_kltopi0inv(x):
+#     citations.register_inspire('KOTO:2018dsc') 
+#     q2min = [0]
+#     q2max = [0.261]
+#     param = [2.4e-9]
+#     sigmap = sigma(0.9, 1, param)
+#     value = [0] #Estimated value
+#     values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmap, sigmap)
+#     return values, sigmals, sigmars
 
 #BaBar B+->K+ nu nu
     #Experiment: BaBar
@@ -334,7 +351,7 @@ def besIII_Jpsivis(x):
     #Branching ratio
 belle_BchargedtoKchargednunu = MeasurementConstantBound(
     inspire_id='Belle:2017oht',
-    type='invisible',
+    decay_type='invisible',
     bound=4e-5,
     conf_level=0.9,
     mass_parent=mB,
@@ -343,7 +360,7 @@ belle_BchargedtoKchargednunu = MeasurementConstantBound(
 
 belle_Bchargedtorhochargednunu = MeasurementConstantBound(
     inspire_id='Belle:2017oht',
-    type='invisible',
+    decay_type='invisible',
     bound=3e-5,
     conf_level=0.9,
     mass_parent=mB,
@@ -352,7 +369,7 @@ belle_Bchargedtorhochargednunu = MeasurementConstantBound(
 
 belle_Bchargedtopichargednunu = MeasurementConstantBound(
     inspire_id='Belle:2017oht',
-    type='invisible',
+    decay_type='invisible',
     bound=1.4e-5,
     conf_level=0.9,
     mass_parent=mB,
@@ -361,7 +378,7 @@ belle_Bchargedtopichargednunu = MeasurementConstantBound(
 
 belle_B0toK0nunu = MeasurementConstantBound(
     inspire_id='Belle:2017oht',
-    type='invisible',
+    decay_type='invisible',
     bound=2.6e-5,
     conf_level=0.9,
     mass_parent=mB0,
@@ -370,7 +387,7 @@ belle_B0toK0nunu = MeasurementConstantBound(
 
 belle_B0toK0starnunu = MeasurementConstantBound(
     inspire_id='Belle:2017oht',
-    type='invisible',
+    decay_type='invisible',
     bound=1.8e-5,
     conf_level=0.9,
     mass_parent=mB0,
@@ -379,7 +396,7 @@ belle_B0toK0starnunu = MeasurementConstantBound(
 
 belle_B0topi0nunu = MeasurementConstantBound(
     inspire_id='Belle:2017oht',
-    type='invisible',
+    decay_type='invisible',
     bound=9e-6,
     conf_level=0.9,
     mass_parent=mB0,
@@ -388,7 +405,7 @@ belle_B0topi0nunu = MeasurementConstantBound(
 
 belle_B0torho0nunu = MeasurementConstantBound(
     inspire_id='Belle:2017oht',
-    type='invisible',
+    decay_type='invisible',
     bound=4e-5,
     conf_level=0.9,
     mass_parent=mB0,
@@ -402,7 +419,7 @@ belle_B0torho0nunu = MeasurementConstantBound(
     #Branching ratio
 besIII_D0topi0nunu = MeasurementConstantBound(
     inspire_id='BESIII:2021slf',
-    type='invisible',
+    decay_type='invisible',
     bound=2.1e-4,
     conf_level=0.9,
     mass_parent=mD0,
@@ -975,5 +992,9 @@ def get_measurements(transition: str, exclude_projections: bool = True) -> dict[
         return {'Belle': belle_B0toK0stautau}
     elif initial == ['Upsilon(3S)'] and final == sorted(['photon', 'tau', 'tau']):
         return {'BaBar': babar_Y3S_tautau}
+    elif initial == ['K+'] and final == sorted(['pion+', 'alp']):
+        return {'NA62': na62_Ktopiinv}
+    elif initial == ['KL'] and final == sorted(['pion0', 'alp']):
+        return {'KOTO': koto_kltopi0inv}
     else:
         raise KeyError(f"No measurements for {transition}")
