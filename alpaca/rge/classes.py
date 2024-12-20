@@ -7,6 +7,9 @@ from ..citations import citations
 from . import bases_above, bases_below
 from functools import cache
 from json import JSONEncoder, JSONDecoder
+from sympy import Symbol
+
+numeric = (int, float, complex, Symbol)
 class ALPcouplings:
     """Container for ALP couplings.
 
@@ -64,14 +67,14 @@ class ALPcouplings:
             self.basis = basis
             values = {'cg':0, 'cB': 0, 'cW':0, 'cqL': 0, 'cuR':0, 'cdR':0, 'clL':0, 'ceR':0} | values
             for c in ['cqL', 'cuR', 'cdR', 'clL', 'ceR']:
-                if isinstance(values[c], (float, int, complex)):
+                if isinstance(values[c], numeric):
                     values[c] = np.matrix(values[c]*np.eye(3))
                 elif isinstance(values[c], (np.ndarray, np.matrix, list)):
                     values[c] = np.matrix(values[c]).reshape([3,3])
                 else:
                     raise TypeError
             for c in ['cg', 'cW', 'cB']:
-                if not isinstance(values[c], (int, float, complex)):
+                if not isinstance(values[c], numeric):
                      raise TypeError
             self.values = {c: values[c] for c in ['cg', 'cB', 'cW', 'cqL', 'cuR', 'cdR', 'clL', 'ceR']}
         elif basis == 'massbasis_above':
@@ -79,14 +82,14 @@ class ALPcouplings:
             self.basis = basis
             values = {'cg': 0, 'cgamma':0, 'cgammaZ': 0, 'cW':0, 'cZ': 0, 'kU': 0, 'ku':0, 'kD':0, 'kd':0, 'kE':0, 'kNu': 0, 'ke': 0} | values
             for c in ['kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke']:
-                if isinstance(values[c], (float, int, complex)):
+                if isinstance(values[c], numeric):
                     values[c] = np.matrix(values[c]*np.eye(3))
                 elif isinstance(values[c], (np.ndarray, np.matrix, list)):
                     values[c] = np.matrix(values[c]).reshape([3,3])
                 else:
                     raise TypeError
             for c in ['cgamma', 'cgammaZ', 'cW', 'cZ', 'cg']:
-                if not isinstance(values[c], (int, float, complex)):
+                if not isinstance(values[c], numeric):
                      raise TypeError
             self.values = {c: values[c] for c in ['kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke', 'cgamma', 'cgammaZ', 'cW', 'cZ', 'cg']}
         elif basis == 'kF_below':
@@ -94,21 +97,21 @@ class ALPcouplings:
             self.basis = basis
             values = {'cg':0, 'cgamma': 0, 'kU': 0, 'kD': 0, 'kE': 0, 'kNu': 0, 'ku': 0, 'kd': 0, 'ke': 0} | values
             for c in ['kD', 'kE', 'kNu', 'kd', 'ke']:
-                if isinstance(values[c], (float, int, complex)):
+                if isinstance(values[c], numeric):
                     values[c] = np.matrix(values[c]*np.eye(3))
                 elif isinstance(values[c], (np.ndarray, np.matrix, list)):
                     values[c] = np.matrix(values[c]).reshape([3,3])
                 else:
                     raise TypeError
             for c in ['kU', 'ku']:
-                if isinstance(values[c], (float, int, complex)):
+                if isinstance(values[c], numeric):
                     values[c] = np.matrix(values[c]*np.eye(2))
                 elif isinstance(values[c], (np.ndarray, np.matrix, list)):
                     values[c] = np.matrix(values[c]).reshape([2,2])
                 else:
                     raise TypeError
             for c in ['cg', 'cgamma']:
-                if not isinstance(values[c], (int, float)):
+                if not isinstance(values[c], numeric):
                      raise TypeError
             self.values = {c: values[c] for c in ['kD', 'kE', 'kNu', 'kd', 'ke', 'kU', 'ku', 'cg', 'cgamma']}
         elif basis == 'VA_below':
@@ -116,21 +119,21 @@ class ALPcouplings:
             self.basis = basis
             values = {'cg':0, 'cgamma': 0, 'cuV': 0, 'cuA': 0, 'cdV': 0, 'cdA': 0, 'ceV': 0, 'ceA': 0, 'cnu': 0} | values
             for c in ['cdV', 'cdA', 'ceV', 'ceA', 'cnu']:
-                if isinstance(values[c], (float, int, complex)):
+                if isinstance(values[c], numeric):
                     values[c] = np.matrix(values[c]*np.eye(3))
                 elif isinstance(values[c], (np.ndarray, np.matrix, list)):
                     values[c] = np.matrix(values[c]).reshape([3,3])
                 else:
                     raise TypeError
             for c in ['cuV', 'cuA']:
-                if isinstance(values[c], (float, int, complex)):
+                if isinstance(values[c], numeric):
                     values[c] = np.matrix(values[c]*np.eye(2))
                 elif isinstance(values[c], (np.ndarray, np.matrix, list)):
                     values[c] = np.matrix(values[c]).reshape([2,2])
                 else:
                     raise TypeError
             for c in ['cg', 'cgamma']:
-                if not isinstance(values[c], (int, float, complex)):
+                if not isinstance(values[c], numeric):
                      raise TypeError
             self.values = {c: values[c] for c in ['cuV', 'cuA', 'cdV', 'cdA', 'ceV', 'ceA', 'cnu', 'cg', 'cgamma']}
         else:
@@ -152,12 +155,12 @@ class ALPcouplings:
     def __setitem__(self, name: str, val):
         if self.basis == 'derivative_above':
             if name in ['cg', 'cW', 'cB']:
-                if isinstance(val, (float, int)):
+                if isinstance(val, numeric):
                     self.values[name] = val
                 else:
                     raise TypeError
             elif name in ['cqL', 'cuR', 'cdR', 'clL', 'ceR']:
-                if isinstance(val, (float, int)):
+                if isinstance(val, numeric):
                     self.values[name] = val * np.eye(3)
                 elif isinstance(val, (np.ndarray, np.matrix, list)):
                     self.values[name] = np.matrix(val).reshape([3,3])
@@ -230,7 +233,7 @@ class ALPcouplings:
             vals = {}
             for i, c in enumerate(['cqL', 'cuR', 'cdR', 'clL', 'ceR']):
                 vals |= {c: array[9*i:9*(i+1)].reshape([3,3])}
-            vals |= {'cg': float(array[45]), "cB": float(array[46]), 'cW': float(array[47])}
+            vals |= {'cg': array[45], "cB": array[46], 'cW': array[47]}
             return ALPcouplings(vals, scale, basis)
         if basis == 'kF_below':
             vals = {}
@@ -238,7 +241,7 @@ class ALPcouplings:
                 vals |= {c: array[9*i:9*(i+1)].reshape([3,3])}
             for i, c in enumerate(['kU', 'ku']):
                 vals |= {c: array[45+4*i:45+4*(i+1)].reshape([2,2])}
-            vals |= {'cg': float(array[53]), "cgamma": float(array[54])}
+            vals |= {'cg': array[53], "cgamma": array[54]}
             return ALPcouplings(vals, scale, basis)
     
     def match_run(self, scale_out: float, basis: str, integrator: str='scipy', beta: str='full', match_2loops = False, **kwargs) -> 'ALPcouplings':
