@@ -965,6 +965,12 @@ na482_Kpimumu = MeasurementDisplacedVertexBound(
     mass_sibling = mpi_pm
     )
 
+microboone_Kpiee = MeasurementDisplacedVertexBound(
+    'MicroBooNE:2021sov',
+    os.path.join(current_dir, visible, 'microboone_kpiee.npy'),
+    conf_level= 0.95
+)
+
 def get_measurements(transition: str, exclude_projections: bool = True) -> dict[str, MeasurementBase]:
     """Retrieve measurements based on the given transition.
 
@@ -1019,5 +1025,7 @@ def get_measurements(transition: str, exclude_projections: bool = True) -> dict[
         return {'NA62+NA48/2': na62na48_kpigammagamma}
     elif initial == ['K+'] and final == sorted(['muon', 'muon', 'pion+']):
         return {'NA48/2': na482_Kpimumu}
+    elif initial == ['K+'] and final == sorted(['electron', 'electron', 'pion+']):
+        return {'MicroBooNE': microboone_Kpiee}
     else:
         raise KeyError(f"No measurements for {transition}")
