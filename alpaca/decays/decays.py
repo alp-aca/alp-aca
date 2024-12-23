@@ -112,6 +112,18 @@ def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: flo
         br = invisible.Kplustopia
     elif initial == ['KL'] and final == sorted(['alp', 'pion0']):
         br = invisible.KLtopia
+    elif initial == ['K+'] and final == sorted(['pion+', 'photon', 'photon']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.Kplustopia(ma, couplings, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['2photons']
+    elif initial == ['KL'] and final == sorted(['pion0', 'photon', 'photon']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.KLtopia(ma, couplings, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['2photons']
+    elif initial == ['K+'] and final == sorted(['pion+', 'muon', 'muon']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.Kplustopia(ma, couplings, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['mu']
+    elif initial == ['KL'] and final == sorted(['pion0', 'muon', 'muon']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.KLtopia(ma, couplings, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['mu']
+    elif initial == ['K+'] and final == sorted(['pion+', 'electron', 'electron']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.Kplustopia(ma, couplings, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['e']
+    elif initial == ['KL'] and final == sorted(['pion0', 'electron', 'electron']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.KLtopia(ma, couplings, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['e']
     
     else:
         raise NotImplementedError(f'Unknown branching ratio process {" ".join(initial)} -> {" ".join(final)}')

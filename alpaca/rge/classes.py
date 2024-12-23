@@ -223,6 +223,8 @@ class ALPcouplings:
         "Converts the object into a vector of coefficientes"
         if self.basis == 'derivative_above':
             return np.hstack([np.asarray(self.values[c]).ravel() for c in ['cqL', 'cuR', 'cdR', 'clL', 'ceR', 'cg', 'cB', 'cW']])
+        if self.basis == 'massbasis_above':
+            return np.hstack([np.asarray(self.values[c]).ravel() for c in ['kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke', 'cgamma', 'cgammaZ', 'cW', 'cZ', 'cg']])
         if self.basis == 'kF_below':
             return np.hstack([np.asarray(self.values[c]).ravel() for c in ['kD', 'kE', 'kNu', 'kd', 'ke', 'kU', 'ku', 'cg', 'cgamma']])
 
@@ -234,6 +236,13 @@ class ALPcouplings:
             for i, c in enumerate(['cqL', 'cuR', 'cdR', 'clL', 'ceR']):
                 vals |= {c: array[9*i:9*(i+1)].reshape([3,3])}
             vals |= {'cg': array[45], "cB": array[46], 'cW': array[47]}
+            return ALPcouplings(vals, scale, basis)
+        if basis == 'massbasis_above':
+            vals = {}
+            for i, c in enumerate(['kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke']):
+                vals |= {c: array[9*i:9*(i+1)].reshape([3,3])}
+            for i, c in enumerate(['cgamma', 'cgammaZ', 'cW', 'cZ', 'cg']):
+                vals |= {c: array[54+i]}
             return ALPcouplings(vals, scale, basis)
         if basis == 'kF_below':
             vals = {}

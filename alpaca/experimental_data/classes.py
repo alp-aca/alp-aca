@@ -201,7 +201,65 @@ class MeasurementInterpolated(MeasurementBase):
         central[valid_ma] = valid_central
         return limsup - central
     
+class MeasurementBinned(MeasurementBase):
+    def __init__(self, inspire_id, filepath, decay_type, rmin = None, rmax = None, lab_boost = 0, mass_parent = 0, mass_sibling = 0):
+        super().__init__(inspire_id, decay_type, rmin, rmax, lab_boost, mass_parent, mass_sibling)
+        self.filepath = filepath
 
+    def initiate(self):
+        if self.initiated:
+            return
+        super().initiate()
+        meas = {}
+        with open(self.filepath, 'rt') as f:
+            l = f.readlines()
+        for line in l:
+            vals = [float(v) for v in line.split()]
+            meas |= {(vals[0], vals[1]): (vals[2], vals[3], vals[4])}
+        gaps = {}
+        for i, k in enumerate(meas.keys()):
+            if i == 0:
+                prev_k = k
+                continue
+            if prev_k[1] != k[0]:
+                gaps |= {(prev_k[1], k[0]): (np.nan, np.nan, np.nan)}
+            prev_k = k
+        meas |= gaps
+        bins = sorted(meas, key=lambda x: x[0])
+        data = {binn: meas[binn] for binn in bins}
+        self.bin_limits = [b[0] for b in data.keys()] + [list(data.keys())[-1][1]]
+        self.centrals = [v[0] for v in data.values()]
+        self.sigma_l = [v[1] for v in data.values()]
+        self.sigma_r = [v[2] for v in data.values()]
+        self.min_ma = np.min(self.bin_limits)
+        self.max_ma = np.max(self.bin_limits)
+
+    def get_central(self, ma: float, ctau: float | None = None) -> float:
+        self.initiate()
+        ma = np.atleast_1d(ma)
+        valid_ma = np.where((ma >= self.min_ma) & (ma <= self.max_ma))
+        indexes = np.digitize(ma[valid_ma], self.bin_limits)
+        central = np.full(ma.shape, np.nan)
+        central[valid_ma] = np.array([self.centrals[ix] for ix in indexes])
+        return central
+
+    def get_sigma_left(self, ma: float, ctau: float | None = None) -> float:
+        self.initiate()
+        ma = np.atleast_1d(ma)
+        valid_ma = np.where((ma >= self.min_ma) & (ma <= self.max_ma))
+        indexes = np.digitize(ma[valid_ma], self.bin_limits)
+        sigmas = np.full(ma.shape, np.nan)
+        sigmas[valid_ma] = np.array([self.sigma_l[ix] for ix in indexes])
+        return sigmas
+    
+    def get_sigma_right(self, ma: float, ctau: float | None = None) -> float:
+        self.initiate()
+        ma = np.atleast_1d(ma)
+        valid_ma = np.where((ma >= self.min_ma) & (ma <= self.max_ma))
+        indexes = np.digitize(ma[valid_ma], self.bin_limits)
+        sigmas = np.full(ma.shape, np.nan)
+        sigmas[valid_ma] = np.array([self.sigma_r[ix] for ix in indexes])
+        return sigmas
 class MeasurementDisplacedVertexBound(MeasurementBase):
     def __init__(self, inspire_id, filepath, conf_level: float = 0.9, rmin = None, rmax = None, lab_boost = 0, mass_parent = 0, mass_sibling = 0, decay_type = 'displaced'):
         decay_type = decay_type

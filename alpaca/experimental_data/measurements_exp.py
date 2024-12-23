@@ -4,10 +4,10 @@ import numpy as np
 from scipy.stats import chi2
 from ..citations import citations
 from ..constants import mUpsilon3S
-from .classes import MeasurementBase, MeasurementConstantBound, MeasurementInterpolatedBound, MeasurementInterpolated, MeasurementDisplacedVertexBound, rmax_belle, rmax_besIII
+from .classes import MeasurementBase, MeasurementConstantBound, MeasurementInterpolatedBound, MeasurementInterpolated, MeasurementDisplacedVertexBound, MeasurementBinned, rmax_belle, rmax_besIII
 from ..decays.particles import particle_aliases
 from ..decays.decays import parse
-from ..constants import mB, mB0, mBs, mK, mtau, mKst0, mKL, mpi0
+from ..constants import mB, mB0, mBs, mK, mtau, mKst0, mKL, mpi0, mpi_pm
 # Get the directory of the current script
 current_dir = os.path.dirname(__file__)
 
@@ -946,6 +946,25 @@ belle_B0toK0stautau = MeasurementConstantBound('Belle:2021ecr', 'prompt', 3.1e-3
 #belle_Y1S_tautau = MeasurementInterpolatedBound('Belle:2021rcl', os.path.join(current_dir, visible, 'Belle_BR_tautau_binned.txt'), 'prompt', conf_level=0.9, min_ma=2*mtau, lab_boost=0.42, mass_parent=mUpsilon1S, mass_sibling=0, rmin=100)
 babar_Y3S_tautau = MeasurementInterpolatedBound('BaBar:2009oxm', os.path.join(current_dir, visible, 'babar_Y3S_tautau.txt'), 'prompt', conf_level=0.9, lab_boost=0.469/(1-0.469**2)**0.5, mass_parent=mUpsilon3S, mass_sibling=0, rmin=10)
 
+na62na48_kpigammagamma = MeasurementBinned(
+    '',
+    os.path.join(current_dir, visible, 'na62na48_Kplus_piphotons'),
+    'prompt',
+    rmin = 14000,
+    lab_boost = 75/mK,
+    mass_parent = mK,
+    mass_sibling = mpi_pm
+    )
+
+na482_Kpimumu = MeasurementDisplacedVertexBound(
+    'NA482:2016sfh',
+    os.path.join(current_dir, visible, 'na482_kpimumu.npy'),
+    rmax = 14000,
+    lab_boost = 75/mK,
+    mass_parent = mK,
+    mass_sibling = mpi_pm
+    )
+
 def get_measurements(transition: str, exclude_projections: bool = True) -> dict[str, MeasurementBase]:
     """Retrieve measurements based on the given transition.
 
@@ -996,5 +1015,9 @@ def get_measurements(transition: str, exclude_projections: bool = True) -> dict[
         return {'NA62': na62_Ktopiinv}
     elif initial == ['KL'] and final == sorted(['pion0', 'alp']):
         return {'KOTO': koto_kltopi0inv}
+    elif initial == ['K+'] and final == sorted(['pion+', 'photon', 'photon']):
+        return {'NA62+NA48/2': na62na48_kpigammagamma}
+    elif initial == ['K+'] and final == sorted(['muon', 'muon', 'pion+']):
+        return {'NA48/2': na482_Kpimumu}
     else:
         raise KeyError(f"No measurements for {transition}")
