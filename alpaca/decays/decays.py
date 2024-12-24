@@ -124,6 +124,12 @@ def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: flo
         br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.Kplustopia(ma, couplings, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['e']
     elif initial == ['KL'] and final == sorted(['pion0', 'electron', 'electron']):
         br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.KLtopia(ma, couplings, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['e']
+    elif initial == ['B+'] and final == sorted(['K+', 'pion+', 'pion-', 'pion0']):
+        from ..constants import GammaB
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BtoKa(ma, couplings, fa, **kwargs)/GammaB * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['pi0pippim']
+    elif initial == ['B0'] and final == sorted(['K0', 'pion+', 'pion-', 'pion0']):
+        from ..constants import GammaB0
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.B0toKa(ma, couplings, fa, **kwargs)/GammaB0 * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['pi0pippim']
     
     else:
         raise NotImplementedError(f'Unknown branching ratio process {" ".join(initial)} -> {" ".join(final)}')

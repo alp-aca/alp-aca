@@ -101,6 +101,18 @@ def BtoKa(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mB**3*abs(gq_eff)**2/(64*np.pi) * f0_BK(ma**2)**2*np.sqrt(kallen_factor)*(1-mK**2/mB**2)**2
 
+def B0toKa(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
+    from ...constants import mK0, mB0
+    from ...common import f0_BK, kallen
+    if ma > mB0-mK0:
+        return 0
+    citations.register_inspire('Izaguirre:2016dfi')
+    coup_low = couplings.match_run(ma, 'VA_below', **kwargs)
+    gq_eff = coup_low['cdV'][1,2]/f_a
+    kallen_factor = kallen(1, mK0**2/mB0**2, ma**2/mB0**2)
+    kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
+    return mB0**3*abs(gq_eff)**2/(64*np.pi) * f0_BK(ma**2)**2*np.sqrt(kallen_factor)*(1-mK0**2/mB0**2)**2
+
 def B0toKsta(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     from ...constants import mKst0, mB0
     from ...common import A0_BKst, kallen

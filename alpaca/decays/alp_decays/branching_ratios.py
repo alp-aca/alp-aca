@@ -18,6 +18,8 @@ def _total_decay_width (ma, couplings: ALPcouplings, fa, br_dark = 0.0, **kwargs
     DW_charm = decay_width_charm(ma, couplings, fa, **kwargs_nointegral)
     DW_bottom = decay_width_bottom(ma, couplings, fa, **kwargs_nointegral)
     DW_3pis = decay_width_3pi000(ma, couplings, fa, **kwargs)+ decay_width_3pi0pm(ma, couplings, fa, **kwargs)
+    DW_3pi000 = decay_width_3pi000(ma, couplings, fa, **kwargs)
+    DW_3pi0pm = decay_width_3pi0pm(ma, couplings, fa, **kwargs)
     DW_etapipi = decay_width_etapipi00(ma, couplings, fa, **kwargs) + decay_width_etapipipm(ma, couplings, fa, **kwargs)*int(ma<2.0)
     DW_etappipi = decay_width_etappipi00(ma, couplings, fa, **kwargs) + decay_width_etappipipm(ma, couplings, fa, **kwargs)*int(ma<2.0)
     DW_2w = decay_width_2w(ma, couplings, fa, **kwargs_nointegral)
@@ -36,6 +38,8 @@ def _total_decay_width (ma, couplings: ALPcouplings, fa, br_dark = 0.0, **kwargs
         'charm': DW_charm,
         'bottom': DW_bottom,
         '3pis': DW_3pis,
+        'pi0pippim': DW_3pi0pm,
+        'pi0pi0pi0': DW_3pi000,
         'etapipi': DW_etapipi,
         'etappipi': DW_etappipi,
         'gammapipi': DW_gammapipi,
@@ -114,6 +118,8 @@ def BRsalp(ma, couplings: ALPcouplings, fa, br_dark = 0, **kwargs):
         'charm': DWs['charm']/DWs['DW_tot'],
         'bottom': DWs['bottom']/DWs['DW_tot'],
         '3pis': DWs['3pis']/DWs['DW_tot'],
+        'pi0pippim': DWs['pi0pippim']/DWs['DW_tot'],
+        'pi0pi0pi0': DWs['pi0pi0pi0']/DWs['DW_tot'],
         'etapipi': DWs['etapipi']/DWs['DW_tot'],
         'etappipi': DWs['etappipi']/DWs['DW_tot'],
         'gammapipi': DWs['gammapipi']/DWs['DW_tot'],

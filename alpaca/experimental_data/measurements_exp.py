@@ -473,14 +473,14 @@ def E949_Ktopigammagamma(x):
 #E787 K+->pi+ gamma gamma
     #Experiment: E787
     #arXiv: hep-ex/9708011
-def E787_Ktopigammagamma(x):
-    citations.register_inspire('E787:1997abk')
-    q2min = [0.196] #Digamma momentum
-    q2max = [0.306] #Digamma momentum
-    value = [6.0e-7]
-    sigmal = [np.sqrt((1.5)**2+(0.7)**2)*1e-7]
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmal)
-    return values, sigmals, sigmars
+#def E787_Ktopigammagamma(x):
+#    citations.register_inspire('E787:1997abk')
+#    q2min = [0.196] #Digamma momentum
+#    q2max = [0.306] #Digamma momentum
+#    value = [6.0e-7]
+#    sigmal = [np.sqrt((1.5)**2+(0.7)**2)*1e-7]
+#    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmal)
+#    return values, sigmals, sigmars
 
 #NA48  KL->pi0 gamma gamma
     #Experiment: NA48
@@ -971,6 +971,38 @@ microboone_Kpiee = MeasurementDisplacedVertexBound(
     conf_level= 0.95
 )
 
+e787_Ktopigammagamma = MeasurementDisplacedVertexBound(
+    'E787:1997abk',
+    os.path.join(current_dir, visible, 'e787_kpigamma.npy'),
+    conf_level= 0.9
+)
+
+belle_bpKomega3pi = MeasurementConstantBound(
+    ['Belle:2013nby', 'Chakraborty:2021wda', 'ParticleDataGroup:2024cfk'],
+    'prompt',
+    (4.5e-6+2*0.5e-6)*0.892, #[BR(B+->K+omega(782)pi+pi-pi0) at 2 sigma]*BR(omega->pi+pi-pi0)
+    conf_level=0.95,
+    rmin = 4,
+    lab_boost = 0.425,
+    mass_parent = mB,
+    mass_sibling = mK,
+    min_ma = 0.73,
+    max_ma = 0.83
+)
+
+belle_b0Komega3pi = MeasurementConstantBound(
+    ['Belle:2013nby', 'Chakraborty:2021wda', 'ParticleDataGroup:2024cfk'],
+    'prompt',
+    (6.9e-6+2*2**0.5*0.4e-6)*0.892, #[BR(B0->K0omega(782)pi+pi-pi0) at 2 sigma]*BR(omega->pi+pi-pi0)
+    conf_level=0.95,
+    rmin = 4,
+    lab_boost = 0.425,
+    mass_parent = mB,
+    mass_sibling = mK,
+    min_ma = 0.73,
+    max_ma = 0.83
+)
+
 def get_measurements(transition: str, exclude_projections: bool = True) -> dict[str, MeasurementBase]:
     """Retrieve measurements based on the given transition.
 
@@ -1021,11 +1053,17 @@ def get_measurements(transition: str, exclude_projections: bool = True) -> dict[
         return {'NA62': na62_Ktopiinv}
     elif initial == ['KL'] and final == sorted(['pion0', 'alp']):
         return {'KOTO': koto_kltopi0inv}
-    elif initial == ['K+'] and final == sorted(['pion+', 'photon', 'photon']):
-        return {'NA62+NA48/2': na62na48_kpigammagamma}
+    #elif initial == ['K+'] and final == sorted(['pion+', 'photon', 'photon']):
+    #    return {'NA62+NA48/2': na62na48_kpigammagamma}
     elif initial == ['K+'] and final == sorted(['muon', 'muon', 'pion+']):
         return {'NA48/2': na482_Kpimumu}
     elif initial == ['K+'] and final == sorted(['electron', 'electron', 'pion+']):
         return {'MicroBooNE': microboone_Kpiee}
+    elif initial == ['K+'] and final == sorted(['photon', 'photon', 'pion+']):
+        return {'E787': e787_Ktopigammagamma}
+    elif initial == ['B+'] and final == sorted(['K+', 'pion+', 'pion-', 'pion0']):
+        return {'Belle': belle_bpKomega3pi}
+    elif initial == ['B0'] and final == sorted(['K0', 'pion+', 'pion-', 'pion0']):
+        return {'Belle': belle_b0Komega3pi}
     else:
         raise KeyError(f"No measurements for {transition}")

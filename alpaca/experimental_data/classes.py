@@ -101,13 +101,16 @@ class MeasurementBase:
         np.seterr(under=underflow_error)
         return result
 class MeasurementConstant(MeasurementBase):
-    def __init__(self, inspire_id: str, decay_type: str, value: float, sigma_left: float, sigma_right: float, min_ma: float=0, rmin: float|None = None, rmax: float|None = None, lab_boost: float = 0.0, mass_parent: float = 0.0, mass_sibling: float = 0.0):
+    def __init__(self, inspire_id: str, decay_type: str, value: float, sigma_left: float, sigma_right: float, min_ma: float=0, max_ma : float|None = None, rmin: float|None = None, rmax: float|None = None, lab_boost: float = 0.0, mass_parent: float = 0.0, mass_sibling: float = 0.0):
         super().__init__(inspire_id, decay_type, rmin, rmax, lab_boost, mass_parent, mass_sibling)
         self.value = value
         self.sigma_left = sigma_left
         self.sigma_right = sigma_right
         self.min_ma = min_ma
-        self.max_ma = self.mass_parent - self.mass_sibling
+        if max_ma is None:
+            self.max_ma = self.mass_parent - self.mass_sibling
+        else:
+            self.max_ma = max_ma
 
     def get_central(self, ma: float, ctau: float | None = None) -> float:
         self.initiate()
@@ -122,8 +125,8 @@ class MeasurementConstant(MeasurementBase):
         return np.where((ma >= self.min_ma) & (ma <= self.max_ma), self.sigma_right, np.nan)
     
 class MeasurementConstantBound(MeasurementConstant):
-    def __init__(self, inspire_id: str, decay_type: str, bound: float, min_ma: float = 0, conf_level: float = 0.9, rmin: float | None = None, rmax: float | None = None, lab_boost: float = 0, mass_parent: float = 0, mass_sibling: float = 0):
-        super().__init__(inspire_id, decay_type, 0, 0, sigma(conf_level, 1, bound), min_ma, rmin, rmax, lab_boost, mass_parent, mass_sibling)
+    def __init__(self, inspire_id: str, decay_type: str, bound: float, min_ma: float = 0, max_ma: float|None = None, conf_level: float = 0.9, rmin: float | None = None, rmax: float | None = None, lab_boost: float = 0, mass_parent: float = 0, mass_sibling: float = 0):
+        super().__init__(inspire_id, decay_type, 0, 0, sigma(conf_level, 1, bound), min_ma, max_ma, rmin, rmax, lab_boost, mass_parent, mass_sibling)
 
 class MeasurementInterpolatedBound(MeasurementBase):
     def __init__(self, inspire_id, filepath: str, decay_type: str, conf_level: float = 0.9, rmin = None, rmax = None, lab_boost = 0, mass_parent = 0, mass_sibling = 0):
