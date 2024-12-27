@@ -3,6 +3,7 @@
 ########################
 import numpy as np
 from ..rge import ALPcouplings
+from . import su3
 
 # It is enough for this program to give the charges for the model
 
@@ -17,38 +18,6 @@ Ququarks = family_universal(2/3)
 Qdquarks = family_universal(-1/3)
 
 couplings_latex = {'cg': r'c_g', 'cB': 'c_B', 'cW': 'c_W', 'cqL': r'c_{q_L}', 'cuR': r'c_{u_R}', 'cdR': r'c_{d_R}', 'clL': r'c_{\ell_L}', 'ceR': r'c_{e_R}'}
-
-# Dynkin index for common representations
-def group_theory(group: str, representation: str) -> list[float]:
-    """
-    Returns the Dynkin index for common representations of SU(3) and SU(2) and its dimension
-    Parameters:
-    group (str): The group (e.g., 'SU(2)', 'SU(3)')
-    representation (str): The representation (e.g., '2')
-    Returns:
-    float: The Dynkin index of the representation
-    """
-    indices = {
-        'SU(2)': {
-            '1': [0,1],
-            '2': [sp.Rational(1/2).limit_denominator(),2],
-            '3': [2,3]
-        },
-        'SU(3)': {
-            '1': [0,1],
-            '3': [sp.Rational(1/2).limit_denominator(),3],
-            '6':[sp.Rational(5/2).limit_denominator(),6],
-            '6_bar': [sp.Rational(5/2).limit_denominator(),6],
-            '8': [3,8],
-            '15': [10,15]
-        }
-        # Add more groups and representations as needed
-    }
-    result = indices.get(group, {}).get(representation)
-    if result is None:
-        raise KeyError(f"The representation {representation} for group {group} is not tabulated.")
-    return result
-
 class ModelBase:
     def __init__(self, model_name: str):
         self.model_name = model_name
@@ -86,19 +55,21 @@ class model(ModelBase):
         else:
             for f in ['qL', 'uR', 'dR', 'lL', 'eR']:
                 self.couplings[f'c{f}'] = -self.charges[f]
-            self.couplings['cg'] = sp.Rational(1/2).limit_denominator() * sp.simplify(np.trace(
+            self.couplings['cg'] = sp.Rational(1,2) * sp.simplify(np.trace(
                 2 * family_universal(self.charges['qL']) - family_universal(self.charges['dR']) - family_universal(self.charges['uR'])
             ))
-            self.couplings['cW'] = sp.Rational(1/2).limit_denominator() * sp.simplify(np.trace(3 * family_universal(self.charges['qL']) + family_universal(self.charges['lL'])))
-            self.couplings['cB'] = sp.Rational(1/6).limit_denominator() * sp.simplify(np.trace(family_universal(self.charges['qL']) - 8 * family_universal(self.charges['uR']) - 2 * family_universal(self.charges['dR']) + 3 * family_universal(self.charges['lL']) - 6 * family_universal(self.charges['eR'])))
+            self.couplings['cW'] = sp.Rational(1,2) * sp.simplify(np.trace(3 * family_universal(self.charges['qL']) + family_universal(self.charges['lL'])))
+            self.couplings['cB'] = sp.Rational(1,6) * sp.simplify(np.trace(family_universal(self.charges['qL']) - 8 * family_universal(self.charges['uR']) - 2 * family_universal(self.charges['dR']) + 3 * family_universal(self.charges['lL']) - 6 * family_universal(self.charges['eR'])))
 
 
 class fermion:
     def __init__(self, SU3_rep: str, SU2_rep: str, Y_hyper: float, PQ: float):
-        self.color_dim = group_theory('SU(3)', SU3_rep)[1]
-        self.weak_isospin_dim = group_theory('SU(2)', SU2_rep)[1]
-        self.dynkin_index_color = group_theory('SU(3)', SU3_rep)[0]
-        self.dynkin_index_weak = group_theory('SU(2)', SU2_rep)[0]
+        j = sp.Rational(int(SU2_rep)-1, 2)
+        label_su3 = su3.dynkinlabels_from_name(SU3_rep)
+        self.color_dim = su3.dim_from_dynkinlabels(*label_su3)
+        self.weak_isospin_dim = 2*j + 1
+        self.dynkin_index_color = su3.index_from_dynkinlabels(*label_su3)
+        self.dynkin_index_weak = sp.Rational(1,3) * (j*(j+1)*(2*j+1))
         self.hypercharge = Y_hyper
         self.PQ = PQ
 
