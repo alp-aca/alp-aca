@@ -3,7 +3,7 @@ from ..citations import citations
 
 def dim_from_dynkinlabels(l1: int, l2: int) -> int:
     """Returns the dimension of the SU(3) representation with the given Dynkin labels."""
-    citations.register_bibtex('Slansky', reference_Slansky)
+    citations.register_inspire('Slansky:1981yr')
     return int((l1+1)*(l2+1)*(l1+l2+2)/2)
 
 def dynkinlabels_from_dim(dim: int) -> set[tuple[int, int]]:
@@ -19,7 +19,7 @@ def dynkinlabels_from_dim(dim: int) -> set[tuple[int, int]]:
 
 def index_from_dynkinlabels(l1: int, l2: int) -> float:
     """Returns the Dynkin index of the SU(3) representation with the given Dynkin labels."""
-    citations.register_bibtex('Slansky', reference_Slansky)
+    citations.register_inspire('Slansky:1981yr')
     return sp.Rational(1,2)*int(dim_from_dynkinlabels(l1, l2)*(l1**2+3*l1+l1*l2+3*l2+l2**2)/12)
 
 def dynkinlabels_from_name(name: str) -> tuple[int, int]:
@@ -52,15 +52,3 @@ def dynkinlabels_from_name(name: str) -> tuple[int, int]:
     if primes > len(reprs)-1:
         raise KeyError(f"The representation {name} of the group SU(3) does not exist.")
     return reprs[primes]
-
-reference_Slansky = '''@article{Slansky:1981yr,
-    author = "Slansky, R.",
-    title = "{Group Theory for Unified Model Building}",
-    reportNumber = "LA-UR-80-3495",
-    doi = "10.1016/0370-1573(81)90092-2",
-    journal = "Phys. Rept.",
-    volume = "79",
-    pages = "1--128",
-    year = "1981"
-}
-'''

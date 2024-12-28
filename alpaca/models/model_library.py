@@ -63,9 +63,50 @@ class model(ModelBase):
 
 
 class fermion:
-    def __init__(self, SU3_rep: str, SU2_rep: str, Y_hyper: float, PQ: float):
+    """
+    A class to represent a heavy fermion with specific group representations and charges.
+
+    Attributes:
+    -----------
+    color_dim : int
+        The dimension of the color representation.
+    weak_isospin_dim : int
+        The dimension of the weak isospin representation.
+    dynkin_index_color : sympy.Rational
+        The Dynkin index for the color representation.
+    dynkin_index_weak : sympy.Rational
+        The Dynkin index for the weak isospin representation.
+    hypercharge : float
+        The hypercharge of the fermion.
+    PQ : float
+        The Peccei-Quinn charge of the fermion.
+    """
+    def __init__(self,
+                 SU3_rep: str | int | tuple[int, int] | list[int],
+                 SU2_rep: str | int,
+                 Y_hyper: float,
+                 PQ: float
+                ):
+        """Initialize the heavy fermion with given representations and charges.
+
+        Parameters:
+        -----------
+        SU3_rep : str | int | tuple[int, int] | list[int]
+            The representation of the SU(3) group. It can be a string, an integer, 
+            a tuple of two integers, or a list of integers.
+        SU2_rep : str | int
+            The representation of the SU(2) group. It can be a string or an integer.
+        Y_hyper : float
+            The hypercharge value.
+        PQ : float
+            The Peccei-Quinn charge value.
+        """
+
         j = sp.Rational(int(SU2_rep)-1, 2)
-        label_su3 = su3.dynkinlabels_from_name(SU3_rep)
+        if isinstance(SU3_rep, (list, tuple)):
+            label_su3 = SU3_rep
+        else:
+            label_su3 = su3.dynkinlabels_from_name(SU3_rep)
         self.color_dim = su3.dim_from_dynkinlabels(*label_su3)
         self.weak_isospin_dim = 2*j + 1
         self.dynkin_index_color = su3.index_from_dynkinlabels(*label_su3)
@@ -89,5 +130,5 @@ KSVZ_charge = sp.symbols(r'\mathcal{X}')
 QED_DFSZ= model('QED-DFSZ', {'lL': 2*sp.cos(beta)**2, 'uR': -2*sp.sin(beta)**2, 'dR': 2*sp.sin(beta)**2})
 u_DFSZ= model('u-DFSZ', {'lL': 2*sp.cos(beta)**2, 'uR': -2*sp.sin(beta)**2})
 d_DFSZ= model('d-DFSZ', {'lL': 2*sp.cos(beta)**2, 'dR': 2*sp.sin(beta)**2})
-Q_KSVZ=KSVZ_model('Q-KSVZ', [fermion('3','1',0,KSVZ_charge)])
-L_KSVZ=KSVZ_model('L-KSVZ', [fermion('1','2',0,KSVZ_charge)])
+Q_KSVZ=KSVZ_model('Q-KSVZ', [fermion(3,1,0,KSVZ_charge)])
+L_KSVZ=KSVZ_model('L-KSVZ', [fermion(1,2,0,KSVZ_charge)])
