@@ -78,58 +78,60 @@ def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: flo
     elif initial == ['J/psi'] and final == sorted(['photon', 'photon', 'photon']):
         from ..constants import mJpsi, BeeJpsi
         br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BR_Vagamma(ma, couplings, mJpsi, BeeJpsi, 'c', fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['2photons']
+    #Initial B meson
     elif initial == ['B+'] and final == sorted(['alp', 'K+']):
         from ..constants import GammaB
         br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BtoKa(ma, couplings, fa, **kwargs)/GammaB
-    elif initial == ['B0'] and final == sorted(['alp', 'K*0']):
-        from ..constants import GammaB0
-        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.B0toKsta(ma, couplings, fa, **kwargs)/GammaB0
     elif initial == ['B+'] and final == sorted(['K+', 'muon', 'muon']):
         from ..constants import GammaB
         br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BtoKa(ma, couplings, fa, **kwargs)/GammaB * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['mu']
-    elif initial == ['B0'] and final == sorted(['K*0', 'muon', 'muon']):
-        from ..constants import GammaB0
-        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.B0toKsta(ma, couplings, fa, **kwargs)/GammaB0 * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['mu']
     elif initial == ['B+'] and final == sorted(['K+', 'electron', 'electron']):
         from ..constants import GammaB
         br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BtoKa(ma, couplings, fa, **kwargs)/GammaB * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['e']
-    elif initial == ['B0'] and final == sorted(['K*0', 'electron', 'electron']):
-        from ..constants import GammaB0
-        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.B0toKsta(ma, couplings, fa, **kwargs)/GammaB0 * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['e']
     elif initial == ['B+'] and final == sorted(['K+', 'tau', 'tau']):
         from ..constants import GammaB
         br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BtoKa(ma, couplings, fa, **kwargs)/GammaB * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['tau']
-    elif initial == ['B0'] and final == sorted(['K*0', 'tau', 'tau']):
-        from ..constants import GammaB0
-        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.B0toKsta(ma, couplings, fa, **kwargs)/GammaB0 * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['tau']
     elif initial == ['B+'] and final == sorted(['K+', 'photon', 'photon']):
         from ..constants import GammaB
         br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BtoKa(ma, couplings, fa, **kwargs)/GammaB * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['2photons']
-    elif initial == ['B0'] and final == sorted(['K*0', 'photon', 'photon']):
-        from ..constants import GammaB0
-        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.B0toKsta(ma, couplings, fa, **kwargs)/GammaB0 * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['2photons']
-    elif initial == ['K+'] and final == sorted(['alp', 'pion+']):
-        br = invisible.Kplustopia
-    elif initial == ['KL'] and final == sorted(['alp', 'pion0']):
-        br = invisible.KLtopia
-    elif initial == ['K+'] and final == sorted(['pion+', 'photon', 'photon']):
-        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.Kplustopia(ma, couplings, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['2photons']
-    elif initial == ['KL'] and final == sorted(['pion0', 'photon', 'photon']):
-        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.KLtopia(ma, couplings, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['2photons']
-    elif initial == ['K+'] and final == sorted(['pion+', 'muon', 'muon']):
-        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.Kplustopia(ma, couplings, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['mu']
-    elif initial == ['KL'] and final == sorted(['pion0', 'muon', 'muon']):
-        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.KLtopia(ma, couplings, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['mu']
-    elif initial == ['K+'] and final == sorted(['pion+', 'electron', 'electron']):
-        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.Kplustopia(ma, couplings, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['e']
-    elif initial == ['KL'] and final == sorted(['pion0', 'electron', 'electron']):
-        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.KLtopia(ma, couplings, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['e']
     elif initial == ['B+'] and final == sorted(['K+', 'pion+', 'pion-', 'pion0']):
         from ..constants import GammaB
         br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BtoKa(ma, couplings, fa, **kwargs)/GammaB * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['pi0pippim']
+    elif initial == ['B0'] and final == sorted(['alp', 'K*0']):
+        from ..constants import GammaB0
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.B0toKsta(ma, couplings, fa, **kwargs)/GammaB0
+    elif initial == ['B0'] and final == sorted(['K*0', 'muon', 'muon']):
+        from ..constants import GammaB0
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.B0toKsta(ma, couplings, fa, **kwargs)/GammaB0 * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['mu']
+    elif initial == ['B0'] and final == sorted(['K*0', 'electron', 'electron']):
+        from ..constants import GammaB0
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.B0toKsta(ma, couplings, fa, **kwargs)/GammaB0 * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['e']
+    elif initial == ['B0'] and final == sorted(['K*0', 'tau', 'tau']):
+        from ..constants import GammaB0
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.B0toKsta(ma, couplings, fa, **kwargs)/GammaB0 * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['tau']
+    elif initial == ['B0'] and final == sorted(['K*0', 'photon', 'photon']):
+        from ..constants import GammaB0
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.B0toKsta(ma, couplings, fa, **kwargs)/GammaB0 * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['2photons']
     elif initial == ['B0'] and final == sorted(['K0', 'pion+', 'pion-', 'pion0']):
         from ..constants import GammaB0
         br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.B0toKa(ma, couplings, fa, **kwargs)/GammaB0 * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['pi0pippim']
+    #Initial K meson
+    elif initial == ['K+'] and final == sorted(['alp', 'pion+']):
+        br = invisible.Kplustopia
+    elif initial == ['K+'] and final == sorted(['pion+', 'photon', 'photon']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.Kplustopia(ma, couplings, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['2photons']
+    elif initial == ['K+'] and final == sorted(['pion+', 'muon', 'muon']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.Kplustopia(ma, couplings, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['mu']
+    elif initial == ['K+'] and final == sorted(['pion+', 'electron', 'electron']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.Kplustopia(ma, couplings, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['e']
+    elif initial == ['KL'] and final == sorted(['alp', 'pion0']):
+        br = invisible.KLtopia
+    elif initial == ['KL'] and final == sorted(['pion0', 'photon', 'photon']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.KLtopia(ma, couplings, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['2photons']
+    elif initial == ['KL'] and final == sorted(['pion0', 'muon', 'muon']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.KLtopia(ma, couplings, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['mu']
+    elif initial == ['KL'] and final == sorted(['pion0', 'electron', 'electron']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.KLtopia(ma, couplings, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['e']
     
     else:
         raise NotImplementedError(f'Unknown branching ratio process {" ".join(initial)} -> {" ".join(final)}')
