@@ -311,7 +311,7 @@ def decay_width_etapipi00(ma: float, couplings: ALPcouplings, fa: float, **kwarg
 def decay_width_etapipipm(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
     return atoetapipi(ma, meta, mpi_pm, mpi_pm, couplings, fa, 1, **kwargs)[0]
 
-###########################    DECAY TO  a-> eta pi pi    ###########################
+###########################    DECAY TO  a-> etap pi pi    ###########################
 #It is assumed that Fpppp(m)=Fspp(m)=Ftpp(m)=F(m)
 
 def ampatoetappipi(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs):
