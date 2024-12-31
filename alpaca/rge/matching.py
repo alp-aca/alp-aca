@@ -79,5 +79,5 @@ def match(couplings: ALPcouplings, two_loops = False) -> ALPcouplings:
     values |= {f'k{F}': couplings[f'k{F}'][0:2,0:2] + 3/(8*np.pi**2)*Delta_kF[F]*np.eye(2) for F in ['U', 'u']}
     values |= {'kD': couplings['kD'] + 3/(8*np.pi**2)*Delta_kF['D']*np.eye(3) + match_FCNC_d(couplings, two_loops)}
     values |= {'cg': couplings['cg'], 'cgamma': couplings['cgamma']}
-    return ALPcouplings(values, scale=couplings.scale, basis='kF_below')
+    return ALPcouplings(values, scale=couplings.scale, basis='kF_below', ew_scale=couplings.ew_scale)
 

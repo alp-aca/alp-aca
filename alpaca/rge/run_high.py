@@ -102,7 +102,7 @@ def beta_ytop(couplings: ALPcouplings) -> ALPcouplings:
 
     betaeR = np.eye(3)*(-6*ytop**2*be*ctt+12*alpha_1**2*tildes['cBtilde'])
 
-    return ALPcouplings({'cqL': betaqL, 'cuR': betauR, 'cdR': betadR, 'clL': betalL, 'ceR': betaeR}, couplings.scale, 'derivative_above')
+    return ALPcouplings({'cqL': betaqL, 'cuR': betauR, 'cdR': betadR, 'clL': betalL, 'ceR': betaeR}, couplings.scale, 'derivative_above', couplings.ew_scale)
 
 
 def beta_full(couplings: ALPcouplings) -> ALPcouplings:
@@ -162,7 +162,7 @@ def beta_full(couplings: ALPcouplings) -> ALPcouplings:
 
     betaeR = ye.H @ ye @ couplings['ceR'] + couplings['ceR'] @ ye.H @ ye - 2*ye.H @ couplings['clL'] @ ye + np.eye(3) * (2*be*X+12*alpha_1**2*hyp_eR**2*tildes['cBtilde'])
 
-    return ALPcouplings({'cqL': betaqL, 'cuR': betauR, 'cdR': betadR, 'clL': betalL, 'ceR': betaeR}, scale=couplings.scale, basis='derivative_above')
+    return ALPcouplings({'cqL': betaqL, 'cuR': betauR, 'cdR': betadR, 'clL': betalL, 'ceR': betaeR}, scale=couplings.scale, basis='derivative_above', ew_scale=couplings.ew_scale)
 
 def run_leadinglog(couplings: ALPcouplings, beta: Callable[[ALPcouplings], ALPcouplings], scale_out: float) -> ALPcouplings:
     """Obtain the ALP couplings at a different scale using the leading log approximation
@@ -209,7 +209,7 @@ def run_scipy(couplings: ALPcouplings, beta: Callable[[ALPcouplings], ALPcouplin
     """
     citations.register_inspire('Virtanen:2019joe')
     def fun(t0, y):
-        return beta(ALPcouplings._fromarray(y, np.exp(t0), 'derivative_above'))._toarray()/(16*np.pi**2)
+        return beta(ALPcouplings._fromarray(y, np.exp(t0), 'derivative_above', couplings.ew_scale))._toarray()/(16*np.pi**2)
     
     sol_re, sol_imag = solve_ivp_complex(fun=fun, t_span=(np.log(couplings.scale), np.log(scale_out)), y0=couplings.translate('derivative_above')._toarray())
-    return ALPcouplings._fromarray(sol_re.y[:,-1] + 1j * sol_imag.y[:,-1], scale_out, 'derivative_above')
+    return ALPcouplings._fromarray(sol_re.y[:,-1] + 1j * sol_imag.y[:,-1], scale_out, 'derivative_above', couplings.ew_scale)

@@ -48,7 +48,7 @@ def beta(couplings: ALPcouplings) -> ALPcouplings:
     beta_u = parsSM['alpha_s']**2/np.pi**2*cggtilde(couplings)+0.75*parsSM['alpha_em']**2/np.pi**2*(2/3)**2*cgammatilde(couplings)
     beta_e = 0.75*parsSM['alpha_em']**2/np.pi**2*cgammatilde(couplings)
 
-    return ALPcouplings({'kd': beta_d*np.eye(3), 'kD': -beta_d*np.eye(3), 'ku': beta_u*np.eye(2), 'kU': -beta_u*np.eye(2), 'ke': beta_e * np.eye(3), 'kE': beta_e*np.eye(3), 'kNu': np.zeros((3,3)), 'cg': 0, 'cgamma': 0}, scale=couplings.scale, basis='kF_below')
+    return ALPcouplings({'kd': beta_d*np.eye(3), 'kD': -beta_d*np.eye(3), 'ku': beta_u*np.eye(2), 'kU': -beta_u*np.eye(2), 'ke': beta_e * np.eye(3), 'kE': beta_e*np.eye(3), 'kNu': np.zeros((3,3)), 'cg': 0, 'cgamma': 0}, scale=couplings.scale, basis='kF_below', ew_scale=couplings.ew_scale)
 
 
 def run_leadinglog(couplings: ALPcouplings, scale_out: float) -> ALPcouplings:
@@ -97,7 +97,7 @@ def run_scipy(couplings: ALPcouplings, scale_out: float) -> ALPcouplings:
 
     citations.register_inspire('Virtanen:2019joe')
     def fun(t0, y):
-        return beta(ALPcouplings._fromarray(y, np.exp(t0), 'kF_below'))._toarray()/(16*np.pi**2)
+        return beta(ALPcouplings._fromarray(y, np.exp(t0), 'kF_below', couplings.ew_scale))._toarray()/(16*np.pi**2)
     
     sol_re, sol_imag = solve_ivp_complex(fun=fun, t_span=(np.log(couplings.scale), np.log(scale_out)), y0=couplings.translate('kF_below')._toarray())
-    return ALPcouplings._fromarray(sol_re.y[:,-1] + 1j * sol_imag.y[:,-1], scale_out, 'kF_below')
+    return ALPcouplings._fromarray(sol_re.y[:,-1] + 1j * sol_imag.y[:,-1], scale_out, 'kF_below', couplings.ew_scale)
