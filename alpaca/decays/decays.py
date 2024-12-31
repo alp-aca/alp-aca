@@ -97,6 +97,9 @@ def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: flo
     elif initial == ['B+'] and final == sorted(['K+', 'pion+', 'pion-', 'pion0']):
         from ..constants import GammaB
         br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BtoKa(ma, couplings, fa, **kwargs)/GammaB * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['pi0pippim']
+    elif initial == ['B+'] and final == sorted(['K+', 'eta', 'pion+', 'pion-']):
+        from ..constants import GammaB
+        br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BtoKa(ma, couplings, fa, **kwargs)/GammaB * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['etapippim']
     elif initial == ['B0'] and final == sorted(['alp', 'K*0']):
         from ..constants import GammaB0
         br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.B0toKsta(ma, couplings, fa, **kwargs)/GammaB0

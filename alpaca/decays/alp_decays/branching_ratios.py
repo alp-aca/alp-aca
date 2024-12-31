@@ -20,8 +20,10 @@ def _total_decay_width (ma, couplings: ALPcouplings, fa, br_dark = 0.0, **kwargs
     DW_3pis = decay_width_3pi000(ma, couplings, fa, **kwargs)+ decay_width_3pi0pm(ma, couplings, fa, **kwargs)
     DW_3pi000 = decay_width_3pi000(ma, couplings, fa, **kwargs)
     DW_3pi0pm = decay_width_3pi0pm(ma, couplings, fa, **kwargs)
-    DW_etapipi = decay_width_etapipi00(ma, couplings, fa, **kwargs) + decay_width_etapipipm(ma, couplings, fa, **kwargs)*int(ma<2.0)
-    DW_etappipi = decay_width_etappipi00(ma, couplings, fa, **kwargs) + decay_width_etappipipm(ma, couplings, fa, **kwargs)*int(ma<2.0)
+    DW_etapipi = (decay_width_etapipi00(ma, couplings, fa, **kwargs) + decay_width_etapipipm(ma, couplings, fa, **kwargs))*int(ma<2.0)
+    DW_etapi0pi0 = decay_width_etapipi00(ma, couplings, fa, **kwargs)*int(ma<2.0)
+    DW_etapippim = decay_width_etapipipm(ma, couplings, fa, **kwargs)*int(ma<2.0)
+    DW_etappipi = (decay_width_etappipi00(ma, couplings, fa, **kwargs) + decay_width_etappipipm(ma, couplings, fa, **kwargs))*int(ma<2.0)
     DW_2w = decay_width_2w(ma, couplings, fa, **kwargs_nointegral)
     DW_gammapipi = decay_width_gammapipi(ma, couplings, fa, **kwargs)
     DW_gluongluon = decay_width_2gluons(ma, couplings, fa, **kwargs_nointegral)
@@ -41,6 +43,8 @@ def _total_decay_width (ma, couplings: ALPcouplings, fa, br_dark = 0.0, **kwargs
         'pi0pippim': DW_3pi0pm,
         'pi0pi0pi0': DW_3pi000,
         'etapipi': DW_etapipi,
+        'etapi0pi0': DW_etapi0pi0,
+        'etapippim': DW_etapippim,
         'etappipi': DW_etappipi,
         'gammapipi': DW_gammapipi,
         '2omega': DW_2w,
@@ -121,6 +125,8 @@ def BRsalp(ma, couplings: ALPcouplings, fa, br_dark = 0, **kwargs):
         'pi0pippim': DWs['pi0pippim']/DWs['DW_tot'],
         'pi0pi0pi0': DWs['pi0pi0pi0']/DWs['DW_tot'],
         'etapipi': DWs['etapipi']/DWs['DW_tot'],
+        'etapi0pi0': DWs['etapi0pi0']/DWs['DW_tot'],
+        'etapippim': DWs['etapippim']/DWs['DW_tot'],
         'etappipi': DWs['etappipi']/DWs['DW_tot'],
         'gammapipi': DWs['gammapipi']/DWs['DW_tot'],
         '2omega': DWs['2omega']/DWs['DW_tot'],

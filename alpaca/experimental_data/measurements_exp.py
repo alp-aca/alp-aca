@@ -1003,6 +1003,17 @@ belle_b0Komega3pi = MeasurementConstantBound(
     max_ma = 0.83
 )
 
+babar_BKetapipi = MeasurementInterpolatedBound(
+    'Chakraborty:2021wda',
+    os.path.join(current_dir, visible, 'babar_BKetapipi.txt'),
+    'prompt',
+    conf_level=0.95,
+    lab_boost=0.469/(1-0.469**2)**0.5,
+    rmin = 10,
+    mass_parent = mB,
+    mass_sibling = mK
+)
+
 def get_measurements(transition: str, exclude_projections: bool = True) -> dict[str, MeasurementBase]:
     """Retrieve measurements based on the given transition.
 
@@ -1065,5 +1076,7 @@ def get_measurements(transition: str, exclude_projections: bool = True) -> dict[
         return {'Belle': belle_bpKomega3pi}
     elif initial == ['B0'] and final == sorted(['K0', 'pion+', 'pion-', 'pion0']):
         return {'Belle': belle_b0Komega3pi}
+    elif initial == ['B+'] and final == sorted(['K+', 'eta', 'pion+', 'pion-']):
+        return {'BaBar': babar_BKetapipi}
     else:
         raise KeyError(f"No measurements for {transition}")
