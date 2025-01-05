@@ -409,6 +409,34 @@ class ALPcouplings:
             return x
         values = {k[:-3]: unflatten(np.array(data['values'][k]) + 1j*np.array(data['values'][k[:-3]+'_Im'])) for k in data['values'] if k[-3:] == '_Re'}
         return ALPcouplings(values, data['scale'], data['basis'], data.get('ew_scale', 100.0))
+    
+    def save(self, filename: str):
+        """Save the object to a JSON file.
+
+        Parameters
+        ----------
+        filename : str
+            Name of the file where the object will be saved.
+        """
+        with open(filename, 'wt') as f:
+            f.write(ALPcouplingsEncoder().encode(self))
+
+    @classmethod
+    def load(cls, filename: str) -> 'ALPcouplings':
+        """Load the object from a JSON file.
+
+        Parameters
+        ----------
+        filename : str
+            Name of the file where the object is saved.
+
+        Returns
+        -------
+        a : ALPcouplings
+            Object loaded from the file.
+        """
+        with open(filename, 'rt') as f:
+            return ALPcouplingsDecoder().decode(f.read())
 
 class ALPcouplingsEncoder(JSONEncoder):
     def default(self, o):
