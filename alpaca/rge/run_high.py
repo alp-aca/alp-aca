@@ -183,17 +183,7 @@ def run_leadinglog(couplings: ALPcouplings, beta: Callable[[ALPcouplings], ALPco
     result.scale = scale_out
     return result
 
-def solve_ivp_complex(fun, t_span, y0, **kwargs):
-    """Solve an IVP with complex initial conditions"""
-    def realfun(t, y):
-        return np.real(fun(t, y))
-    def imagfun(t, y):
-        return np.imag(fun(t, y))
-    sol_real = solve_ivp(realfun, t_span, np.real(y0), **kwargs)
-    sol_imag = solve_ivp(imagfun, t_span, np.imag(y0), **kwargs)
-    return sol_real, sol_imag
-
-def run_scipy(couplings: ALPcouplings, beta: Callable[[ALPcouplings], ALPcouplings], scale_out: float) -> ALPcouplings:
+def run_scipy(couplings: ALPcouplings, beta: Callable[[ALPcouplings], ALPcouplings], scale_out: float, scipy_options: dict) -> ALPcouplings:
     """Obtain the ALP couplings at a different scale using scipy's integration
     
     Parameters
@@ -211,5 +201,6 @@ def run_scipy(couplings: ALPcouplings, beta: Callable[[ALPcouplings], ALPcouplin
     def fun(t0, y):
         return beta(ALPcouplings._fromarray(y, np.exp(t0), 'derivative_above', couplings.ew_scale))._toarray()/(16*np.pi**2)
     
-    sol_re, sol_imag = solve_ivp_complex(fun=fun, t_span=(np.log(couplings.scale), np.log(scale_out)), y0=couplings.translate('derivative_above')._toarray())
-    return ALPcouplings._fromarray(sol_re.y[:,-1] + 1j * sol_imag.y[:,-1], scale_out, 'derivative_above', couplings.ew_scale)
+    y0 = couplings.translate('derivative_above')._toarray()
+    sol = solve_ivp(fun=fun, t_span=(np.log(couplings.scale), np.log(scale_out)), y0=y0, **scipy_options)
+    return ALPcouplings._fromarray(sol.y[:,-1], scale_out, 'derivative_above', couplings.ew_scale)

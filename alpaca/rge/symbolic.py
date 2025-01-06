@@ -155,7 +155,7 @@ def beta_full(couplings: ALPcouplings) -> ALPcouplings:
 
     tildes = gauge_tilde(couplings)
     yu = np.matrix(np.diag([y_u, yc, yt]))
-    yd = np.matrix(np.diag([y_d, ys, yb]))
+    yd = Vckm @ np.matrix(np.diag([y_d, ys, yb]))
     ye = np.matrix(np.diag([y_e, ymu, ytau]))
 
     # Field redefinitions of the fermionic fields that eliminate Ophi, see Eq.(5) of 2012.12272 and the discussion below
