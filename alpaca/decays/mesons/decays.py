@@ -9,24 +9,25 @@ from ...constants import(
 from ..alp_decays.branching_ratios import decay_channels, BRsalp
 
 meson_to_alp = {
-    ('Upsilon(1S)', ('alp', 'photon')): lambda ma, couplings, fa, **kwargs: BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, 'b', fa, **kwargs),
-    ('Upsilon(3S)', ('alp', 'photon')): lambda ma, couplings, fa, **kwargs: Mixed_QuarkoniaSearches(ma, couplings, mUpsilon3S, 'b', fa, **kwargs),
-    ('Upsilon(4S)', ('alp', 'photon')): lambda ma, couplings, fa, **kwargs: BR_Vagamma(ma, couplings, mUpsilon4S, BeeUpsilon4S, 'b', fa, **kwargs),
-    ('J/psi', ('alp', 'photon')): lambda ma, couplings, fa, **kwargs: BR_Vagamma(ma, couplings, mJpsi, BeeJpsi, 'c', fa, **kwargs),
-    ('B+', ('alp', 'K+')): lambda ma, couplings, fa, **kwargs: BtoKa(ma, couplings, fa, **kwargs)/GammaB,
-    ('B0', ('alp', 'K0')): lambda ma, couplings, fa, **kwargs: B0toKa(ma, couplings, fa, **kwargs)/GammaB0,
-    ('B0', ('alp', 'K*0')): lambda ma, couplings, fa, **kwargs: B0toKsta(ma, couplings, fa, **kwargs)/GammaB0,
-    ('K+', ('alp', 'pion+')): Kplustopia,
-    ('KL', ('alp', 'pion0')): KLtopia,
+    ('Upsilon(1S)', ('alp', 'photon')): lambda ma, couplings, fa, br_dark, **kwargs: BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, 'b', fa, **kwargs),
+    ('Upsilon(3S)', ('alp', 'photon')): lambda ma, couplings, fa, br_dark, **kwargs: Mixed_QuarkoniaSearches(ma, couplings, mUpsilon3S, 'b', fa, **kwargs),
+    ('Upsilon(4S)', ('alp', 'photon')): lambda ma, couplings, fa, br_dark, **kwargs: BR_Vagamma(ma, couplings, mUpsilon4S, BeeUpsilon4S, 'b', fa, **kwargs),
+    ('J/psi', ('alp', 'photon')): lambda ma, couplings, fa, br_dark, **kwargs: BR_Vagamma(ma, couplings, mJpsi, BeeJpsi, 'c', fa, **kwargs),
+    ('B+', ('K+', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: BtoKa(ma, couplings, fa, **kwargs)/GammaB,
+    ('B0', ('K0', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: B0toKa(ma, couplings, fa, **kwargs)/GammaB0,
+    ('B0', ('K*0', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: B0toKsta(ma, couplings, fa, **kwargs)/GammaB0,
+    ('K+', ('alp', 'pion+')): lambda ma, couplings, fa, br_dark, **kwargs: Kplustopia(ma, couplings, fa, **kwargs),
+    ('KL', ('alp', 'pion0')): lambda ma, couplings, fa, br_dark, **kwargs: KLtopia(ma, couplings, fa, **kwargs),
 }
 
 def transition_nwa(
-        production_channel: tuple[list[str], list[str]],
-        decay_channel: list[str],) -> tuple[list[str], list[str]]:
-    final = sorted(set(production_channel[1]+decay_channel)-set(['alp']))
-    return (production_channel[0], final)
+        production_channel: tuple[tuple[str], tuple[str]],
+        decay_channel: tuple[str],) -> tuple[str, tuple[str]]:
+    final = [particle for particle in production_channel[1] if particle != 'alp']
+    final += decay_channel
+    return (production_channel[0], tuple(sorted(final)))
 
 meson_nwa = {}
-for meson_process, meson_br in meson_to_alp.items():
+for meson_process in meson_to_alp.keys():
     for channel in decay_channels:
-        meson_nwa[transition_nwa(meson_process, channel)] = lambda ma, couplings, fa, br_dark, **kwargs: meson_br(ma, couplings, fa, **kwargs) * BRsalp(ma, couplings, fa, br_dark, **kwargs)[channel]
+        meson_nwa[transition_nwa(meson_process, channel)] = (meson_process, channel)

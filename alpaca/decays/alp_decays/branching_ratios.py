@@ -5,6 +5,29 @@ from .hadronic_decays_def import decay_width_3pi000, decay_width_3pi0pm, decay_w
 from .gaugebosons import decay_width_2gamma, decay_width_2gluons
 from functools import cache
 
+decay_channels =[
+    ('electron', 'electron'),
+    ('muon', 'muon'),
+    ('tau', 'tau'),
+    ('charm', 'charm'),
+    ('bottom', 'bottom'),
+    ('pion', 'pion', 'pion'),
+    ('pion+', 'pion-', 'pion0'),
+    ('pion0', 'pion0', 'pion0'),
+    ('eta', 'pion', 'pion'),
+    ('eta', 'pion0', 'pion0'),
+    ('eta', 'pion+', 'pion-'),
+    ('eta_prime', 'pion', 'pion'),
+    ('eta_prime', 'pion0', 'pion0'),
+    ('eta_prime', 'pion+', 'pion-'),
+    ('photon', 'pion', 'pion'),
+    ('omega', 'omega'),
+    ('gluon', 'gluon'),
+    ('photon', 'photon'),
+    ('hadrons',),
+    ('dark',),
+]
+
 @cache
 def _total_decay_width (ma, couplings: ALPcouplings, fa, br_dark = 0.0, **kwargs):
     if br_dark < 0.0 or br_dark > 1.0:
@@ -117,70 +140,28 @@ def BRsalp(ma, couplings: ALPcouplings, fa, br_dark = 0, **kwargs):
     #kwargs_dw = {k: v for k, v in kwargs.items() if k != 'br_dark'}
     #br_dark = kwargs.get('br_dark', 0.0)
     if br_dark == 1.0:
-        return {'e': 0.0, 'mu': 0.0, 'tau': 0.0, 'charm': 0.0, 'bottom': 0.0, '3pis': 0.0, 'pi0pippim': 0.0, 'pi0pi0pi0': 0.0, 'etapipi': 0.0, 'etapi0pi0': 0.0, 'etapippim': 0.0, 'etappipi': 0.0, 'etappi0pi0': 0.0, 'etappippim': 0.0, 'gammapipi': 0.0, '2omega': 0.0, 'gluongluon': 0.0, '2photons': 0.0, 'hadrons': 0.0, 'dark': 1.0}
+        return {channel: 0.0 for channel in decay_channels} | {'dark': 1.0}
     DWs = total_decay_width(ma, couplings, fa, br_dark, **kwargs)
     BRs={
-        'e': DWs['e']/DWs['DW_tot'],
-        'mu': DWs['mu']/DWs['DW_tot'],
-        'tau': DWs['tau']/DWs['DW_tot'],
-        'charm': DWs['charm']/DWs['DW_tot'],
-        'bottom': DWs['bottom']/DWs['DW_tot'],
-        '3pis': DWs['3pis']/DWs['DW_tot'],
-        'pi0pippim': DWs['pi0pippim']/DWs['DW_tot'],
-        'pi0pi0pi0': DWs['pi0pi0pi0']/DWs['DW_tot'],
-        'etapipi': DWs['etapipi']/DWs['DW_tot'],
-        'etapi0pi0': DWs['etapi0pi0']/DWs['DW_tot'],
-        'etapippim': DWs['etapippim']/DWs['DW_tot'],
-        'etappipi': DWs['etappipi']/DWs['DW_tot'],
-        'etappi0pi0': DWs['etappi0pi0']/DWs['DW_tot'],
-        'etappippim': DWs['etappippim']/DWs['DW_tot'],
-        'gammapipi': DWs['gammapipi']/DWs['DW_tot'],
-        '2omega': DWs['2omega']/DWs['DW_tot'],
-        'gluongluon': DWs['gluongluon']/DWs['DW_tot'],
-        '2photons': DWs['2photons']/DWs['DW_tot'],
-        'hadrons':(DWs['3pis'] + DWs['etapipi']*int(ma<2.0) + DWs['etappipi']*int(ma<2.0) + DWs['gammapipi']*int(ma<2.0) + DWs['2omega']*int(ma<2.0) + DWs['gluongluon']*int(ma>2.0) + DWs['charm'] + DWs['bottom'])/DWs['DW_tot'],
-        'dark': br_dark
+        ('electron', 'electron'): DWs['e']/DWs['DW_tot'],
+        ('muon', 'muon'): DWs['mu']/DWs['DW_tot'],
+        ('tau', 'tau'): DWs['tau']/DWs['DW_tot'],
+        ('charm', 'charm'): DWs['charm']/DWs['DW_tot'],
+        ('bottom', 'bottom'): DWs['bottom']/DWs['DW_tot'],
+        ('pion', 'pion', 'pion'): DWs['3pis']/DWs['DW_tot'],
+        ('pion+', 'pion-', 'pion0'): DWs['pi0pippim']/DWs['DW_tot'],
+        ('pion0', 'pion0', 'pion0'): DWs['pi0pi0pi0']/DWs['DW_tot'],
+        ('eta', 'pion', 'pion'): DWs['etapipi']/DWs['DW_tot'],
+        ('eta', 'pion0', 'pion0'): DWs['etapi0pi0']/DWs['DW_tot'],
+        ('eta', 'pion+', 'pion-'): DWs['etapippim']/DWs['DW_tot'],
+        ('eta_prime', 'pion', 'pion'): DWs['etappipi']/DWs['DW_tot'],
+        ('eta_prime', 'pion0', 'pion0'): DWs['etappi0pi0']/DWs['DW_tot'],
+        ('eta_prime', 'pion+', 'pion-'): DWs['etappippim']/DWs['DW_tot'],
+        ('photon', 'pion', 'pion'): DWs['gammapipi']/DWs['DW_tot'],
+        ('omega', 'omega'): DWs['2omega']/DWs['DW_tot'],
+        ('gluon', 'gluon'): DWs['gluongluon']/DWs['DW_tot'],
+        ('photon', 'photon'): DWs['2photons']/DWs['DW_tot'],
+        ('hadrons',):(DWs['3pis'] + DWs['etapipi']*int(ma<2.0) + DWs['etappipi']*int(ma<2.0) + DWs['gammapipi']*int(ma<2.0) + DWs['2omega']*int(ma<2.0) + DWs['gluongluon']*int(ma>2.0) + DWs['charm'] + DWs['bottom'])/DWs['DW_tot'],
+        ('dark',): br_dark
         }
     return BRs
-
-# def BR_electron(ma, fa, couplings: ALPcouplings):
-#     DW_elec = decay_width_electron(ma, couplings, fa)
-#     return DW_elec/total_decay_width(ma, fa, couplings)
-
-# def BR_muon(ma, fa, couplings: ALPcouplings):
-#     DW_muon = decay_width_muon(ma, couplings, fa)
-#     return DW_muon/total_decay_width(ma, fa, couplings)
-
-# def BR_tau(ma, fa, couplings: ALPcouplings):
-#     DW_tau = decay_width_tau(ma, couplings, fa)
-#     return DW_tau/total_decay_width(ma, fa, couplings)
-
-# def BR_charm(ma, fa, couplings: ALPcouplings):
-#     DW_charm = decay_width_charm(ma, couplings, fa)
-#     return DW_charm/total_decay_width(ma, fa, couplings)
-
-# def BR_bottom(ma, fa, couplings: ALPcouplings):
-#     DW_bottom = decay_width_bottom(ma, couplings, fa)
-#     return DW_bottom/total_decay_width(ma, fa, couplings)
-
-# def BR_3pis(ma, fa, couplings: ALPcouplings):
-#     DW_3pis = decay_width_3pi000(ma, couplings, fa)+ decay_width_3pi0pm(ma, couplings, fa)
-#     return DW_3pis/total_decay_width(ma, fa, couplings)
-
-# def BR_etapipi(ma, fa, couplings: ALPcouplings):
-#     DW_etapipi = decay_width_etapipi00(ma, couplings, fa) + decay_width_etapipipm(ma, couplings, fa)
-#     return DW_etapipi/total_decay_width(ma, fa, couplings)
-
-# def BR_gammapipi(ma, fa, couplings: ALPcouplings):
-#     DW_gammapipi = decay_width_gammapipi(ma, couplings, fa)
-#     return DW_gammapipi/total_decay_width(ma, fa, couplings)
-
-# def BR_gluongluon(ma, fa, couplings: ALPcouplings):
-#     DW_gluongluon = decay_width_2gluons(ma, couplings, fa)
-#     return DW_gluongluon/total_decay_width(ma, fa, couplings)
-
-# def BR_2photons(ma, fa, couplings: ALPcouplings):
-#     DW_2photons = decay_width_2gamma(ma, couplings, fa)
-#     return DW_2photons/total_decay_width(ma, fa, couplings)
-
-
