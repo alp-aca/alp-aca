@@ -18,16 +18,38 @@ def decay_width(transition: str, ma: float, couplings: ALPcouplings, fa: float, 
         dw = fermion_decays.decay_width_muon
     elif initial == ['alp'] and final == ['tau', 'tau']:
         dw = fermion_decays.decay_width_tau
+    elif initial == ['alp'] and final == ['charm', 'charm']:
+        dw = fermion_decays.decay_width_charm
+    elif initial == ['alp'] and final == ['bottom', 'bottom']:
+        dw = fermion_decays.decay_width_bottom
     elif initial == ['alp'] and final == ['photon', 'photon']:
         dw = gaugebosons.decay_width_2gamma
+    elif initial == ['alp'] and final == ['gluon', 'gluon']:
+        dw = gaugebosons.decay_width_2gluons
+    elif initial == ['alp'] and final == ['hadrons']:
+        dw = hadronic_decays_def.decay_width_hadrons
+    elif initial == ['alp'] and final == sorted(['pion0', 'pion0', 'pion0']):
+        dw = hadronic_decays_def.decay_width_3pi000
+    elif initial == ['alp'] and final == sorted(['pion0', 'pion+', 'pion-']):
+        dw = hadronic_decays_def.decay_width_3pi0pm
+    elif initial == ['alp'] and final == sorted(['pion', 'pion', 'pion']):
+        dw = lambda ma, couplings, fa, **kwargs: hadronic_decays_def.decay_width_3pi000(ma, couplings, fa, **kwargs) + hadronic_decays_def.decay_width_3pi0pm(ma, couplings, fa, **kwargs)
     elif initial == ['alp'] and final == sorted(['eta', 'pion0', 'pion0']):
         dw = hadronic_decays_def.decay_width_etapipi00
     elif initial == ['alp'] and final == sorted(['eta', 'pion+', 'pion-']):
         dw = hadronic_decays_def.decay_width_etapipipm
     elif initial == ['alp'] and final == ['eta', 'pion', 'pion']:
         dw = lambda ma, couplings, fa, **kwargs: hadronic_decays_def.decay_width_etapipi00(ma, couplings, fa, **kwargs) + hadronic_decays_def.decay_width_etapipipm(ma, couplings, fa, **kwargs)
+    elif initial == ['alp'] and final == sorted(['eta_prime', 'pion0', 'pion0']):
+        dw = hadronic_decays_def.decay_width_etappipi00
+    elif initial == ['alp'] and final == sorted(['eta_prime', 'pion+', 'pion-']):
+        dw = hadronic_decays_def.decay_width_etappipipm
+    elif initial == ['alp'] and final == ['eta_prime', 'pion', 'pion']:
+        dw = lambda ma, couplings, fa, **kwargs: hadronic_decays_def.decay_width_etappipi00(ma, couplings, fa, **kwargs) + hadronic_decays_def.decay_width_etappipipm(ma, couplings, fa, **kwargs)
     elif initial == ['alp'] and (final == sorted(['photon', 'pion', 'pion']) or final == sorted(['photon', 'pion+', 'pion-'])):
         dw = hadronic_decays_def.decay_width_gammapipi
+    elif initial == ['alp'] and final == sorted(['omega', 'omega']):
+        dw = hadronic_decays_def.decay_width_2w
     else:
         raise NotImplementedError(f'Unknown decay process {" ".join(initial)} -> {" ".join(final)}')
     
@@ -35,8 +57,49 @@ def decay_width(transition: str, ma: float, couplings: ALPcouplings, fa: float, 
 
 def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: float, br_dark: float = 0, **kwargs) -> float:
     initial, final = parse(transition)
+    # ALP decays
+    if initial == ['alp'] and final == ['electron', 'electron']:
+        br = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['e']
+    elif initial == ['alp'] and final == ['muon', 'muon']:
+        br = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['mu']
+    elif initial == ['alp'] and final == ['tau', 'tau']:
+        br = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['tau']
+    elif initial == ['alp'] and final == ['charm', 'charm']:
+        br = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['charm']
+    elif initial == ['alp'] and final == ['bottom', 'bottom']:
+        br = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['bottom']
+    elif initial == ['alp'] and final == ['photon', 'photon']:
+        br = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['2photons']
+    elif initial == ['alp'] and final == ['gluon', 'gluon']:
+        br = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['gluongluon']
+    elif initial == ['alp'] and final == ['hadrons']:
+        br = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['hadrons']
+    elif initial == ['alp'] and final == sorted(['pion0', 'pion0', 'pion0']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['pi0pi0pi0']
+    elif initial == ['alp'] and final == sorted(['pion0', 'pion+', 'pion-']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['pi0pippim']
+    elif initial == ['alp'] and final == sorted(['pion', 'pion', 'pion']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['3pis']
+    elif initial == ['alp'] and final == sorted(['eta', 'pion0', 'pion0']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['etapi0pi0']
+    elif initial == ['alp'] and final == sorted(['eta', 'pion+', 'pion-']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['etapippim']
+    elif initial == ['alp'] and final == sorted(['eta', 'pion', 'pion']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['etapipi']
+    elif initial == ['alp'] and final == sorted(['eta_prime', 'pion0', 'pion0']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['etappi0pi0']
+    elif initial == ['alp'] and final == sorted(['eta_prime', 'pion+', 'pion-']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['etappippim']
+    elif initial == ['alp'] and final == sorted(['eta_prime', 'pion', 'pion']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['etappipi']
+    elif initial == ['alp'] and final == sorted(['photon', 'pion', 'pion']) or final == sorted(['photon', 'pion+', 'pion-']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['gammapipi']
+    elif initial == ['alp'] and final == sorted(['omega', 'omega']):
+        br = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['2omega']
+    elif initial == ['alp'] and final == ['dark']:
+        br = lambda ma, couplings, fa, br_dark, **kwargs: br_dark
     #Initial resonance Upsilon (1S)
-    if initial == ['Upsilon(1S)'] and final == sorted(['photon', 'alp']):
+    elif initial == ['Upsilon(1S)'] and final == sorted(['photon', 'alp']):
         from ..constants import mUpsilon1S, BeeUpsilon1S
         br = lambda ma, couplings, fa, br_dark, **kwargs: invisible.BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, 'b', fa, **kwargs)
     elif initial == ['Upsilon(1S)'] and final == sorted(['photon', 'muon', 'muon']):

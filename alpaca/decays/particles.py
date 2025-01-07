@@ -40,6 +40,7 @@ particle_aliases = {
     'eta_prime': 'eta_prime',
     "eta'": 'eta_prime',
     'etap': 'eta_prime',
+    'omega': 'omega',
     'J/psi': 'J/psi',
     'Upsilon(1S)': 'Upsilon(1S)',
     'Y(1S)': 'Upsilon(1S)',
@@ -59,4 +60,5 @@ particle_aliases = {
     # invisible
     'invisible': 'invisible',
     'inv': 'invisible',
+    'dark': 'dark',
 }
