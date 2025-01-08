@@ -11,52 +11,72 @@ def parse(transition: str) -> tuple[list[str], list[str]]:
     final = sorted([particle_aliases[p.strip()] for p in final.split()])
     return initial, final
 
-def decay_width(transition: str, ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
+def decay_width(transition: str, ma: float, couplings: ALPcouplings, fa: float, br_dark: float = 0.0, **kwargs) -> float:
+    """ Calculate the decay width for a given transition.
+
+    Parameters
+    ----------
+    transition (str) : 
+        The particle transition in the form 'initial -> final'.
+    ma (float) :
+        The mass of the ALP.
+    couplings (ALPcouplings) :
+        The couplings of the ALP to other particles.
+    fa (float):
+        The decay constant of the ALP.
+    br_dark (float, optional):
+        The branching ratio to dark sector particles. Default is 0.0.
+    **kwargs:
+        Additional parameters for the decay width calculation.
+
+    Returns
+    -------
+    Gamma (float) :
+        The decay width for the specified transition, in GeV.
+
+    Raises
+    ------
+        NotImplementedError: If the decay process is unknown.
+    """
+    if particle_aliases.get(transition.strip()) == 'alp':
+        dw = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.total_decay_width(ma, couplings, fa, br_dark, **kwargs)['DW_tot']
+        return np.vectorize(dw)(ma, couplings, fa, br_dark, **kwargs)
     initial, final = parse(transition)
-    if initial == ['alp'] and final == ['electron', 'electron']:
-        dw = fermion_decays.decay_width_electron
-    elif initial == ['alp'] and final == ['muon', 'muon']:
-        dw = fermion_decays.decay_width_muon
-    elif initial == ['alp'] and final == ['tau', 'tau']:
-        dw = fermion_decays.decay_width_tau
-    elif initial == ['alp'] and final == ['charm', 'charm']:
-        dw = fermion_decays.decay_width_charm
-    elif initial == ['alp'] and final == ['bottom', 'bottom']:
-        dw = fermion_decays.decay_width_bottom
-    elif initial == ['alp'] and final == ['photon', 'photon']:
-        dw = gaugebosons.decay_width_2gamma
-    elif initial == ['alp'] and final == ['gluon', 'gluon']:
-        dw = gaugebosons.decay_width_2gluons
-    elif initial == ['alp'] and final == ['hadrons']:
-        dw = hadronic_decays_def.decay_width_hadrons
-    elif initial == ['alp'] and final == sorted(['pion0', 'pion0', 'pion0']):
-        dw = hadronic_decays_def.decay_width_3pi000
-    elif initial == ['alp'] and final == sorted(['pion0', 'pion+', 'pion-']):
-        dw = hadronic_decays_def.decay_width_3pi0pm
-    elif initial == ['alp'] and final == sorted(['pion', 'pion', 'pion']):
-        dw = lambda ma, couplings, fa, **kwargs: hadronic_decays_def.decay_width_3pi000(ma, couplings, fa, **kwargs) + hadronic_decays_def.decay_width_3pi0pm(ma, couplings, fa, **kwargs)
-    elif initial == ['alp'] and final == sorted(['eta', 'pion0', 'pion0']):
-        dw = hadronic_decays_def.decay_width_etapipi00
-    elif initial == ['alp'] and final == sorted(['eta', 'pion+', 'pion-']):
-        dw = hadronic_decays_def.decay_width_etapipipm
-    elif initial == ['alp'] and final == ['eta', 'pion', 'pion']:
-        dw = lambda ma, couplings, fa, **kwargs: hadronic_decays_def.decay_width_etapipi00(ma, couplings, fa, **kwargs) + hadronic_decays_def.decay_width_etapipipm(ma, couplings, fa, **kwargs)
-    elif initial == ['alp'] and final == sorted(['eta_prime', 'pion0', 'pion0']):
-        dw = hadronic_decays_def.decay_width_etappipi00
-    elif initial == ['alp'] and final == sorted(['eta_prime', 'pion+', 'pion-']):
-        dw = hadronic_decays_def.decay_width_etappipipm
-    elif initial == ['alp'] and final == ['eta_prime', 'pion', 'pion']:
-        dw = lambda ma, couplings, fa, **kwargs: hadronic_decays_def.decay_width_etappipi00(ma, couplings, fa, **kwargs) + hadronic_decays_def.decay_width_etappipipm(ma, couplings, fa, **kwargs)
-    elif initial == ['alp'] and (final == sorted(['photon', 'pion', 'pion']) or final == sorted(['photon', 'pion+', 'pion-'])):
-        dw = hadronic_decays_def.decay_width_gammapipi
-    elif initial == ['alp'] and final == sorted(['omega', 'omega']):
-        dw = hadronic_decays_def.decay_width_2w
+    # ALP decays
+    if initial == ['alp']:
+        dw = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.total_decay_width(ma, couplings, fa, br_dark, **kwargs)['DW_tot'] * branching_ratio(transition, ma, couplings, fa, br_dark, **kwargs)
     else:
         raise NotImplementedError(f'Unknown decay process {" ".join(initial)} -> {" ".join(final)}')
     
-    return np.vectorize(dw)(ma, couplings, fa, **kwargs)
+    return np.vectorize(dw)(ma, couplings, fa, br_dark, **kwargs)
 
-def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: float, br_dark: float = 0, **kwargs) -> float:
+def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: float, br_dark: float = 0.0, **kwargs) -> float:
+    """ Calculate the branching ratio for a given transition.
+
+    Parameters
+    ----------
+    transition (str) : 
+        The particle transition in the form 'initial -> final'.
+    ma (float) :
+        The mass of the ALP.
+    couplings (ALPcouplings) :
+        The couplings of the ALP to other particles.
+    fa (float):
+        The decay constant of the ALP.
+    br_dark (float, optional):
+        The branching ratio to dark sector particles. Default is 0.0.
+    **kwargs:
+        Additional parameters for the branching ratio calculation.
+
+    Returns
+    -------
+    BR (float) :
+        The branching ratio for the specified transition.
+
+    Raises
+    ------
+        NotImplementedError: If the decay process is unknown.
+    """
     initial, final = parse(transition)
     # ALP decays
     if initial == ['alp'] and tuple(final) in branching_ratios.decay_channels:
