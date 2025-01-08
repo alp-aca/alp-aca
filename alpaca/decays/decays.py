@@ -1,8 +1,9 @@
 from .mesons import invisible
-from .alp_decays import hadronic_decays_def, gaugebosons, fermion_decays, branching_ratios
+from .alp_decays import branching_ratios
 from ..rge import ALPcouplings
 from .particles import particle_aliases
 from .mesons.decays import meson_to_alp, meson_nwa
+from .ee.cross_sections import xsections as xsections_ee, xsections_nwa as xsections_nwa_ee
 import numpy as np
 
 def parse(transition: str) -> tuple[list[str], list[str]]:
@@ -19,11 +20,11 @@ def decay_width(transition: str, ma: float, couplings: ALPcouplings, fa: float, 
     transition (str) : 
         The particle transition in the form 'initial -> final'.
     ma (float) :
-        The mass of the ALP.
+        The mass of the ALP, in GeV.
     couplings (ALPcouplings) :
         The couplings of the ALP to other particles.
     fa (float):
-        The decay constant of the ALP.
+        The decay constant of the ALP, in GeV.
     br_dark (float, optional):
         The branching ratio to dark sector particles. Default is 0.0.
     **kwargs:
@@ -58,11 +59,11 @@ def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: flo
     transition (str) : 
         The particle transition in the form 'initial -> final'.
     ma (float) :
-        The mass of the ALP.
+        The mass of the ALP, in GeV.
     couplings (ALPcouplings) :
         The couplings of the ALP to other particles.
     fa (float):
-        The decay constant of the ALP.
+        The decay constant of the ALP, in GeV.
     br_dark (float, optional):
         The branching ratio to dark sector particles. Default is 0.0.
     **kwargs:
@@ -94,12 +95,43 @@ def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: flo
     return np.vectorize(br, otypes=[float])(ma, couplings, fa, br_dark, **kwargs)
 
 def cross_section(transition: str, ma: float, couplings: ALPcouplings, s: float, fa: float, br_dark=0, **kwargs) -> float:
+    """Calculate the cross section for a given transition process involving an ALP
+
+    Parameters
+    ----------
+    transition (str) :
+        The transition process in the form 'initial -> final'.
+    ma (float) :
+        The mass of the ALP, in GeV.
+    couplings (ALPcouplings) :
+        The couplings of the ALP to other particles.
+    s (float) :
+        The Mandelstam variable s, representing the square of the center-of-mass energy, in Gev^2.
+    fa (float) :
+        The decay constant of the ALP, in GeV.
+    br_dark (float, optional) :
+        The branching ratio to dark sector particles. Default is 0.
+    **kwargs:
+        Additional keyword arguments for specific cross section calculations.
+
+    Returns
+    -------
+    sigma (float) :
+        The calculated cross section for the given transition process.
+
+    Raises
+    ------
+    NotImplementedError: If the transition process is not recognized or implemented.
+    """
     initial, final = parse(transition)
-    if initial == ['electron', 'electron'] and final == sorted(['alp', 'photon']):
-        sigma = invisible.sigmaNR
-    elif initial == ['electron', 'electron'] and final == sorted(['photon', 'photon', 'photon']):
-        sigma = lambda ma, couplings, s, fa, br_dark, **kwargs: invisible.sigmaNR(ma, couplings, s, fa, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)['2photons']
+    # ee -> alp + X
+    if (tuple(initial), tuple(final)) in xsections_ee.keys():
+        sigma = xsections_ee[(tuple(initial), tuple(final))]
+    # ee -> alp + X -> final in NWA
+    elif (tuple(initial), tuple(final)) in xsections_nwa_ee.keys():
+        production, decay = xsections_nwa_ee[(tuple(initial), tuple(final))]
+        sigma = lambda ma, couplings, s, fa, br_dark, **kwargs: xsections_ee[production](ma, couplings, s, fa, br_dark, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)[decay]
     else:
         raise NotImplementedError(f'Unknown cross section process {" ".join(initial)} -> {" ".join(final)}')
     
-    return np.vectorize(sigma)(ma, couplings, s, fa, br_dark, **kwargs)
+    return np.vectorize(sigma, otypes=[float])(ma, couplings, s, fa, br_dark, **kwargs)

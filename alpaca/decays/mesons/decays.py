@@ -6,7 +6,8 @@ from ...constants import(
     mJpsi, BeeJpsi,
     GammaB, GammaB0,
 )
-from ..alp_decays.branching_ratios import decay_channels, BRsalp
+from ..nwa import transition_nwa
+from ..alp_decays.branching_ratios import decay_channels
 
 meson_to_alp = {
     ('Upsilon(1S)', ('alp', 'photon')): lambda ma, couplings, fa, br_dark, **kwargs: BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, 'b', fa, **kwargs),
@@ -19,13 +20,6 @@ meson_to_alp = {
     ('K+', ('alp', 'pion+')): lambda ma, couplings, fa, br_dark, **kwargs: Kplustopia(ma, couplings, fa, **kwargs),
     ('KL', ('alp', 'pion0')): lambda ma, couplings, fa, br_dark, **kwargs: KLtopia(ma, couplings, fa, **kwargs),
 }
-
-def transition_nwa(
-        production_channel: tuple[tuple[str], tuple[str]],
-        decay_channel: tuple[str],) -> tuple[str, tuple[str]]:
-    final = [particle for particle in production_channel[1] if particle != 'alp']
-    final += decay_channel
-    return (production_channel[0], tuple(sorted(final)))
 
 meson_nwa = {}
 for meson_process in meson_to_alp.keys():
