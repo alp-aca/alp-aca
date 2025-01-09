@@ -37,7 +37,7 @@ def cgamma_twoloops(ma: float, couplings: ALPcouplings, fa: float) -> float:
 
 def decay_width_2gamma(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
     cgamma_eff = 0
-    if couplings.basis in bases_above:
+    if ma > couplings.ew_scale:
         cc = couplings.match_run(ma, 'massbasis_above', **kwargs)
         cgamma_eff += 2*alpha_em/np.pi*cc['cW']/s2w*B2(4*mW**2/ma**2)
         cuA = cc['ku'] - cc['kU']

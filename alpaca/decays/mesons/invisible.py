@@ -3,6 +3,7 @@ import numpy as np
 from ...rge import ALPcouplings
 from ...rge.runSM import runSM
 from ...citations import citations
+from ..ee.cross_sections import sigmaNR_gammaALP
 
 def Kminustopia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **kwargs):
     from ...constants import mK, mpi_pm, g8, fpi, GammaK, GF
@@ -125,15 +126,6 @@ def B0toKsta(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mB0**3*abs(gq_eff)**2/(64*np.pi) * A0_BKst(ma**2)**2 * kallen_factor**1.5
 
-def sigmaNR(ma: float, couplings: ALPcouplings, s: float, f_a: float=1000,**kwargs):
-    citations.register_inspire('Merlo:2019anv')
-    citations.register_inspire('DiLuzio:2024jip')
-    from ...constants import hbarc2_GeV2pb
-    from ...common import alpha_em
-    coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
-    gaphoton = coup_low['cgamma']*alpha_em(np.sqrt(s))/(np.pi*f_a)
-    return hbarc2_GeV2pb*(((alpha_em(np.sqrt(s))*np.abs(gaphoton)**2)/24)*(1-(ma**2)/s)**3)
-
 def BR_Vagamma(ma: float, couplings: ALPcouplings, mV: float, BeeV: float, quark: str, f_a: float=1000, **kwargs):
     citations.register_inspire('Merlo:2019anv')
     citations.register_inspire('DiLuzio:2024jip')
@@ -165,5 +157,5 @@ def Mixed_QuarkoniaSearches(ma: float, couplings: ALPcouplings, mV: float, quark
         raise ValueError("mV must be mJpsi or mUpsilon3S")
     
     sigma_peak=sigmapeak(mV, BeeV)
-    return BR_Vagamma(ma, couplings, mV, BeeV, quark, f_a, **kwargs)+sigmaNR(ma, couplings, mV**2, f_a, **kwargs)/(Corr_Factor*sigma_peak)
+    return BR_Vagamma(ma, couplings, mV, BeeV, quark, f_a, **kwargs)+sigmaNR_gammaALP(ma, couplings, mV**2, f_a, **kwargs)/(Corr_Factor*sigma_peak)
         
