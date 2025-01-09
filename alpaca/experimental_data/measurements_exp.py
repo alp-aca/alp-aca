@@ -1037,33 +1037,41 @@ def get_measurements(transition: str, exclude_projections: bool = True) -> dict[
     """
 
     initial, final = parse(transition)
+    #Initial state B+
     if initial == ['B+'] and final == sorted(['K+', 'alp']):
         return {'Belle II': belleII_bptoknunu_lightmediator}
-    elif initial == ['B0'] and final == sorted(['K*0', 'alp']):
-        return {'BaBar': babar_btoksnunu_lightmediator}
     elif initial == ['B+'] and final == sorted(['K+', 'electron', 'electron']):
         return {'Belle II': belleII_bkee_displvertex}
-    elif initial == ['B0'] and final == sorted(['K*0', 'electron', 'electron']):
-        return {'Belle II': belleII_bks0ee_displvertex}
     elif initial == ['B+'] and final == sorted(['K+', 'muon', 'muon']):
         if exclude_projections:
             return {'LHCb': lhcb_bkmumu_displvertex, 'Belle II': belleII_bkmumu_displvertex, 'CHARM': charm_bkmumu_displvertex}
         else:
-            return {'LHCb': lhcb_bkmumu_displvertex, 'Belle II': belleII_bkmumu_displvertex, 'CHARM': charm_bkmumu_displvertex, 'NA62': na62proj_bkmumu_displvertex, 'SHiP': shipproj_bkmumu_displvertex}
-    elif initial == ['B0'] and final == sorted(['K*0', 'muon', 'muon']):
-        return {'LHCb': lhcb_bks0mumu_displvertex, 'Belle II': belleII_bks0mumu_displvertex}
-    elif initial == ['B+'] and final == sorted(['K+', 'photon', 'photon']):
-        return {'BaBar': babar_bkphotons_displvertex}
+            return {'LHCb': lhcb_bkmumu_displvertex, 'Belle II': belleII_bkmumu_displvertex, 'CHARM': charm_bkmumu_displvertex, 'NA62': na62proj_bkmumu_displvertex, 'SHiP': shipproj_bkmumu_displvertex}  
     elif initial == ['B+'] and final == sorted(['K+', 'tau', 'tau']):
         return {'BaBar': babar_bktautau}
+    elif initial == ['B+'] and final == sorted(['K+', 'photon', 'photon']):
+        return {'BaBar': babar_bkphotons_displvertex}
+    elif initial == ['B+'] and final == sorted(['K+', 'pion+', 'pion-', 'pion0']):
+        return {'Belle': belle_bpKomega3pi}
+    elif initial == ['B+'] and final == sorted(['K+', 'eta', 'pion+', 'pion-']):
+        return {'BaBar': babar_BKetapipi}
+    #Initial state B0
+    elif initial == ['B0'] and final == sorted(['K*0', 'alp']):
+        return {'BaBar': babar_btoksnunu_lightmediator}
+    elif initial == ['B0'] and final == sorted(['K*0', 'electron', 'electron']):
+        return {'Belle II': belleII_bks0ee_displvertex}
+    elif initial == ['B0'] and final == sorted(['K*0', 'muon', 'muon']):
+        return {'LHCb': lhcb_bks0mumu_displvertex, 'Belle II': belleII_bks0mumu_displvertex}
     elif initial == ['B0'] and final == sorted(['K*0', 'tau', 'tau']):
         return {'Belle': belle_B0toK0stautau}
+    elif initial == ['B0'] and final == sorted(['K0', 'pion+', 'pion-', 'pion0']):
+        return {'Belle': belle_b0Komega3pi}
+    #Initial state Upsilon(3S)
     elif initial == ['Upsilon(3S)'] and final == sorted(['photon', 'tau', 'tau']):
         return {'BaBar': babar_Y3S_tautau}
+    #Initial state K+
     elif initial == ['K+'] and final == sorted(['pion+', 'alp']):
-        return {'NA62': na62_Ktopiinv}
-    elif initial == ['KL'] and final == sorted(['pion0', 'alp']):
-        return {'KOTO': koto_kltopi0inv}
+        return {'NA62': na62_Ktopiinv}    
     #elif initial == ['K+'] and final == sorted(['pion+', 'photon', 'photon']):
     #    return {'NA62+NA48/2': na62na48_kpigammagamma}
     elif initial == ['K+'] and final == sorted(['muon', 'muon', 'pion+']):
@@ -1072,11 +1080,8 @@ def get_measurements(transition: str, exclude_projections: bool = True) -> dict[
         return {'MicroBooNE': microboone_Kpiee}
     elif initial == ['K+'] and final == sorted(['photon', 'photon', 'pion+']):
         return {'E787': e787_Ktopigammagamma}
-    elif initial == ['B+'] and final == sorted(['K+', 'pion+', 'pion-', 'pion0']):
-        return {'Belle': belle_bpKomega3pi}
-    elif initial == ['B0'] and final == sorted(['K0', 'pion+', 'pion-', 'pion0']):
-        return {'Belle': belle_b0Komega3pi}
-    elif initial == ['B+'] and final == sorted(['K+', 'eta', 'pion+', 'pion-']):
-        return {'BaBar': babar_BKetapipi}
+    #Initial state KL
+    elif initial == ['KL'] and final == sorted(['pion0', 'alp']):
+        return {'KOTO': koto_kltopi0inv}
     else:
         raise KeyError(f"No measurements for {transition}")
