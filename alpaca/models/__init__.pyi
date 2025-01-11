@@ -1,4 +1,5 @@
 from .model_library import (
+    ModelBase as ModelBase,
     model as model,
     KSVZ_model as KSVZ_model,
     fermion as fermion,

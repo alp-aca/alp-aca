@@ -19,18 +19,73 @@ Qdquarks = family_universal(-1/3)
 
 couplings_latex = {'cg': r'c_g', 'cB': 'c_B', 'cW': 'c_W', 'cqL': r'c_{q_L}', 'cuR': r'c_{u_R}', 'cdR': r'c_{d_R}', 'clL': r'c_{\ell_L}', 'ceR': r'c_{e_R}'}
 class ModelBase:
+    """
+    Base class representing a UV model with couplings to ALPs.
+    Specific models should inherit from this class and implement the couplings.
+
+    Attributes
+    ----------
+    model_name : str
+        The name of the model.
+    couplings : dict[str, sp.Expr]
+        A dictionary with the couplings of the model.
+
+    Methods
+    -------
+    get_couplings(substitutions: dict[sp.Expr, float | complex], scale: float) -> ALPcouplings
+        Returns the couplings of the model with numerical values.
+    couplings_latex(nonumber: bool = False) -> str
+        Returns the couplings of the model in LaTeX format.
+    E_over_N() -> sp.Rational
+        Returns the ratio E/N for the model.
+    """
     def __init__(self, model_name: str):
+        """ Intialize an empty model with the given name."""
         self.model_name = model_name
-        self.couplings = {}
+        self.couplings: dict[str, sp.Expr] = {}
     
-    def get_couplings(self, substitutions: dict, scale: float) -> ALPcouplings:
-        # Substitute the symbolic variables with numerical values directly into the couplings
+    def get_couplings(self,
+                      substitutions: dict[sp.Expr, float | complex],
+                      scale: float,
+                      ew_scale: float = 100.0
+                      ) -> ALPcouplings:
+        """Substitute the symbolic variables with numerical values directly into the couplings
+
+        Arguments
+        ---------
+        substitutions : dict[sp.Expr, float | complex]
+            A dictionary with the values to substitute in the couplings.
+        scale : float
+            The scale at which the couplings are evaluated, in GeV.
+        ew_scale : float
+            The electroweak scale, in GeV. Default is 100.0 GeV.
+
+        Returns
+        -------
+        ALPcouplings
+            The couplings of the model with numerical values.
+        """
         substituted_couplings = {key: float(value.subs(substitutions)) for key, value in self.couplings.items()}
-        return ALPcouplings(substituted_couplings, scale, 'derivative_above')
+        return ALPcouplings(substituted_couplings, scale, 'derivative_above', ew_scale)
     
-    def couplings_latex(self, nonumber: bool = False) -> str:
+    def couplings_latex(self, eqnumber: bool = False) -> str:
+        """Return the couplings of the model in LaTeX format.
+
+        The couplings are returned inside an align environment,
+        one coupling per line, aligned at the = sign.
+
+        Arguments
+        ---------
+        eqnumber : bool
+            If True, the align environment will number the lines. Default is False.
+
+        Returns
+        -------
+        str
+            The couplings of the model in LaTeX format.
+        """
         latex = r'\begin{align}' + '\n'
-        if nonumber:
+        if eqnumber:
             nn = ''
         else:
             nn = r' \nonumber '
@@ -39,13 +94,44 @@ class ModelBase:
         return latex + r'\end{align}'
     
     def E_over_N(self) -> sp.Rational:
-        if self.couplings['cg'] == 0:
+        """Return the ratio E/N for the model relating the electromagnetic and QCD anomalies.
+
+        Returns
+        -------
+        sp.Rational
+            The ratio E/N for the model.
+        
+        Raises
+        ------
+        ZeroDivisionError
+            If the coupling cg is zero.
+        """
+        if self.couplings.get('cg', 0) == 0:
             raise ZeroDivisionError('cg = 0')
         cgamma = self.couplings['cB'] + self.couplings['cW']
         return sp.Rational(sp.simplify(cgamma/self.couplings['cg'])).limit_denominator()
 
-class model(ModelBase): 
-    def __init__(self, model_name: str, charges: dict, nonuniversal: bool = False):
+class model(ModelBase):
+    """A class to define a model given the PQ charges of the SM fermions.
+
+    """
+    def __init__(self, model_name: str, charges: dict[str, sp.Expr], nonuniversal: bool = False):
+        """Initialize the model with the given name and PQ charges.
+
+        Arguments
+        ---------
+        model_name : str
+            The name of the model.
+        charges : dict[str, sp.Expr]
+            A dictionary with the PQ charges of the SM fermions. The keys are the names of the fermions in the unbroken phase: 'cqL', 'cuR', 'cdR', 'clL', 'ceR'.
+        nonuniversal : bool
+            If True, the model will have non-universal couplings. Default is False. Non-universal couplings are not implemented yet.
+
+        Raises
+        ------
+        NotImplementedError
+            If nonuniversal is True.
+        """
         super().__init__(model_name)
         charges = {f: 0 for f in ['lL', 'eR', 'qL', 'uR', 'dR']} | charges # initialize to zero all missing charges
         self.charges = {key: sp.sympify(value) for key, value in charges.items()}  # Convert all values to sympy objects
@@ -115,7 +201,17 @@ class fermion:
         self.PQ = PQ
 
 class KSVZ_model(ModelBase):
+    """A class to define the KSVZ-like models given the new heavy fermions."""
     def __init__(self, model_name: str, fermions: list[fermion]):
+        """Initialize the KSVZ-like model with the given name and heavy fermions.
+        
+        Arguments
+        ---------
+        model_name : str
+            The name of the model.
+        fermions : list[fermion]
+            A list with the heavy fermions of the model.
+        """
         super().__init__(model_name)
         self.couplings['cg']=sum(f.PQ * f.weak_isospin_dim * f.dynkin_index_color for f in fermions)
         self.couplings['cB']=sum(f.PQ * f.color_dim * f.weak_isospin_dim * f.hypercharge**2 for f in fermions)
@@ -125,10 +221,17 @@ class KSVZ_model(ModelBase):
 # Benchmark Models
 
 beta = sp.symbols('beta')
+"""Symbol representing the angle beta in the DFSZ-like models."""
 KSVZ_charge = sp.symbols(r'\mathcal{X}')
+"""Symbol representing the PQ charge of the heavy fermions in the KSVZ-like models."""
 
 QED_DFSZ= model('QED-DFSZ', {'lL': 2*sp.cos(beta)**2, 'uR': -2*sp.sin(beta)**2, 'dR': 2*sp.sin(beta)**2})
+"""QED-DFSZ: A DFSZ-like model with couplings to leptons and quarks that does not generate a QCD anomaly."""
 u_DFSZ= model('u-DFSZ', {'lL': 2*sp.cos(beta)**2, 'uR': -2*sp.sin(beta)**2})
+"""u-DFSZ: A DFSZ-like model with couplings to leptons and up-type quarks."""
 d_DFSZ= model('d-DFSZ', {'lL': 2*sp.cos(beta)**2, 'dR': 2*sp.sin(beta)**2})
+"""d-DFSZ: A DFSZ-like model with couplings to leptons and down-type quarks."""
 Q_KSVZ=KSVZ_model('Q-KSVZ', [fermion(3,1,0,KSVZ_charge)])
+"""Q-KSVZ: A KSVZ-like model with a heavy vector-like quark."""
 L_KSVZ=KSVZ_model('L-KSVZ', [fermion(1,2,0,KSVZ_charge)])
+"""L-KSVZ: A KSVZ-like model with a heavy vector-like lepton."""

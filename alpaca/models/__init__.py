@@ -4,6 +4,9 @@ This module contains the classes to define the UV models.
 
 Classes
 -------
+ModelBase :
+    A base class to define a model which generates couplings to ALPs.
+
 model :
     A class to define a model given the PQ charges of the SM fermions.
 
