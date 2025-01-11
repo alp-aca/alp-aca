@@ -8,6 +8,8 @@ from . import bases_above, bases_below
 from functools import cache
 from json import JSONEncoder, JSONDecoder
 from sympy import Expr, Matrix
+from os import PathLike
+from io import TextIOBase
 
 numeric = (int, float, complex, Expr)
 matricial = (np.ndarray, np.matrix, Matrix, list)
@@ -442,41 +444,67 @@ class ALPcouplings:
         values = {k[:-3]: unflatten(np.array(data['values'][k]) + 1j*np.array(data['values'][k[:-3]+'_Im'])) for k in data['values'] if k[-3:] == '_Re'}
         return ALPcouplings(values, data['scale'], data['basis'], data.get('ew_scale', 100.0))
     
-    def save(self, filename: str):
+    def save(self, file: str | PathLike | TextIOBase) -> None:
         """Save the object to a JSON file.
 
         Parameters
         ----------
-        filename : str
-            Name of the file where the object will be saved.
+        file : str | PathLike | TextIOBase
+            Name of the file, or object, where the object will be saved.
         """
-        with open(filename, 'wt') as f:
-            f.write(ALPcouplingsEncoder().encode(self))
+        if isinstance(file, TextIOBase):
+            file.write(ALPcouplingsEncoder().encode(self))
+        else:
+            with open(file, 'wt') as f:
+                f.write(ALPcouplingsEncoder().encode(self))
 
     @classmethod
-    def load(cls, filename: str) -> 'ALPcouplings':
+    def load(cls, file: str | PathLike | TextIOBase) -> 'ALPcouplings':
         """Load the object from a JSON file.
 
         Parameters
         ----------
-        filename : str
-            Name of the file where the object is saved.
+        file : str | PathLike | TextIOBase
+            Name of the file, or object, where the object is saved.
 
         Returns
         -------
         a : ALPcouplings
             Object loaded from the file.
         """
-        with open(filename, 'rt') as f:
+        if isinstance(file, TextIOBase):
+            return ALPcouplingsDecoder().decode(file.read())
+        with open(file, 'rt') as f:
             return ALPcouplingsDecoder().decode(f.read())
 
 class ALPcouplingsEncoder(JSONEncoder):
+    """ JSON encoder for ALPcouplings objects and structures containing them.
+     
+    Usage
+    -----
+    >>> import json
+    >>> from alpaca import ALPcouplings, ALPcouplingsEncoder
+
+    >>> a = ALPcouplings({'cg': 1.0}, 1e3, 'derivative_above')
+    >>> with open('file.json', 'wt') as f:
+    ...     json.dump(a, f, cls=ALPcouplingsEncoder)
+     """
     def default(self, o):
         if isinstance(o, ALPcouplings):
             return {'__class__': 'ALPcouplings'} | o.to_dict()
         return super().default(o)
     
 class ALPcouplingsDecoder(JSONDecoder):
+    """ JSON decoder for ALPcouplings objects and structures containing them.
+
+    Usage
+    -----
+    >>> import json
+    >>> from alpaca import ALPcouplingsDecoder
+
+    >>> with open('file.json', 'rt') as f:
+    ...     a = json.load(f, cls=ALPcouplingsDecoder)
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(object_hook=self.object_hook, *args, **kwargs)
     
