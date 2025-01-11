@@ -2,7 +2,7 @@
 name = "alpaca"
 version = "0.1.0"
 description = "The ALP Automatic Computing Algorithm"
-authors = ["Jorge-Alda <jorge.alda@pd.infn.it>"]
+authors = ["Jorge Alda <jorge.alda@pd.infn.it>", "Marta Fuentes Zamoro <marta.zamoro@uam.es>", "Luca Merlo <luca.merlo@uam.es>", "Xavier Ponce Díaz <xavier.poncediaz@unibas.ch>", "Stefano Rigolin <stefano.rigolin@pd.infn.it>"]
 license = "MIT"
 readme = "README.md"
 
@@ -13,6 +13,7 @@ vegas = "^6.1.1"
 requests = "^2.32.3"
 sympy = "1.13.3"
 scipy = "<1.15"
+lazy-loader = "^0.4"
 
 [tool.poetry.group.tutorial]
 optional = true
