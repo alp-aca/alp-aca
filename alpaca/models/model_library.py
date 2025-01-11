@@ -9,13 +9,6 @@ from . import su3
 
 import sympy as sp
 
-# Create a diagonal matrix
-def family_universal(charge):
-    return np.diag(np.full(3, charge))
-
-Qleptons = family_universal(-1)
-Ququarks = family_universal(2/3)
-Qdquarks = family_universal(-1/3)
 
 couplings_latex = {'cg': r'c_g', 'cB': 'c_B', 'cW': 'c_W', 'cqL': r'c_{q_L}', 'cuR': r'c_{u_R}', 'cdR': r'c_{d_R}', 'clL': r'c_{\ell_L}', 'ceR': r'c_{e_R}'}
 class ModelBase:
@@ -90,7 +83,12 @@ class ModelBase:
         else:
             nn = r' \nonumber '
         for ck, cv in self.couplings.items():
-            latex += couplings_latex[ck] + ' &= ' + sp.latex(cv) + nn + r'\\'  + '\n'
+            if not np.any(np.array(cv)):
+                continue
+            if np.array(cv).shape == ():
+                latex += couplings_latex[ck] + ' &= ' + sp.latex(cv) + nn + r'\\' + '\n'
+            else:
+                latex += couplings_latex[ck] + ' &= ' + sp.latex(sp.Matrix(cv), mat_delim='(') + nn + r'\\'  + '\n'
         return latex + r'\end{align}'
     
     def E_over_N(self) -> sp.Rational:
@@ -115,7 +113,7 @@ class model(ModelBase):
     """A class to define a model given the PQ charges of the SM fermions.
 
     """
-    def __init__(self, model_name: str, charges: dict[str, sp.Expr], nonuniversal: bool = False):
+    def __init__(self, model_name: str, charges: dict[str, sp.Expr]):
         """Initialize the model with the given name and PQ charges.
 
         Arguments
@@ -124,8 +122,6 @@ class model(ModelBase):
             The name of the model.
         charges : dict[str, sp.Expr]
             A dictionary with the PQ charges of the SM fermions. The keys are the names of the fermions in the unbroken phase: 'cqL', 'cuR', 'cdR', 'clL', 'ceR'.
-        nonuniversal : bool
-            If True, the model will have non-universal couplings. Default is False. Non-universal couplings are not implemented yet.
 
         Raises
         ------
@@ -136,16 +132,21 @@ class model(ModelBase):
         charges = {f: 0 for f in ['lL', 'eR', 'qL', 'uR', 'dR']} | charges # initialize to zero all missing charges
         self.charges = {key: sp.sympify(value) for key, value in charges.items()}  # Convert all values to sympy objects
         
-        if nonuniversal:
-            raise NotImplementedError('function not implemented... yet...')
-        else:
-            for f in ['qL', 'uR', 'dR', 'lL', 'eR']:
+        charges_np = {key: np.broadcast_to(value, 3) for key, value in charges.items()}  # Convert all values to numpy arrays
+        for f in ['qL', 'uR', 'dR', 'lL', 'eR']:
+            if np.array(self.charges[f]).shape == ():
                 self.couplings[f'c{f}'] = -self.charges[f]
-            self.couplings['cg'] = sp.Rational(1,2) * sp.simplify(np.trace(
-                2 * family_universal(self.charges['qL']) - family_universal(self.charges['dR']) - family_universal(self.charges['uR'])
-            ))
-            self.couplings['cW'] = sp.Rational(1,2) * sp.simplify(np.trace(3 * family_universal(self.charges['qL']) + family_universal(self.charges['lL'])))
-            self.couplings['cB'] = sp.Rational(1,6) * sp.simplify(np.trace(family_universal(self.charges['qL']) - 8 * family_universal(self.charges['uR']) - 2 * family_universal(self.charges['dR']) + 3 * family_universal(self.charges['lL']) - 6 * family_universal(self.charges['eR'])))
+            else:
+                self.couplings[f'c{f}'] = - np.diag(charges_np[f])
+        self.couplings['cg'] = sp.Rational(1,2) * sp.simplify(np.sum(
+            2 * charges_np['qL'] - charges_np['dR'] - charges_np['uR']
+        ))
+        self.couplings['cW'] = sp.Rational(1,2) * sp.simplify(np.sum(
+            3 * charges_np['qL'] + charges_np['lL']
+        ))
+        self.couplings['cB'] = sp.Rational(1,6) * sp.simplify(np.sum(
+            charges_np['qL'] - 8 * charges_np['uR'] - 2 * charges_np['dR'] + 3 * charges_np['lL'] - 6 * charges_np['eR']
+        ))
 
 
 class fermion:
