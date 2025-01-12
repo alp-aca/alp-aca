@@ -77,19 +77,20 @@ class ModelBase:
         str
             The couplings of the model in LaTeX format.
         """
-        latex = r'\begin{align}' + '\n'
         if eqnumber:
             nn = ''
         else:
             nn = r' \nonumber '
+        eqs = []
         for ck, cv in self.couplings.items():
             if not np.any(np.array(cv)):
-                continue
+                continue # Skip coefficients equal to zero
             if np.array(cv).shape == ():
-                latex += couplings_latex[ck] + ' &= ' + sp.latex(cv) + nn + r'\\' + '\n'
+                eqs.append(couplings_latex[ck] + ' &= ' + sp.latex(cv) + nn)
             else:
-                latex += couplings_latex[ck] + ' &= ' + sp.latex(sp.Matrix(cv), mat_delim='(') + nn + r'\\'  + '\n'
-        return latex + r'\end{align}'
+                eqs.append(couplings_latex[ck] + ' &= ' + sp.latex(sp.Matrix(cv), mat_delim='(') + nn)
+        linebreak = r'\\' + '\n'
+        return r'\begin{align}' + '\n' + linebreak.join(eqs) + '\n' + r'\end{align}'
     
     def E_over_N(self) -> sp.Rational:
         """Return the ratio E/N for the model relating the electromagnetic and QCD anomalies.
