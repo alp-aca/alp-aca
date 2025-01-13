@@ -1,4 +1,5 @@
 from .invisible import *
+from .visible import *
 from ...constants import(
     mUpsilon1S, BeeUpsilon1S,
     mUpsilon3S,
@@ -31,3 +32,12 @@ meson_nwa = {}
 for meson_process in meson_to_alp.keys():
     for channel in decay_channels:
         meson_nwa[transition_nwa(meson_process, channel)] = (meson_process, channel)
+
+meson_mediated = {
+    ('Bs', ('electron', 'electron')): lambda ma, couplings, fa, br_dark, **kwargs: BR_Bs_leptons_ALP('e', ma, couplings, fa, br_dark, **kwargs),
+    ('Bs', ('muon', 'muon')): lambda ma, couplings, fa, br_dark, **kwargs: BR_Bs_leptons_ALP('mu', ma, couplings, fa, br_dark, **kwargs),
+    ('Bs', ('tau', 'tau')): lambda ma, couplings, fa, br_dark, **kwargs: BR_Bs_leptons_ALP('tau', ma, couplings, fa, br_dark, **kwargs),
+    ('B0', ('electron', 'electron')): lambda ma, couplings, fa, br_dark, **kwargs: BR_Bd_leptons_ALP('e', ma, couplings, fa, br_dark, **kwargs),
+    ('B0', ('muon', 'muon')): lambda ma, couplings, fa, br_dark, **kwargs: BR_Bd_leptons_ALP('mu', ma, couplings, fa, br_dark, **kwargs),
+    ('B0', ('tau', 'tau')): lambda ma, couplings, fa, br_dark, **kwargs: BR_Bd_leptons_ALP('tau', ma, couplings, fa, br_dark, **kwargs),
+}

@@ -151,3 +151,6 @@ sigmaW_BESIII = Constant(3.686*5e-4, 'Song:2022umk')
 g8 = Constant(3.61, 'Cirigliano:2011ny')
 epsilonKaon = Constant(2.228e-3, 'ParticleDataGroup:2024cfk')
 phiepsilonKaon = Constant(43.52/180*np.pi, 'ParticleDataGroup:2024cfk')
+
+# Mixing effects in Bs decays
+DeltaGamma_Bs = Constant(pars['DeltaGamma/Gamma_Bs'], 'Straub:2018kue')

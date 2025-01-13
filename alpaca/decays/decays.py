@@ -2,7 +2,7 @@ from .mesons import invisible
 from .alp_decays import branching_ratios
 from ..rge import ALPcouplings
 from .particles import particle_aliases
-from .mesons.decays import meson_to_alp, meson_nwa
+from .mesons.decays import meson_to_alp, meson_nwa, meson_mediated
 from .ee.cross_sections import xsections as xsections_ee, xsections_nwa as xsections_nwa_ee
 import numpy as np
 
@@ -89,6 +89,9 @@ def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: flo
     elif len(initial) == 1 and (initial[0], tuple(final)) in meson_nwa.keys():
         meson_process, channel = meson_nwa[(initial[0], tuple(final))]
         br = lambda ma, couplings, fa, br_dark, **kwargs: meson_to_alp[meson_process](ma, couplings, fa, br_dark, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)[channel]
+    # Meson decays mediated by off-shell ALP
+    elif len(initial) == 1 and (initial[0], tuple(final)) in meson_mediated.keys():
+        br = meson_mediated[(initial[0], tuple(final))]
     else:
         raise NotImplementedError(f'Unknown branching ratio process {" ".join(initial)} -> {" ".join(final)}')
     

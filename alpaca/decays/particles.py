@@ -66,6 +66,7 @@ particle_aliases = {
     'B+': 'B+',
     'B-': 'B-',
     'B0': 'B0',
+    'Bs': 'Bs',
     # invisible
     'invisible': 'invisible',
     'inv': 'invisible',
