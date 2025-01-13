@@ -53,7 +53,7 @@ def _total_decay_width (ma, couplings: ALPcouplings, fa, br_dark = 0.0, **kwargs
     DW_gammapipi = decay_width_gammapipi(ma, couplings, fa, **kwargs)
     DW_gluongluon = decay_width_2gluons(ma, couplings, fa, **kwargs_nointegral)
     DW_2photons = decay_width_2gamma(ma, couplings, fa, **kwargs_nointegral)
-    DW_sm = DW_elec+DW_muon+DW_tau+DW_charm+DW_bottom+DW_3pis+DW_etapipi*int(ma<2.0)+DW_etapipi*int(ma<2.0)+DW_gammapipi*int(ma<2.0)+DW_2w*int(ma<2.0)+DW_gluongluon*int(ma>2.0)+DW_2photons+DW_2w*int(ma<2.0)
+    DW_sm = DW_elec+DW_muon+DW_tau+DW_charm+DW_bottom+DW_3pis+DW_etapipi*int(ma<2.0)+DW_etappipi*int(ma<2.0)+DW_gammapipi*int(ma<2.0)+DW_2w*int(ma<2.0)+DW_gluongluon*int(ma>2.0)+DW_2photons+DW_2w*int(ma<2.0)
     if br_dark > 0.0:
         DW_dark = DW_sm/(1-br_dark)*br_dark
     else:
