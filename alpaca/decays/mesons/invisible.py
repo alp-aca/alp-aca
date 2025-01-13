@@ -59,11 +59,12 @@ def Kplustopia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **
     amp = N8*chiral_contrib/(4*f_a)-(mK**2-mpi_pm**2)/(2*f_a)*(coupl_low['kd'][1,0]+coupl_low['kD'][1,0])
     return np.abs(amp)**2/(16*np.pi*mK)*np.sqrt(kallen(1, mpi_pm**2/mK**2, ma**2/mK**2))/GammaK
 
-def KLtopia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **kwargs):
-    from ...constants import mKL, mpi0, g8, fpi, epsilonKaon, phiepsilonKaon, GammaKL, GF
-    from ... common import kallen
+def ampK0topia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **kwargs):
+    from ...constants import mKL, mpi0, g8, fpi, GF, mu, md, ms
     if ma > mKL-mpi0:
         return 0
+    B0 = mpi0**2/(mu+md)
+    mK = np.sqrt(B0*(ms+mu/2+md/2))
     citations.register_inspire('Bauer:2021mvw')
     coupl_low = couplings.match_run(ma, 'kF_below', **kwargs)
     cg = coupl_low['cg']
@@ -77,18 +78,32 @@ def KLtopia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **kwa
     parsSM = runSM(ma)
     Vckm = parsSM['CKM']
     N8 = -g8*GF/np.sqrt(2)*np.conj(Vckm[0,0])*Vckm[0,1]*fpi**2*(np.cos(delta8)+1j*np.sin(delta8))
-    eps = epsilonKaon*(np.cos(phiepsilonKaon)+1j*np.sin(phiepsilonKaon))
 
-    chiral_contrib = 16*cg*(mKL**2-mpi0**2)*(mKL**2-ma**2)/(4*mKL**2-mpi0**2-3*ma**2)
-    chiral_contrib -= 2*(cuu+cdd-2*css)*ma**2*(mKL**2-ma**2)/(4*mKL**2-mpi0**2-3*ma**2)
-    chiral_contrib += (3*cdd+css)*(mKL**2-mpi0**2)+(2*cuu-cdd-css)*ma**2
-    chiral_contrib -= 2*(cuu-cdd)*ma**2*(mKL**2-ma**2)/(mpi0**2-ma**2)
-    chiral_contrib += (kd+kD-ks-kS)*(mKL**2+mpi0**2-ma**2)
+    chiral_contrib = 16*cg*(mK**2-mpi0**2)*(mK**2-ma**2)/(4*mK**2-mpi0**2-3*ma**2)
+    chiral_contrib -= 2*(cuu+cdd-2*css)*ma**2*(mK**2-ma**2)/(4*mK**2-mpi0**2-3*ma**2)
+    chiral_contrib += (3*cdd+css)*(mK**2-mpi0**2)+(2*cuu-cdd-css)*ma**2
+    chiral_contrib -= 2*(cuu-cdd)*ma**2*(mK**2-ma**2)/(mpi0**2-ma**2)
+    chiral_contrib += (kd+kD-ks-kS)*(mK**2+mpi0**2-ma**2)
 
     amp_K0bar = N8*chiral_contrib/(4*f_a*2**0.5)-(mKL**2-mpi0**2)/(2*f_a*2**0.5)*(coupl_low['kd'][0,1]+coupl_low['kD'][0,1])
     amp_K0 = -N8*chiral_contrib/(4*f_a*2**0.5)+(mKL**2-mpi0**2)/(2*f_a*2**0.5)*(coupl_low['kd'][1,0]+coupl_low['kD'][1,0])
+    return (amp_K0, amp_K0bar)
+
+def KLtopia(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
+    from ...constants import mKL, mpi0, epsilonKaon, phiepsilonKaon, GammaKL
+    from ... common import kallen
+    amp_K0, amp_K0bar = ampK0topia(ma, couplings, f_a, **kwargs)
+    eps = epsilonKaon*(np.cos(phiepsilonKaon)+1j*np.sin(phiepsilonKaon))
     amp = ((1+eps)*amp_K0+(1-eps)*amp_K0bar)/np.sqrt(2*(1+np.abs(eps)**2))
     return np.abs(amp)**2/(16*np.pi*mKL)*np.sqrt(kallen(1, mpi0**2/mKL**2, ma**2/mKL**2))/GammaKL
+
+def KStopia(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
+    from ...constants import mKS, mpi0, epsilonKaon, phiepsilonKaon, GammaKS
+    from ... common import kallen
+    amp_K0, amp_K0bar = ampK0topia(ma, couplings, f_a, **kwargs)
+    eps = epsilonKaon*(np.cos(phiepsilonKaon)+1j*np.sin(phiepsilonKaon))
+    amp = ((1+eps)*amp_K0-(1-eps)*amp_K0bar)/np.sqrt(2*(1+np.abs(eps)**2))
+    return np.abs(amp)**2/(16*np.pi*mKS)*np.sqrt(kallen(1, mpi0**2/mKS**2, ma**2/mKS**2))/GammaKS
 
 def BtoKa(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     from ...constants import mK, mB
@@ -125,6 +140,30 @@ def B0toKsta(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     kallen_factor = kallen(1, mKst0**2/mB0**2, ma**2/mB0**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mB0**3*abs(gq_eff)**2/(64*np.pi) * A0_BKst(ma**2)**2 * kallen_factor**1.5
+
+def Btopia(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
+    from ...constants import mpi_pm, mB
+    from ...common import f0_Bpi, kallen
+    if ma > mB-mpi_pm:
+        return 0
+    citations.register_inspire('Bauer:2021mvw')
+    coup_low = couplings.match_run(ma, 'VA_below', **kwargs)
+    gq_eff = coup_low['cdV'][0,2]/f_a
+    kallen_factor = kallen(1, mpi_pm**2/mB**2, ma**2/mB**2)
+    kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
+    return mB**3*abs(gq_eff)**2/(64*np.pi) * f0_Bpi(ma**2)**2*np.sqrt(kallen_factor)*(1-mpi_pm**2/mB**2)**2
+
+def B0topia(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
+    from ...constants import mpi0, mB0
+    from ...common import f0_Bpi, kallen
+    if ma > mB0-mpi0:
+        return 0
+    citations.register_inspire('Bauer:2021mvw')
+    coup_low = couplings.match_run(ma, 'VA_below', **kwargs)
+    gq_eff = coup_low['cdV'][0,2]/f_a
+    kallen_factor = kallen(1, mpi0**2/mB0**2, ma**2/mB0**2)
+    kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
+    return mB0**3*abs(gq_eff)**2/(128*np.pi) * f0_Bpi(ma**2)**2*np.sqrt(kallen_factor)*(1-mpi0**2/mB0**2)**2
 
 def BR_Vagamma(ma: float, couplings: ALPcouplings, mV: float, BeeV: float, quark: str, f_a: float=1000, **kwargs):
     citations.register_inspire('Merlo:2019anv')
