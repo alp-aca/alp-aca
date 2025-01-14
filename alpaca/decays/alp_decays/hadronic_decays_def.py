@@ -366,7 +366,7 @@ def ampatoetappipi(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs):
     af0 = (7.3)**2* aetapf0* papeta* ppi1ppi2* bw(mpi1pi2**2, mf0, Gammaf0, 0)*ffunction(ma) 
 
     #a-> a0 (Eq.S51)
-    aa0 = (13)**2* api0a0p* ffunction(ma)* (pappi2* petappi1*bw(metapi1**2, ma0, Gammaa0, 0) + pappi1* petappi2* bw(metapi2, ma0, Gammaa0,0)) 
+    aa0 = (13)**2* api0a0p* 1.2* ffunction(ma)* (pappi2* petappi1*bw(metapi1**2, ma0, Gammaa0, 0) + pappi1* petappi2* bw(metapi2, ma0, Gammaa0,0)) 
 
     #a-> f2 (Eq.)
     af2 = (16)**2* aetapf2* (petaqpipi**2 - 1/3*qpipi2*(m3**2+ petappipi**2/ppi1ppi2**2- 2*petappipi**2/ppi1ppi2**2))*\
