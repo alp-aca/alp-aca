@@ -4,7 +4,7 @@ import numpy as np
 from scipy.stats import chi2
 from ..citations import citations
 from ..constants import mUpsilon3S
-from .classes import MeasurementBase, MeasurementConstantBound, MeasurementInterpolatedBound, MeasurementInterpolated, MeasurementDisplacedVertexBound, MeasurementBinned, rmax_belle, rmax_besIII
+from .classes import MeasurementBase, MeasurementConstantBound, MeasurementInterpolatedBound, MeasurementInterpolated, MeasurementDisplacedVertexBound, MeasurementBinned, rmax_belle, rmax_besIII, MeasurementConstant
 from ..decays.particles import particle_aliases
 from ..decays.decays import parse
 from ..constants import mB, mB0, mBs, mK, mtau, mKst0, mKL, mpi0, mpi_pm
@@ -702,48 +702,67 @@ def cms_BchargedtoKchargedmumu(x):
     values, sigmals, sigmars = bin_selection(x**2, q2min, q2max, value, sigmal, sigmar)
     return values, sigmals, sigmars
 
-#LHCb Bs->mu mu
-    #Experiment: LHCb
-    #arXiv: 1703.05747
-    #Branching ratio
-def lhcb_Bstomumu(x):
-    citations.register_inspire('LHCb:2017rmj')
-    q2min = [5.320]
-    q2max = [6.0]
-    value = [3.0e-9]
-    sigmal = [np.sqrt((0.6)**2+(0.3)**2)*1e-9]
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmal)
-    return values, sigmals, sigmars
+cms_Bstomumu = MeasurementConstant(
+    'CMS:2022mgd',
+    'flat',
+    3.83e-9,
+    np.sqrt(0.36**2+0.21**2)*1e-9,
+    np.sqrt(0.38**2+0.24**2)*1e-9,
+    max_ma=np.inf
+)
 
-#Combo Bs->mu mu
-    #Experiment: LHCb + ATLAS + CMS
-    #arXiv: LHCb-CONF-2020-002,CMS PAS BPH-20-003, ATLAS-CONF-2020-049
-    #Branching ratio
-def combo_Bstomumu(x):
-    citations.register_inspire('ATLAS:2020acx')
-    q2min = [5.367]
-    q2max = [6.0]
-    value = [2.69e-9]
-    sigmal = [0.35e-9]
-    sigmar = [0.37e-9]
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmar)
-    return values, sigmals, sigmars
+cms_B0tomumu = MeasurementConstantBound(
+    'CMS:2022mgd',
+    'flat',
+    1.9e-10,
+    max_ma=np.inf,
+    conf_level=0.95
+)
 
-#Combo B0->mu mu
-    #Experiment: LHCb + ATLAS + CMS
-    #arXiv: LHCb-CONF-2020-002,CMS PAS BPH-20-003, ATLAS-CONF-2020-049
-    #Branching ratio
-def combo_B0tomumu(x):
-    citations.register_inspire('ATLAS:2020acx')
-    q2min = [5.230] #Dimuon mass
-    q2max = [6.0] #Dimuon mass
-    value = [1.6e-10]
-    cl = 0.9
-    df = 1 
-    sigmas = sigma(cl, df, value)
-    valuep = [0]
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
-    return values, sigmals, sigmars
+lhcb_Bstomumu = MeasurementConstant(
+    ['LHCb:2021awg', 'LHCb:2021vsc'],
+    'flat',
+    3.09e-9,
+    np.sqrt(0.43**2+0.11**2)*1e-9,
+    np.sqrt(0.46**2+0.15**2)*1e-9,
+    max_ma=np.inf
+)
+
+lhcb_B0tomumu = MeasurementConstantBound(
+    ['LHCb:2021awg', 'LHCb:2021vsc'],
+    'flat',
+    2.6e-10,
+    max_ma=np.inf,
+    conf_level=0.95
+)
+
+lhcb_Bstoee = MeasurementConstantBound(
+    'LHCb:2020pcv',
+    'flat',
+    9.4e-9,
+    max_ma=np.inf,
+)
+
+lhcb_B0toee = MeasurementConstantBound(
+    'LHCb:2020pcv',
+    'flat',
+    2.5e-9,
+    max_ma=np.inf,
+)
+
+lhcb_Bstotautau = MeasurementConstantBound(
+    'LHCb:2017myy',
+    'flat',
+    5.2e-3,
+    max_ma=np.inf,
+)
+
+lhcb_B0totautau = MeasurementConstantBound(
+    'LHCb:2017myy',
+    'flat',
+    1.6e-3,
+    max_ma=np.inf,
+)
 
 #LHCb D+->pi+ mu mu
     #Experiment: LHCb
@@ -1066,6 +1085,19 @@ def get_measurements(transition: str, exclude_projections: bool = True) -> dict[
         return {'Belle': belle_B0toK0stautau}
     elif initial == ['B0'] and final == sorted(['K0', 'pion+', 'pion-', 'pion0']):
         return {'Belle': belle_b0Komega3pi}
+    elif initial == ['B0'] and final == ['electron', 'electron']:
+        return {'LHCb': lhcb_B0toee}
+    elif initial == ['B0'] and final == ['muon', 'muon']:
+        return {'LHCb': lhcb_B0tomumu, 'CMS': cms_B0tomumu}
+    elif initial == ['B0'] and final == sorted(['tau', 'tau']):
+        return {'LHCb': lhcb_B0totautau}
+    #Initial state Bs
+    elif initial == ['Bs'] and final == ['electron', 'electron']:
+        return {'LHCb': lhcb_Bstoee}
+    elif initial == ['Bs'] and final == sorted(['muon', 'muon']):
+        return {'LHCb': lhcb_Bstomumu, 'CMS': cms_Bstomumu}
+    elif initial == ['Bs'] and final == sorted(['tau', 'tau']):
+        return {'LHCb': lhcb_Bstotautau}
     #Initial state Upsilon(3S)
     elif initial == ['Upsilon(3S)'] and final == sorted(['photon', 'tau', 'tau']):
         return {'BaBar': babar_Y3S_tautau}
