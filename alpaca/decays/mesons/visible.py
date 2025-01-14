@@ -17,7 +17,7 @@ def amp_Bs_leptons_ALP(lepton: str, ma: float, couplings: ALPcouplings, fa: floa
         basis = 'kF_below'
     cc = couplings.match_run(ma, basis, **kwargs)
     clep = cc['ke'][genlepton[lepton],genlepton[lepton]] - cc['kE'][genlepton[lepton],genlepton[lepton]]
-    cbs = - cc['kD'][2,1]
+    cbs = cc['kD'][2,1] - cc['kd'][2,1]
     Gamma_a = total_decay_width(ma, couplings, fa, br_dark, **kwargs)['DW_tot']
     return - cbs*clep/fa**2 *fBs*mlepton[lepton]/np.sqrt(2)*mBs**3/(mBs**2-ma**2+1j*ma*Gamma_a)
 
@@ -39,7 +39,7 @@ def amp_Bd_leptons_ALP(lepton: str, ma: float, couplings: ALPcouplings, fa: floa
         basis = 'kF_below'
     cc = couplings.match_run(ma, basis, **kwargs)
     clep = cc['ke'][genlepton[lepton],genlepton[lepton]] - cc['kE'][genlepton[lepton],genlepton[lepton]]
-    cbs = - cc['kD'][2,0]
+    cbs = cc['kD'][2,0] - cc['kd'][2,0]
     Gamma_a = total_decay_width(ma, couplings, fa, br_dark, **kwargs)['DW_tot']
     return - cbs*clep/fa**2 *fB*mlepton[lepton]/np.sqrt(2)*mB0**3/(mB0**2-ma**2+1j*ma*Gamma_a)
 
