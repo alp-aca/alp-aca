@@ -1,5 +1,8 @@
 #File with all possible theoretical predictions
 from ..citations import citations
+from ..decays.decays import parse
+import flavio
+from functools import cache
 
 #################################### INVISIBLE FINAL STATES ####################################
 #B+->K+ nu nu 
@@ -62,3 +65,31 @@ def theo_Bstomumu():
     sigmar = sigmal
     return value, sigmal, sigmar
 
+@cache
+def get_th_uncert(transition: str, N: int = 50) -> float:
+    initial, final = parse(transition)
+    if initial == ['Bs'] and final == ['electron', 'electron']:
+        return flavio.sm_uncertainty('BR(Bs->ee)', N=N)
+    elif initial == ['Bs'] and final == ['muon', 'muon']:
+        return theo_Bstomumu()[1]
+    elif initial == ['Bs'] and final == ['tau', 'tau']:
+        return flavio.sm_uncertainty('BR(Bs->tautau)', N=N)
+    elif initial == ['B0'] and final == ['electron', 'electron']:
+        return flavio.sm_uncertainty('BR(B0->ee)', N=N)
+    elif initial == ['B0'] and final == ['muon', 'muon']:
+        return flavio.sm_uncertainty('BR(B0->mumu)', N=N)
+    elif initial == ['B0'] and final == ['tau', 'tau']:
+        return flavio.sm_uncertainty('BR(B0->tautau)', N=N)
+    elif initial == ['KL'] and final == ['electron', 'electron']:
+        return flavio.sm_uncertainty('BR(KL->ee)', N=N)
+    elif initial == ['KL'] and final == ['muon', 'muon']:
+        return flavio.sm_uncertainty('BR(KL->mumu)', N=N)
+    elif initial == ['KS'] and final == ['electron', 'electron']:
+        return flavio.sm_uncertainty('BR(KS->ee)', N=N)
+    elif initial == ['KS'] and final == ['muon', 'muon']:
+        return flavio.sm_uncertainty('BR(KS->mumu)', N=N)
+    else:
+        return 0.0
+    
+def get_th_value(transition: str) -> float:
+    return 0.0
