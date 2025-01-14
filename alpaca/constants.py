@@ -59,6 +59,19 @@ def getC10():
 
 C10 = LazyFloat(getC10)
 
+def getC10sd():
+    import flavio
+    citations.register_inspire('Straub:201')
+    citations.register_inspire('Bobeth:2013uxa')
+    citations.register_inspire('Gorbahn:2006bm')
+    wcdict = flavio.physics.kdecays.wilsoncoefficients.wilsoncoefficients_sm_sl(pars, 0)
+    xi_t = flavio.physics.ckm.xi('t', 'sd')(pars)
+    xi_c = flavio.physics.ckm.xi('c', 'sd')(pars)
+    return wcdict['C10_t'] + xi_c / xi_t * wcdict['C10_c']
+
+C10sdRe = LazyFloat(lambda: np.real(getC10sd()))
+C10sdIm = LazyFloat(lambda: np.imag(getC10sd()))
+
 # masses (in GeV)
 me = Constant(particles.e_minus.mass/1000, 'particle')
 mmu = Constant(particles.mu_minus.mass/1000, 'particle')
@@ -118,6 +131,7 @@ theta_eta_etap = Constant(-14.1/180*np.pi, 'Christ:2010dd')
 fB = LazyFloat(lambda: pars['f_B+'])
 fBs = LazyFloat(lambda: pars['f_Bs'])
 fK = LazyFloat(lambda: pars['f_K+'])
+fK0 = LazyFloat(lambda: pars['f_K0'])
 fpi = LazyFloat(lambda: pars['f_pi+'])
 fJpsi = Constant(0.4104, 'Hatton:2020qhk')
 fUpsilon1S = Constant(0.6772, 'Hatton:2021dvg')
