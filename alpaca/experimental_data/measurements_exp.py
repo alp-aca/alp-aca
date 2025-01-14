@@ -810,22 +810,39 @@ def babar_Dptokpmumu(x):
     return values, sigmals, sigmars
 
 
-#PDG Kl-> mu mu
-    #Experiment: PDG
-    #DOI: 10.1103/PhysRevD.110.030001
-    #Branching ratio
-def pdg_Kltomumu(x):
-    citations.register_inspire('ParticleDataGroup:2024cfk')
-    q2min = [0]
-    q2max = [mKl]
-    value = [6.84e-9]
-    sigma = [0.11e-9]
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigma, sigma)
-    return values, sigmals, sigmars
+pdg_KLtomumu = MeasurementConstant(
+    ['ParticleDataGroup:2024cfk', 'E871:2000wvm', 'Akagi:1994bb', 'E791:1994xxb'],
+    'flat',
+    6.84e-9,
+    0.11e-9,
+    0.11e-9,
+    max_ma=np.inf
+)
 
+e871_KLtoee = MeasurementConstant(
+    'BNLE871:1998bii',
+    'flat',
+    8.7e-12,
+    4.1e-12,
+    5.7e-12,
+    max_ma=np.inf
+)
 
+lhcb_KStomumu = MeasurementConstant(
+    'LHCb:2020ycd',
+    'flat',
+    0.9e-10,
+    0.6e-10,
+    0.7e-10,
+    max_ma=np.inf
+)
 
-
+kloe_KStoee = MeasurementConstantBound(
+    'KLOE:2008acb',
+    'flat',
+    9e-9,
+    max_ma=np.inf
+)
 
 ############ Quarkonia decays ############
 visible = "visible/"
@@ -1115,5 +1132,14 @@ def get_measurements(transition: str, exclude_projections: bool = True) -> dict[
     #Initial state KL
     elif initial == ['KL'] and final == sorted(['pion0', 'alp']):
         return {'KOTO': koto_kltopi0inv}
+    elif initial == ['KL'] and final == ['electron', 'electron']:
+        return {'E871': e871_KLtoee}
+    elif initial == ['KL'] and final == ['muon', 'muon']:
+        return {'PDG': pdg_KLtomumu}
+    #Initial state KS
+    elif initial == ['KS'] and final == ['electron', 'electron']:
+        return {'KLOE': kloe_KStoee}
+    elif initial == ['KS'] and final == ['muon', 'muon']:
+        return {'LHCb': lhcb_KStomumu}
     else:
         raise KeyError(f"No measurements for {transition}")
