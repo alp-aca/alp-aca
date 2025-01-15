@@ -1064,6 +1064,86 @@ babar_BKetapipi = MeasurementInterpolatedBound(
     mass_sibling = mK
 )
 
+babar_bptopiee = MeasurementConstantBound(
+    'BaBar:2013qaj',
+    'prompt',
+    12.5e-8,
+    mass_parent=mB,
+    mass_sibling=mpi_pm,
+    lab_boost=0.469/(1-0.469**2)**0.5,
+    rmin = 10,
+)
+
+babar_b0topiee = MeasurementConstantBound(
+    'BaBar:2013qaj',
+    'prompt',
+    8.4e-8,
+    mass_parent=mB0,
+    mass_sibling=mpi0,
+    lab_boost=0.469/(1-0.469**2)**0.5,
+    rmin = 10,
+)
+
+babar_bptopimumu = MeasurementConstantBound(
+    'BaBar:2013qaj',
+    'prompt',
+    5.5e-8,
+    mass_parent=mB,
+    mass_sibling=mpi_pm,
+    lab_boost=0.469/(1-0.469**2)**0.5,
+    rmin = 10,
+)
+
+babar_b0topimumu = MeasurementConstantBound(
+    'BaBar:2013qaj',
+    'prompt',
+    6.9e-8,
+    mass_parent=mB0,
+    mass_sibling=mpi0,
+    lab_boost=0.469/(1-0.469**2)**0.5,
+    rmin = 10,
+)
+
+belle_bptopiee = MeasurementConstantBound(
+    'Belle:2008tjs',
+    'prompt',
+    8e-8,
+    rmin = 4,
+    lab_boost = 0.425,
+    mass_parent=mB,
+    mass_sibling=mpi_pm
+)
+
+belle_bptopimumu = MeasurementConstantBound(
+    'Belle:2008tjs',
+    'prompt',
+    6.9e-8,
+    rmin = 4,
+    lab_boost = 0.425,
+    mass_parent=mB,
+    mass_sibling=mpi_pm
+)
+
+belle_b0topiee = MeasurementConstantBound(
+    'Belle:2008tjs',
+    'prompt',
+    22.7e-8,
+    rmin = 4,
+    lab_boost = 0.425,
+    mass_parent=mB0,
+    mass_sibling=mpi0
+)
+
+belle_b0topimumu = MeasurementConstantBound(
+    'Belle:2008tjs',
+    'prompt',
+    18.4e-8,
+    rmin = 4,
+    lab_boost = 0.425,
+    mass_parent=mB0,
+    mass_sibling=mpi0
+)
+
 def get_measurements(transition: str, exclude_projections: bool = True) -> dict[str, MeasurementBase]:
     """Retrieve measurements based on the given transition.
 
@@ -1094,6 +1174,10 @@ def get_measurements(transition: str, exclude_projections: bool = True) -> dict[
         return {'Belle': belle_Bchargedtopichargednunu}
     elif initial == ['B+'] and final == sorted(['rho+', 'alp']):
         return {'Belle': belle_Bchargedtorhochargednunu}
+    elif initial == ['B+'] and final == sorted(['pion+', 'electron', 'electron']):
+        return {'BaBar': babar_bptopiee, 'Belle': belle_bptopiee}
+    elif initial == ['B+'] and final == sorted(['pion+', 'muon', 'muon']):
+        return {'BaBar': babar_bptopimumu, 'Belle': belle_bptopimumu}
     elif initial == ['B+'] and final == sorted(['K+', 'electron', 'electron']):
         return {'Belle II': belleII_bkee_displvertex}
     elif initial == ['B+'] and final == sorted(['K+', 'muon', 'muon']):
@@ -1118,6 +1202,10 @@ def get_measurements(transition: str, exclude_projections: bool = True) -> dict[
         return {'Belle': belle_B0torho0nunu}
     elif initial == ['B0'] and final == sorted(['K*0', 'alp']):
         return {'BaBar': babar_btoksnunu_lightmediator}
+    elif initial == ['B0'] and final == sorted(['pion0', 'electron', 'electron']):
+        return {'BaBar': babar_b0topiee, 'Belle': belle_b0topiee}
+    elif initial == ['B0'] and final == sorted(['pion0', 'muon', 'muon']):
+        return {'BaBar': babar_b0topimumu, 'Belle': belle_b0topimumu}
     elif initial == ['B0'] and final == sorted(['K*0', 'electron', 'electron']):
         return {'Belle II': belleII_bks0ee_displvertex}
     elif initial == ['B0'] and final == sorted(['K*0', 'muon', 'muon']):
