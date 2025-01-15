@@ -124,7 +124,7 @@ na62_Ktopiinv = MeasurementDisplacedVertexBound(
 #     values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmap, sigmap)
 #     return values, sigmals, sigmars
 koto_kltopi0inv = MeasurementInterpolatedBound(
-    '1810.09655',
+    'KOTO:2018dsc',
     os.path.join(current_dir, invisible, 'koto_KLpiInv.txt'),
     'invisible',
     conf_level=0.9,
@@ -1040,7 +1040,7 @@ belle_b0Komega3pi = MeasurementConstantBound(
 )
 
 babar_BKetapipi = MeasurementInterpolatedBound(
-    'Chakraborty:2021wda',
+    ['Chakraborty:2021wda', 'BaBar:2008rth'],
     os.path.join(current_dir, visible, 'babar_BKetapipi.txt'),
     'prompt',
     conf_level=0.95,
