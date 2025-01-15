@@ -165,6 +165,42 @@ def B0topia(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mB0**3*abs(gq_eff)**2/(128*np.pi) * f0_Bpi(ma**2)**2*np.sqrt(kallen_factor)*(1-mpi0**2/mB0**2)**2
 
+def B0torhoa(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
+    from ...constants import mrho, mB0
+    from ...common import A0_Brho, kallen
+    if ma > mB0-mrho:
+        return 0
+    citations.register_inspire('Izaguirre:2016dfi')
+    coup_low = couplings.match_run(ma, 'VA_below', **kwargs)
+    gq_eff = coup_low['cdA'][0,2]/f_a
+    kallen_factor = kallen(1, mrho**2/mB0**2, ma**2/mB0**2)
+    kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
+    return mB0**3*abs(gq_eff)**2/(64*np.pi) * A0_Brho(ma**2)**2 * kallen_factor**1.5
+
+def Bplustorhoa(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
+    from ...constants import mrho_pm, mB
+    from ...common import A0_Brho, kallen
+    if ma > mB-mrho_pm:
+        return 0
+    citations.register_inspire('Izaguirre:2016dfi')
+    coup_low = couplings.match_run(ma, 'VA_below', **kwargs)
+    gq_eff = coup_low['cdA'][0,2]/f_a
+    kallen_factor = kallen(1, mrho_pm**2/mB**2, ma**2/mB**2)
+    kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
+    return mB**3*abs(gq_eff)**2/(64*np.pi) * A0_Brho(ma**2)**2 * kallen_factor**1.5
+
+def Bstophia(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
+    from ...constants import mBs, mphi
+    from ...common import A0_Bsphi, kallen
+    if ma > mBs-mphi:
+        return 0
+    citations.register_inspire('Izaguirre:2016dfi')
+    coup_low = couplings.match_run(ma, 'VA_below', **kwargs)
+    gq_eff = coup_low['cdA'][1,2]/f_a
+    kallen_factor = kallen(1, mphi**2/mBs**2, ma**2/mBs**2)
+    kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
+    return mBs**3*abs(gq_eff)**2/(64*np.pi) * A0_Bsphi(ma**2)**2 * kallen_factor**1.5
+
 def BR_Vagamma(ma: float, couplings: ALPcouplings, mV: float, BeeV: float, quark: str, f_a: float=1000, **kwargs):
     citations.register_inspire('Merlo:2019anv')
     citations.register_inspire('DiLuzio:2024jip')

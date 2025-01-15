@@ -7,7 +7,7 @@ from ..constants import mUpsilon3S
 from .classes import MeasurementBase, MeasurementConstantBound, MeasurementInterpolatedBound, MeasurementInterpolated, MeasurementDisplacedVertexBound, MeasurementBinned, rmax_belle, rmax_besIII, MeasurementConstant
 from ..decays.particles import particle_aliases
 from ..decays.decays import parse
-from ..constants import mB, mB0, mBs, mK, mtau, mKst0, mKL, mpi0, mpi_pm
+from ..constants import mB, mB0, mBs, mK, mtau, mKst0, mKL, mpi0, mpi_pm, mphi, mZ
 # Get the directory of the current script
 current_dir = os.path.dirname(__file__)
 
@@ -364,7 +364,8 @@ belle_Bchargedtorhochargednunu = MeasurementConstantBound(
     bound=3e-5,
     conf_level=0.9,
     mass_parent=mB,
-    rmax=rmax_belle
+    rmax=rmax_belle,
+    lab_boost=0.28
 )
 
 belle_Bchargedtopichargednunu = MeasurementConstantBound(
@@ -382,7 +383,8 @@ belle_B0toK0nunu = MeasurementConstantBound(
     bound=2.6e-5,
     conf_level=0.9,
     mass_parent=mB0,
-    rmax=rmax_belle
+    rmax=rmax_belle,
+    lab_boost=0.28
 )
 
 belle_B0toK0starnunu = MeasurementConstantBound(
@@ -400,7 +402,8 @@ belle_B0topi0nunu = MeasurementConstantBound(
     bound=9e-6,
     conf_level=0.9,
     mass_parent=mB0,
-    rmax=rmax_belle
+    rmax=rmax_belle,
+    lab_boost=0.28
 )
 
 belle_B0torho0nunu = MeasurementConstantBound(
@@ -409,7 +412,18 @@ belle_B0torho0nunu = MeasurementConstantBound(
     bound=4e-5,
     conf_level=0.9,
     mass_parent=mB0,
-    rmax=rmax_belle
+    rmax=rmax_belle,
+    lab_boost=0.28
+)
+
+delphi_Bstophinunu = MeasurementConstantBound(
+    'DELPHI:1996ohp',
+    'invisible',
+    5.4e-3,
+    mass_parent=mBs,
+    mass_sibling=mphi,
+    lab_boost=np.sqrt(0.25*mZ**2/mBs**2-1), # Z -> Bs Bs decay
+    rmax=24
 )
 
 #BESIII D0->pi0 nu nu 2021 
@@ -1076,6 +1090,10 @@ def get_measurements(transition: str, exclude_projections: bool = True) -> dict[
     #Initial state B+
     if initial == ['B+'] and final == sorted(['K+', 'alp']):
         return {'Belle II': belleII_bptoknunu_lightmediator}
+    elif initial == ['B+'] and final == sorted(['pion+', 'alp']):
+        return {'Belle': belle_Bchargedtopichargednunu}
+    elif initial == ['B+'] and final == sorted(['rho+', 'alp']):
+        return {'Belle': belle_Bchargedtorhochargednunu}
     elif initial == ['B+'] and final == sorted(['K+', 'electron', 'electron']):
         return {'Belle II': belleII_bkee_displvertex}
     elif initial == ['B+'] and final == sorted(['K+', 'muon', 'muon']):
@@ -1092,6 +1110,12 @@ def get_measurements(transition: str, exclude_projections: bool = True) -> dict[
     elif initial == ['B+'] and final == sorted(['K+', 'eta', 'pion+', 'pion-']):
         return {'BaBar': babar_BKetapipi}
     #Initial state B0
+    elif initial == ['B0'] and final == sorted(['pion0', 'alp']):
+        return {'Belle': belle_B0topi0nunu}
+    elif initial == ['B0'] and final == sorted(['K0', 'alp']):
+        return {'Belle': belle_B0toK0nunu}
+    elif initial == ['B0'] and final == sorted(['rho0', 'alp']):
+        return {'Belle': belle_B0torho0nunu}
     elif initial == ['B0'] and final == sorted(['K*0', 'alp']):
         return {'BaBar': babar_btoksnunu_lightmediator}
     elif initial == ['B0'] and final == sorted(['K*0', 'electron', 'electron']):
@@ -1109,6 +1133,8 @@ def get_measurements(transition: str, exclude_projections: bool = True) -> dict[
     elif initial == ['B0'] and final == sorted(['tau', 'tau']):
         return {'LHCb': lhcb_B0totautau}
     #Initial state Bs
+    elif initial == ['Bs'] and final == sorted(['phi', 'alp']):
+        return {'DELPHI': delphi_Bstophinunu}
     elif initial == ['Bs'] and final == ['electron', 'electron']:
         return {'LHCb': lhcb_Bstoee}
     elif initial == ['Bs'] and final == sorted(['muon', 'muon']):

@@ -25,6 +25,8 @@ f0_BK = lambda q2: flavio.physics.bdecays.formfactors.b_p.bcl.ff('B->K', q2, par
 f0_Bpi = lambda q2: flavio.physics.bdecays.formfactors.b_p.bcl_lmvd.ff('B->pi', q2, pars)['f0']
 f0_Kpi = lambda q2: flavio.physics.kdecays.formfactors.fp0_dispersive(q2, pars)['f0']
 A0_BKst = lambda q2: flavio.physics.bdecays.formfactors.b_v.bsz.ff('B->K*', q2, pars)['A0']
+A0_Brho = lambda q2: flavio.physics.bdecays.formfactors.b_v.bsz.ff('B->rho', q2, pars)['A0']
+A0_Bsphi = lambda q2: flavio.physics.bdecays.formfactors.b_v.bsz.ff('Bs->phi', q2, pars)['A0']
 
 ckm_xi = lambda i, j: flavio.physics.ckm.xi(i, j)(pars)
 
