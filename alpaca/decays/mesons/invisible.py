@@ -142,6 +142,18 @@ def B0toKsta(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mB0**3*abs(gq_eff)**2/(64*np.pi) * A0_BKst(ma**2)**2 * kallen_factor**1.5
 
+def BplustoKsta(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
+    from ...constants import mKst_plus, mB
+    from ...common import A0_BKst, kallen
+    if ma > mB-mKst_plus:
+        return 0
+    citations.register_inspire('Izaguirre:2016dfi')
+    coup_low = couplings.match_run(ma, 'VA_below', **kwargs)
+    gq_eff = coup_low['cdA'][1,2]/f_a
+    kallen_factor = kallen(1, mKst_plus**2/mB**2, ma**2/mB**2)
+    kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
+    return mB**3*abs(gq_eff)**2/(64*np.pi) * A0_BKst(ma**2)**2 * kallen_factor**1.5
+
 def Btopia(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     from ...constants import mpi_pm, mB
     from ...common import f0_Bpi, kallen

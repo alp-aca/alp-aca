@@ -20,6 +20,8 @@ meson_to_alp = {
     ('B-', ('K-', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: BtoKa(ma, couplings, fa, **kwargs)/GammaB,
     ('B0', ('K0', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: B0toKa(ma, couplings, fa, **kwargs)/GammaB0,
     ('B0', ('K*0', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: B0toKsta(ma, couplings, fa, **kwargs)/GammaB0,
+    ('B+', ('K*+', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: BplustoKsta(ma, couplings, fa, **kwargs)/GammaB,
+    ('B-', ('K*-', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: BplustoKsta(ma, couplings, fa, **kwargs)/GammaB,
     ('B+', ('alp', 'pion+')): lambda ma, couplings, fa, br_dark, **kwargs: Btopia(ma, couplings, fa, **kwargs)/GammaB,
     ('B-', ('alp', 'pion-')): lambda ma, couplings, fa, br_dark, **kwargs: Btopia(ma, couplings, fa, **kwargs)/GammaB,
     ('B0', ('alp', 'pion0')): lambda ma, couplings, fa, br_dark, **kwargs: B0topia(ma, couplings, fa, **kwargs)/GammaB0,
