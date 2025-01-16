@@ -1,7 +1,7 @@
 import numpy as np
 import flavio
 from .constants import pars
-
+from .citations import citations
 
 
 def kallen(a, b, c):
@@ -17,6 +17,8 @@ def floop(x):
 B1 = lambda x: 1-x*floop(x)**2
 B2 = lambda x: 1-(x-1)*floop(x)**2
 
+def B0disc_equalmass(q2: float, m: float) -> complex:
+    return 2j*np.sqrt(1+0j-4*m**2/q2)*floop(np.sqrt(4*m**2/q2))
 
 alpha_em = lambda q: flavio.physics.running.running.get_alpha_e(pars, q)
 alpha_s = lambda q: flavio.physics.running.running.get_alpha_s(pars, q)
