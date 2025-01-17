@@ -6,6 +6,7 @@ from ...constants import(
     mUpsilon4S, BeeUpsilon4S,
     mJpsi, BeeJpsi,
     GammaB, GammaB0,
+    GammaD0, GammaDplus, GammaDs
 )
 from ..nwa import transition_nwa
 from ..alp_decays.branching_ratios import decay_channels
@@ -19,6 +20,8 @@ meson_to_alp = {
     ('B-', ('K-', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: BtoKa(ma, couplings, fa, **kwargs)/GammaB,
     ('B0', ('K0', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: B0toKa(ma, couplings, fa, **kwargs)/GammaB0,
     ('B0', ('K*0', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: B0toKsta(ma, couplings, fa, **kwargs)/GammaB0,
+    ('B+', ('K*+', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: BplustoKsta(ma, couplings, fa, **kwargs)/GammaB,
+    ('B-', ('K*-', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: BplustoKsta(ma, couplings, fa, **kwargs)/GammaB,
     ('B+', ('alp', 'pion+')): lambda ma, couplings, fa, br_dark, **kwargs: Btopia(ma, couplings, fa, **kwargs)/GammaB,
     ('B-', ('alp', 'pion-')): lambda ma, couplings, fa, br_dark, **kwargs: Btopia(ma, couplings, fa, **kwargs)/GammaB,
     ('B0', ('alp', 'pion0')): lambda ma, couplings, fa, br_dark, **kwargs: B0topia(ma, couplings, fa, **kwargs)/GammaB0,
@@ -30,6 +33,18 @@ meson_to_alp = {
     ('K-', ('alp', 'pion-')): lambda ma, couplings, fa, br_dark, **kwargs: Kplustopia(ma, couplings, fa, **kwargs),
     ('KL', ('alp', 'pion0')): lambda ma, couplings, fa, br_dark, **kwargs: KLtopia(ma, couplings, fa, **kwargs),
     ('KS', ('alp', 'pion0')): lambda ma, couplings, fa, br_dark, **kwargs: KStopia(ma, couplings, fa, **kwargs),
+    ('D0', ('alp', 'pion0')): lambda ma, couplings, fa, br_dark, **kwargs: D0topi0a(ma, couplings, fa, **kwargs)/GammaD0,
+    ('D0', ('alp', 'eta')): lambda ma, couplings, fa, br_dark, **kwargs: D0toetaa(ma, couplings, fa, **kwargs)/GammaD0,
+    ('D0', ('alp', 'eta_prime')): lambda ma, couplings, fa, br_dark, **kwargs: D0toetapa(ma, couplings, fa, **kwargs)/GammaD0,
+    ('D0', ('alp', 'rho0')): lambda ma, couplings, fa, br_dark, **kwargs: D0torhoa(ma, couplings, fa, **kwargs)/GammaD0,
+    ('D+', ('alp', 'pion+')): lambda ma, couplings, fa, br_dark, **kwargs: Dplustopiplusa(ma, couplings, fa, **kwargs)/GammaDplus,
+    ('D-', ('alp', 'pion-')): lambda ma, couplings, fa, br_dark, **kwargs: Dplustopiplusa(ma, couplings, fa, **kwargs)/GammaDplus,
+    ('D+', ('alp', 'rho+')): lambda ma, couplings, fa, br_dark, **kwargs: Dplustorhoa(ma, couplings, fa, **kwargs)/GammaDplus,
+    ('D-', ('alp', 'rho-')): lambda ma, couplings, fa, br_dark, **kwargs: Dplustorhoa(ma, couplings, fa, **kwargs)/GammaDplus,
+    ('Ds+', ('K+', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: DstoKa(ma, couplings, fa, **kwargs)/GammaDs,
+    ('Ds-', ('K-', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: DstoKa(ma, couplings, fa, **kwargs)/GammaDs,
+    ('Ds+', ('K*+', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: DstoKsta(ma, couplings, fa, **kwargs)/GammaDs,
+    ('Ds-', ('K*-', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: DstoKsta(ma, couplings, fa, **kwargs)/GammaDs,
 }
 
 meson_nwa = {}

@@ -7,7 +7,7 @@ from ..constants import mUpsilon3S
 from .classes import MeasurementBase, MeasurementConstantBound, MeasurementInterpolatedBound, MeasurementInterpolated, MeasurementDisplacedVertexBound, MeasurementBinned, rmax_belle, rmax_besIII, MeasurementConstant
 from ..decays.particles import particle_aliases
 from ..decays.decays import parse
-from ..constants import mB, mB0, mBs, mK, mtau, mKst0, mKL, mpi0, mpi_pm, mphi, mZ
+from ..constants import mB, mB0, mBs, mK, mtau, mKst0, mKL, mpi0, mpi_pm, mphi, mZ, mDplus, mDs, mrho, mD0, meta
 # Get the directory of the current script
 current_dir = os.path.dirname(__file__)
 
@@ -437,6 +437,7 @@ besIII_D0topi0nunu = MeasurementConstantBound(
     bound=2.1e-4,
     conf_level=0.9,
     mass_parent=mD0,
+    mass_sibling=mpi0,
     rmax=rmax_besIII
 )
 
@@ -638,53 +639,52 @@ def LHCb_Rkstar(x):
     return values, sigmals, sigmars
 
 
-#BESIII  D0->pi0 e e
-    #Experiment: BESIII
-    #arXiv: 1802.09752
-def besiii_D0topi0ee(x):
-    citations.register_inspire('BESIII:2018hqu')
-    q2min = [0, 1.053] #Dielectron mass
-    q2max = [0.935, 1.730] #Dielectron mass
-    value = [0.4e-5]
-    cl = 0.9
-    df = 1 
-    sigmas = sigma(cl, df, value)
-    valuep = [0]
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
-    return values, sigmals, sigmars
+lhcb_Dptopipee = MeasurementConstantBound(
+    'LHCb:2020car',
+    'prompt',
+    1600e-9,
+    rmin = 150e-4,
+    mass_parent=mDplus,
+    mass_sibling=mpi0
+)
 
-#BaBar D+->pi+ e e
-    #Experiment: BaBar
-    #arXiv: 1107.4465
-def babar_Dptopipee(x):
-    citations.register_inspire('BaBar:2011ouc')
-    q2min = [0.200, 1.050] #Dielectron mass
-    q2max = [0.950, 1.730] #Dielectron mass
-    value = [3.9e-4]
-    cl = 0.9
-    df = 1 
-    sigmas = sigma(cl, df, value)
-    valuep = [0]
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
-    return values, sigmals, sigmars
+lhcb_DstoKpee = MeasurementConstantBound(
+    'LHCb:2020car',
+    'prompt',
+    850e-9,
+    rmin = 150e-4,
+    mass_parent=mDs,
+    mass_sibling=mK
+)
 
-#BaBar Ds+->K+ e e
-    #Experiment: BaBar
-    #arXiv: 1107.4465
-def babar_DsptoKpee(x):
-    citations.register_inspire('BaBar:2011ouc')
-    q2min = [0.200, 1.050] #Dielectron mass
-    q2max = [0.950, 1.475] #Dielectron mass
-    value = [1.6e-4]
-    cl = 0.9
-    df = 1 
-    sigmas = sigma(cl, df, value)
-    valuep = [0]
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
-    return values, sigmals, sigmars
+besIII_D0topi0ee = MeasurementConstantBound(
+    inspire_id='BESIII:2018hqu',
+    decay_type='prompt',
+    bound=0.4e-5,
+    conf_level=0.9,
+    mass_parent=mD0,
+    mass_sibling=mpi0,
+    rmin=rmax_besIII
+)
 
+besIII_D0toetaee = MeasurementConstantBound(
+    inspire_id='BESIII:2018hqu',
+    decay_type='prompt',
+    bound=0.3e-5,
+    conf_level=0.9,
+    mass_parent=mD0,
+    mass_sibling=meta,
+    rmin=rmax_besIII
+)
 
-
+e791_D0torho0ee = MeasurementConstantBound(
+    'E791:2000jkj',
+    'prompt',
+    12.4e-5,
+    mass_parent=mD0,
+    mass_sibling=mrho,
+    rmin=1.5
+)
 
 ####### Decay to mu mu ######
 #KTeV KL->pi0 mu mu
@@ -778,21 +778,6 @@ lhcb_B0totautau = MeasurementConstantBound(
     max_ma=np.inf,
 )
 
-#LHCb D+->pi+ mu mu
-    #Experiment: LHCb
-    #arXiv: 1304.6365
-def lhcb_Dptopipmumu(x):
-    citations.register_inspire('LHCb:2013hxr')
-    q2min = [0.250, 1.250] #Dimuonon mass
-    q2max = [0.525, 2.000] #Dimuon mass
-    value = [2.0e-8, 2.6e-8]
-    cl = 0.9
-    df = 1 
-    sigmas = sigma(cl, df, value)
-    valuep = [0]
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
-    return values, sigmals, sigmars
-
 #LHCb Ds+->pi+ mu mu
     #Experiment: LHCb
     #arXiv: 1304.6365
@@ -808,21 +793,59 @@ def lhcb_Dsptopipmumu(x):
     values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
     return values, sigmals, sigmars
 
-#BaBar D+->K+ mu mu
-    #Experiment: BaBar
-    #arXiv: 1107.4465
-def babar_Dptokpmumu(x):
-    citations.register_inspire('BaBar:2011ouc')
-    q2min = [0.200] #Dimuonon mass
-    q2max = [1.475] #Dimuon mass
-    value = [9.1e-4]
-    cl = 0.9
-    df = 1 
-    sigmas = sigma(cl, df, value)
-    valuep = [0]
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, valuep, sigmas, sigmas)
-    return values, sigmals, sigmars
+lhcb_Dptopipmumu = MeasurementConstantBound(
+    'LHCb:2020car',
+    'prompt',
+    67e-9,
+    rmin = 150e-4,
+    mass_parent=mDplus,
+    mass_sibling=mpi0
+)
 
+lhcb_DstoKpmumu = MeasurementConstantBound(
+    'LHCb:2020car',
+    'prompt',
+    54e-9,
+    rmin = 150e-4,
+    mass_parent=mDs,
+    mass_sibling=mK
+)
+
+e653_Dptorhopmumu = MeasurementConstantBound(
+    'E653:1995rpz',
+    'prompt',
+    5.6e-4,
+    rmin=1.5,
+    mass_parent=mDplus,
+    mass_sibling=mrho
+)
+
+e653_D0topi0mumu = MeasurementConstantBound(
+    'E653:1995rpz',
+    'prompt',
+    1.8e-4,
+    rmin=1.5,
+    mass_parent=mD0,
+    mass_sibling=mpi0
+)
+
+cleo_D0toetamumu = MeasurementConstantBound(
+    'CLEO:1996jxx',
+    'prompt',
+    5.3e-4,
+    rmin=4.7,
+    mass_parent=mD0,
+    mass_sibling=meta
+)
+
+e791_D0torho0mumu = MeasurementConstantBound(
+    'E791:2000jkj',
+    'prompt',
+    2.2e-5,
+    mass_parent=mD0,
+    mass_sibling=mrho,
+    rmin=1.5
+)
 
 pdg_KLtomumu = MeasurementConstant(
     ['ParticleDataGroup:2024cfk', 'E871:2000wvm', 'Akagi:1994bb', 'E791:1994xxb'],
@@ -1232,6 +1255,33 @@ def get_measurements(transition: str, exclude_projections: bool = True) -> dict[
     #Initial state Upsilon(3S)
     elif initial == ['Upsilon(3S)'] and final == sorted(['photon', 'tau', 'tau']):
         return {'BaBar': babar_Y3S_tautau}
+    #initial state D0
+    elif initial == ['D0'] and final == sorted(['pion0', 'alp']):
+        return {'BESIII': besIII_D0topi0nunu}
+    elif initial == ['D0'] and final == sorted(['pion0', 'electron', 'electron']):
+        return {'BESIII': besIII_D0topi0ee}
+    elif initial == ['D0'] and final == sorted(['pion0', 'muon', 'muon']):
+        return {'E653': e653_D0topi0mumu}
+    elif initial == ['D0'] and final == sorted(['eta', 'electron', 'electron']):
+        return {'BESIII': besIII_D0toetaee}
+    elif initial == ['D0'] and final == sorted(['eta', 'muon', 'muon']):
+        return {'CLEO II': cleo_D0toetamumu}
+    elif initial == ['D0'] and final == sorted(['rho0', 'electron', 'electron']):
+        return {'E791': e791_D0torho0ee}
+    elif initial == ['D0'] and final == sorted(['rho0', 'muon', 'muon']):
+        return {'E791': e791_D0torho0mumu}
+    #Initial state D+
+    elif initial == ['D+'] and final == sorted(['pion+', 'electron', 'electron']):
+        return {'LHCb': lhcb_Dptopipee}
+    elif initial == ['D+'] and final == sorted(['pion+', 'muon', 'muon']):
+        return {'LHCb': lhcb_Dptopipmumu}
+    elif initial == ['D+'] and final == sorted(['rho+', 'muon', 'muon']):
+        return {'E653': e653_Dptorhopmumu}
+    #Initial state Ds+
+    elif initial == ['Ds+'] and final == sorted(['K+', 'electron', 'electron']):
+        return {'LHCb': lhcb_DstoKpee}
+    elif initial == ['Ds+'] and final == sorted(['K+', 'muon', 'muon']):
+        return {'LHCb': lhcb_DstoKpmumu}
     #Initial state K+
     elif initial == ['K+'] and final == sorted(['pion+', 'alp']):
         return {'NA62': na62_Ktopiinv}    

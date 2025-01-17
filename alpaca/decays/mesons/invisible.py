@@ -4,6 +4,7 @@ from ...rge import ALPcouplings
 from ...rge.runSM import runSM
 from ...citations import citations
 from ..ee.cross_sections import sigmaNR_gammaALP
+from .effcouplings import effcouplings_cq1q2_W
 
 def Kminustopia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **kwargs):
     from ...constants import mK, mpi_pm, g8, fpi, GammaK, GF
@@ -127,7 +128,7 @@ def B0toKa(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     gq_eff = coup_low['cdV'][1,2]/f_a
     kallen_factor = kallen(1, mK0**2/mB0**2, ma**2/mB0**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
-    return mB0**3*abs(gq_eff)**2/(64*np.pi) * f0_BK(ma**2)**2*np.sqrt(kallen_factor)*(1-mK0**2/mB0**2)**2
+    return mB0**3*abs(gq_eff)**2/(128*np.pi) * f0_BK(ma**2)**2*np.sqrt(kallen_factor)*(1-mK0**2/mB0**2)**2
 
 def B0toKsta(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     from ...constants import mKst0, mB0
@@ -140,6 +141,18 @@ def B0toKsta(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     kallen_factor = kallen(1, mKst0**2/mB0**2, ma**2/mB0**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mB0**3*abs(gq_eff)**2/(64*np.pi) * A0_BKst(ma**2)**2 * kallen_factor**1.5
+
+def BplustoKsta(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
+    from ...constants import mKst_plus, mB
+    from ...common import A0_BKst, kallen
+    if ma > mB-mKst_plus:
+        return 0
+    citations.register_inspire('Izaguirre:2016dfi')
+    coup_low = couplings.match_run(ma, 'VA_below', **kwargs)
+    gq_eff = coup_low['cdA'][1,2]/f_a
+    kallen_factor = kallen(1, mKst_plus**2/mB**2, ma**2/mB**2)
+    kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
+    return mB**3*abs(gq_eff)**2/(64*np.pi) * A0_BKst(ma**2)**2 * kallen_factor**1.5
 
 def Btopia(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     from ...constants import mpi_pm, mB
@@ -200,6 +213,94 @@ def Bstophia(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     kallen_factor = kallen(1, mphi**2/mBs**2, ma**2/mBs**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mBs**3*abs(gq_eff)**2/(64*np.pi) * A0_Bsphi(ma**2)**2 * kallen_factor**1.5
+
+def D0topi0a(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
+    from ...constants import mD0, mpi0
+    from ...common import f0_Dpi, kallen
+    if ma > mD0-mpi0:
+        return 0
+    coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + coup_low['ku'][1,0])/f_a
+    kallen_factor = kallen(1, mpi0**2/mD0**2, ma**2/mD0**2)
+    kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
+    return mD0**3*abs(gq_eff)**2/(128*np.pi) * f0_Dpi(ma**2)**2*np.sqrt(kallen_factor)*(1-mpi0**2/mD0**2)**2
+
+def Dplustopiplusa(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
+    from ...constants import mDplus, mpi_pm
+    from ...common import f0_Dpi, kallen
+    if ma > mDplus-mpi_pm:
+        return 0
+    coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + coup_low['ku'][1,0])/f_a
+    kallen_factor = kallen(1, mpi_pm**2/mDplus**2, ma**2/mDplus**2)
+    kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
+    return mDplus**3*abs(gq_eff)**2/(64*np.pi) * f0_Dpi(ma**2)**2*np.sqrt(kallen_factor)*(1-mpi_pm**2/mDplus**2)**2
+
+def D0toetaa(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
+    from ...constants import mD0, meta
+    from ...common import f0_Deta, kallen
+    if ma > mD0-meta:
+        return 0
+    coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + coup_low['ku'][1,0])/f_a
+    kallen_factor = kallen(1, meta**2/mD0**2, ma**2/mD0**2)
+    kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
+    return mD0**3*abs(gq_eff)**2/(128*np.pi) * f0_Deta(ma**2)**2*np.sqrt(kallen_factor)*(1-meta**2/mD0**2)**2
+
+def D0toetapa(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
+    from ...constants import mD0, metap
+    from ...common import f0_Detap, kallen
+    if ma > mD0-metap:
+        return 0
+    coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + coup_low['ku'][1,0])/f_a
+    kallen_factor = kallen(1, metap**2/mD0**2, ma**2/mD0**2)
+    kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
+    return mD0**3*abs(gq_eff)**2/(128*np.pi) * f0_Detap(ma**2)**2*np.sqrt(kallen_factor)*(1-metap**2/mD0**2)**2
+
+def DstoKa(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
+    from ...constants import mDs, mK
+    from ...common import f0_DsK, kallen
+    if ma > mDs-mK:
+        return 0
+    coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + coup_low['ku'][1,0])/f_a
+    kallen_factor = kallen(1, mK**2/mDs**2, ma**2/mDs**2)
+    kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
+    return mDs**3*abs(gq_eff)**2/(64*np.pi) * f0_DsK(ma**2)**2*np.sqrt(kallen_factor)*(1-mK**2/mDs**2)**2
+
+def D0torhoa(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
+    from ...constants import mD0, mrho
+    from ...common import A0_Drho, kallen
+    if ma > mD0-mrho:
+        return 0
+    coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') - coup_low['ku'][1,0])/f_a
+    kallen_factor = kallen(1, mrho**2/mD0**2, ma**2/mD0**2)
+    kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
+    return mD0**3*abs(gq_eff)**2/(64*np.pi) * A0_Drho(ma**2)**2 * kallen_factor**1.5
+
+def Dplustorhoa(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
+    from ...constants import mDplus, mrho_pm
+    from ...common import A0_Drho, kallen
+    if ma > mDplus-mrho_pm:
+        return 0
+    coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') - coup_low['ku'][1,0])/f_a
+    kallen_factor = kallen(1, mrho_pm**2/mDplus**2, ma**2/mDplus**2)
+    kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
+    return mDplus**3*abs(gq_eff)**2/(64*np.pi) * A0_Drho(ma**2)**2 * kallen_factor**1.5
+
+def DstoKsta(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
+    from ...constants import mDs, mKst_plus
+    from ...common import A0_DsKst, kallen
+    if ma > mDs-mKst_plus:
+        return 0
+    coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') - coup_low['ku'][1,0])/f_a
+    kallen_factor = kallen(1, mKst_plus**2/mDs**2, ma**2/mDs**2)
+    kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
+    return mDs**3*abs(gq_eff)**2/(64*np.pi) * A0_DsKst(ma**2)**2 * kallen_factor**1.5
 
 def BR_Vagamma(ma: float, couplings: ALPcouplings, mV: float, BeeV: float, quark: str, f_a: float=1000, **kwargs):
     citations.register_inspire('Merlo:2019anv')

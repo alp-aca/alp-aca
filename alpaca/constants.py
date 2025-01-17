@@ -92,6 +92,7 @@ mK0 = Constant(particles.K_0.mass/1000, 'particle')
 mKL = Constant(particles.K_L_0.mass/1000, 'particle')
 mKS = Constant(particles.K_S_0.mass/1000, 'particle')
 mKst0 = Constant(particles.Kst_892_0.mass/1000, 'particle')
+mKst_plus = Constant(particles.Kst_892_plus.mass/1000, 'particle')
 meta = Constant(particles.eta.mass/1000, 'particle')
 metap = Constant(particles.etap_958.mass/1000, 'particle')
 mrho = Constant(particles.rho_770_0.mass/1000, 'particle')
@@ -107,6 +108,9 @@ msigma = Constant(particles.f_0_500.mass/1000, 'particle') # f0(500) used to be 
 mf0 = Constant(particles.f_0_980.mass/1000, 'particle')
 mf2 = Constant(particles.f_2_1270.mass/1000, 'particle')
 momega = Constant(particles.omega_782.mass/1000, 'particle')
+mD0 = Constant(particles.D_0.mass/1000, 'particle')
+mDplus = Constant(particles.D_plus.mass/1000, 'particle')
+mDs = Constant(particles.D_s_plus.mass/1000, 'particle')
 
 # widths (in GeV)
 GammaB = Constant(particles.B_plus.width/1000, 'particle')
@@ -125,6 +129,9 @@ Gammasigma = Constant(particles.f_0_500.width/1000, 'particle') # f0(500) used t
 Gammaf0 = Constant(particles.f_0_980.width/1000, 'particle')
 Gammaf2 = Constant(particles.f_2_1270.width/1000, 'particle')
 Gammarho = Constant(particles.rho_770_0.width/1000, 'particle')
+GammaD0 = Constant(particles.D_0.width/1000, 'particle')
+GammaDplus = Constant(particles.D_plus.width/1000, 'particle')
+GammaDs = Constant(particles.D_s_plus.width/1000, 'particle')
 
 # Mixing angle
 theta_eta_etap = Constant(-14.1/180*np.pi, 'Christ:2010dd')
