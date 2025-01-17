@@ -12,7 +12,9 @@ def exclusionplot(x, y, chi2, xlabel, ylabel, title, tex):
             return -1
         return np.max(finite)
     cmap_newmaga = ListedColormap(newmagma+['#000000'])
-    colors = {k: c for k, c in zip(chi2.keys(), darker_set3)}
+    colors = {k: c for k, c in zip(chi2.keys(), darker_set3*4)}
+    styles_list = ['solid']*len(darker_set3) + ['dashed']*len(darker_set3) + ['dotted']*len(darker_set3) + ['dashdot']*len(darker_set3)
+    lss = {k: s for k, s in zip(chi2.keys(), styles_list)}
     fig, ax = plt.subplots()
     legend_elements = []
     pl = plt.contourf(x,y, nsigmas(chi2[('', 'Global')],2), levels=list(np.linspace(0, 3, 100)), cmap=cmap_newmaga, vmax=3, extend='max')
@@ -22,8 +24,8 @@ def exclusionplot(x, y, chi2, xlabel, ylabel, title, tex):
         if max_finite(nsigmas(chi2_obs, 2)) < 2:
             continue
         mask = np.where(np.isnan(chi2_obs), 0, nsigmas(chi2_obs, 2))
-        plt.contour(x, y, mask, levels=[2], colors = colors[observable])
-        legend_elements.append(plt.Line2D([0], [0], color=colors[observable], label=tex[observable[0]] + ' (' + observable[1] + ')'))
+        plt.contour(x, y, mask, levels=[2], colors = colors[observable], linestyles=lss[observable])
+        legend_elements.append(plt.Line2D([0], [0], color=colors[observable], ls=lss[observable], label=tex[observable[0]] + ' (' + observable[1] + ')'))
     ax.set_xscale('log')
     ax.set_yscale('log')
     cb = plt.colorbar(pl, extend='max')
