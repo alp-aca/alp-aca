@@ -7,7 +7,7 @@ from ..constants import mUpsilon3S
 from .classes import MeasurementBase, MeasurementConstantBound, MeasurementInterpolatedBound, MeasurementInterpolated, MeasurementDisplacedVertexBound, MeasurementBinned, rmax_belle, rmax_besIII, MeasurementConstant
 from ..decays.particles import particle_aliases
 from ..decays.decays import parse
-from ..constants import mB, mB0, mBs, mK, mtau, mKst0, mKL, mpi0, mpi_pm, mphi, mZ, mDplus, mDs, mrho, mD0, meta
+from ..constants import mB, mB0, mBs, mK, mtau, mKst0, mKL, mpi0, mpi_pm, mphi, mZ, mDplus, mDs, mrho, mD0, meta, mUpsilon1S, mJpsi
 # Get the directory of the current script
 current_dir = os.path.dirname(__file__)
 
@@ -272,18 +272,6 @@ def babar_psi2stonunu_comb(x):
     #Experiment: BaBar
     #arXiv:0808.0017
     #Branching ratio
-def babar_upsilon3S(x):
-    citations.register_inspire('BaBar:2008aby') 
-    data_file_path = os.path.join(current_dir, invisible, 'Babar_BR_Y3S_binned.txt')
-    q2min, q2max, param = data_reading(data_file_path)
-    value = []
-    sigmar = []
-    for ii in range(len(q2min)):
-        value.append(0)
-        sigmar.append(sigma(0.9, 1, param[ii]))
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmar, sigmar)
-    return values, sigmals, sigmars
-
 babar_Y3S_inv = MeasurementInterpolatedBound(
     'BaBar:2008aby',
     os.path.join(current_dir, invisible, 'Babar_BR_Y3S_binned.txt'),
@@ -298,51 +286,30 @@ babar_Y3S_inv = MeasurementInterpolatedBound(
     #Experiment: Belle
     #arXiv:1809.05222
     #Branching ratio
-def belle_upsilon1S(x):
-    citations.register_inspire('Belle:2018pzt') 
-    data_file_path = os.path.join(current_dir, invisible, 'Belle_BR_Y1S_binned.txt')
-    q2min, q2max, param = data_reading(data_file_path)
-    value = []
-    sigmar = []
-    for ii in range(len(q2min)):
-        value.append(0)
-        sigmar.append(sigma(0.9, 1, param[ii]))
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmar, sigmar)
-    return values, sigmals, sigmars
+belle_Y1S_inv = MeasurementInterpolatedBound(
+    'Belle:2018pzt',
+    os.path.join(current_dir, invisible, 'Belle_BR_Y1S_binned.txt'),
+    'invisible',
+    rmax=rmax_belle,
+    lab_boost=0.28,
+    mass_parent=mUpsilon1S,
+    mass_sibling=0
+)
 
 #BesIII J/psi invisible
     #Experiment: BESIII
     #arXiv:2003.05594
     #Branching ratio
-def besIII_Jpsiinv(x):
-    citations.register_inspire('BESIII:2020sdo') 
-    data_file_path = os.path.join(current_dir, invisible, 'BESIII_BR_Jpsi_inv_binned.txt')
-    q2min, q2max, param = data_reading(data_file_path)
-    value = []
-    sigmar = []
-    for ii in range(len(q2min)):
-        value.append(0)
-        sigmar.append(sigma(0.9, 1, param[ii]))
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmar, sigmar)
-    return values, sigmals, sigmars
 
-
-#BesIII J/psi visible
-    #Experiment: BESIII
-    #arXiv:2211.12699
-    #Branching ratio
-def besIII_Jpsivis(x):
-    citations.register_inspire('BESIII:2022rzz')
-    data_file_path = os.path.join(current_dir, invisible, 'BESIII_BR_Jpsi_vis_binned.txt')
-    q2min, q2max, param = data_reading(data_file_path)
-    value = []
-    sigmar = []
-    for ii in range(len(q2min)):
-        value.append(0)
-        sigmar.append(sigma(0.9, 1, param[ii]))
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmar, sigmar)
-    return values, sigmals, sigmars
-
+besIII_Jpsiinv = MeasurementInterpolatedBound(
+    'BESIII:2020sdo',
+    os.path.join(current_dir, invisible, 'BESIII_BR_Jpsi_inv_binned.txt'),
+    'invisible',
+    rmax = rmax_besIII,
+    mass_parent=mJpsi,
+    mass_sibling=0,
+    lab_boost=11e-3 #Symmetric beams crossing at angle theta=11mrad. pJ/psi = sqrt(s)*sin(theta) approx sqrt(s)*theta
+)
 
 #Belle B->h nu nu 2017
     #Experiment: Belle
@@ -889,17 +856,16 @@ visible = "visible/"
     #arXiv:1108.3549
     #Results at 90% confidence level
     #Branching ratio
-def babar_Y_hadrons(x):
-    citations.register_inspire('BaBar:2011kau')
-    data_file_path = os.path.join(current_dir, visible, 'Babar_BR_hadrons_binned.txt')
-    q2min, q2max, param = data_reading(data_file_path)
-    value = []
-    sigmar = []
-    for ii in range(len(q2min)):
-        value.append(0)
-        sigmar.append(sigma(0.9, 1, param[ii]))
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmar, sigmar)
-    return values, sigmals, sigmars
+
+babar_Y3S_hadrons = MeasurementInterpolatedBound(
+    'BaBar:2011kau',
+    os.path.join(current_dir, visible, 'Babar_BR_hadrons_binned.txt'),
+    'prompt',
+    rmin=2.0,
+    lab_boost=0.469/(1-0.469**2)**0.5, #gamma = 0.469, correspinding to E_electron = 8.6GeV and E_positron = 3.1GeV
+    mass_parent=mUpsilon3S,
+    mass_sibling=0
+)
 
 babar_Y3S_mumu = MeasurementInterpolatedBound(
     'BaBar:2009lbr',
@@ -916,81 +882,80 @@ babar_Y3S_mumu = MeasurementInterpolatedBound(
     #arXiv:1210.0287
     #Results at 90% confidence level
     #Branching ratio
-def babar_Y1s_mumu(x):
-    citations.register_inspire('BaBar:2012wey')
-    data_file_path = os.path.join(current_dir, visible, 'Babar_BR_mumu_binned.txt')
-    q2min, q2max, param = data_reading(data_file_path)
-    value = []
-    sigmar = []
-    for ii in range(len(q2min)):
-        value.append(0)
-        sigmar.append(sigma(0.9, 1, param[ii]))
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmar, sigmar)
-    return values, sigmals, sigmars
+babar_Y1s_mumu = MeasurementInterpolatedBound(
+    'BaBar:2012wey',
+    os.path.join(current_dir, visible, 'Babar_BR_mumu_binned.txt'),
+    'prompt',
+    rmin=2.0,
+    lab_boost=0.469/(1-0.469**2)**0.5, #gamma = 0.469, correspinding to E_electron = 8.6GeV and E_positron = 3.1GeV
+    mass_parent=mUpsilon1S,
+    mass_sibling=0
+)
 
 #BaBar Y(1S)--> c c
     #Experiment: BaBar
     #arXiv:1502.06019
     #Results at 90% confidence level
     #Branching ratio
-def babar_Y1s_cc(x):
-    citations.register_inspire('BaBar:2015cce')
-    data_file_path = os.path.join(current_dir, visible, 'Babar_BR_cc_binned.txt')
-    q2min, q2max, param = data_reading(data_file_path)
-    value = []
-    sigmar = []
-    for ii in range(len(q2min)):
-        value.append(0)
-        sigmar.append(sigma(0.9, 1, param[ii]))
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmar, sigmar)
-    return values, sigmals, sigmars
+babar_Y1s_cc = MeasurementInterpolatedBound(
+    'BaBar:2015cce',
+    os.path.join(current_dir, visible, 'Babar_BR_cc_binned.txt'),
+    'prompt',
+    rmin=2.0,
+    lab_boost=0.469/(1-0.469**2)**0.5, #gamma = 0.469, correspinding to E_electron = 8.6GeV and E_positron = 3.1GeV
+    mass_parent=mUpsilon1S,
+    mass_sibling=0
+)
 
 #Belle Y(1S)--> Leptons
     #Experiment: Belle
     #arXiv:2112.11852
     #Results at 90% confidence level
     #Branching ratio
-def belle_Y1S_mumu(x):
-    citations.register_inspire('Belle:2021rcl')
-    data_file_path = os.path.join(current_dir, visible, 'Belle_BR_mumu_binned.txt')
-    q2min, q2max, param = data_reading(data_file_path)
-    value = []
-    sigmar = []
-    for ii in range(len(q2min)):
-        value.append(0)
-        sigmar.append(sigma(0.9, 1, param[ii]))
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmar, sigmar)
-    return values, sigmals, sigmars
+belle_Y1S_mumu = MeasurementInterpolatedBound(
+    'Belle:2021rcl',
+    os.path.join(current_dir, visible, 'Belle_BR_mumu_binned.txt'),
+    'prompt',
+    lab_boost=0.28,
+    mass_parent=mUpsilon1S,
+    mass_sibling=0,
+    rmin=4
+)
 
-def belle_Y1S_tautau(x):
-    citations.register_inspire('Belle:2021rcl')
-    data_file_path = os.path.join(current_dir, visible, 'Belle_BR_tautau_binned.txt')
-    q2min, q2max, param = data_reading(data_file_path)
-    value = []
-    sigmar = []
-    for ii in range(len(q2min)):
-        value.append(0)
-        sigmar.append(sigma(0.9, 1, param[ii]))
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmar, sigmar)
-    return values, sigmals, sigmars
-
+belle_Y1S_tautau = MeasurementInterpolatedBound(
+    'Belle:2021rcl',
+    os.path.join(current_dir, visible, 'Belle_BR_tautau_binned.txt'),
+    'prompt',
+    lab_boost=0.28,
+    mass_parent=mUpsilon1S,
+    mass_sibling=0,
+    rmin=4
+)
 
 #BESIII J/psi--> mu mu
     #Experiment: BESIII
     #arXiv:2109.12625
     #Results at 90% confidence level
     #Branching ratio
-def besiii_Jpsi_mumu(x):
-    citations.register_inspire('BESIII:2021ges')
-    data_file_path = os.path.join(current_dir, visible, 'BES_BR_mumu_binned.txt')
-    q2min, q2max, param = data_reading(data_file_path)
-    value = []
-    sigmar = []
-    for ii in range(len(q2min)):
-        value.append(0)
-        sigmar.append(sigma(0.9, 1, param[ii]))
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmar, sigmar)
-    return values, sigmals, sigmars
+besIII_Jpsi_mumu = MeasurementInterpolatedBound(
+    'BESIII:2021ges',
+    os.path.join(current_dir, visible, 'BES_BR_mumu_binned.txt'),
+    'prompt',
+    rmin = rmax_besIII,
+    mass_parent=mJpsi,
+    mass_sibling=0,
+    lab_boost=11e-3 #Symmetric beams crossing at angle theta=11mrad. pJ/psi = sqrt(s)*sin(theta) approx sqrt(s)*theta
+)
+
+besIII_Jpsi_3gamma = MeasurementInterpolatedBound(
+    'BESIII:2024hdv',
+    os.path.join(current_dir, visible, 'BESIII_Jpsi3photon.txt'),
+    'prompt',
+    rmin = rmax_besIII,
+    mass_parent=mJpsi,
+    mass_sibling=0,
+    lab_boost=11e-3 #Symmetric beams crossing at angle theta=11mrad. pJ/psi = sqrt(s)*sin(theta) approx sqrt(s)*theta
+)
 
 lhcb_bkmumu_displvertex = MeasurementDisplacedVertexBound('LHCb:2016awg', os.path.join(current_dir, visible, 'LHCb_BKmumu_displ.npy'), 0.95)
 
@@ -1252,9 +1217,31 @@ def get_measurements(transition: str, exclude_projections: bool = True) -> dict[
         return {'LHCb': lhcb_Bstomumu, 'CMS': cms_Bstomumu}
     elif initial == ['Bs'] and final == sorted(['tau', 'tau']):
         return {'LHCb': lhcb_Bstotautau}
+    #Initial state J/psi
+    elif initial == ['J/psi'] and final == sorted(['photon', 'alp']):
+        return {'BESIII': besIII_Jpsiinv}
+    elif initial == ['J/psi'] and final == ['photon', 'photon', 'photon']:
+        return {'BESeIII': besIII_Jpsi_3gamma}
+    elif initial == ['J/psi'] and final == sorted(['muon', 'muon', 'photon']):
+        return {'BESIII': besIII_Jpsi_mumu}
+    #Initial state Y(1S)
+    elif initial == ['Upsilon(1S)'] and final == sorted(['photon', 'alp']):
+        return {'Belle': belle_Y1S_inv}
+    elif initial == ['Upsilon(1S)'] and final == sorted(['muon', 'muon', 'photon']):
+        return {'BaBar': babar_Y1s_mumu, 'Belle': belle_Y1S_mumu}
+    elif initial == ['Upsilon(1S)'] and final == sorted(['tau', 'tau', 'photon']):
+        return {'Belle': belle_Y1S_tautau}
+    elif initial == ['Upsilon(1S)'] and final == sorted(['photon', 'charm', 'charm']):
+        return {'BaBar': babar_Y1s_cc}
     #Initial state Upsilon(3S)
+    elif initial == ['Upsilon(3S)'] and final == sorted(['photon', 'alp']):
+        return {'BaBar': babar_Y3S_inv}
     elif initial == ['Upsilon(3S)'] and final == sorted(['photon', 'tau', 'tau']):
         return {'BaBar': babar_Y3S_tautau}
+    elif initial == ['Upsilon(3S)'] and final == sorted(['photon', 'muon', 'muon']):
+        return {'BaBar': babar_Y3S_mumu}
+    elif initial == ['Upsilon(3S)'] and final == sorted(['photon', 'hadrons']):
+        return {'BaBar': babar_Y3S_hadrons}
     #initial state D0
     elif initial == ['D0'] and final == sorted(['pion0', 'alp']):
         return {'BESIII': besIII_D0topi0nunu}
