@@ -220,7 +220,7 @@ def D0topi0a(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
     if ma > mD0-mpi0:
         return 0
     coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
-    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + couplings['ku'][1,0])/f_a
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + coup_low['ku'][1,0])/f_a
     kallen_factor = kallen(1, mpi0**2/mD0**2, ma**2/mD0**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mD0**3*abs(gq_eff)**2/(128*np.pi) * f0_Dpi(ma**2)**2*np.sqrt(kallen_factor)*(1-mpi0**2/mD0**2)**2
@@ -231,7 +231,7 @@ def Dplustopiplusa(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
     if ma > mDplus-mpi_pm:
         return 0
     coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
-    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + couplings['ku'][1,0])/f_a
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + coup_low['ku'][1,0])/f_a
     kallen_factor = kallen(1, mpi_pm**2/mDplus**2, ma**2/mDplus**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mDplus**3*abs(gq_eff)**2/(64*np.pi) * f0_Dpi(ma**2)**2*np.sqrt(kallen_factor)*(1-mpi_pm**2/mDplus**2)**2
@@ -242,7 +242,7 @@ def D0toetaa(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
     if ma > mD0-meta:
         return 0
     coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
-    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + couplings['ku'][1,0])/f_a
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + coup_low['ku'][1,0])/f_a
     kallen_factor = kallen(1, meta**2/mD0**2, ma**2/mD0**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mD0**3*abs(gq_eff)**2/(128*np.pi) * f0_Deta(ma**2)**2*np.sqrt(kallen_factor)*(1-meta**2/mD0**2)**2
@@ -253,7 +253,7 @@ def D0toetapa(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
     if ma > mD0-metap:
         return 0
     coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
-    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + couplings['ku'][1,0])/f_a
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + coup_low['ku'][1,0])/f_a
     kallen_factor = kallen(1, metap**2/mD0**2, ma**2/mD0**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mD0**3*abs(gq_eff)**2/(128*np.pi) * f0_Detap(ma**2)**2*np.sqrt(kallen_factor)*(1-metap**2/mD0**2)**2
@@ -264,7 +264,7 @@ def DstoKa(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
     if ma > mDs-mK:
         return 0
     coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
-    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + couplings['ku'][1,0])/f_a
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + coup_low['ku'][1,0])/f_a
     kallen_factor = kallen(1, mK**2/mDs**2, ma**2/mDs**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mDs**3*abs(gq_eff)**2/(64*np.pi) * f0_DsK(ma**2)**2*np.sqrt(kallen_factor)*(1-mK**2/mDs**2)**2
@@ -275,7 +275,7 @@ def D0torhoa(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
     if ma > mD0-mrho:
         return 0
     coup_low = couplings.match_run(ma, 'VA_below', **kwargs)
-    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') - couplings['ku'][1,0])/f_a
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') - coup_low['ku'][1,0])/f_a
     kallen_factor = kallen(1, mrho**2/mD0**2, ma**2/mD0**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mD0**3*abs(gq_eff)**2/(64*np.pi) * A0_Drho(ma**2)**2 * kallen_factor**1.5
@@ -286,7 +286,7 @@ def Dplustorhoa(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
     if ma > mDplus-mrho_pm:
         return 0
     coup_low = couplings.match_run(ma, 'VA_below', **kwargs)
-    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') - couplings['ku'][1,0])/f_a
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') - coup_low['ku'][1,0])/f_a
     kallen_factor = kallen(1, mrho_pm**2/mDplus**2, ma**2/mDplus**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mDplus**3*abs(gq_eff)**2/(64*np.pi) * A0_Drho(ma**2)**2 * kallen_factor**1.5
@@ -297,7 +297,7 @@ def DstoKsta(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
     if ma > mDs-mKst_plus:
         return 0
     coup_low = couplings.match_run(ma, 'VA_below', **kwargs)
-    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') - couplings['ku'][1,0])/f_a
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') - coup_low['ku'][1,0])/f_a
     kallen_factor = kallen(1, mKst_plus**2/mDs**2, ma**2/mDs**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mDs**3*abs(gq_eff)**2/(64*np.pi) * A0_DsKst(ma**2)**2 * kallen_factor**1.5

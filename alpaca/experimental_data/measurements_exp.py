@@ -664,7 +664,7 @@ besIII_D0topi0ee = MeasurementConstantBound(
     conf_level=0.9,
     mass_parent=mD0,
     mass_sibling=mpi0,
-    rmax=rmax_besIII
+    rmin=rmax_besIII
 )
 
 besIII_D0toetaee = MeasurementConstantBound(
@@ -674,7 +674,7 @@ besIII_D0toetaee = MeasurementConstantBound(
     conf_level=0.9,
     mass_parent=mD0,
     mass_sibling=meta,
-    rmax=rmax_besIII
+    rmin=rmax_besIII
 )
 
 e791_D0torho0ee = MeasurementConstantBound(
@@ -1280,7 +1280,7 @@ def get_measurements(transition: str, exclude_projections: bool = True) -> dict[
     #Initial state Ds+
     elif initial == ['Ds+'] and final == sorted(['K+', 'electron', 'electron']):
         return {'LHCb': lhcb_DstoKpee}
-    elif initial == ['Ds+'] and final == sorted(['pion+', 'muon', 'muon']):
+    elif initial == ['Ds+'] and final == sorted(['K+', 'muon', 'muon']):
         return {'LHCb': lhcb_DstoKpmumu}
     #Initial state K+
     elif initial == ['K+'] and final == sorted(['pion+', 'alp']):
