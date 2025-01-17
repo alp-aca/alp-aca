@@ -274,7 +274,7 @@ def D0torhoa(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
     from ...common import A0_Drho, kallen
     if ma > mD0-mrho:
         return 0
-    coup_low = couplings.match_run(ma, 'VA_below', **kwargs)
+    coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
     gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') - coup_low['ku'][1,0])/f_a
     kallen_factor = kallen(1, mrho**2/mD0**2, ma**2/mD0**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
@@ -285,7 +285,7 @@ def Dplustorhoa(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
     from ...common import A0_Drho, kallen
     if ma > mDplus-mrho_pm:
         return 0
-    coup_low = couplings.match_run(ma, 'VA_below', **kwargs)
+    coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
     gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') - coup_low['ku'][1,0])/f_a
     kallen_factor = kallen(1, mrho_pm**2/mDplus**2, ma**2/mDplus**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
@@ -296,7 +296,7 @@ def DstoKsta(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
     from ...common import A0_DsKst, kallen
     if ma > mDs-mKst_plus:
         return 0
-    coup_low = couplings.match_run(ma, 'VA_below', **kwargs)
+    coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
     gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') - coup_low['ku'][1,0])/f_a
     kallen_factor = kallen(1, mKst_plus**2/mDs**2, ma**2/mDs**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
