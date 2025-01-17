@@ -1,13 +1,13 @@
 import numpy as np
 from ..decays.alp_decays.branching_ratios import total_decay_width
-from ..decays.decays import branching_ratio
+from ..decays.decays import branching_ratio, cross_section
 from ..constants import hbarc_GeVnm
 from ..experimental_data.classes import MeasurementBase
 from ..experimental_data.measurements_exp import get_measurements
 from ..experimental_data.theoretical_predictions import get_th_uncert, get_th_value
 from ..rge import ALPcouplings
 
-def chi2_obs(measurement: MeasurementBase, transition: str, ma, couplings, fa, min_probability=1e-3, br_dark = 0.0, sm_pred=0, sm_uncert=0, **kwargs):
+def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, couplings, fa, min_probability=1e-3, br_dark = 0.0, sm_pred=0, sm_uncert=0, **kwargs):
     kwargs_dw = {k: v for k, v in kwargs.items() if k != 'theta'}
     ma = np.atleast_1d(ma).astype(float)
     couplings = np.atleast_1d(couplings)
@@ -17,7 +17,10 @@ def chi2_obs(measurement: MeasurementBase, transition: str, ma, couplings, fa, m
     ctau = np.where(br_dark == 1.0, np.inf, 1e-7*hbarc_GeVnm/dw)
     prob_decay = measurement.decay_probability(ctau, ma, theta=kwargs.get('theta', None), br_dark=br_dark)
     prob_decay = np.where(prob_decay < min_probability, np.nan, prob_decay)
-    br = branching_ratio(transition, ma, couplings, fa, br_dark, **kwargs_dw)
+    if isinstance(transition, str):
+        br = branching_ratio(transition, ma, couplings, fa, br_dark, **kwargs_dw)
+    else:
+        br = cross_section(transition[0], ma, couplings, transition[1], fa, br_dark, **kwargs_dw)
     sigma_left = measurement.get_sigma_left(ma, ctau)
     sigma_right = measurement.get_sigma_right(ma, ctau)
     sigma = np.where(sigma_left == 0, sigma_right, (sigma_left+sigma_right)/2)
@@ -27,7 +30,7 @@ def combine_chi2(*chi2):
     ndof = np.sum(np.where(np.isnan(m), 0, 1) for m in chi2)
     return np.where(ndof == 0, np.nan, sum(np.nan_to_num(m) for m in chi2))/ndof
 
-def get_chi2(transitions: list[str], ma: np.ndarray[float], couplings: np.ndarray[ALPcouplings], fa: np.ndarray[float], min_probability = 1e-3, exclude_projections=True, **kwargs) -> dict[tuple[str, str], np.array]:
+def get_chi2(transitions: list[str | tuple], ma: np.ndarray[float], couplings: np.ndarray[ALPcouplings], fa: np.ndarray[float], min_probability = 1e-3, exclude_projections=True, **kwargs) -> dict[tuple[str, str], np.array]:
     """Calculate the chi-squared values for a set of transitions.
 
     Parameters

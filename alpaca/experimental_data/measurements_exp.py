@@ -291,7 +291,7 @@ belle_Y1S_inv = MeasurementInterpolatedBound(
     os.path.join(current_dir, invisible, 'Belle_BR_Y1S_binned.txt'),
     'invisible',
     rmax=rmax_belle,
-    lab_boost=0.28,
+    lab_boost=0.42,
     mass_parent=mUpsilon1S,
     mass_sibling=0
 )
@@ -413,12 +413,6 @@ besIII_D0topi0nunu = MeasurementConstantBound(
     #arXiv: 2007.13071
     #@95% confidence level
     #Cross section (pb)
-def belleII_upsilon4s(x):
-    citations.register_inspire('Belle-II:2020jti')
-    data_file_path = os.path.join(current_dir, invisible, 'Belle2_gamma_binned.txt')
-    q2min, q2max, value = data_reading(data_file_path)
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, 0.5*np.array(value), 0.5*np.array(value))
-    return values*1e12, sigmals*1e12, sigmars*1e12
 
 #################################### VISIBLE SEARCHES ####################################
 
@@ -916,7 +910,7 @@ belle_Y1S_mumu = MeasurementInterpolatedBound(
     'Belle:2021rcl',
     os.path.join(current_dir, visible, 'Belle_BR_mumu_binned.txt'),
     'prompt',
-    lab_boost=0.28,
+    lab_boost=0.42,
     mass_parent=mUpsilon1S,
     mass_sibling=0,
     rmin=4
@@ -926,7 +920,7 @@ belle_Y1S_tautau = MeasurementInterpolatedBound(
     'Belle:2021rcl',
     os.path.join(current_dir, visible, 'Belle_BR_tautau_binned.txt'),
     'prompt',
-    lab_boost=0.28,
+    lab_boost=0.42,
     mass_parent=mUpsilon1S,
     mass_sibling=0,
     rmin=4
@@ -957,6 +951,18 @@ besIII_Jpsi_3gamma = MeasurementInterpolatedBound(
     lab_boost=11e-3 #Symmetric beams crossing at angle theta=11mrad. pJ/psi = sqrt(s)*sin(theta) approx sqrt(s)*theta
 )
 
+belleII_Upsilon4S_3gamma = MeasurementInterpolatedBound(
+    'Belle-II:2020jti',
+    os.path.join(current_dir, visible, 'Belle2_gamma_binned.txt'),
+    'prompt',
+    rmin=0.1,
+    lab_boost=0.28,
+    mass_parent=10.58,
+    conf_level=0.95,
+    mass_sibling=0
+)
+
+
 lhcb_bkmumu_displvertex = MeasurementDisplacedVertexBound('LHCb:2016awg', os.path.join(current_dir, visible, 'LHCb_BKmumu_displ.npy'), 0.95)
 
 lhcb_bks0mumu_displvertex = MeasurementDisplacedVertexBound('LHCb:2015nkv', os.path.join(current_dir, visible, 'LHCb_BKsmumu_displ.npy'), 0.95)
@@ -979,7 +985,7 @@ babar_bkphotons_displvertex = MeasurementDisplacedVertexBound('BaBar:2021ich', o
 
 babar_bktautau = MeasurementConstantBound('BaBar:2016wgb', 'prompt', 2.25e-3, min_ma = 2*mtau, conf_level=0.9, rmin =100, mass_parent=mB, mass_sibling=mK)
 
-belle_B0toK0stautau = MeasurementConstantBound('Belle:2021ecr', 'prompt', 3.1e-3, conf_level=0.9, min_ma=2*mtau, lab_boost=0.28, mass_parent=mB0, mass_sibling=mKst0, rmin=100)
+belle_B0toK0stautau = MeasurementConstantBound('Belle:2021ecr', 'prompt', 3.1e-3, conf_level=0.9, min_ma=2*mtau, mass_parent=mB0, mass_sibling=mKst0, rmin=100)
 
 #belle_Y1S_tautau = MeasurementInterpolatedBound('Belle:2021rcl', os.path.join(current_dir, visible, 'Belle_BR_tautau_binned.txt'), 'prompt', conf_level=0.9, min_ma=2*mtau, lab_boost=0.42, mass_parent=mUpsilon1S, mass_sibling=0, rmin=100)
 babar_Y3S_tautau = MeasurementInterpolatedBound('BaBar:2009oxm', os.path.join(current_dir, visible, 'babar_Y3S_tautau.txt'), 'prompt', conf_level=0.9, lab_boost=0.469/(1-0.469**2)**0.5, mass_parent=mUpsilon3S, mass_sibling=0, rmin=10)
@@ -1132,7 +1138,7 @@ belle_b0topimumu = MeasurementConstantBound(
     mass_sibling=mpi0
 )
 
-def get_measurements(transition: str, exclude_projections: bool = True) -> dict[str, MeasurementBase]:
+def get_measurements(process: str | tuple, exclude_projections: bool = True) -> dict[str, MeasurementBase]:
     """Retrieve measurements based on the given transition.
 
     Parameters
@@ -1153,6 +1159,12 @@ def get_measurements(transition: str, exclude_projections: bool = True) -> dict[
     KeyError
         If no measurements are found for the given transition.
     """
+
+    if isinstance(process, str):
+        transition = process
+    else:
+        transition = process[0]
+        args = process[1:]
 
     initial, final = parse(transition)
     #Initial state B+
@@ -1242,6 +1254,9 @@ def get_measurements(transition: str, exclude_projections: bool = True) -> dict[
         return {'BaBar': babar_Y3S_mumu}
     elif initial == ['Upsilon(3S)'] and final == sorted(['photon', 'hadrons']):
         return {'BaBar': babar_Y3S_hadrons}
+    #Non-resonant e+e- -> gamma a @ mUpsilon(4S)
+    elif initial == ['electron', 'electron'] and final == ['photon', 'photon', 'photon'] and len(args)==1 and args[0] == 10.58**2:
+        return {'Belle II': belleII_Upsilon4S_3gamma}
     #initial state D0
     elif initial == ['D0'] and final == sorted(['pion0', 'alp']):
         return {'BESIII': besIII_D0topi0nunu}

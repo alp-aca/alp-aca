@@ -66,7 +66,12 @@ def theo_Bstomumu():
     return value, sigmal, sigmar
 
 @cache
-def get_th_uncert(transition: str, N: int = 50) -> float:
+def get_th_uncert(process: str | tuple, N: int = 50) -> float:
+    if isinstance(process, str):
+        transition = process
+    else:
+        transition = process[0]
+        args = process[1:]
     initial, final = parse(transition)
     if initial == ['Bs'] and final == ['electron', 'electron']:
         return flavio.sm_uncertainty('BR(Bs->ee)', N=N)
