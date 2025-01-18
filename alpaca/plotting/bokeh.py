@@ -51,7 +51,11 @@ def exclusionplot(x, y, chi2, xlabel, ylabel, title, tex = None):
         contour = contourpy.contour_generator(xx, yy, nsigmas(chi2_obs,2))
         contour_bokeh = filled_to_bokeh(contour.filled(2, np.inf), contour.fill_type)
         source = ColumnDataSource(data={'xs': [contour_bokeh[0]], 'ys':[contour_bokeh[1]], 'observable': [observable[0]], 'experiment': [observable[1]]})
-        contour_fig = fig1.multi_polygons(xs = 'xs', ys='ys', line_width=4, source=source, color=colors[observable], legend_label=f'{observable[0]} ({observable[1]})', fill_alpha=0, hover_alpha=0.3, visible=False)
+        if isinstance(observable, tuple):
+            label = tex[observable[0]] + ' (' + observable[1] + ')'
+        else:
+            label = tex[observable]
+        contour_fig = fig1.multi_polygons(xs = 'xs', ys='ys', line_width=4, source=source, color=colors[observable], legend_label=label, fill_alpha=0, hover_alpha=0.3, visible=False)
         contours_obs.append(contour_fig)
     fig1.legend.click_policy = 'hide'
     fig1.add_layout(fig1.legend[0], 'right')

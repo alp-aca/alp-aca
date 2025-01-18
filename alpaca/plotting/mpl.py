@@ -25,7 +25,11 @@ def exclusionplot(x, y, chi2, xlabel, ylabel, title, tex):
             continue
         mask = np.where(np.isnan(chi2_obs), 0, nsigmas(chi2_obs, 2))
         plt.contour(x, y, mask, levels=[2], colors = colors[observable], linestyles=lss[observable])
-        legend_elements.append(plt.Line2D([0], [0], color=colors[observable], ls=lss[observable], label=tex[observable[0]] + ' (' + observable[1] + ')'))
+        if isinstance(observable, tuple):
+            label = tex[observable[0]] + ' (' + observable[1] + ')'
+        else:
+            label = tex[observable]
+        legend_elements.append(plt.Line2D([0], [0], color=colors[observable], ls=lss[observable], label=label))
     ax.set_xscale('log')
     ax.set_yscale('log')
     cb = plt.colorbar(pl, extend='max')
