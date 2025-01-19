@@ -63,7 +63,7 @@ def Kplustopia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **
 def ampK0topia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **kwargs):
     from ...constants import mKL, mpi0, g8, fpi, GF, mu, md, ms
     if ma > mKL-mpi0:
-        return 0
+        return (0, 0)
     B0 = mpi0**2/(mu+md)
     mK = np.sqrt(B0*(ms+mu/2+md/2))
     citations.register_inspire('Bauer:2021mvw')
