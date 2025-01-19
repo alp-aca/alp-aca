@@ -1,5 +1,8 @@
 import requests
 import tempfile
+from contextlib import contextmanager
+from os import PathLike
+from io import TextIOBase
 
 class Citations:
     def __init__(self):
@@ -26,7 +29,18 @@ class Citations:
     def inspires_ids(self):
         return list(self.citations)
     
-    def generate_bibtex(self, filepath: str):
+    def generate_bibtex(self, filepath: str | PathLike | TextIOBase):
+        '''Generates a bibtex file with the citations registered in the object.
+
+        This method uses the inspirehep.net API to generate the bibtex file.
+
+        Arguments
+        ---------
+        filepath: str | PathLike | TextIOBase
+            The path to the file where the bibtex will be written. If a file-like
+            object is passed, the bibtex will be written to it. If a string is
+            passed, the bibtex will be written to a file with the given name.
+        '''
         with tempfile.NamedTemporaryFile('w+t', suffix='.tex') as tf:
             tf.write(r'\cite{' + ','.join(citations.inspires_ids()) + r'}')
             tf.seek(0)
@@ -36,14 +50,50 @@ class Citations:
         r.raise_for_status()
         r2 = requests.get(r.json()['data']['download_url'], stream=True)
         r2.raise_for_status()
-        with open(filepath, 'wb') as f:
+        if isinstance(filepath, TextIOBase):
             for chunck in r2.iter_content(chunk_size=16*1024):
-                f.write(chunck)
+                filepath.write(chunck)
             for v in self.dict_citations.values():
-                f.write(str.encode('\n\n' + v))
+                filepath.write('\n\n' + v)
+        else:
+            with open(filepath, 'wb') as f:
+                for chunck in r2.iter_content(chunk_size=16*1024):
+                    f.write(chunck)
+                for v in self.dict_citations.values():
+                    f.write(str.encode('\n\n' + v))
 
 citations = Citations()
 citations.register_inspire('Harris:2020xlr') # Including numpy by default
+
+@contextmanager
+def citations_context(merge: bool = True):
+    '''Creates a context manager to gather citations in a block of code.
+    
+    Arguments
+    ---------
+    merge: bool (default: True)
+        If True, the citations gathered in the block will be merged with the
+        citations outside the block. If False, the citations gathered in the
+        block wil be erased after the block.
+
+    Usage
+    -----
+    >>> from alpaca.citations import citations, citations_context
+    >>> with citations_context():
+    >>>     # Code that uses alpaca
+    >>>     citations.generate_bibtex('my_bibtex.bib')
+    '''
+    saved_citations = citations.citations.copy()
+    saved_dict_citations = citations.dict_citations.copy()
+    citations.citations.clear()
+    citations.dict_citations.clear()
+    yield
+    if merge:
+        citations.citations |= saved_citations
+        citations.dict_citations |= saved_dict_citations
+    else:
+        citations.citations = saved_citations
+        citations.dict_citations = saved_dict_citations
 
 class Constant(float):
     def __new__(self, val: float, source: str):
@@ -142,4 +192,5 @@ class Constant(float):
         return super().__hash__()
 
     def __complex__(self) -> complex:
+        self.register()
         return float(self) + 0j
