@@ -66,7 +66,7 @@ citations = Citations()
 citations.register_inspire('Harris:2020xlr') # Including numpy by default
 
 @contextmanager
-def citations_context(merge: bool = True):
+def _citations_context(merge: bool = True):
     saved_citations = citations.citations.copy()
     saved_dict_citations = citations.dict_citations.copy()
     citations.citations.clear()
@@ -79,7 +79,8 @@ def citations_context(merge: bool = True):
         citations.citations = saved_citations
         citations.dict_citations = saved_dict_citations
 
-citations_context.__doc__ =    '''Creates a context manager to gather citations in a block of code.
+def citations_context(merge: bool = True):
+    '''Creates a context manager to gather citations in a block of code.
     
     Arguments
     ---------
@@ -95,6 +96,7 @@ citations_context.__doc__ =    '''Creates a context manager to gather citations 
     >>>     # Code that uses alpaca
     >>>     citations.generate_bibtex('my_bibtex.bib')
     '''
+    return _citations_context(merge)
 
 class Constant(float):
     def __new__(self, val: float, source: str):
