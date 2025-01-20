@@ -10,6 +10,9 @@ from json import JSONEncoder, JSONDecoder
 from sympy import Expr, Matrix
 from os import PathLike
 from io import TextIOBase
+import wilson
+import ckmutil
+from cmath import phase
 
 numeric = (int, float, complex, Expr)
 matricial = (np.ndarray, np.matrix, Matrix, list)
@@ -35,7 +38,16 @@ class ALPcouplings:
     ValueError
         If attempting to translate to an unrecognized basis.
     """
-    def __init__(self, values: dict, scale:float, basis:str, ew_scale: float = 100.0):
+    def __init__(self,
+                 values: dict,
+                 scale:float,
+                 basis:str,
+                 ew_scale: float = 100.0,
+                 VuL: np.ndarray| None = None,
+                 VdL: np.ndarray| None = None,
+                 VuR: np.ndarray| None = None,
+                 VdR: np.ndarray| None = None
+                ):
         """Constructor method
 
         Parameters
@@ -55,6 +67,18 @@ class ALPcouplings:
         ew_scale : float, optional
             Energy scale of the electroweak symmetry breaking scale, in GeV. Defaults to 100 GeV
 
+        VuL : np.ndarray, optional
+            Unitary rotation of the left-handed up-type quarks to diagonalize Yu. If None, it is set to the identity.
+
+        VdL : np.ndarray, optional
+            Unitary rotation of the left-handed down-type quarks to diagonalize Yd. If None, it is set to the CKM matrix.
+
+        VuR : np.ndarray, optional
+            Unitary rotation of the right-handed up-type quarks to diagonalize Yu. If None, it is set to the identity.
+
+        VdR : np.ndarray, optional
+            Unitary rotation of the right-handed down-type quarks to diagonalize Yd. If None, it is set to the identity.
+            
         Raises
         ------
         ValueError
@@ -62,6 +86,9 @@ class ALPcouplings:
 
         TypeError
             If attempting to assign a non-numeric value
+
+        AttributeError
+            If the matrices VuL and VdL are provided at the same time.
         """
         citations.register_inspire('Bauer:2020jbp')
         self.ew_scale = ew_scale
@@ -141,6 +168,31 @@ class ALPcouplings:
             self.values = {c: values[c] for c in ['cuV', 'cuA', 'cdV', 'cdA', 'ceV', 'ceA', 'cnu', 'cg', 'cgamma']}
         else:
             raise ValueError('Unknown basis')
+        if self.basis in bases_above:
+            if VuL is not None and VdL is not None:
+                raise AttributeError('It is not possible to provide VuL and VdL at the same time')
+            wSM = wilson.classes.SMEFT(wilson.wcxf.WC('SMEFT', 'Warsaw', scale, {})).C_in
+            UuL, mu, UuR = ckmutil.diag.msvd(wSM['Gu'])
+            UdL, md, UdR = ckmutil.diag.msvd(wSM['Gd'])
+            K = UuL.conj().T @ UdL
+            Vub = abs(K[0,2])
+            Vcb = abs(K[1,2])
+            Vus = abs(K[0,1])
+            gamma = phase(-K[0,0]*K[0,2].conj()/(K[1,0]*K[1,2].conj()))
+            Vckm = ckmutil.ckm.ckm_tree(Vus, Vub, Vcb, gamma)
+            if VdL is not None:
+                VuL = VdL @ Vckm
+            elif VuL is not None:
+                VdL = VuL @ np.matrix(Vckm).H
+            else:
+                VuL = np.eye(3)
+                VdL = Vckm
+            if VdR is None:
+                VdR = np.eye(3)
+            if VuR is None:
+                VuR = np.eye(3)
+            self.yu = VuL @ np.diag(mu) @ np.matrix(VuR).H
+            self.yd = VdL @ np.diag(md) @ np.matrix(VdR).H
     
     def __add__(self, other: 'ALPcouplings') -> 'ALPcouplings':
         if self.basis == other.basis and self.ew_scale == other.ew_scale and self.scale == other.scale:
@@ -203,16 +255,38 @@ class ALPcouplings:
             smpars = runSM(self.scale)
             s2w = smpars['s2w']
             c2w = 1-s2w
-            Vckm = smpars['CKM']
+            UuL, mu, UuR = ckmutil.diag.msvd(self.yu)
+            UdL, md, UdR = ckmutil.diag.msvd(self.yd)
 
             cgamma = self.values['cW'] + self.values['cB']
             cgammaZ = c2w * self.values['cW'] - s2w * self.values['cB']
             cZ = c2w**2 * self.values['cW'] + s2w**2 *self.values['cB']
 
-            return ALPcouplings({'kU': self.values['cqL'], 'ku': self.values['cuR'], 'kD': Vckm.H @ self.values['cqL'] @ Vckm, 'kd': self.values['cdR'], 'kE': self.values['clL'], 'kNu': self.values['clL'], 'ke': self.values['ceR'], 'cgamma': cgamma, 'cW': self.values['cW'], 'cgammaZ': cgammaZ, 'cZ': cZ, 'cg': self.values['cg']}, scale=self.scale, basis='massbasis_above', ew_scale=self.ew_scale)
+            a = ALPcouplings({
+                'kU': np.matrix(UuL).H @ self.values['cqL'] @ UuL,
+                'ku': np.matrix(UuR).H @ self.values['cuR'] @ UuR,
+                'kD': np.matrix(UdL).H @ self.values['cqL'] @ UdL,
+                'kd': np.matrix(UdR).H @ self.values['cdR'] @ UdR,
+                'kE': self.values['clL'], 'kNu': self.values['clL'], 'ke': self.values['ceR'],
+                'cgamma': cgamma, 'cW': self.values['cW'], 'cgammaZ': cgammaZ, 'cZ': cZ, 'cg': self.values['cg']
+                }, scale=self.scale, basis='massbasis_above', ew_scale=self.ew_scale)
+            a.yu = self.yu
+            a.yd = self.yd
+            return a
         
         if self.basis == 'massbasis_above' and basis == 'derivative_above':
-            return ALPcouplings({'cg': self.values['cg'], 'cB': self.values['cgamma'] - self.values['cW'], 'cW': self.values['cW'], 'cqL': self.values['kU'], 'cuR': self.values['ku'], 'cdR': self.values['kD'], 'clL': self.values['kE'], 'ceR': self.values['ke']}, scale=self.scale, basis='derivative_above', ew_scale=self.ew_scale)
+            UuL, mu, UuR = ckmutil.diag.msvd(self.yu)
+            UdL, md, UdR = ckmutil.diag.msvd(self.yd)
+            a = ALPcouplings({'cg': self.values['cg'], 'cB': self.values['cgamma'] - self.values['cW'], 'cW': self.values['cW'],
+                                 'cqL': UuL @ self.values['kU'] @ np.matrix(UuL).H/2 + UdL @ self.values['kD'] @ np.matrix(UdL).H/2,
+                                 'cuR': UuR @ self.values['ku'] @ np.matrix(UuR),
+                                 'cdR': UdR @ self.values['kD'] @ np.matrix(UdR),
+                                 'clL': self.values['kE']/2 + self.values['kNu']/2,
+                                 'ceR': self.values['ke']
+                                 }, scale=self.scale, basis='derivative_above', ew_scale=self.ew_scale)
+            a.yu = self.yu
+            a.yd = self.yd
+            return a
         
         if self.basis == 'kF_below' and basis == 'VA_below':
             return ALPcouplings({'cuV': self.values['ku'] + self.values['kU'],
@@ -236,9 +310,9 @@ class ALPcouplings:
     def _toarray(self) -> np.ndarray:
         "Converts the object into a vector of coefficientes"
         if self.basis == 'derivative_above':
-            return np.hstack([np.asarray(self.values[c]).ravel() for c in ['cqL', 'cuR', 'cdR', 'clL', 'ceR', 'cg', 'cB', 'cW']]).astype(dtype=complex)
+            return np.hstack([np.asarray(self.values[c]).ravel() for c in ['cqL', 'cuR', 'cdR', 'clL', 'ceR', 'cg', 'cB', 'cW']]+[np.asarray(self.yu).ravel()]+[np.asarray(self.yd).ravel()]).astype(dtype=complex)
         if self.basis == 'massbasis_above':
-            return np.hstack([np.asarray(self.values[c]).ravel() for c in ['kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke', 'cgamma', 'cgammaZ', 'cW', 'cZ', 'cg']]).astype(dtype=complex)
+            return np.hstack([np.asarray(self.values[c]).ravel() for c in ['kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke', 'cgamma', 'cgammaZ', 'cW', 'cZ', 'cg']]+[np.asarray(self.yu).ravel()]+[np.asarray(self.yd).ravel()]).astype(dtype=complex)
         if self.basis == 'kF_below':
             return np.hstack([np.asarray(self.values[c]).ravel() for c in ['kD', 'kE', 'kNu', 'kd', 'ke', 'kU', 'ku', 'cg', 'cgamma']]).astype(dtype=complex)
 
@@ -250,14 +324,19 @@ class ALPcouplings:
             for i, c in enumerate(['cqL', 'cuR', 'cdR', 'clL', 'ceR']):
                 vals |= {c: array[9*i:9*(i+1)].reshape([3,3])}
             vals |= {'cg': array[45], "cB": array[46], 'cW': array[47]}
-            return ALPcouplings(vals, scale, basis, ew_scale)
+            a1 = ALPcouplings(vals, scale, basis, ew_scale)
+            a1.yu = array[48:48+9].reshape([3,3])
+            a1.yd = array[48+9: 48+18].reshape([3,3])
+            return a1
         if basis == 'massbasis_above':
             vals = {}
             for i, c in enumerate(['kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke']):
                 vals |= {c: array[9*i:9*(i+1)].reshape([3,3])}
             for i, c in enumerate(['cgamma', 'cgammaZ', 'cW', 'cZ', 'cg']):
                 vals |= {c: array[54+i]}
-            return ALPcouplings(vals, scale, basis, ew_scale)
+            a1 = ALPcouplings(vals, scale, basis, ew_scale)
+            a1.yu = array[59:59+9].reshape([3,3])
+            a1.yd = array[59+9:59+18].reshape([3,3])
         if basis == 'kF_below':
             vals = {}
             for i, c in enumerate(['kD', 'kE', 'kNu', 'kd', 'ke']):
@@ -424,7 +503,11 @@ class ALPcouplings:
                 return x.tolist()
             return x
         values = {f'{k}_Re': np.real(v) for k, v in self.values.items()} | {f'{k}_Im': np.imag(v) for k, v in self.values.items()}
-        return {'values': {k: flatten(v) for k, v in values.items()}, 'scale': self.scale, 'basis': self.basis, 'ew_scale': self.ew_scale}
+        d = {'values': {k: flatten(v) for k, v in values.items()}, 'scale': self.scale, 'basis': self.basis, 'ew_scale': self.ew_scale}
+        if self.basis in bases_above:
+            yukawas = {f'{k}_Re': flatten(np.real(v)) for k, v in {'yu': self.yu, 'yd': self.yd}.items()} | {f'{k}_Im': flatten(np.imag(v)) for k, v in {'yu': self.yu, 'yd': self.yd}.items()}
+            d |= {'yukawas': yukawas}
+        return d
     
     @classmethod
     def from_dict(cls, data: dict) -> 'ALPcouplings':
@@ -445,7 +528,11 @@ class ALPcouplings:
                 return np.array(x)
             return x
         values = {k[:-3]: unflatten(np.array(data['values'][k]) + 1j*np.array(data['values'][k[:-3]+'_Im'])) for k in data['values'] if k[-3:] == '_Re'}
-        return ALPcouplings(values, data['scale'], data['basis'], data.get('ew_scale', 100.0))
+        a = ALPcouplings(values, data['scale'], data['basis'], data.get('ew_scale', 100.0))
+        if 'yukawas' in data.keys():
+            a.yu = unflatten(np.array(data['yukawas']['yu_Re']) + 1j*np.array(data['yukawas']['yu_Im']))
+            a.yd = unflatten(np.array(data['yukawas']['yd_Re']) + 1j*np.array(data['yukawas']['yd_Im']))
+        return a
     
     def save(self, file: str | PathLike | TextIOBase) -> None:
         """Save the object to a JSON file.

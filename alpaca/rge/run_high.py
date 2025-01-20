@@ -123,12 +123,15 @@ def beta_full(couplings: ALPcouplings) -> ALPcouplings:
 
     tildes = gauge_tilde(couplings)
     pars = runSM(couplings.scale)
-    yu = np.matrix(pars['yu'])
-    yd = np.matrix(pars['yd'])
+    yu = np.matrix(couplings.yu)
+    yd = np.matrix(couplings.yd)
     ye = np.matrix(pars['ye'])
     alpha_s = pars['alpha_s']
     alpha_1 = pars['alpha_1']
     alpha_2 = pars['alpha_2']
+    g_s = np.sqrt(4*np.pi*alpha_s)
+    g_1 = np.sqrt(4*np.pi*alpha_1)
+    g_2 = np.sqrt(4*np.pi*alpha_2)
 
     # Field redefinitions of the fermionic fields that eliminate Ophi, see Eq.(5) of 2012.12272 and the discussion below
     bu = -1
@@ -162,7 +165,14 @@ def beta_full(couplings: ALPcouplings) -> ALPcouplings:
 
     betaeR = ye.H @ ye @ couplings['ceR'] + couplings['ceR'] @ ye.H @ ye - 2*ye.H @ couplings['clL'] @ ye + np.eye(3) * (2*be*X+12*alpha_1**2*hyp_eR**2*tildes['cBtilde'])
 
-    return ALPcouplings({'cqL': betaqL, 'cuR': betauR, 'cdR': betadR, 'clL': betalL, 'ceR': betaeR}, scale=couplings.scale, basis='derivative_above', ew_scale=couplings.ew_scale)
+    gammaH = np.trace(3* yu @ yu.H + 3* yd @ yd.H + ye @ ye.H)
+    beta_yu = 3/2*(yu @ yu.H @ yu - yd @ yd.H @ yu) + (gammaH -9/4*g_2**2-17/12*g_1**2-8*g_s**2)*yu
+    beta_yd = 3/2*(yd @ yd.H @ yd - yu @ yu.H @ yd) + (gammaH -9/4*g_2**2-5/12*g_1**2-8*g_s**2)*yd
+
+    a = ALPcouplings({'cqL': betaqL, 'cuR': betauR, 'cdR': betadR, 'clL': betalL, 'ceR': betaeR}, scale=couplings.scale, basis='derivative_above', ew_scale=couplings.ew_scale)
+    a.yu = beta_yu
+    a.yd = beta_yd
+    return a
 
 def run_leadinglog(couplings: ALPcouplings, beta: Callable[[ALPcouplings], ALPcouplings], scale_out: float) -> ALPcouplings:
     """Obtain the ALP couplings at a different scale using the leading log approximation
@@ -179,8 +189,11 @@ def run_leadinglog(couplings: ALPcouplings, beta: Callable[[ALPcouplings], ALPco
         Final energy scale, in GeV
     """
 
-    result = couplings + beta(couplings) * (np.log(scale_out/couplings.scale)/(16*np.pi**2))
+    betac = beta(couplings)
+    result = couplings + betac * (np.log(scale_out/couplings.scale)/(16*np.pi**2))
     result.scale = scale_out
+    result.yu = couplings.yu + betac.yu * (np.log(scale_out/couplings.scale)/(16*np.pi**2))
+    result.yd = couplings.yd + betac.yd * (np.log(scale_out/couplings.scale)/(16*np.pi**2))
     return result
 
 def run_scipy(couplings: ALPcouplings, beta: Callable[[ALPcouplings], ALPcouplings], scale_out: float, scipy_options: dict) -> ALPcouplings:
