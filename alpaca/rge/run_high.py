@@ -63,10 +63,14 @@ def beta_ytop(couplings: ALPcouplings) -> ALPcouplings:
 
     tildes = gauge_tilde(couplings)
     pars = runSM(couplings.scale)
-    ytop = np.real(pars['yu'][2,2])
+    ytop = couplings.yu[2,2]
     alpha_s = pars['alpha_s']
     alpha_1 = pars['alpha_1']
     alpha_2 = pars['alpha_2']
+    yu = np.matrix(np.diag([0, 0, ytop]))
+    g_s = np.sqrt(4*np.pi*alpha_s)
+    g_1 = np.sqrt(4*np.pi*alpha_1)
+    g_2 = np.sqrt(4*np.pi*alpha_2)
 
     # Field redefinitions of the fermionic fields that eliminate Ophi, see Eq.(5) of 2012.12272 and the discussion below
     bu = -1
@@ -102,7 +106,12 @@ def beta_ytop(couplings: ALPcouplings) -> ALPcouplings:
 
     betaeR = np.eye(3)*(-6*ytop**2*be*ctt+12*alpha_1**2*tildes['cBtilde'])
 
-    return ALPcouplings({'cqL': betaqL, 'cuR': betauR, 'cdR': betadR, 'clL': betalL, 'ceR': betaeR}, couplings.scale, 'derivative_above', couplings.ew_scale)
+    gammaH = np.trace(3* yu @ yu.H)
+    beta_yu = 3/2*(yu @ yu.H @ yu) + (gammaH -9/4*g_2**2-17/12*g_1**2-8*g_s**2)*yu
+
+    a = ALPcouplings({'cqL': betaqL, 'cuR': betauR, 'cdR': betadR, 'clL': betalL, 'ceR': betaeR}, couplings.scale, 'derivative_above', couplings.ew_scale)
+    a.yu = beta_yu
+    return a
 
 
 def beta_full(couplings: ALPcouplings) -> ALPcouplings:
