@@ -40,7 +40,11 @@ class ModelBase:
     def get_couplings(self,
                       substitutions: dict[sp.Expr, float | complex],
                       scale: float,
-                      ew_scale: float = 100.0
+                      ew_scale: float = 100.0,
+                      VuL: np.ndarray| None = None,
+                      VdL: np.ndarray| None = None,
+                      VuR: np.ndarray| None = None,
+                      VdR: np.ndarray| None = None
                       ) -> ALPcouplings:
         """Substitute the symbolic variables with numerical values directly into the couplings
 
@@ -53,13 +57,25 @@ class ModelBase:
         ew_scale : float
             The electroweak scale, in GeV. Default is 100.0 GeV.
 
+        VuL : np.ndarray, optional
+            Unitary rotation of the left-handed up-type quarks to diagonalize Yu. If None, it is set to the identity.
+
+        VdL : np.ndarray, optional
+            Unitary rotation of the left-handed down-type quarks to diagonalize Yd. If None, it is set to the CKM matrix.
+
+        VuR : np.ndarray, optional
+            Unitary rotation of the right-handed up-type quarks to diagonalize Yu. If None, it is set to the identity.
+
+        VdR : np.ndarray, optional
+            Unitary rotation of the right-handed down-type quarks to diagonalize Yd. If None, it is set to the identity.
+
         Returns
         -------
         ALPcouplings
             The couplings of the model with numerical values.
         """
         substituted_couplings = {key: float(value.subs(substitutions)) for key, value in self.couplings.items()}
-        return ALPcouplings(substituted_couplings, scale, 'derivative_above', ew_scale)
+        return ALPcouplings(substituted_couplings, scale, 'derivative_above', ew_scale, VuL, VdL, VuR, VdR)
     
     def couplings_latex(self, eqnumber: bool = False) -> str:
         """Return the couplings of the model in LaTeX format.
