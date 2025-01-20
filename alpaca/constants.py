@@ -1,6 +1,6 @@
 import particle.literals as particles
 import numpy as np
-from .citations import citations, Constant
+from .citations.citations import citations, Constant
 from .classes import LazyFloat
 
 import operator

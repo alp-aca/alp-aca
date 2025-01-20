@@ -10,11 +10,10 @@ from .decays.decays import (
     cross_section as cross_section,
 )
 
-from .citations import citations as citations
-
 from . import(
     models as models,
     experimental_data as experimental_data,
     statistics as statistics,
     plotting as plotting,
+    citations as citations,
 )

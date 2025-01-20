@@ -10,6 +10,8 @@ statistics
     Contains functions to handle statistics.
 plotting
     Contains functions to handle plotting.
+citations
+    Contains functions to handle bibliographical references.
 
 Classes
 -------
