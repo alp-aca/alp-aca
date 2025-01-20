@@ -379,6 +379,9 @@ class ALPcouplings:
                 return couplings_below.match_run(scale_out, basis, integrator, beta, scipy_method=scipy_method, scipy_rtol=scipy_rtol, scipy_atol=scipy_atol)
             else:
                 raise KeyError(basis)
+        if self.scale == self.ew_scale and self.basis in bases_above and basis in bases_below:
+                couplings_below = matching.match(self, match_2loops)
+                return couplings_below.match_run(scale_out, basis, integrator, beta, scipy_method=scipy_method, scipy_rtol=scipy_rtol, scipy_atol=scipy_atol)
         if scale_out < self.ew_scale:
             if integrator == 'scipy':
                 scipy_options = {'method': scipy_method, 'rtol': scipy_rtol, 'atol': scipy_atol}
