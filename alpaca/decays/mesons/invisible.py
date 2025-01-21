@@ -96,7 +96,9 @@ def KLtopia(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     amp_K0, amp_K0bar = ampK0topia(ma, couplings, f_a, **kwargs)
     eps = epsilonKaon*(np.cos(phiepsilonKaon)+1j*np.sin(phiepsilonKaon))
     amp = ((1+eps)*amp_K0+(1-eps)*amp_K0bar)/np.sqrt(2*(1+np.abs(eps)**2))
-    return np.abs(amp)**2/(16*np.pi*mKL)*np.sqrt(kallen(1, mpi0**2/mKL**2, ma**2/mKL**2))/GammaKL
+    kallen_factor = kallen(1, mpi0**2/mKL**2, ma**2/mKL**2)
+    kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
+    return np.abs(amp)**2/(16*np.pi*mKL)*np.sqrt(kallen_factor)/GammaKL
 
 def KStopia(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     from ...constants import mKS, mpi0, epsilonKaon, phiepsilonKaon, GammaKS
@@ -104,7 +106,9 @@ def KStopia(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     amp_K0, amp_K0bar = ampK0topia(ma, couplings, f_a, **kwargs)
     eps = epsilonKaon*(np.cos(phiepsilonKaon)+1j*np.sin(phiepsilonKaon))
     amp = ((1+eps)*amp_K0-(1-eps)*amp_K0bar)/np.sqrt(2*(1+np.abs(eps)**2))
-    return np.abs(amp)**2/(16*np.pi*mKS)*np.sqrt(kallen(1, mpi0**2/mKS**2, ma**2/mKS**2))/GammaKS
+    kallen_factor = kallen(1, mpi0**2/mKS**2, ma**2/mKS**2)
+    kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
+    return np.abs(amp)**2/(16*np.pi*mKS)*np.sqrt(kallen_factor)/GammaKS
 
 def BtoKa(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     from ...constants import mK, mB
