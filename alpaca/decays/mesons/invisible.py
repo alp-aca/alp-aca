@@ -2,7 +2,7 @@ import numpy as np
 
 from ...rge import ALPcouplings
 from ...rge.runSM import runSM
-from ...citations import citations
+from ...biblio.biblio import citations
 from ..ee.cross_sections import sigmaNR_gammaALP
 from .effcouplings import effcouplings_cq1q2_W
 

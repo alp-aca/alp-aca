@@ -4,7 +4,7 @@ import numpy as np
 import vegas as vegas
 import math
 import functools
-from ...citations import citations
+from ...biblio.biblio import citations
 
 #NOTES
 #The input amplitude should have space for all possible kinematic variables

@@ -8,7 +8,7 @@ from . import chiral
 from .chiral import ffunction
 from .u3reprs import pi0, eta, etap, rho0, omega, phi, sigma, f0, a0, f2, eta0, eta8
 from ...constants import mu, md, ms, mc, mb, mt, me, mmu, mtau, mpi0, meta, metap, mK, mrho, fpi, mpi_pm, ma0, msigma, mf0, mf2, momega, Gammaa0, Gammasigma, Gammaf0, Gammaf2, Gammarho
-from ...citations import citations
+from ...biblio.biblio import citations
 
 #ALP decays to different channels (leptonic, hadronic, photons)
 

@@ -1,5 +1,5 @@
 #File with all possible theoretical predictions
-from ..citations import citations
+from ..biblio.biblio import citations
 from ..decays.decays import parse
 import flavio
 from functools import cache

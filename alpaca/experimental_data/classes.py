@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.stats import chi2
-from ..citations import citations
+from ..biblio.biblio import citations
 from ..common import kallen
 from ..constants import c_nm_per_ps
 from scipy.integrate import quad_vec

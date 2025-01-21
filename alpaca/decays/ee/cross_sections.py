@@ -1,5 +1,5 @@
 import numpy as np
-from ...citations import citations
+from ...biblio.biblio import citations
 from ...rge.classes import ALPcouplings
 from ..nwa import transition_nwa
 from ..alp_decays.branching_ratios import decay_channels

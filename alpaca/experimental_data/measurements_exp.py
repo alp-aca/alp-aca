@@ -2,7 +2,7 @@
 import os
 import numpy as np
 from scipy.stats import chi2
-from ..citations import citations
+from ..biblio.biblio import citations
 from ..constants import mUpsilon3S
 from .classes import MeasurementBase, MeasurementConstantBound, MeasurementInterpolatedBound, MeasurementInterpolated, MeasurementDisplacedVertexBound, MeasurementBinned, rmax_belle, rmax_besIII, MeasurementConstant
 from ..decays.particles import particle_aliases
