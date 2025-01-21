@@ -3,7 +3,7 @@ import particle.literals
 from . import ALPcouplings, runSM
 from typing import Callable
 from scipy.integrate import solve_ivp
-from ..citations import citations
+from ..biblio.biblio import citations
 
 def cggtilde(couplings: ALPcouplings) -> complex:
     citations.register_particle()

@@ -1,4 +1,4 @@
-"""alpaca.citations
+"""alpaca.biblio
 
 This module contains functions to handle bibliographical references.
 

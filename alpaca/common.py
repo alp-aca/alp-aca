@@ -1,7 +1,7 @@
 import numpy as np
 import flavio
 from .constants import pars
-from .citations import citations
+from .biblio.biblio import citations
 
 
 def kallen(a, b, c):

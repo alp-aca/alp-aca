@@ -1,7 +1,7 @@
 import numpy as np
 from . import ALPcouplings, runSM
 import particle.literals
-from ..citations import citations
+from ..biblio.biblio import citations
 
 def gauge_tilde(couplings):
         parsSM = runSM(couplings.scale)

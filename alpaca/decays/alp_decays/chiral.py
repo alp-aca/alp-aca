@@ -3,15 +3,14 @@ import numpy as np
 from ...constants import mu, md, ms, mpi0, meta, metap, fpi
 from ...common import alpha_s
 from . import u3reprs
-from ...citations import citations
+from ...biblio.biblio import citations
 from functools import lru_cache
 import pickle
 import os
 
-path = os.path.dirname(__file__)
 
-with open(os.path.join(path, 'ffunction.pickle'), 'rb') as f:
-    ffunction_interp = pickle.load(f)
+#with open(os.path.join(path, 'ffunction.pickle'), 'rb') as f:
+#    ffunction_interp = pickle.load(f)
 
 kappa = np.diag([1/m for m in [mu, md, ms]])/sum(1/m for m in [mu, md, ms])
 
@@ -57,18 +56,33 @@ def alphas_tilde(ma: float) -> float:
         return 2*ma*(alpha_s(1.5)-1)+3-2*alpha_s(1.5)
     return alpha_s(ma)
 
-def ffunction(ma):
-    #INPUT:
-        #ma: Mass of ALP (GeV)
-    #OUTPUT:
-        #Data-driven function 
-    #Chiral contribution (1811.03474, eq. S26, ,approx) (below mass eta')
-    citations.register_inspire('Aloni:2018vki')
-    citations.register_inspire('BaBar:2017zmc')
-    citations.register_inspire('BaBar:2007ceh')
-    citations.register_inspire('BaBar:2004ytv')
-    if ma < 1.4: fun = 1
-    elif ma >= 1.4 and ma <= 2: 
-        fun = ffunction_interp(ma)
-    else: fun = (1.4/ma)**4
-    return fun
+class _ffunction:
+    ffunction_interp = None
+    initialized = False
+
+    def initialize(self):
+        path = os.path.dirname(__file__)
+        with open(os.path.join(path, 'ffunction.pickle'), 'rb') as f:
+            self.ffunction_interp = pickle.load(f)
+        self.initialized = True
+
+    def __call__(self, ma):
+        #INPUT:
+            #ma: Mass of ALP (GeV)
+        #OUTPUT:
+            #Data-driven function 
+        #Chiral contribution (1811.03474, eq. S26, ,approx) (below mass eta')
+
+        if not self.initialized:
+            self.initialize()
+        citations.register_inspire('Aloni:2018vki')
+        citations.register_inspire('BaBar:2017zmc')
+        citations.register_inspire('BaBar:2007ceh')
+        citations.register_inspire('BaBar:2004ytv')
+        if ma < 1.4: fun = 1
+        elif ma >= 1.4 and ma <= 2: 
+            fun = self.ffunction_interp(ma)
+        else: fun = (1.4/ma)**4
+        return fun
+    
+ffunction = _ffunction()

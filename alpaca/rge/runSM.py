@@ -2,7 +2,7 @@ import wilson
 import ckmutil
 import numpy as np
 from cmath import phase
-from ..citations import citations
+from ..biblio.biblio import citations
 from functools import lru_cache
 
 def runSM(scale: float) -> dict:

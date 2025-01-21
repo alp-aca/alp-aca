@@ -2,7 +2,7 @@ from .classes import ALPcouplings
 import numpy as np
 import sympy as sp
 from typing import Callable
-from ..citations import citations
+from ..biblio.biblio import citations
 import particle.literals
 
 

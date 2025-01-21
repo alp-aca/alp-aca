@@ -3,7 +3,7 @@ from . import u3reprs
 from ...rge import ALPcouplings, bases_above
 from ...constants import mpi0, metap, mK, mu, md, ms, mc, mb, mt, mW, s2w, me, mmu, mtau, fpi
 from ...common import alpha_s, alpha_em, B1, B2
-from ...citations import citations
+from ...biblio.biblio import citations
 import numpy as np
 
 

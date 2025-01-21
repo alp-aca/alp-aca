@@ -1,7 +1,7 @@
 import numpy as np
 from ...rge import ALPcouplings, bases_above
 from ...constants import me, mmu, mtau, mc, mb
-from ...citations import citations
+from ...biblio.biblio import citations
 
 
 def fermion_decay_width(ma, fa,cf, mf,Nc):

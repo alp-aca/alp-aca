@@ -1,5 +1,5 @@
 import sympy as sp
-from ..citations import citations
+from ..biblio.biblio import citations
 
 def dim_from_dynkinlabels(l1: int, l2: int) -> int:
     """Returns the dimension of the SU(3) representation with the given Dynkin labels."""

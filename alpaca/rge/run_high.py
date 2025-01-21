@@ -20,7 +20,7 @@ import numpy as np
 from . import ALPcouplings, runSM
 from typing import Callable
 from scipy.integrate import solve_ivp
-from ..citations import citations
+from ..biblio.biblio import citations
 
 
 def gauge_tilde(couplings: ALPcouplings) -> dict:

@@ -2,7 +2,7 @@
 
 import numpy as np
 from .runSM import runSM
-from ..citations import citations
+from ..biblio.biblio import citations
 
 from . import bases_above, bases_below
 from functools import cache
