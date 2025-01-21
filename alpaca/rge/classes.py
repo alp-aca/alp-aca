@@ -197,33 +197,38 @@ class ALPcouplings:
     def __add__(self, other: 'ALPcouplings') -> 'ALPcouplings':
         if self.basis == other.basis and self.ew_scale == other.ew_scale and self.scale == other.scale:
             a = ALPcouplings({k: self.values[k]+other.values[k] for k in self.values.keys()}, self.scale, self.basis, self.ew_scale)
-            a.yu = self.yu
-            a.yd = self.yd
+            if 'yu' in self.__dict__.keys():
+                a.yu = self.yu
+                a.yd = self.yd
             return a
         
     def __sub__(self, other: 'ALPcouplings') -> 'ALPcouplings':
         if self.basis == other.basis and self.ew_scale == other.ew_scale and self.scale == other.scale:
             a = ALPcouplings({k: self.values[k]-other.values[k] for k in self.values.keys()}, self.scale, self.basis, self.ew_scale)
-            a.yu = self.yu
-            a.yd = self.yd
+            if 'yu' in self.__dict__.keys():
+                a.yu = self.yu
+                a.yd = self.yd
             return a
 
     def __mul__(self, a: float) -> 'ALPcouplings':
             a1 = ALPcouplings({k: a*self.values[k] for k in self.values.keys()}, self.scale, self.basis, self.ew_scale)
-            a1.yu = self.yu
-            a1.yd = self.yd
+            if 'yu' in self.__dict__.keys():
+                a1.yu = self.yu
+                a1.yd = self.yd
             return a1
 
     def __rmul__(self, a: float) -> 'ALPcouplings':
             a1 =  ALPcouplings({k: a*self.values[k] for k in self.values.keys()}, self.scale, self.basis, self.ew_scale)
-            a1.yu = self.yu
-            a1.yd = self.yd
+            if 'yu' in self.__dict__.keys():
+                a1.yu = self.yu
+                a1.yd = self.yd
             return a1
     
     def __truediv__(self, a: float) -> 'ALPcouplings':
             a1 = ALPcouplings({k: self.values[k]/a for k in self.values.keys()}, self.scale, self.basis, self.ew_scale)
-            a1.yu = self.yu
-            a1.yd = self.yd
+            if 'yu' in self.__dict__.keys():
+                a1.yu = self.yu
+                a1.yd = self.yd
             return a1
     
     def __getitem__(self, name: str):
