@@ -53,6 +53,7 @@ class MeasurementBase:
         self.mass_parent = mass_parent
         self.mass_sibling = mass_sibling
         self.conf_level = None
+        self.conf_level = None
 
     def initiate(self):
         if not self.initiated:
