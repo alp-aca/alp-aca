@@ -51,6 +51,7 @@ class MeasurementBase:
         self.lab_boost = lab_boost
         self.mass_parent = mass_parent
         self.mass_sibling = mass_sibling
+        self.conf_level = None
 
     def initiate(self):
         if not self.initiated:
@@ -127,6 +128,7 @@ class MeasurementConstant(MeasurementBase):
 class MeasurementConstantBound(MeasurementConstant):
     def __init__(self, inspire_id: str, decay_type: str, bound: float, min_ma: float = 0, max_ma: float|None = None, conf_level: float = 0.9, rmin: float | None = None, rmax: float | None = None, lab_boost: float = 0, mass_parent: float = 0, mass_sibling: float = 0):
         super().__init__(inspire_id, decay_type, 0, 0, sigma(conf_level, 1, bound), min_ma, max_ma, rmin, rmax, lab_boost, mass_parent, mass_sibling)
+        self.conf_level = conf_level
 
 class MeasurementInterpolatedBound(MeasurementBase):
     def __init__(self, inspire_id, filepath: str, decay_type: str, conf_level: float = 0.9, rmin = None, rmax = None, lab_boost = 0, mass_parent = 0, mass_sibling = 0):
