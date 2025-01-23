@@ -34,6 +34,9 @@ class LazyFloat:
 
     def __rmul__(self, other):
         return other * float(self)
+    
+    def __neg__(self):
+        return -float(self)
 
     def __truediv__(self, other):
         return float(self) / other

@@ -150,6 +150,10 @@ class Constant(float):
         self.register()
         return super().__rmul__(other)
     
+    def __neg__(self):
+        self.register()
+        return super().__neg__()
+    
     def __truediv__(self, other):
         self.register()
         return super().__truediv__(other)
