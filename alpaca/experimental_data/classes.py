@@ -4,6 +4,7 @@ from ..biblio.biblio import citations
 from ..common import kallen
 from ..constants import c_nm_per_ps
 from scipy.integrate import quad_vec
+from scipy.special import erfinv
 import pandas as pd
 from scipy.interpolate import interp1d, RegularGridInterpolator
 
@@ -127,7 +128,7 @@ class MeasurementConstant(MeasurementBase):
     
 class MeasurementConstantBound(MeasurementConstant):
     def __init__(self, inspire_id: str, decay_type: str, bound: float, min_ma: float = 0, max_ma: float|None = None, conf_level: float = 0.9, rmin: float | None = None, rmax: float | None = None, lab_boost: float = 0, mass_parent: float = 0, mass_sibling: float = 0):
-        super().__init__(inspire_id, decay_type, 0, 0, sigma(conf_level, 1, bound), min_ma, max_ma, rmin, rmax, lab_boost, mass_parent, mass_sibling)
+        super().__init__(inspire_id, decay_type, bound, 0, sigma(conf_level, 1, bound), min_ma, max_ma, rmin, rmax, lab_boost, mass_parent, mass_sibling)
         self.conf_level = conf_level
 
 class MeasurementInterpolatedBound(MeasurementBase):
@@ -145,7 +146,7 @@ class MeasurementInterpolatedBound(MeasurementBase):
 
     def get_central(self, ma: float, ctau: float | None = None) -> float:
         self.initiate()
-        return np.where((ma >= self.min_ma) & (ma <= self.max_ma), 0, np.nan)
+        return self.get_sigma_right(ma, ctau)*np.sqrt(2)*erfinv(self.conf_level)
     
     def get_sigma_left(self, ma: float, ctau: float | None = None) -> float:
         self.initiate()
@@ -286,8 +287,7 @@ class MeasurementDisplacedVertexBound(MeasurementBase):
 
     def get_central(self, ma: float, ctau: float) -> float:
         self.initiate()
-        tau = ctau*1e7/c_nm_per_ps
-        return np.where((ma >= self.min_ma) & (ma <= self.max_ma), 0, np.nan)
+        return self.get_sigma_right(ma, ctau)*np.sqrt(2)*erfinv(self.conf_level)
     
     def get_sigma_left(self, ma: float, ctau: float) -> float:
         self.initiate()
