@@ -177,3 +177,14 @@ phiepsilonKaon = Constant(43.52/180*np.pi, 'ParticleDataGroup:2024cfk')
 
 # Mixing effects in Bs decays
 DeltaGamma_Bs = Constant(pars['DeltaGamma/Gamma_Bs'], 'Straub:2018kue')
+
+# KL,S->ll long-distance contributions
+re_ae = Constant(31.68, 'Hoferichter:2023wiy')
+re_ae_error = Constant(0.98, 'Hoferichter:2023wiy')
+re_amu = Constant(-0.16, 'Hoferichter:2023wiy')
+re_amu_error = Constant(0.38, 'Hoferichter:2023wiy')
+br_KLgammagamma = Constant(5.47e-4, 'ParticleDataGroup:2024cfk')
+ie_disp = Constant(1.4, 'Ecker:1991ru')
+ie_abs = Constant(-35, 'Ecker:1991ru')
+imu_disp = Constant(-2.82, 'Ecker:1991ru')
+imu_abs = Constant(1.21, 'Ecker:1991ru')
