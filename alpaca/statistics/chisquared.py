@@ -27,12 +27,12 @@ def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, coupling
     central = measurement.get_central(ma, ctau)
     sigma = np.where(prediction > central, sigma_right, sigma_left)
     if measurement.conf_level is None:
-        return ((central-prediction)**2/sigma**2, 1)
+        return ((central-prediction)**2/sigma**2, np.where(np.isfinite(prob_decay), 1, 0))
     else:
         return (np.where(prediction < 0, np.inf, prediction**2/sigma**2), np.where(prediction < upperbound_limit*central, 0, 1))
 
 def combine_chi2(*chi2):
-    chi_tot = np.sum([c[1] for c in chi2], axis=0)
+    chi_tot = np.sum([c[0] for c in chi2], axis=0)
     ndof = np.sum([c[1] for c in chi2], axis=0)
     return chi_tot, ndof
 
