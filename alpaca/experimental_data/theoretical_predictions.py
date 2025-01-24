@@ -3,6 +3,7 @@ from ..biblio.biblio import citations
 from ..decays.decays import parse
 import flavio
 from functools import cache
+import numpy as np
 
 #################################### INVISIBLE FINAL STATES ####################################
 #B+->K+ nu nu 
@@ -86,13 +87,17 @@ def get_th_uncert(process: str | tuple, N: int = 50) -> float:
     elif initial == ['B0'] and final == ['tau', 'tau']:
         return flavio.sm_uncertainty('BR(B0->tautau)', N=N)
     elif initial == ['KL'] and final == ['electron', 'electron']:
-        return flavio.sm_uncertainty('BR(KL->ee)', N=N)
+        from ..constants import re_ae, me, mKL, re_ae_error, br_KLgammagamma
+        a_em = 1/137
+        # Only the contribution of the real part of the long distance amplitude is considered
+        # -1.8 is the approximate value of the real part of the short distance amplitude
+        return 2*a_em**2/np.pi**2*me**2/mKL**2 *(2*np.abs(re_ae-1.8)*re_ae_error)*br_KLgammagamma*np.sqrt(1-4*me**2/mKL**2)
     elif initial == ['KL'] and final == ['muon', 'muon']:
-        return flavio.sm_uncertainty('BR(KL->mumu)', N=N)
-    elif initial == ['KS'] and final == ['electron', 'electron']:
-        return flavio.sm_uncertainty('BR(KS->ee)', N=N)
-    elif initial == ['KS'] and final == ['muon', 'muon']:
-        return flavio.sm_uncertainty('BR(KS->mumu)', N=N)
+        from ..constants import re_amu, mmu, mKL, re_amu_error, br_KLgammagamma
+        a_em = 1/137
+        # Only the contribution of the real part of the long distance amplitude is considered
+        # -1.8 is the approximate value of the real part of the short distance amplitude
+        return 2*a_em**2/np.pi**2*mmu**2/mKL**2 *(2*np.abs(re_amu-1.8)*re_amu_error)*br_KLgammagamma*np.sqrt(1-4*mmu**2/mKL**2)
     else:
         return 0.0
     
