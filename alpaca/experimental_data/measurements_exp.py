@@ -826,13 +826,12 @@ e871_KLtoee = MeasurementConstant(
     max_ma=np.inf
 )
 
-lhcb_KStomumu = MeasurementConstant(
+lhcb_KStomumu = MeasurementConstantBound(
     'LHCb:2020ycd',
     'flat',
-    0.9e-10,
-    0.6e-10,
-    0.7e-10,
-    max_ma=np.inf
+    2.1e-10,
+    max_ma=np.inf,
+    conf_level=0.9
 )
 
 kloe_KStoee = MeasurementConstantBound(
