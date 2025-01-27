@@ -739,6 +739,20 @@ lhcb_B0totautau = MeasurementConstantBound(
     max_ma=np.inf,
 )
 
+belle_Bstogammagamma = MeasurementConstantBound(
+    'Belle:2014sac',
+    'flat',
+    3.1e-6,
+    max_ma=np.inf,
+)
+
+babar_B0togammagamma = MeasurementConstantBound(
+    'BaBar:2010qny',
+    'flat',
+    3.2e-7,
+    max_ma=np.inf,
+)
+
 #LHCb Ds+->pi+ mu mu
     #Experiment: LHCb
     #arXiv: 1304.6365
@@ -1219,6 +1233,8 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         return {'LHCb': lhcb_B0tomumu, 'CMS': cms_B0tomumu}
     elif initial == ['B0'] and final == sorted(['tau', 'tau']):
         return {'LHCb': lhcb_B0totautau}
+    elif initial == ['B0'] and final == sorted(['photon', 'photon']):
+        return {'BaBar': babar_B0togammagamma}
     #Initial state Bs
     elif initial == ['Bs'] and final == sorted(['phi', 'alp']):
         return {'DELPHI': delphi_Bstophinunu}
@@ -1228,6 +1244,8 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         return {'LHCb': lhcb_Bstomumu, 'CMS': cms_Bstomumu}
     elif initial == ['Bs'] and final == sorted(['tau', 'tau']):
         return {'LHCb': lhcb_Bstotautau}
+    elif initial == ['Bs'] and final == sorted(['photon', 'photon']):
+        return {'Belle': belle_Bstogammagamma}
     #Initial state J/psi
     elif initial == ['J/psi'] and final == sorted(['photon', 'alp']):
         return {'BESIII': besIII_Jpsiinv}
