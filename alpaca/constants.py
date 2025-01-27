@@ -59,6 +59,13 @@ def getC10():
 
 C10 = LazyFloat(getC10)
 
+def getC7():
+    import flavio
+    citations.register_inspire('Straub:201')
+    return flavio.physics.bdecays.wilsoncoefficients.wcsm_nf5(4.18)[6]
+
+C7 = LazyFloat(getC7)
+
 def getC10sd():
     import flavio
     citations.register_inspire('Straub:201')
@@ -177,6 +184,7 @@ phiepsilonKaon = Constant(43.52/180*np.pi, 'ParticleDataGroup:2024cfk')
 
 # Mixing effects in Bs decays
 DeltaGamma_Bs = Constant(pars['DeltaGamma/Gamma_Bs'], 'Straub:2018kue')
+lambdaB0 = Constant(0.35, 'Bosch:2002bv')
 
 # KL,S->ll long-distance contributions
 re_ae = Constant(31.68, 'Hoferichter:2023wiy')
