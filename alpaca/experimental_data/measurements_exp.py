@@ -760,6 +760,20 @@ belle_D0togammagamma = MeasurementConstantBound(
     max_ma=np.inf,
 )
 
+belle_D0toee = MeasurementConstantBound(
+    'Belle:2010ouj',
+    'flat',
+    7.9e-8,
+    max_ma=np.inf,
+)
+
+lhcb_D0tomumu = MeasurementConstantBound(
+    'LHCb:2022jaa',
+    'flat',
+    3.1e-9,
+    max_ma=np.inf,
+)
+
 #LHCb Ds+->pi+ mu mu
     #Experiment: LHCb
     #arXiv: 1304.6365
@@ -1298,6 +1312,10 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         return {'E791': e791_D0torho0mumu}
     elif initial == ['D0'] and final == sorted(['photon', 'photon']):
         return {'Belle': belle_D0togammagamma}
+    elif initial == ['D0'] and final == sorted(['electron', 'electron']):
+        return {'Belle': belle_D0toee}
+    elif initial == ['D0'] and final == sorted(['muon', 'muon']):
+        return {'LHCb': lhcb_D0tomumu}
     #Initial state D+
     elif initial == ['D+'] and final == sorted(['pion+', 'electron', 'electron']):
         return {'LHCb': lhcb_Dptopipee}
