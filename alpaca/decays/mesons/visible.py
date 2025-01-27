@@ -116,6 +116,26 @@ def BR_D0_photons_ALP(ma: float, couplings: ALPcouplings, fa: float, br_dark: fl
     gamma_th = amp_sq*mD0**3/(64*np.pi)
     return gamma_th/GammaD0
 
+def amp_D0_leptons_ALP(lepton: str, ma: float, couplings: ALPcouplings, fa: float, br_dark: float, **kwargs) -> complex:
+    if ma > couplings.ew_scale:
+        basis = 'massbasis_above'
+    else:
+        basis = 'kF_below'
+    citations.register_inspire('Burdman:2001tf')
+    cc = couplings.match_run(ma, basis, **kwargs)
+    ccu = cc['kU'][1,0] - cc['ku'][1,0]
+    clep = cc['ke'][genlepton[lepton],genlepton[lepton]] - cc['kE'][genlepton[lepton],genlepton[lepton]]
+    Gamma_a = total_decay_width(ma, couplings, fa, br_dark, **kwargs)['DW_tot']
+    return - ccu*clep/fa**2 *fD0*mlepton[lepton]/2*mD0**3/(mD0**2-ma**2+1j*ma*Gamma_a)
+
+def BR_D0_leptons_ALP(lepton: str, ma: float, couplings: ALPcouplings, fa: float, br_dark: float, **kwargs) -> float:
+    from ...constants import b_D0gammagamma_VMD, c_D0gammagamma_VMD
+    amp_ALP = amp_D0_photons_ALP(ma, couplings, fa, br_dark, **kwargs)
+    amp_gamma_lep = alpha_em(mD0)*mlepton[lepton]*np.log(mD0**2/mlepton[lepton]**2)
+    amp_sq = (np.abs(amp_ALP) + c_D0gammagamma_VMD)**2 + b_D0gammagamma_VMD**2*(1-4*mlepton[lepton]**2/mD0**2)
+    gamma_th = amp_sq*amp_gamma_lep**2 *mD0/(8*np.pi)*np.sqrt(1-4*mlepton[lepton]**2/mD0**2)
+    return gamma_th/GammaD0
+
 def amp_K0_leptons_SM(lepton: str) -> complex:
     #a_em = alpha_em(mK0)
     a_em = 1/137

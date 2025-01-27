@@ -62,6 +62,8 @@ meson_mediated = {
     ('B0', ('tau', 'tau')): lambda ma, couplings, fa, br_dark, **kwargs: BR_Bd_leptons_ALP('tau', ma, couplings, fa, br_dark, **kwargs),
     ('B0', ('photon', 'photon')): lambda ma, couplings, fa, br_dark, **kwargs: BR_Bd_photons_ALP(ma, couplings, fa, br_dark, **kwargs),
     ('D0', ('photon', 'photon')): lambda ma, couplings, fa, br_dark, **kwargs: BR_D0_photons_ALP(ma, couplings, fa, br_dark, **kwargs),
+    ('D0', ('electron', 'electron')): lambda ma, couplings, fa, br_dark, **kwargs: BR_D0_leptons_ALP('e', ma, couplings, fa, br_dark, **kwargs),
+    ('D0', ('muon', 'muon')): lambda ma, couplings, fa, br_dark, **kwargs: BR_D0_leptons_ALP('mu', ma, couplings, fa, br_dark, **kwargs),
     ('KL', ('electron', 'electron')): lambda ma, couplings, fa, br_dark, **kwargs: BR_KL_leptons('e', ma, couplings, fa, br_dark, **kwargs),
     ('KL', ('muon', 'muon')): lambda ma, couplings, fa, br_dark, **kwargs: BR_KL_leptons('mu', ma, couplings, fa, br_dark, **kwargs),
     ('KS', ('electron', 'electron')): lambda ma, couplings, fa, br_dark, **kwargs: BR_KS_leptons('e', ma, couplings, fa, br_dark, **kwargs),
