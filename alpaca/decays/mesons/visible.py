@@ -1,4 +1,4 @@
-from ...constants import GF, mB0, mBs, fB, fBs, C10, me, mmu, mtau, GammaB, GammaBs, DeltaGamma_Bs, mK0, fK0, epsilonKaon, phiepsilonKaon, mKL, mKS, GammaKL, GammaKS, C10sdRe, C10sdIm, pars
+from ...constants import GF, mB0, mBs, fB, fBs, C10, me, mmu, mtau, GammaB, GammaBs, DeltaGamma_Bs, mK0, fK0, epsilonKaon, phiepsilonKaon, mKL, mKS, GammaKL, GammaKS, C10sdRe, C10sdIm, mD0
 from ...common import kallen, ckm_xi, alpha_em
 from ...rge.classes import ALPcouplings
 from ..alp_decays.branching_ratios import total_decay_width
@@ -19,14 +19,14 @@ def amp_Bs_leptons_ALP(lepton: str, ma: float, couplings: ALPcouplings, fa: floa
         basis = 'kF_below'
     cc = couplings.match_run(ma, basis, **kwargs)
     clep = cc['ke'][genlepton[lepton],genlepton[lepton]] - cc['kE'][genlepton[lepton],genlepton[lepton]]
-    cbs = cc['kD'][2,1] - cc['kd'][2,1]
+    cbs = np.array(cc['kD'][2,1] - cc['kd'][2,1], cc['kD'][1,2] - cc['kd'][1,2])
     Gamma_a = total_decay_width(ma, couplings, fa, br_dark, **kwargs)['DW_tot']
     return - cbs*clep/fa**2 *fBs*mlepton[lepton]/np.sqrt(2)*mBs**3/(mBs**2-ma**2+1j*ma*Gamma_a)
 
 def BR_Bs_leptons_ALP(lepton: str, ma: float, couplings: ALPcouplings, fa: float, br_dark: float, **kwargs) -> float:
     amp_SM = amp_Bs_leptons_SM(lepton)
     amp_ALP = amp_Bs_leptons_ALP(lepton, ma, couplings, fa, br_dark, **kwargs)
-    amp_sq = np.abs(amp_SM + amp_ALP)**2
+    amp_sq = 0.5*np.abs(amp_SM + amp_ALP[0])**2 + 0.5*np.abs(np.conj(amp_SM) + amp_ALP[1])**2
     gamma_th = amp_sq*np.sqrt(kallen(mBs**2, mlepton[lepton]**2, mlepton[lepton]**2))/(16*np.pi*mBs**3)
     gamma_exp = gamma_th/(1-DeltaGamma_Bs/2)
     return gamma_exp/GammaBs
@@ -41,14 +41,14 @@ def amp_Bd_leptons_ALP(lepton: str, ma: float, couplings: ALPcouplings, fa: floa
         basis = 'kF_below'
     cc = couplings.match_run(ma, basis, **kwargs)
     clep = cc['ke'][genlepton[lepton],genlepton[lepton]] - cc['kE'][genlepton[lepton],genlepton[lepton]]
-    cbs = cc['kD'][2,0] - cc['kd'][2,0]
+    cbs = np.array([cc['kD'][2,0] - cc['kd'][2,0], cc['kD'][0,2] - cc['kd'][0,2]])
     Gamma_a = total_decay_width(ma, couplings, fa, br_dark, **kwargs)['DW_tot']
     return - cbs*clep/fa**2 *fB*mlepton[lepton]/np.sqrt(2)*mB0**3/(mB0**2-ma**2+1j*ma*Gamma_a)
 
 def BR_Bd_leptons_ALP(lepton: str, ma: float, couplings: ALPcouplings, fa: float, br_dark: float, **kwargs) -> float:
     amp_SM = amp_Bd_leptons_SM(lepton)
     amp_ALP = amp_Bd_leptons_ALP(lepton, ma, couplings, fa, br_dark, **kwargs)
-    amp_sq = np.abs(amp_SM + amp_ALP)**2
+    amp_sq = 0.5*np.abs(amp_SM + amp_ALP[0])**2 + 0.5*np.abs(np.conj(amp_SM) + amp_ALP[1])**2
     gamma_th = amp_sq*np.sqrt(kallen(mB0**2, mlepton[lepton]**2, mlepton[lepton]**2))/(16*np.pi*mB0**3)
     return gamma_th/GammaB #The mixing correction is negligible for Bd
 
@@ -91,20 +91,24 @@ def amp_K0_leptons_ALP(lepton: str, ma: float, couplings: ALPcouplings, fa: floa
         basis = 'kF_below'
     cc = couplings.match_run(ma, basis, **kwargs)
     clep = cc['ke'][genlepton[lepton],genlepton[lepton]] - cc['kE'][genlepton[lepton],genlepton[lepton]]
-    csd = cc['kD'][1,0] - cc['kd'][1,0]
+    csd = np.array([cc['kD'][1,0] - cc['kd'][1,0], cc['kD'][0,1] - cc['kd'][0,1]])
     Gamma_a = total_decay_width(ma, couplings, fa, br_dark, **kwargs)['DW_tot']
     return - csd*clep/fa**2 *fK0*mlepton[lepton]/np.sqrt(2)*mK0**3/(mK0**2-ma**2+1j*ma*Gamma_a)
 
 def amp_KL_leptons_P(lepton: str, ma: float, couplings: ALPcouplings, fa: float, br_dark: float, **kwargs) -> complex:
-    amp_K0 = amp_K0_leptons_SM(lepton) + amp_K0_leptons_ALP(lepton, ma, couplings, fa, br_dark, **kwargs)
-    amp_K0bar = np.conj(amp_K0)
+    a_ALP = amp_K0_leptons_ALP(lepton, ma, couplings, fa, br_dark, **kwargs)
+    a_SM = amp_K0_leptons_SM(lepton)
+    amp_K0 = a_SM + a_ALP[0]
+    amp_K0bar = np.conj(a_SM) + a_ALP[1]
     eps = epsilonKaon*(np.cos(phiepsilonKaon)+1j*np.sin(phiepsilonKaon))
     amp = ((1+eps)*amp_K0+(1-eps)*amp_K0bar)/np.sqrt(2*(1+np.abs(eps)**2))
     return amp + amp_KL_leptons_LD(lepton)
 
 def amp_KS_leptons_P(lepton: str, ma: float, couplings: ALPcouplings, fa: float, br_dark: float, **kwargs) -> complex:
-    amp_K0 = amp_K0_leptons_SM(lepton) + amp_K0_leptons_ALP(lepton, ma, couplings, fa, br_dark, **kwargs)
-    amp_K0bar = np.conj(amp_K0)
+    a_ALP = amp_K0_leptons_ALP(lepton, ma, couplings, fa, br_dark, **kwargs)
+    a_SM = amp_K0_leptons_SM(lepton)
+    amp_K0 = a_SM + a_ALP[0]
+    amp_K0bar = np.conj(a_SM) + a_ALP[1]
     eps = epsilonKaon*(np.cos(phiepsilonKaon)+1j*np.sin(phiepsilonKaon))
     amp = ((1+eps)*amp_K0-(1-eps)*amp_K0bar)/np.sqrt(2*(1+np.abs(eps)**2))
     return amp
