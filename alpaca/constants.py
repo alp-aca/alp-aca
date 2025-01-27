@@ -146,6 +146,7 @@ theta_eta_etap = Constant(-14.1/180*np.pi, 'Christ:2010dd')
 # Form factors
 fB = LazyFloat(lambda: pars['f_B+'])
 fBs = LazyFloat(lambda: pars['f_Bs'])
+fD0 = LazyFloat(lambda: pars['f_D0'])
 fK = LazyFloat(lambda: pars['f_K+'])
 fK0 = LazyFloat(lambda: pars['f_K0'])
 fpi = LazyFloat(lambda: pars['f_pi+'])
@@ -185,6 +186,10 @@ phiepsilonKaon = Constant(43.52/180*np.pi, 'ParticleDataGroup:2024cfk')
 # Mixing effects in Bs decays
 DeltaGamma_Bs = Constant(pars['DeltaGamma/Gamma_Bs'], 'Straub:2018kue')
 lambdaB0 = Constant(0.35, 'Bosch:2002bv')
+
+# D0 -> gamma gamma
+b_D0gammagamma_VMD = Constant(9.3e-10, 'Burdman:2001tf')
+c_D0gammagamma_VMD = Constant(9.4e-10, 'Burdman:2001tf')
 
 # KL,S->ll long-distance contributions
 re_ae = Constant(31.68, 'Hoferichter:2023wiy')

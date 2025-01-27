@@ -1,4 +1,4 @@
-from ...constants import GF, mB0, mBs, fB, fBs, C10, me, mmu, mtau, GammaB, GammaBs, DeltaGamma_Bs, mK0, fK0, epsilonKaon, phiepsilonKaon, mKL, mKS, GammaKL, GammaKS, C10sdRe, C10sdIm, C7, lambdaB0
+from ...constants import GF, mB0, mBs, fB, fBs, C10, me, mmu, mtau, GammaB, GammaBs, DeltaGamma_Bs, mK0, fK0, epsilonKaon, phiepsilonKaon, mKL, mKS, GammaKL, GammaKS, C10sdRe, C10sdIm, C7, lambdaB0, mD0, fD0, GammaD0
 from ...common import kallen, ckm_xi, alpha_em
 from ...rge.classes import ALPcouplings
 from ..alp_decays.branching_ratios import total_decay_width
@@ -96,6 +96,25 @@ def BR_Bd_photons_ALP(ma: float, couplings: ALPcouplings, fa: float, br_dark: fl
     amp_sq = 0.5*np.abs(amp_SM + amp_ALP[0])**2 + 0.5*np.abs(np.conj(amp_SM) + amp_ALP[1])**2 + np.abs(amp_SM)**2
     gamma_th = amp_sq*mB0**3/(64*np.pi)
     return gamma_th/GammaB #The mixing correction is negligible for Bd
+
+def amp_D0_photons_ALP(ma: float, couplings: ALPcouplings, fa: float, br_dark: float, **kwargs) -> complex:
+    if ma > couplings.ew_scale:
+        basis = 'massbasis_above'
+    else:
+        basis = 'kF_below'
+    citations.register_inspire('Burdman:2001tf')
+    cc = couplings.match_run(ma, basis, **kwargs)
+    ccu = cc['kU'][1,0] - cc['ku'][1,0]
+    cgamma = cc['cgamma']
+    Gamma_a = total_decay_width(ma, couplings, fa, br_dark, **kwargs)['DW_tot']
+    return 0.5*alpha_em(mD0)/np.pi * cgamma*ccu/fa**2 *fD0*mD0**3/(mD0**2-ma**2+1j*ma*Gamma_a)
+
+def BR_D0_photons_ALP(ma: float, couplings: ALPcouplings, fa: float, br_dark: float, **kwargs) -> float:
+    from ...constants import b_D0gammagamma_VMD, c_D0gammagamma_VMD
+    amp_ALP = amp_D0_photons_ALP(ma, couplings, fa, br_dark, **kwargs)
+    amp_sq = (np.abs(amp_ALP) + c_D0gammagamma_VMD)**2 + b_D0gammagamma_VMD**2
+    gamma_th = amp_sq*mD0**3/(64*np.pi)
+    return gamma_th/GammaD0
 
 def amp_K0_leptons_SM(lepton: str) -> complex:
     #a_em = alpha_em(mK0)
