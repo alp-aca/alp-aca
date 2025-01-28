@@ -1172,6 +1172,24 @@ belle_b0topimumu = MeasurementConstantBound(
     mass_sibling=mpi0
 )
 
+kloe_KStogammagamma = MeasurementConstant(
+    'KLOE:2007rta',
+    'flat',
+    2.26e-6,
+    np.sqrt(0.12**2+0.06**2)*1e-6,
+    np.sqrt(0.12**2+0.06**2)*1e-6,
+    max_ma=np.inf
+)
+
+na48_KStogammagamma = MeasurementConstant(
+    'Lai:2002sr',
+    'flat',
+    2.713e-6,
+    np.sqrt(6.3**2+0.5**2)*1e-8,
+    np.sqrt(6.3**2+0.5**2)*1e-8,
+    max_ma=np.inf
+)
+
 def get_measurements(process: str | tuple, exclude_projections: bool = True) -> dict[str, MeasurementBase]:
     """Retrieve measurements based on the given transition.
 
@@ -1351,5 +1369,7 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         return {'KLOE': kloe_KStoee}
     elif initial == ['KS'] and final == ['muon', 'muon']:
         return {'LHCb': lhcb_KStomumu}
+    elif initial == ['KS'] and final == sorted(['photon', 'photon']):
+        return {'NA48': na48_KStogammagamma, 'KLOE': kloe_KStogammagamma}
     else:
         raise KeyError(f"No measurements for {transition}")
