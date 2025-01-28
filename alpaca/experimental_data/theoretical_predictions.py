@@ -98,6 +98,8 @@ def get_th_uncert(process: str | tuple, N: int = 50) -> float:
         # Only the contribution of the real part of the long distance amplitude is considered
         # -1.8 is the approximate value of the real part of the short distance amplitude
         return 2*a_em**2/np.pi**2*mmu**2/mKL**2 *(2*np.abs(re_amu-1.8)*re_amu_error)*br_KLgammagamma*np.sqrt(1-4*mmu**2/mKL**2)
+    elif initial == ['KS'] and final == ['photon', 'photon']:
+        return 0.32e-6
     else:
         return 0.0
     

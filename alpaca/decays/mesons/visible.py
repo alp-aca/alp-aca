@@ -209,3 +209,19 @@ def BR_KS_leptons(lepton: str, ma: float, couplings: ALPcouplings, fa: float, br
     amp_sq = np.abs(amp_P)**2 + np.abs(amp_S)**2 * (1-4*mlepton[lepton]**2/mKS**2)
     gamma = amp_sq*np.sqrt(kallen(mKS**2, mlepton[lepton]**2, mlepton[lepton]**2))/(16*np.pi*mKS**3)
     return gamma/GammaKS
+
+def BR_KS_photons(ma: float, couplings: ALPcouplings, fa: float, br_dark: float, **kwargs) -> float:
+    from ...constants import br_ksphotons_LD
+    if ma > couplings.ew_scale:
+        basis = 'massbasis_above'
+    else:
+        basis = 'kF_below'
+    cc = couplings.match_run(ma, basis, **kwargs)
+    csd = cc['kD'][1,0] - cc['kd'][1,0]
+    cgamma = cc['cgamma']
+    Gamma_a = total_decay_width(ma, couplings, fa, br_dark, **kwargs)['DW_tot']
+    ampK0 = 0.5*alpha_em(mK0)/np.pi * cgamma*csd/fa**2 *fD0*mK0**3/(mK0**2-ma**2+1j*ma*Gamma_a)
+    ampK0bar = 0.5*alpha_em(mK0)/np.pi * cgamma*np.conj(csd)/fa**2 *fD0*mK0**3/(mK0**2-ma**2+1j*ma*Gamma_a)
+    eps = epsilonKaon*(np.cos(phiepsilonKaon)+1j*np.sin(phiepsilonKaon))
+    amp = ((1+eps)*ampK0-(1-eps)*ampK0bar)/np.sqrt(2*(1+np.abs(eps)**2))
+    return br_ksphotons_LD + np.abs(amp)**2*mK0**3/(64*np.pi)/GammaKS
