@@ -23,16 +23,37 @@ def B0disc_equalmass(q2: float, m: float) -> complex:
 alpha_em = lambda q: flavio.physics.running.running.get_alpha_e(pars, q)
 alpha_s = lambda q: flavio.physics.running.running.get_alpha_s(pars, q)
 
-f0_BK = lambda q2: flavio.physics.bdecays.formfactors.b_p.bcl.ff('B->K', q2, pars)['f0']
-f0_Bpi = lambda q2: flavio.physics.bdecays.formfactors.b_p.bcl_lmvd.ff('B->pi', q2, pars)['f0']
-f0_Kpi = lambda q2: flavio.physics.kdecays.formfactors.fp0_dispersive(q2, pars)['f0']
-A0_BKst = lambda q2: flavio.physics.bdecays.formfactors.b_v.bsz.ff('B->K*', q2, pars)['A0']
-A0_Brho = lambda q2: flavio.physics.bdecays.formfactors.b_v.bsz.ff('B->rho', q2, pars)['A0']
-A0_Bsphi = lambda q2: flavio.physics.bdecays.formfactors.b_v.bsz.ff('Bs->phi', q2, pars)['A0']
+def f0_BK(q2):
+    citations.register_inspire('FlavourLatticeAveragingGroupFLAG:2021npn')
+    return flavio.physics.bdecays.formfactors.b_p.bcl.ff('B->K', q2, pars)['f0']
+
+def f0_Bpi(q2):
+    citations.register_inspire('FlavourLatticeAveragingGroupFLAG:2021npn')
+    return flavio.physics.bdecays.formfactors.b_p.bcl.ff('B->pi', q2, pars)['f0']
+
+def f0_Kpi(q2):
+    citations.register_inspire('FlaviaNetWorkingGrouponKaonDecays:2010lot')
+    citations.register_inspire('Antonelli:2010yf')
+    citations.register_inspire('FlavourLatticeAveragingGroupFLAG:2021npn')
+    return flavio.physics.kdecays.formfactors.fp0_dispersive(q2, pars)['f0']
+
+def A0_BKst(q2):
+    citations.register_inspire('Horgan:2015vla')
+    return flavio.physics.bdecays.formfactors.b_v.bsz.ff('B->K*', q2, pars)['A0']
+
+def A0_Brho(q2):
+    citations.register_inspire('Bharucha:2015bzk')
+    return flavio.physics.bdecays.formfactors.b_v.bsz.ff('B->rho', q2, pars)['A0']
+
+def A0_Bsphi(q2):
+    citations.register_inspire('Bharucha:2015bzk')
+    return flavio.physics.bdecays.formfactors.b_v.bsz.ff('Bs->phi', q2, pars)['A0']
 
 ckm_xi = lambda i, j: flavio.physics.ckm.xi(i, j)(pars)
 
-f0_Dpi = lambda q2: flavio.physics.ddecays.formfactors.bsz.ff('D->pi', q2, pars)['f0']
+def f0_Dpi(q2):
+    citations.register_inspire('Lubicz:2017syv')
+    return flavio.physics.ddecays.formfactors.bsz.ff('D->pi', q2, pars)['f0']
 
 def f0_DsK(q2):
     citations.register_inspire('Wang:2008ci')
