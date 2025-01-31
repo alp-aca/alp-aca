@@ -183,7 +183,7 @@ mixing_observables = {
     'delta_mBs': delta_mBs,
 }
 
-def meson_mixing(obs: str, couplings: ALPcouplings, ma, fa, **kwargs) -> float:
+def meson_mixing(obs: str, ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
     '''Obtains the value of a meson mixing observable.
 
     Parameters
@@ -197,11 +197,11 @@ def meson_mixing(obs: str, couplings: ALPcouplings, ma, fa, **kwargs) -> float:
         - 'delta_mB0': The mass difference of the B0 meson, in ps^{-1}.
         - 'delta_mBs': The mass difference of the Bs meson, in ps^{-1}.
 
-    couplings : ALPcouplings
-        The couplings of the ALP to other particles.
-
     ma : float
         The mass of the ALP, in GeV.
+
+    couplings : ALPcouplings
+        The couplings of the ALP to other particles.
 
     fa : float
         The decay constant of the ALP, in GeV.

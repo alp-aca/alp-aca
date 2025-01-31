@@ -4,6 +4,7 @@ from ..decays.decays import parse
 import flavio
 from functools import cache
 import numpy as np
+from ..constants import hbar_GeVps
 
 #################################### INVISIBLE FINAL STATES ####################################
 #B+->K+ nu nu 
@@ -68,6 +69,18 @@ def theo_Bstomumu():
 
 @cache
 def get_th_uncert(process: str | tuple, N: int = 50) -> float:
+    if process == 'delta_mB0':
+        return flavio.sm_uncertainty('DeltaM_d', N=N)/hbar_GeVps
+    elif process == 'delta_mBs':
+        return flavio.sm_uncertainty('DeltaM_s', N=N)/hbar_GeVps
+    elif process == 'delta_mK0':
+        return 1.8e-3
+    elif process == 'epsK':
+        return flavio.sm_uncertainty('eps_K', N=N)
+    elif process == 'x_D0':
+        return flavio.sm_uncertainty('x_D', N=N)
+    elif process == 'phi12_D0':
+        return 0 
     if isinstance(process, str):
         transition = process
     else:

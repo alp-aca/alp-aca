@@ -1190,6 +1190,60 @@ na48_KStogammagamma = MeasurementConstant(
     max_ma=np.inf
 )
 
+pdg_deltamK = MeasurementConstant(
+    'ParticleDataGroup:2024cfk',
+    'flat',
+    5.293e-3, #ps^-1
+    0.009e-3, #ps^-1
+    0.009e-3, #ps^-1
+    max_ma=np.inf
+)
+
+pdg_epsK = MeasurementConstant(
+    'ParticleDataGroup:2024cfk',
+    'flat',
+    2.228e-3,
+    0.011e-3,
+    0.011e-3,
+    max_ma=np.inf
+)
+
+hflav_xD0 = MeasurementConstant(
+    'HeavyFlavorAveragingGroupHFLAV:2024ctg',
+    'flat',
+    0.407*1e-2,
+    0.044*1e-2,
+    0.044*1e-2,
+    max_ma=np.inf
+)
+
+hflav_phi12D0 = MeasurementConstant(
+    'HeavyFlavorAveragingGroupHFLAV:2024ctg',
+    'flat',
+    0.65*np.pi/180,
+    0.90*np.pi/180,
+    0.92*np.pi/180,
+    max_ma=np.inf
+)
+
+belleII_deltaMd = MeasurementConstant(
+    'Belle-II:2023bps',
+    'flat',
+    0.516,
+    (0.008**2+0.005**2)**0.5,
+    (0.008**2+0.005**2)**0.5,
+    max_ma=np.inf
+)
+
+lhcb_deltaMs = MeasurementConstant(
+    'LHCb:2023sim',
+    'flat',
+    17.743,
+    (0.033**2+0.009**2)**0.5,
+    (0.033**2+0.009**2)**0.5,
+    max_ma=np.inf
+)
+
 def get_measurements(process: str | tuple, exclude_projections: bool = True) -> dict[str, MeasurementBase]:
     """Retrieve measurements based on the given transition.
 
@@ -1211,6 +1265,19 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     KeyError
         If no measurements are found for the given transition.
     """
+
+    if process == 'delta_mK0':
+        return {'PDG': pdg_deltamK}
+    elif process == 'epsK':
+        return {'PDG': pdg_epsK}
+    elif process == 'x_D0':
+        return {'HFLAV': hflav_xD0}
+    elif process == 'phi12_D0':
+        return {'HFLAV': hflav_phi12D0}
+    elif process == 'delta_mB0':
+        return {'Belle II': belleII_deltaMd}
+    elif process == 'delta_mBs':
+        return {'LHCb': lhcb_deltaMs}
 
     if isinstance(process, str):
         transition = process

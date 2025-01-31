@@ -1,6 +1,7 @@
 import numpy as np
 from ..decays.alp_decays.branching_ratios import total_decay_width
 from ..decays.decays import branching_ratio, cross_section
+from ..decays.mesons.mixing import mixing_observables, meson_mixing
 from ..constants import hbarc_GeVnm
 from ..experimental_data.classes import MeasurementBase
 from ..experimental_data.measurements_exp import get_measurements
@@ -13,11 +14,17 @@ def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, coupling
     couplings = np.atleast_1d(couplings)
     fa = np.atleast_1d(fa).astype(float)
     br_dark = np.atleast_1d(br_dark).astype(float)
-    dw = np.vectorize(lambda ma, coupl, fa, br_dark: total_decay_width(ma, coupl, fa, br_dark, **kwargs_dw)['DW_SM'])(ma, couplings, fa, br_dark)
-    ctau = np.where(br_dark == 1.0, np.inf, 1e-7*hbarc_GeVnm/dw)
-    prob_decay = measurement.decay_probability(ctau, ma, theta=kwargs.get('theta', None), br_dark=br_dark)
-    prob_decay = np.where(prob_decay < min_probability, np.nan, prob_decay)
-    if isinstance(transition, str):
+    if measurement.decay_type == 'flat':
+        prob_decay = 1.0
+        ctau = None # Arbitrary value
+    else:
+        dw = np.vectorize(lambda ma, coupl, fa, br_dark: total_decay_width(ma, coupl, fa, br_dark, **kwargs_dw)['DW_SM'])(ma, couplings, fa, br_dark)
+        ctau = np.where(br_dark == 1.0, np.inf, 1e-7*hbarc_GeVnm/dw)
+        prob_decay = measurement.decay_probability(ctau, ma, theta=kwargs.get('theta', None), br_dark=br_dark)
+        prob_decay = np.where(prob_decay < min_probability, np.nan, prob_decay)
+    if transition in mixing_observables:
+        br = meson_mixing(transition, ma, couplings, fa, **kwargs_dw)
+    elif isinstance(transition, str):
         br = branching_ratio(transition, ma, couplings, fa, br_dark, **kwargs_dw)
     else:
         br = cross_section(transition[0], ma, couplings, transition[1], fa, br_dark, **kwargs_dw)
