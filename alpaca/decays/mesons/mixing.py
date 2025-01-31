@@ -156,15 +156,15 @@ def epsK(couplings: ALPcouplings, ma, fa, **kwargs) -> float:
     effH = effhamiltonian('K0', couplings, ma, fa, **kwargs)
     return 0.5*np.imag(effH)/np.real(effH)/np.sqrt(2)
 
-def re_x12_D0(couplings: ALPcouplings, ma, fa, **kwargs) -> float:
+def x_D0(couplings: ALPcouplings, ma, fa, **kwargs) -> float:
     from ...constants import mD0, GammaD0
     effH = effhamiltonian('D0', couplings, ma, fa, **kwargs)
-    return np.real(effH)/mD0/GammaD0
+    return np.abs(effH)/mD0/GammaD0
 
-def im_x12_D0(couplings: ALPcouplings, ma, fa, **kwargs) -> float:
-    from ...constants import mD0, GammaD0
+def phi12_D0(couplings: ALPcouplings, ma, fa, **kwargs) -> float:
+    from ...constants import mD0
     effH = effhamiltonian('D0', couplings, ma, fa, **kwargs)
-    return np.imag(effH)/mD0/GammaD0
+    return np.angle(effH/(2*mD0*G12_u_SM(pars)))
 
 def delta_mB0(couplings: ALPcouplings, ma, fa, **kwargs) -> float:
     from ...constants import mB0, hbar_GeVps
@@ -177,8 +177,8 @@ def delta_mBs(couplings: ALPcouplings, ma, fa, **kwargs) -> float:
 mixing_observables = {
     'delta_mK0': delta_mK0,
     'epsK': epsK,
-    're_x12_D0': re_x12_D0,
-    'im_x12_D0': im_x12_D0,
+    'x_D0': x_D0,
+    'phi12_D0': phi12_D0,
     'delta_mB0': delta_mB0,
     'delta_mBs': delta_mBs,
 }
@@ -192,8 +192,8 @@ def meson_mixing(obs: str, couplings: ALPcouplings, ma, fa, **kwargs) -> float:
         The observable to calculate. The available options are:
         - 'delta_mK0': The mass difference of the K0 meson, in ps^{-1}.
         - 'epsK': The epsilon parameter of the K0 meson.
-        - 're_x12_D0': Normalized real part of the dispersive mixing amplitude in the D0 system.
-        - 'im_x12_D0': Normalized imaginary part of the dispersive mixing amplitude in the D0 system.
+        - 'x_D0': Normalized mass difference in D0 mixing.
+        - 'phi12_D0': D0 mixing phase, in rad.
         - 'delta_mB0': The mass difference of the B0 meson, in ps^{-1}.
         - 'delta_mBs': The mass difference of the Bs meson, in ps^{-1}.
 
