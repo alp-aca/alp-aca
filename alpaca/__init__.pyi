@@ -10,6 +10,10 @@ from .decays.decays import (
     cross_section as cross_section,
 )
 
+from .decays.mesons.mixing import (
+    meson_mixing as meson_mixing,
+)
+
 from . import(
     models as models,
     experimental_data as experimental_data,

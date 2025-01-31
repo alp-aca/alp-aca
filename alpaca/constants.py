@@ -202,3 +202,29 @@ ie_abs = Constant(-35, 'Ecker:1991ru')
 imu_disp = Constant(-2.82, 'Ecker:1991ru')
 imu_abs = Constant(1.21, 'Ecker:1991ru')
 br_ksphotons_LD = Constant(2.17e-6, 'Cirigianno:2011ny')
+
+## Neutral meson mixing
+# B0
+B1_Bd = Constant(0.806, 'Dowdall:2019bea')
+B2_Bd = Constant(0.769, 'Dowdall:2019bea')
+B3_Bd = Constant(0.747, 'Dowdall:2019bea')
+B4_Bd = Constant(1.077, 'Dowdall:2019bea')
+B5_Bd = Constant(0.973, 'Dowdall:2019bea')
+# Bs
+B1_Bs = Constant(0.813, 'Dowdall:2019bea')
+B2_Bs = Constant(0.817, 'Dowdall:2019bea')
+B3_Bs = Constant(0.816, 'Dowdall:2019bea')
+B4_Bs = Constant(1.033, 'Dowdall:2019bea')
+B5_Bs = Constant(0.941, 'Dowdall:2019bea')
+# K0
+B1_K0 = Constant(0.5268, 'Boyle:2024gge')
+B2_K0 = Constant(0.5596, 'Boyle:2024gge')
+B3_K0 = Constant(0.856, 'Boyle:2024gge')
+B4_K0 = Constant(0.9097, 'Boyle:2024gge')
+B5_K0 = Constant(0.750, 'Boyle:2024gge')
+# D0
+O1_D0 = Constant(0.0805, 'Bazavov:2017weg') #GeV^4
+O2_D0 = Constant(-0.1561, 'Bazavov:2017weg') #GeV^4
+O3_D0 = Constant(0.0464, 'Bazavov:2017weg') #GeV^4
+O4_D0 = Constant(0.2747, 'Bazavov:2017weg') #GeV^4
+O5_D0 = Constant(0.1035, 'Bazavov:2017weg') #GeV^4

@@ -30,6 +30,8 @@ branching_ratio
     Calculates the branching ratio of a particle.
 cross_section
     Calculates the cross section of a process.
+meson_mixing
+    Calculates the value of a meson mixing observable.
 """
 
 import lazy_loader as lazy
