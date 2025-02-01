@@ -5,6 +5,8 @@ from ...rge.runSM import runSM
 from ...biblio.biblio import citations
 from ..ee.cross_sections import sigmaNR_gammaALP
 from .effcouplings import effcouplings_cq1q2_W
+from . import transition_fv, transition_tree_level
+from ...common import ckm_xi
 
 def Kminustopia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **kwargs):
     from ...constants import mK, mpi_pm, g8, fpi, GammaK, GF
@@ -109,30 +111,6 @@ def KStopia(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     kallen_factor = kallen(1, mpi0**2/mKS**2, ma**2/mKS**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return np.abs(amp)**2/(16*np.pi*mKS)*np.sqrt(kallen_factor)/GammaKS
-
-def BtoKa(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
-    from ...constants import mK, mB
-    from ...common import f0_BK, kallen
-    if ma > mB-mK:
-        return 0
-    citations.register_inspire('Izaguirre:2016dfi')
-    coup_low = couplings.match_run(ma, 'VA_below', **kwargs)
-    gq_eff = coup_low['cdV'][1,2]/f_a
-    kallen_factor = kallen(1, mK**2/mB**2, ma**2/mB**2)
-    kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
-    return mB**3*abs(gq_eff)**2/(64*np.pi) * f0_BK(ma**2)**2*np.sqrt(kallen_factor)*(1-mK**2/mB**2)**2
-
-def B0toKa(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
-    from ...constants import mK0, mB0
-    from ...common import f0_BK, kallen
-    if ma > mB0-mK0:
-        return 0
-    citations.register_inspire('Izaguirre:2016dfi')
-    coup_low = couplings.match_run(ma, 'VA_below', **kwargs)
-    gq_eff = coup_low['cdV'][1,2]/f_a
-    kallen_factor = kallen(1, mK0**2/mB0**2, ma**2/mB0**2)
-    kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
-    return mB0**3*abs(gq_eff)**2/(128*np.pi) * f0_BK(ma**2)**2*np.sqrt(kallen_factor)*(1-mK0**2/mB0**2)**2
 
 def B0toKsta(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     from ...constants import mKst0, mB0
@@ -339,3 +317,66 @@ def Mixed_QuarkoniaSearches(ma: float, couplings: ALPcouplings, mV: float, quark
     sigma_peak=sigmapeak(mV, BeeV)
     return BR_Vagamma(ma, couplings, mV, BeeV, quark, f_a, **kwargs)+sigmaNR_gammaALP(ma, couplings, mV**2, f_a, **kwargs)/(Corr_Factor*sigma_peak)
         
+def dwPtoPa(ampsq: float, mP1: float, mP2: float, ma: float):
+    from ...common import kallen
+    return ampsq/(16*np.pi*mP1)*np.sqrt(kallen(1, mP2**2/mP1**2, ma**2/mP1**2))
+
+def dwPtoVa(ampsq: float, mP: float, mV: float, ma: float):
+    from ...common import kallen
+    return ampsq/(64*np.pi)*np.sqrt(kallen(mP**2, mV**2, ma**2))**3/(mP**3*mV**2)
+
+def dwVtoPa(ampsq: float, mV: float, mP: float, ma: float):
+    from ...common import kallen
+    return ampsq/(64*np.pi)*np.sqrt(kallen(mV**2, mP**2, ma**2))**3/mV**5
+
+def brBplusKa(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
+    from ...constants import mB, mK, fB, fK, mb, ms, GammaB
+    from ...common import f0_BK
+    diags = kwargs.get('diagrams', 'fv')
+    args_tree = kwargs.get('args_tree', {})
+    kwargs = {k: v for k, v in kwargs.items() if k not in ['diagrams', 'args_tree']}
+    if ma > mB-mK:
+        return 0
+    if ma < couplings.ew_scale:
+        clow = couplings.match_run(ma, 'kF_below', **kwargs)
+        csb = clow['kD'][1,2]+clow['kd'][1,2]
+        cbb = clow['kd'][2,2]-clow['kD'][2,2]
+        css = clow['kd'][1,1]-clow['kD'][1,1]
+    else:
+        clow = couplings.match_run(ma, 'massbasis_above', **kwargs)
+        csb = clow['kD'][1,2]+clow['kd'][1,2]+effcouplings_cq1q2_W(clow, ma**2, 's', 'b')
+        cbb = clow['kd'][2,2]-clow['kD'][2,2]
+        css = clow['kd'][1,1]-clow['kD'][1,1]
+    amp = 0
+    if diags != 'tree':
+        amp += transition_fv.amp_PtoP(mB, mK, f0_BK(ma**2), f_a, csb)
+    if diags != 'fv':
+        amp += transition_tree_level.pseudo_to_pseudo_schannel_initial(mB, mK, ma, fB, fK, f_a, ms, mb, css, cbb, ckm_xi('t', 'sb'), **args_tree)
+        amp += transition_tree_level.pseudo_to_pseudo_schannel_final(mB, mK, ma, fB, fK, f_a, ms, mb, css, cbb, ckm_xi('t', 'sb'), **args_tree)
+    return dwPtoPa(np.abs(amp)**2, mB, mK, ma)/GammaB
+
+def brB0Ka(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
+    from ...constants import mB0, mK0, fB, fK0, mb, ms, GammaB0
+    from ...common import f0_BK
+    diags = kwargs.get('diagrams', 'fv')
+    args_tree = kwargs.get('args_tree', {})
+    kwargs = {k: v for k, v in kwargs.items() if k not in ['diagrams', 'args_tree']}
+    if ma > mB0-mK0:
+        return 0
+    if ma < couplings.ew_scale:
+        clow = couplings.match_run(ma, 'kF_below', **kwargs)
+        csb = clow['kD'][1,2]+clow['kd'][1,2]
+        cbb = clow['kd'][2,2]-clow['kD'][2,2]
+        css = clow['kd'][1,1]-clow['kD'][1,1]
+    else:
+        clow = couplings.match_run(ma, 'massbasis_above', **kwargs)
+        csb = clow['kD'][1,2]+clow['kd'][1,2]+effcouplings_cq1q2_W(clow, ma**2, 's', 'b')
+        cbb = clow['kd'][2,2]-clow['kD'][2,2]
+        css = clow['kd'][1,1]-clow['kD'][1,1]
+    amp = 0
+    if diags != 'tree':
+        amp += transition_fv.amp_PtoP(mB0, mK0, f0_BK(ma**2), f_a, csb)/2
+    if diags != 'fv':
+        amp += transition_tree_level.pseudo_to_pseudo_schannel_initial(mB0, mK0, ma, fB, fK0, f_a, ms, mb, css, cbb, ckm_xi('t', 'sb'), **args_tree)
+        amp += transition_tree_level.pseudo_to_pseudo_schannel_final(mB0, mK0, ma, fB, fK0, f_a, ms, mb, css, cbb, ckm_xi('t', 'sb'), **args_tree)
+    return dwPtoPa(np.abs(amp)**2, mB0, mK0, ma)/GammaB0
