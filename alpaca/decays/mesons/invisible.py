@@ -351,17 +351,31 @@ def brBplusKa(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     if diags != 'tree':
         amp += transition_fv.amp_PtoP(mB, mK, f0_BK(ma**2), f_a, csb)
     if diags != 'fv':
-        amp += transition_tree_level.pseudo_to_pseudo_schannel_initial(mB, mK, ma, fB, fK, f_a, ms, mb, css, cbb, ckm_xi('t', 'sb'), **args_tree)
-        amp += transition_tree_level.pseudo_to_pseudo_schannel_final(mB, mK, ma, fB, fK, f_a, ms, mb, css, cbb, ckm_xi('t', 'sb'), **args_tree)
+        amp += transition_tree_level.pseudo_to_pseudo_schannel_initial(mB, mK, ma, fB, fK, f_a, ms, mb, css, cbb, ckm_xi('u', 'sb'), **args_tree)
+        amp += transition_tree_level.pseudo_to_pseudo_schannel_final(mB, mK, ma, fB, fK, f_a, ms, mb, css, cbb, ckm_xi('u', 'sb'), **args_tree)
     return dwPtoPa(np.abs(amp)**2, mB, mK, ma)/GammaB
 
 def brB0Ka(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
-    from ...constants import mB0, mK0, fB, fK0, mb, ms, GammaB0
+    from ...constants import mB0, mK0, GammaB0
     from ...common import f0_BK
+    if ma > mB0-mK0:
+        return 0
+    if ma < couplings.ew_scale:
+        clow = couplings.match_run(ma, 'kF_below', **kwargs)
+        csb = clow['kD'][1,2]+clow['kd'][1,2]
+    else:
+        clow = couplings.match_run(ma, 'massbasis_above', **kwargs)
+        csb = clow['kD'][1,2]+clow['kd'][1,2]+effcouplings_cq1q2_W(clow, ma**2, 's', 'b')
+    amp = transition_fv.amp_PtoP(mB0, mK0, f0_BK(ma**2), f_a, csb)/2
+    return dwPtoPa(np.abs(amp)**2, mB0, mK0, ma)/GammaB0
+
+def brBplusKsta(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
+    from ...constants import mB, mKst_plus, fB, fKst, mb, ms, GammaB
+    from ...common import A0_BKst
     diags = kwargs.get('diagrams', 'fv')
     args_tree = kwargs.get('args_tree', {})
     kwargs = {k: v for k, v in kwargs.items() if k not in ['diagrams', 'args_tree']}
-    if ma > mB0-mK0:
+    if ma > mB-mKst_plus:
         return 0
     if ma < couplings.ew_scale:
         clow = couplings.match_run(ma, 'kF_below', **kwargs)
@@ -375,8 +389,23 @@ def brB0Ka(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
         css = clow['kd'][1,1]-clow['kD'][1,1]
     amp = 0
     if diags != 'tree':
-        amp += transition_fv.amp_PtoP(mB0, mK0, f0_BK(ma**2), f_a, csb)/2
+        amp += transition_fv.amp_PtoV(mKst_plus, A0_BKst(ma**2), f_a, csb)
     if diags != 'fv':
-        amp += transition_tree_level.pseudo_to_pseudo_schannel_initial(mB0, mK0, ma, fB, fK0, f_a, ms, mb, css, cbb, ckm_xi('t', 'sb'), **args_tree)
-        amp += transition_tree_level.pseudo_to_pseudo_schannel_final(mB0, mK0, ma, fB, fK0, f_a, ms, mb, css, cbb, ckm_xi('t', 'sb'), **args_tree)
-    return dwPtoPa(np.abs(amp)**2, mB0, mK0, ma)/GammaB0
+        amp += transition_tree_level.pseudo_to_vector_schannel_initial(mB, mKst_plus, ma, fB, fKst, f_a, ms, mb, css, cbb, ckm_xi('u', 'sb'), **args_tree)
+        amp += transition_tree_level.pseudo_to_vector_schannel_final(mB, mKst_plus, ma, fB, fKst, f_a, ms, mb, css, cbb, ckm_xi('u', 'sb'), **args_tree)
+    return dwPtoVa(np.abs(amp)**2, mB, mKst_plus, ma)/GammaB
+
+def brB0Ksta(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
+    from ...constants import mB0, mKst0, GammaB0
+    from ...common import A0_BKst
+    kwargs = {k: v for k, v in kwargs.items() if k not in ['diagrams', 'args_tree']}
+    if ma > mB0-mKst0:
+        return 0
+    if ma < couplings.ew_scale:
+        clow = couplings.match_run(ma, 'kF_below', **kwargs)
+        csb = clow['kD'][1,2]+clow['kd'][1,2]
+    else:
+        clow = couplings.match_run(ma, 'massbasis_above', **kwargs)
+        csb = clow['kD'][1,2]+clow['kd'][1,2]+effcouplings_cq1q2_W(clow, ma**2, 's', 'b')
+    amp = transition_fv.amp_PtoV(mKst0, A0_BKst(ma**2), f_a, csb)/2
+    return dwPtoVa(np.abs(amp)**2, mB0, mKst0, ma)/GammaB0
