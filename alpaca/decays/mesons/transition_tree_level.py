@@ -39,13 +39,15 @@ def pseudo_to_pseudo_schannel_initial(MI:float, MF:float, ma:float, fI: float, f
     citations.register_inspire('Guerrera:2022ykl')
     kPI = (MI**2-MF**2+ma**2)/2
     kPF = (MI**2-MF**2-ma**2)/2
-    integral = integrate.quad(lambda x: g(MI)*phi(x, MI, mQ, mq)*(cq*mq*np.heaviside(1-x, deltaaM(MI,ma))/(ma**2 - 2* kPI*(1-x)) - cQ*mQ *np.heaviside(x, deltaaM(MI,ma))/(ma**2 - 2* kPI*x)), 0, 1-1e-5, complex_func=True, **kwargs)
+    kwargs = {'limit': 75} | kwargs
+    integral = integrate.quad(lambda x: g(MI)*phi(x, MI, mQ, mq)*(cq*mq*np.heaviside(1-x-deltaaM(MI,ma), 0.0)/(ma**2 - 2* kPI*(1-x)) - cQ*mQ *np.heaviside(x-deltaaM(MI,ma),0)/(ma**2 - 2* kPI*x)), 0, 1-1e-5, complex_func=True, **kwargs)
     return GF*VCKM*fI*fF/(np.sqrt(2)*fa)*MI*kPF*integral[0]
 
 def pseudo_to_pseudo_schannel_final(MI:float, MF:float, ma:float, fI: float, fF: float, fa:float, mqp:float, mQp:float, cqp:float, cQp:float, VCKM:float, **kwargs):
     citations.register_inspire('Guerrera:2022ykl')
     kPI = (MI**2-MF**2+ma**2)/2
     kPF = (MI**2-MF**2-ma**2)/2
+    kwargs = {'limit': 75} | kwargs
     integral = integrate.quad(lambda y: g(MF)*phi(y, MF, mQp, mqp)*(cQp*mQp/(ma**2 + kPF*y) - cqp*mqp/(ma**2 + 2* kPF*(1-y))), 0, 1-1e-5, complex_func=True, **kwargs)
     return GF*VCKM*fI*fF/(np.sqrt(2)*fa)*MF*kPI*integral[0]
 
@@ -54,13 +56,15 @@ def pseudo_to_pseudo_tchannel_initial(MI:float, MF:float, ma:float, fI: float, f
     citations.register_inspire('Guerrera:2022ykl')
     kPI = (MI**2-MF**2+ma**2)/2
     kPF = (MI**2-MF**2-ma**2)/2
-    integral = integrate.quad(lambda x: g(MI)*phi(x, MI, mQ, mq)*(cQ*mQ*np.heaviside(x, deltaaM(MI,ma))/(ma**2 - 2* kPI*x) - cq*mq *np.heaviside(1-x, deltaaM(MI,ma))/(ma**2 - 2* kPI*(1-x))), 0, 1-1e-5, complex_func=True, **kwargs)
+    kwargs = {'limit': 75} | kwargs
+    integral = integrate.quad(lambda x: g(MI)*phi(x, MI, mQ, mq)*(cQ*mQ*np.heaviside(x-deltaaM(MI,ma), 0)/(ma**2 - 2* kPI*x) - cq*mq *np.heaviside(1-x-deltaaM(MI,ma), 0)/(ma**2 - 2* kPI*(1-x))), 0, 1-1e-5, complex_func=True, **kwargs)
     return GF*VCKM*fI*fF/(2*fa)*MI*kPF*integral[0]
 
 def pseudo_to_pseudo_tchannel_final(MI:float, MF:float, ma:float, fI: float, fF: float, fa:float, mqp:float, mQp:float, cqp:float, cQp:float, VCKM:float, **kwargs):
     citations.register_inspire('Guerrera:2022ykl')
     kPI = (MI**2-MF**2+ma**2)/2
     kPF = (MI**2-MF**2-ma**2)/2
+    kwargs = {'limit': 75} | kwargs
     integral = integrate.quad(lambda y: g(MF)*phi(y, MF, mQp, mqp)*(cqp*mqp/(ma**2 + 2* kPF*(1-y)) - cQp*mQp/(ma**2 + 2* kPF*y)), 0, 1-1e-5, complex_func=True, **kwargs)
     return GF*VCKM*fI*fF/(2*fa)*MF*kPI*integral[0]
 
@@ -70,13 +74,15 @@ def pseudo_to_vector_schannel_initial(MI:float, MF:float, ma:float, fI: float, f
     citations.register_inspire('Guerrera:2022ykl')
     pIepspFnum = pIepspF(MI, MF, ma)
     kPI = (MI**2-MF**2+ma**2)/2
-    integral = integrate.quad(lambda x: g(MI)*phi(x, MI, mQ, mq)*(cq*mq*np.heaviside(1-x, deltaaM(MI,ma))/(ma**2 - kPI*(1-x)) - cQ*mQ *np.heaviside(x, deltaaM(MI,ma))/(ma**2 - 2* kPI*x)), 0, 1-1e-5, complex_func=True, **kwargs)
+    kwargs = {'limit': 75} | kwargs
+    integral = integrate.quad(lambda x: g(MI)*phi(x, MI, mQ, mq)*(cq*mq*np.heaviside(1-x-deltaaM(MI,ma), 0)/(ma**2 - kPI*(1-x)) - cQ*mQ *np.heaviside(x-deltaaM(MI,ma), 0)/(ma**2 - 2* kPI*x)), 0, 1-1e-5, complex_func=True, **kwargs)
     return 1j*GF*VCKM*fI*fF/(np.sqrt(2)*fa)*MI*MF*np.sum(pIepspFnum)*integral[0]
 
 def pseudo_to_vector_schannel_final(MI:float, MF:float, ma:float, fI: float, fF: float, fa:float, mqp:float, mQp:float, cqp:float, cQp:float, VCKM:float, **kwargs):
     citations.register_inspire('Guerrera:2022ykl')
     pIepspFnum = pIepspF(MI, MF, ma)
     kPF = (MI**2-MF**2-ma**2)/2
+    kwargs = {'limit': 75} | kwargs
     integral = integrate.quad(lambda y: g(MF)*phi(y, MF, mQp, mqp)*(cQp*mQp/(ma**2 + 2* kPF*y) - cqp*mqp/(ma**2 + 2* kPF*(1-y))), 0, 1-1e-5, complex_func=True, **kwargs)
     return 1j*GF*VCKM*fI*fF/(np.sqrt(2)*fa)*(-MF**2*np.sum(pIepspFnum))*integral[0]
 
@@ -85,13 +91,15 @@ def pseudo_to_vector_tchannel_initial(MI:float, MF:float, ma:float, fI: float, f
     citations.register_inspire('Guerrera:2022ykl')
     pIepspFnum = pIepspF(MI, MF, ma)
     kPI = (MI**2-MF**2+ma**2)/2
-    integral = integrate.quad(lambda x: g(MI)*phi(x, MI, mQ, mq)*(cQ*mQ*np.heaviside(x, deltaaM(MI,ma))/(ma**2 - kPI*x) - cq*mq *np.heaviside(1-x, deltaaM(MI,ma))/(ma**2 - 2* kPI*(1-x))), 0, 1-1e-5, complex_func=True, **kwargs)
+    kwargs = {'limit': 75} | kwargs
+    integral = integrate.quad(lambda x: g(MI)*phi(x, MI, mQ, mq)*(cQ*mQ*np.heaviside(x-deltaaM(MI,ma), 0)/(ma**2 - kPI*x) - cq*mq *np.heaviside(1-x-deltaaM(MI,ma), 0)/(ma**2 - 2* kPI*(1-x))), 0, 1-1e-5, complex_func=True, **kwargs)
     return 1j*GF*VCKM*fI*fF/(2*fa)*MI*MF*np.sum(pIepspFnum)*integral[0]
 
 def pseudo_to_vector_tchannel_final(MI:float, MF:float, ma:float, fI: float, fF: float, fa:float, mqp:float, mQp:float, cqp:float, cQp:float, VCKM:float, **kwargs):
     citations.register_inspire('Guerrera:2022ykl')
     pIepspFnum = pIepspF(MI, MF, ma)
     kPF = (MI**2-MF**2-ma**2)/2
+    kwargs = {'limit': 75} | kwargs
     integral = integrate.quad(lambda y: phi(y, MF, mQp, mqp)*(cQp*mQp/(ma**2 + 2* kPF*y) - cqp*mqp/(ma**2 + 2* kPF*(1-y))), 0, 1-1e-5, complex_func=True, **kwargs)
     return 1j*GF*VCKM*fI*fF/(2*fa)*(-MF**2*np.sum(pIepspFnum))*integral[0]
 
@@ -102,13 +110,15 @@ def vector_to_pseudo_schannel_initial(MI:float, MF:float, ma:float, fI: float, f
     citations.register_inspire('Guerrera:2022ykl')
     kPI = (MI**2-MF**2+ma**2)/2
     pFepspInum = pFepspI(MI, MF, ma)
-    integral = integrate.quad(lambda x: phi(x, MI, mQ,mq)*((cq*mq*np.heaviside(1-x, deltaaM(MI,ma))))/(ma**2-2* kPI*(1-x))-(cQ*mQ*np.heaviside(x,deltaaM(MI,ma)))/(ma**2-2*kPI*x), 0, 1-1e-5, complex_func=True, **kwargs)
+    kwargs = {'limit': 75} | kwargs
+    integral = integrate.quad(lambda x: phi(x, MI, mQ,mq)*((cq*mq*np.heaviside(1-x-deltaaM(MI,ma), 0)))/(ma**2-2* kPI*(1-x))-(cQ*mQ*np.heaviside(x-deltaaM(MI,ma), 0))/(ma**2-2*kPI*x), 0, 1-1e-5, complex_func=True, **kwargs)
     return -1j*GF*VCKM*fI*fF/(np.sqrt(2)*fa)*(-MI**2*np.sum(pFepspInum))*integral[0]
 
 def vector_to_pseudo_schannel_final(MI:float, MF:float, ma:float, fI: float, fF: float, fa:float, mqp:float, mQp:float, cqp:float, cQp:float, VCKM:float, **kwargs):
     citations.register_inspire('Guerrera:2022ykl')
     kPF = (MI**2-MF**2-ma**2)/2
     pIepspFnum = pIepspF(MI, MF, ma)
+    kwargs = {'limit': 75} | kwargs
     integral = integrate.quad(lambda y: phi(y, MI, mQp, mqp)*((cQp*mQp)/(ma**2+2*kPF*y)-(cqp*mqp)/(ma**2+2*kPF*(1-y))), 0, 1-1e-5, complex_func=True, **kwargs)
     return -1j*GF*VCKM*fI*fF/(np.sqrt(2)*fa)*MI*MF*(np.sum(pIepspFnum))*integral[0]
 ## t-channel
@@ -116,13 +126,15 @@ def vector_to_pseudo_tchannel_initial(MI:float, MF:float, ma:float, fI: float, f
     citations.register_inspire('Guerrera:2022ykl')
     kPI = (MI**2-MF**2+ma**2)/2
     pFepspInum = pFepspI(MI, MF, ma)
-    integral = integrate.quad(lambda x: phi(x, MI, mQ, mq)*((cQ*mQ*np.heaviside(x, deltaaM(MI,ma))))/(ma**2-2* kPI*x)-(cq*mq*np.heaviside(1-x,deltaaM(MI,ma)))/(ma**2-2*kPI*(1-x)), 0, 1-1e-5, complex_func=True, **kwargs)
+    kwargs = {'limit': 75} | kwargs
+    integral = integrate.quad(lambda x: phi(x, MI, mQ, mq)*((cQ*mQ*np.heaviside(x-deltaaM(MI,ma), 0)))/(ma**2-2* kPI*x)-(cq*mq*np.heaviside(1-x-deltaaM(MI,ma), 0))/(ma**2-2*kPI*(1-x)), 0, 1-1e-5, complex_func=True, **kwargs)
     return -1j*GF*VCKM*fI*fF/(2*fa)*(-MI**2*np.sum(pFepspInum))*integral[0]
 
 def vector_to_pseudo_tchannel_final(MI:float, MF:float, ma:float, fI: float, fF: float, fa:float, mqp:float, mQp:float, cqp:float, cQp:float, VCKM:float, **kwargs):
     citations.register_inspire('Guerrera:2022ykl')
     kPF = (MI**2-MF**2-ma**2)/2
     pIepspFnum = pIepspF(MI, MF, ma)
+    kwargs = {'limit': 75} | kwargs
     integral = integrate.quad(lambda y: g(MF)*phi(y, MI, mQp, mqp)*((cQp*mQp)/(ma**2+2*kPF*y)-(cqp*mqp)/(ma**2+2*kPF*(1-y))), 0, 1-1e-5, complex_func=True, **kwargs)
     return -1j*GF*VCKM*fI*fF/(2*fa)*MI*MF*integral[0]*np.sum(pIepspFnum)
 
