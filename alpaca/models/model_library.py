@@ -155,13 +155,13 @@ class model(ModelBase):
                 self.couplings[f'c{f}'] = -self.charges[f]
             else:
                 self.couplings[f'c{f}'] = - np.diag(charges_np[f])
-        self.couplings['cg'] = sp.Rational(1,2) * sp.simplify(np.sum(
+        self.couplings['cg'] = -sp.Rational(1,2) * sp.simplify(np.sum(
             2 * charges_np['qL'] - charges_np['dR'] - charges_np['uR']
         ))
-        self.couplings['cW'] = sp.Rational(1,2) * sp.simplify(np.sum(
+        self.couplings['cW'] = -sp.Rational(1,2) * sp.simplify(np.sum(
             3 * charges_np['qL'] + charges_np['lL']
         ))
-        self.couplings['cB'] = sp.Rational(1,6) * sp.simplify(np.sum(
+        self.couplings['cB'] = -sp.Rational(1,6) * sp.simplify(np.sum(
             charges_np['qL'] - 8 * charges_np['uR'] - 2 * charges_np['dR'] + 3 * charges_np['lL'] - 6 * charges_np['eR']
         ))
 
@@ -231,9 +231,9 @@ class KSVZ_model(ModelBase):
             A list with the heavy fermions of the model.
         """
         super().__init__(model_name)
-        self.couplings['cg']=sum(f.PQ * f.weak_isospin_dim * f.dynkin_index_color for f in fermions)
-        self.couplings['cB']=sum(f.PQ * f.color_dim * f.weak_isospin_dim * f.hypercharge**2 for f in fermions)
-        self.couplings['cW']=sum(f.PQ * f.dynkin_index_weak * f.color_dim for f in fermions)
+        self.couplings['cg']=-sum(f.PQ * f.weak_isospin_dim * f.dynkin_index_color for f in fermions)
+        self.couplings['cB']=-sum(f.PQ * f.color_dim * f.weak_isospin_dim * f.hypercharge**2 for f in fermions)
+        self.couplings['cW']=-sum(f.PQ * f.dynkin_index_weak * f.color_dim for f in fermions)
 
 
 # Benchmark Models
@@ -243,11 +243,11 @@ beta = sp.symbols('beta')
 KSVZ_charge = sp.symbols(r'\mathcal{X}')
 """Symbol representing the PQ charge of the heavy fermions in the KSVZ-like models."""
 
-QED_DFSZ= model('QED-DFSZ', {'lL': 2*sp.cos(beta)**2, 'uR': -2*sp.sin(beta)**2, 'dR': 2*sp.sin(beta)**2})
+QED_DFSZ= model('QED-DFSZ', {'eR': 2*sp.cos(beta)**2, 'uR': 2*sp.sin(beta)**2, 'dR': -2*sp.sin(beta)**2})
 """QED-DFSZ: A DFSZ-like model with couplings to leptons and quarks that does not generate a QCD anomaly."""
-u_DFSZ= model('u-DFSZ', {'lL': 2*sp.cos(beta)**2, 'uR': -2*sp.sin(beta)**2})
+u_DFSZ= model('u-DFSZ', {'eR': 2*sp.cos(beta)**2, 'uR': 2*sp.sin(beta)**2})
 """u-DFSZ: A DFSZ-like model with couplings to leptons and up-type quarks."""
-d_DFSZ= model('d-DFSZ', {'lL': 2*sp.cos(beta)**2, 'dR': 2*sp.sin(beta)**2})
+d_DFSZ= model('d-DFSZ', {'eR': 2*sp.cos(beta)**2, 'dR': -2*sp.sin(beta)**2})
 """d-DFSZ: A DFSZ-like model with couplings to leptons and down-type quarks."""
 Q_KSVZ=KSVZ_model('Q-KSVZ', [fermion(3,1,0,KSVZ_charge)])
 """Q-KSVZ: A KSVZ-like model with a heavy vector-like quark."""
