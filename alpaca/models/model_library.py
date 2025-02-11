@@ -74,7 +74,10 @@ class ModelBase:
         ALPcouplings
             The couplings of the model with numerical values.
         """
-        substituted_couplings = {key: float(value.subs(substitutions)) for key, value in self.couplings.items()}
+        substituted_couplings = {key: np.array(value.subs(substitutions), dtype=float) for key, value in self.couplings.items()}
+        for k, v in substituted_couplings.items():
+            if np.array(v).shape == ():
+                substituted_couplings[k] = float(v)
         return ALPcouplings(substituted_couplings, scale, 'derivative_above', ew_scale, VuL, VdL, VuR, VdR)
     
     def couplings_latex(self, eqnumber: bool = False) -> str:
@@ -154,7 +157,7 @@ class model(ModelBase):
             if np.array(self.charges[f]).shape == ():
                 self.couplings[f'c{f}'] = -self.charges[f]
             else:
-                self.couplings[f'c{f}'] = - np.diag(charges_np[f])
+                self.couplings[f'c{f}'] = - sp.diag(charges_np[f], unpack=True)
         self.couplings['cg'] = -sp.Rational(1,2) * sp.simplify(np.sum(
             2 * charges_np['qL'] - charges_np['dR'] - charges_np['uR']
         ))
@@ -243,13 +246,15 @@ beta = sp.symbols('beta')
 KSVZ_charge = sp.symbols(r'\mathcal{X}')
 """Symbol representing the PQ charge of the heavy fermions in the KSVZ-like models."""
 
-QED_DFSZ= model('QED-DFSZ', {'eR': 2*sp.cos(beta)**2, 'uR': 2*sp.sin(beta)**2, 'dR': -2*sp.sin(beta)**2})
+QED_DFSZ= model('QED-DFSZ', {'eR': -2*sp.cos(beta)**2, 'uR': -2*sp.sin(beta)**2, 'dR': 2*sp.sin(beta)**2})
 """QED-DFSZ: A DFSZ-like model with couplings to leptons and quarks that does not generate a QCD anomaly."""
-u_DFSZ= model('u-DFSZ', {'eR': 2*sp.cos(beta)**2, 'uR': 2*sp.sin(beta)**2})
+u_DFSZ= model('u-DFSZ', {'eR': -2*sp.cos(beta)**2, 'uR': -2*sp.sin(beta)**2})
 """u-DFSZ: A DFSZ-like model with couplings to leptons and up-type quarks."""
-d_DFSZ= model('d-DFSZ', {'eR': 2*sp.cos(beta)**2, 'dR': -2*sp.sin(beta)**2})
+d_DFSZ= model('d-DFSZ', {'eR': -2*sp.cos(beta)**2, 'dR': 2*sp.sin(beta)**2})
 """d-DFSZ: A DFSZ-like model with couplings to leptons and down-type quarks."""
 Q_KSVZ=KSVZ_model('Q-KSVZ', [fermion(3,1,0,KSVZ_charge)])
 """Q-KSVZ: A KSVZ-like model with a heavy vector-like quark."""
 L_KSVZ=KSVZ_model('L-KSVZ', [fermion(1,2,0,KSVZ_charge)])
+"""L-KSVZ: A KSVZ-like model with a heavy vector-like lepton."""
+Y_KSVZ=KSVZ_model('Y-KSVZ', [fermion(1,1,sp.Rational(1,2),KSVZ_charge)])
 """L-KSVZ: A KSVZ-like model with a heavy vector-like lepton."""
