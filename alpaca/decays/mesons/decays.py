@@ -6,16 +6,17 @@ from ...constants import(
     mUpsilon4S, BeeUpsilon4S,
     mJpsi, BeeJpsi,
     GammaB, GammaB0,
+    GammaJpsi, GammaUpsilon1S, GammaUpsilon3S, GammaUpsilon4S,
     GammaD0, GammaDplus, GammaDs
 )
 from ..nwa import transition_nwa
 from ..alp_decays.branching_ratios import decay_channels
 
 meson_to_alp = {
-    ('Upsilon(1S)', ('alp', 'photon')): lambda ma, couplings, fa, br_dark, **kwargs: BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, 'b', fa, **kwargs),
+    ('Upsilon(1S)', ('alp', 'photon')): lambda ma, couplings, fa, br_dark, **kwargs: BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, GammaUpsilon1S, 'b', fa, **kwargs),
     ('Upsilon(3S)', ('alp', 'photon')): lambda ma, couplings, fa, br_dark, **kwargs: Mixed_QuarkoniaSearches(ma, couplings, mUpsilon3S, 'b', fa, **kwargs),
-    ('Upsilon(4S)', ('alp', 'photon')): lambda ma, couplings, fa, br_dark, **kwargs: BR_Vagamma(ma, couplings, mUpsilon4S, BeeUpsilon4S, 'b', fa, **kwargs),
-    ('J/psi', ('alp', 'photon')): lambda ma, couplings, fa, br_dark, **kwargs: BR_Vagamma(ma, couplings, mJpsi, BeeJpsi, 'c', fa, **kwargs),
+    ('Upsilon(4S)', ('alp', 'photon')): lambda ma, couplings, fa, br_dark, **kwargs: BR_Vagamma(ma, couplings, mUpsilon4S, BeeUpsilon4S, GammaUpsilon4S, 'b', fa, **kwargs),
+    ('J/psi', ('alp', 'photon')): lambda ma, couplings, fa, br_dark, **kwargs: BR_Vagamma(ma, couplings, mJpsi, BeeJpsi, GammaJpsi, 'c', fa, **kwargs),
     ('B+', ('K+', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: brBplusKa(ma, couplings, fa, **kwargs),
     ('B-', ('K-', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: brBplusKa(ma, couplings, fa, **kwargs),
     ('B0', ('K0', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: brB0Ka(ma, couplings, fa, **kwargs),

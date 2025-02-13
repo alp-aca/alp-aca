@@ -284,38 +284,69 @@ def DstoKsta(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mDs**3*abs(gq_eff)**2/(64*np.pi) * A0_DsKst(ma**2)**2 * kallen_factor**1.5
 
-def BR_Vagamma(ma: float, couplings: ALPcouplings, mV: float, BeeV: float, quark: str, f_a: float=1000, **kwargs):
+class ftilde_JpsiClass:
+    def __init__(self):
+        self.initialized = False
+    def init(self):
+        citations.register_inspire('Colquhoun:2025xlx')
+        import pandas as pd
+        import os
+        from scipy.interpolate import interp1d
+        current_dir = os.path.dirname(__file__)
+        data = pd.read_csv(os.path.join(current_dir, 'HPQCD_Ftilde.txt'), sep=' ', names=['x', 'ftilde', 'sigma'], skiprows=6)
+        self.interpolator = interp1d(data['x'], data['ftilde'], kind='cubic')
+    def __call__(self, x):
+        if not self.initialized:
+            self.init()
+            self.initialized = True
+        return self.interpolator(x)
+    
+ftilde_Jpsi = ftilde_JpsiClass()
+
+def BR_Vagamma(ma: float, couplings: ALPcouplings, mV: float, BeeV: float, GammaV: float, quark: str, f_a: float=1000, **kwargs):
     citations.register_inspire('Merlo:2019anv')
     citations.register_inspire('DiLuzio:2024jip')
     citations.register_inspire('Hwang:1997ie') # Eliminate fV in favour of BR(V->ee)
     from ...common import alpha_em
     coup_low = couplings.match_run(ma, 'VA_below', **kwargs)
     if quark == 'b':
-        gaff = 0.5*coup_low['cdA'][2,2]/f_a
+        qq = -1/3
+        gaff = coup_low['cdA'][2,2]/f_a
     elif quark=='c':
-        gaff = 0.5*coup_low['cuA'][1,1]/f_a
+        qq = 2/3
+        gaff = coup_low['cuA'][1,1]/f_a# * ftilde_Jpsi(ma**2/mV**2)
     else:
         raise ValueError("Q must be -1/3 or 2/3")
-    gaphoton = coup_low['cgamma']*alpha_em(mV)/(np.pi*f_a)
-    return mV**2/(32*np.pi*alpha_em(mV))*BeeV*(1-(ma**2)/mV**2)*np.abs((gaphoton)*(1-ma**2/mV**2)-2*gaff)**2
+    aem = alpha_em(mV)
+    gaphoton = coup_low['cgamma']*aem/(np.pi*f_a)
+
+    fV = np.sqrt(3 * mV * BeeV * GammaV/(4*np.pi*aem**2 * qq**2))
+    if quark == 'c':
+        formfactor = ftilde_Jpsi(ma**2/mV**2)
+    else:
+        formfactor = 2*fV/mV
+
+    return aem *qq**2 *mV**3/24/GammaV * (1-ma**2/mV**2) * np.abs(gaphoton * fV/mV*(1-ma**2/mV**2) - gaff*formfactor)**2
 
 def sigmapeak(mV, BeeV):
      from ...constants import hbarc2_GeV2pb
      return (12*np.pi*BeeV/(mV**2))*hbarc2_GeV2pb
 
 def Mixed_QuarkoniaSearches(ma: float, couplings: ALPcouplings, mV: float, quark: str, f_a: float=1000, **kwargs):
-    from ...constants import mJpsi, mUpsilon3S, BeeJpsi, BeeUpsilon3S
+    from ...constants import mJpsi, mUpsilon3S, BeeJpsi, BeeUpsilon3S, GammaJpsi, GammaUpsilon3S
     if mV == mJpsi:
         Corr_Factor=0.03075942
         BeeV = BeeJpsi
+        GammaV = GammaJpsi
     elif mV == mUpsilon3S:
         Corr_Factor=0.0023112
         BeeV = BeeUpsilon3S
+        GammaV = GammaUpsilon3S
     else:
         raise ValueError("mV must be mJpsi or mUpsilon3S")
     
     sigma_peak=sigmapeak(mV, BeeV)
-    return BR_Vagamma(ma, couplings, mV, BeeV, quark, f_a, **kwargs)+sigmaNR_gammaALP(ma, couplings, mV**2, f_a, **kwargs)/(Corr_Factor*sigma_peak)
+    return BR_Vagamma(ma, couplings, mV, BeeV, GammaV, quark, f_a, **kwargs)+sigmaNR_gammaALP(ma, couplings, mV**2, f_a, **kwargs)/(Corr_Factor*sigma_peak)
         
 def dwPtoPa(ampsq: float, mP1: float, mP2: float, ma: float):
     from ...common import kallen
