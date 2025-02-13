@@ -1,0 +1,76 @@
+from ..rge import ALPcouplings
+from ..common import B0disc_equalmass, ckm_xi
+from ..constants import GF, mu, md, ms, mc, mb, me, mmu, mtau, s2w, mW, mZ
+import numpy as np
+from ..common import g_photonloop, alpha_em, alpha_s
+
+def effcoupling_ff(ma, couplings: ALPcouplings, fermion, **kwargs):
+    mass = {'e': me, 'mu': mmu, 'tau': mtau, 'c': mc, 'b': mb}[fermion]
+    ftype = {'e': 'e', 'mu': 'e', 'tau': 'e', 'c': 'u', 'b': 'd'}[fermion]
+    Nc = {'e': 1, 'mu': 1, 'tau': 1, 'c': 3, 'b': 3}[fermion]
+    gen = {'e': 0, 'mu': 1, 'tau': 2, 'c': 1, 'b': 2}[fermion]
+    qf = {'e': -1, 'mu': -1, 'tau': -1, 'c': 2/3, 'b': -1/3}[fermion]
+    t3f = {'e': -0.5, 'mu': -0.5, 'tau': -0.5, 'c': 0.5, 'b': -0.5}[fermion]
+    delta1 = -11/3
+    aem = alpha_em(mass**2)/4/np.pi
+    if Nc == 3:
+        a_s = alpha_s(mass**2)/4/np.pi
+    else:
+        a_s = 0
+    if ma < couplings.ew_scale:
+        cc = couplings.match_run(ma, 'VA_below', **kwargs)
+        cgamma = cc['cgamma']
+        cg = cc['cg']
+        cf = cc[f'c{ftype}A'][gen, gen]
+        if cgamma != 0 or (cg!=0 and Nc == 3):
+            g = g_photonloop(4*mass**2/ma**2)
+        else:
+            g = 0
+        ceff = cf
+        ceff -= 12 * qf**2 * aem**2 * cgamma * (np.log(ma**2/mass**2) + delta1+g)
+        if Nc == 3:
+            ceff -= 12 * (4/3) * a_s**2 * cg * (np.log(ma**2/mass**2) + delta1+g)
+        return ceff
+    else:
+        cc = couplings.translate('massbasis_above')
+        cgamma = cc['cgamma']
+        cgammaZ = cc['cgammaZ']
+        cZ = cc['cZ']
+        cW = cc['cW']
+        cg = cc['cg']
+        cf = cc[f'k{ftype}'][gen, gen]-cc[f'k{ftype.upper()}'][gen, gen]
+        if cgamma != 0 or (cg!=0 and Nc == 3):
+            g = g_photonloop(4*mass**2/ma**2)
+        else:
+            g = 0
+        ceff = cf
+        ceff -= 12 * qf**2 * aem**2 * cgamma * (np.log(ma**2/mass**2) + delta1+g)
+        if Nc == 3:
+            ceff -= 12 * (4/3) * a_s**2 * cg * (np.log(ma**2/mass**2) + delta1+g)
+        c2w = 1-s2w
+        ceff -= 3* aem**2/s2w**2 * cW * (np.log(ma**2/mW**2) + delta1 + 1/2)
+        ceff -= 12*aem**2/s2w/c2w * cgammaZ * qf *(t3f - 2*qf*s2w)* (np.log(ma**2/mZ**2) + delta1 + 3/2)
+        ceff -= 12*aem**2/s2w**2/c2w**2 * cZ * (qf**2*s2w**2-t3f*qf*s2w+1/8) * (np.log(ma**2/mZ**2) + delta1 + 1/2)
+        return ceff
+
+def effcouplings_cq1q2_W(couplings: ALPcouplings, pa2: float, q1: str, q2: str) -> complex:
+    if couplings.scale > couplings.ew_scale:
+        raise NotImplementedError(f"The effective couplings c_{q1}{q2} are implemented only below the EW scale.")
+    couplings = couplings.translate('kF_below')
+    mq = {'u': mu, 'd': md, 's': ms, 'c': mc, 'b': mb}
+    ceff = 0
+    if q1 == q2:
+        return ceff
+    if q1 in ['u', 'c'] and q2 in ['u', 'c']:
+        gen = {'u': 0, 'c': 1}
+        ceff = couplings['kU'][gen[q1], gen[q2]]
+        for iq, qloop in enumerate(['d', 's', 'b']):
+            cqloop = couplings['kD'][iq, iq] - couplings['kd'][iq, iq]
+            ceff += GF/np.sqrt(2)/np.pi**2*ckm_xi(qloop, q1+q2)*cqloop * mq[qloop]**2 * (1 + B0disc_equalmass(pa2, mq[qloop]) + np.log(couplings.scale**2/mq[qloop]**2))
+    elif q1 in ['d', 's', 'b'] and q2 in ['d', 's', 'b']:
+        gen = {'d': 0, 's': 1, 'b': 2}
+        ceff = couplings['kD'][gen[q1], gen[q2]]
+        for iq, qloop in enumerate(['u', 'c']):
+            cqloop = couplings['kU'][iq, iq] - couplings['ku'][iq, iq]
+            ceff += GF/np.sqrt(2)/np.pi**2*ckm_xi(qloop, q1+q2) * cqloop * mq[qloop]**2 * (1 + B0disc_equalmass(pa2, mq[qloop]) + np.log(couplings.scale**2/mq[qloop]**2))
+    return ceff

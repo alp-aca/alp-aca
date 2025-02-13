@@ -4,7 +4,7 @@ from ...rge import ALPcouplings
 from ...rge.runSM import runSM
 from ...biblio.biblio import citations
 from ..ee.cross_sections import sigmaNR_gammaALP
-from .effcouplings import effcouplings_cq1q2_W
+from ..effcouplings import effcouplings_cq1q2_W
 from . import transition_fv, transition_tree_level
 from ...common import ckm_xi
 

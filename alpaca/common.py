@@ -2,7 +2,9 @@ import numpy as np
 import flavio
 from .constants import pars
 from .biblio.biblio import citations
-
+from scipy.integrate import quad
+import warnings
+from functools import cache
 
 def kallen(a, b, c):
     return a**2+b**2+c**2-2*a*b-2*a*c-2*b*c
@@ -19,6 +21,18 @@ B2 = lambda x: 1-(x-1)*floop(x)**2
 
 def B0disc_equalmass(q2: float, m: float) -> complex:
     return 2j*np.sqrt(1+0j-4*m**2/q2)*floop(np.sqrt(4*m**2/q2))
+
+@cache
+def g_photonloop(tau):
+    def int_g(x, tau):
+        tau *= (1-1e-8j)
+        den = np.sqrt(tau*(1-x)**2-x**2)
+        atan = np.atan(x/den)
+        num = 1-4*tau*(1-x)**2-2*x+4*x**2
+        return num/den*atan
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        return quad(int_g, 0, 1, args=tau, complex_func=True)[0]/3*4+5
 
 alpha_em = lambda q: flavio.physics.running.running.get_alpha_e(pars, q)
 alpha_s = lambda q: flavio.physics.running.running.get_alpha_s(pars, q)

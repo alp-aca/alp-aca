@@ -2,6 +2,7 @@ import numpy as np
 from ...rge import ALPcouplings, bases_above
 from ...constants import me, mmu, mtau, mc, mb
 from ...biblio.biblio import citations
+from ..effcouplings import effcoupling_ff
 
 
 def fermion_decay_width(ma, fa,cf, mf,Nc):
@@ -12,54 +13,24 @@ def fermion_decay_width(ma, fa,cf, mf,Nc):
         return 0.0
 
 def decay_width_electron(ma, couplings: ALPcouplings,fa,**kwargs):
-    matching_scale = couplings.ew_scale
-    if ma > matching_scale:
-        cc = couplings.match_run(ma, 'massbasis_above', **kwargs)
-        ceA = cc['ke'] - cc['kE']
-    else:
-        cc = couplings.match_run(ma, 'VA_below', **kwargs)
-        ceA = cc['ceA']
-    return fermion_decay_width(ma, fa, ceA[0,0],me,Nc=1)
+    ceA = effcoupling_ff(ma, couplings, 'e', **kwargs)
+    return fermion_decay_width(ma, fa, ceA, me, Nc=1)
 
 def decay_width_muon(ma,couplings: ALPcouplings,fa, **kwargs):
-    matching_scale = couplings.ew_scale
-    if ma > matching_scale:
-        cc = couplings.match_run(ma, 'massbasis_above', **kwargs)
-        ceA = cc['ke'] - cc['kE']
-    else:
-        cc = couplings.match_run(ma, 'VA_below', **kwargs)
-        ceA = cc['ceA']
-    return fermion_decay_width(ma, fa, ceA[1,1], mmu, Nc=1)
+    ceA = effcoupling_ff(ma, couplings, 'mu', **kwargs)
+    return fermion_decay_width(ma, fa, ceA, mmu, Nc=1)
 
 def decay_width_tau(ma,couplings: ALPcouplings,fa,**kwargs):
-    matching_scale = couplings.ew_scale
-    if ma > matching_scale:
-        cc = couplings.match_run(ma, 'massbasis_above', **kwargs)
-        ceA = cc['ke'] - cc['kE']
-    else:
-        cc = couplings.match_run(ma, 'VA_below', **kwargs)
-        ceA = cc['ceA']
-    return fermion_decay_width(ma, fa, ceA[2,2], mtau, Nc=1)
+    ceA = effcoupling_ff(ma, couplings, 'tau', **kwargs)
+    return fermion_decay_width(ma, fa, ceA, mtau, Nc=1)
 
 def decay_width_charm(ma,couplings: ALPcouplings,fa,**kwargs):
-    matching_scale = couplings.ew_scale
-    if ma > matching_scale:
-        cc = couplings.match_run(ma, 'massbasis_above', **kwargs)
-        cuA = cc['ku'] - cc['kU']
-    else:
-        cc = couplings.match_run(ma, 'VA_below', **kwargs)
-        cuA = cc['cuA']
-    return fermion_decay_width(ma, fa, cuA[1,1], mc, Nc=3)
+    cuA = effcoupling_ff(ma, couplings, 'c', **kwargs)
+    return fermion_decay_width(ma, fa, cuA, mc, Nc=3)
 
 def decay_width_bottom(ma,couplings: ALPcouplings,fa,**kwargs):
-    matching_scale = couplings.ew_scale
-    if ma > matching_scale:
-        cc = couplings.match_run(ma, 'massbasis_above', **kwargs)
-        cdA = cc['kd'] - cc['kD']
-    else:
-        cc = couplings.match_run(ma, 'VA_below', **kwargs)
-        cdA = cc['cdA']
-    return fermion_decay_width(ma, fa, cdA[2,2], mb, Nc=3)
+    cdA = effcoupling_ff(ma, couplings, 'b', **kwargs)
+    return fermion_decay_width(ma, fa, cdA, mb, Nc=3)
 
 
 
