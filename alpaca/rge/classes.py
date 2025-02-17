@@ -608,6 +608,40 @@ class ALPcouplings:
             return ALPcouplingsDecoder().decode(file.read())
         with open(file, 'rt') as f:
             return ALPcouplingsDecoder().decode(f.read())
+        
+    def get_ckm(self):
+        if self.scale < self.ew_scale:
+            raise ValueError("The running of the CKM matrix is only computed above the EW scale")
+        wSM = wilson.classes.SMEFT(wilson.wcxf.WC('SMEFT', 'Warsaw', self.scale, {})).C_in
+        UuL, mu, UuR = ckmutil.diag.msvd(self.yu)
+        UdL, md, UdR = ckmutil.diag.msvd(self.yd)
+        K = UuL.conj().T @ UdL
+        Vub = abs(K[0,2])
+        Vcb = abs(K[1,2])
+        Vus = abs(K[0,1])
+        gamma = phase(-K[0,0]*K[0,2].conj()/(K[1,0]*K[1,2].conj()))
+        return ckmutil.ckm.ckm_tree(Vus, Vub, Vcb, gamma, 2)
+    
+    def get_mup(self):
+        if self.scale < self.ew_scale:
+            raise ValueError("The running of the quark masses is only computed above the EW scale")
+        wSM = wilson.classes.SMEFT(wilson.wcxf.WC('SMEFT', 'Warsaw', self.scale, {})).C_in
+        UuL, mu, UuR = ckmutil.diag.msvd(self.yu)
+        return mu * np.sqrt(wSM['m2']/wSM['Lambda'])
+    
+    def get_mdown(self):
+        if self.scale < self.ew_scale:
+            raise ValueError("The running of the quark masses is only computed above the EW scale")
+        wSM = wilson.classes.SMEFT(wilson.wcxf.WC('SMEFT', 'Warsaw', self.scale, {})).C_in
+        UdL, md, UdR = ckmutil.diag.msvd(self.yd)
+        return md * np.sqrt(wSM['m2']/wSM['Lambda'])
+    
+    def get_mlept(self):
+        if self.scale < self.ew_scale:
+            raise ValueError("The running of the quark masses is only computed above the EW scale")
+        wSM = wilson.classes.SMEFT(wilson.wcxf.WC('SMEFT', 'Warsaw', self.scale, {})).C_in
+        UeL, me, UeR = ckmutil.diag.msvd(self.ye)
+        return me * np.sqrt(wSM['m2']/wSM['Lambda'])
 
 class ALPcouplingsEncoder(JSONEncoder):
     """ JSON encoder for ALPcouplings objects and structures containing them.
