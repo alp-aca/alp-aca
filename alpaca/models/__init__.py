@@ -16,6 +16,9 @@ KSVZ_model :
 fermion :
     A class to represent a heavy fermion with specific group representations and charges.
 
+Flaxion :
+    A class to define a model with a flaxion field.
+
 Objects
 -------
 QED_DFSZ :
@@ -31,7 +34,16 @@ Q_KSVZ :
     A KSVZ-like model with a heavy vector-like quark.
 
 L_KSVZ :
-    A KSVZ-like model with a heavy vector-like lepton.
+    A KSVZ-like model with a heavy vector-like lepton charged under SU(2)_L.
+
+Y_KSVZ :
+    A KSVZ-like model with a heavy vector-like lepton charged under U(1)Y.
+
+flaxion_benchmark :
+    A benchmark model for the flaxion field.
+
+eps_flaxion :
+    A symbol representing the parameter epsilon in the flaxion model.
 
 beta :
     A symbol representing the angle beta in the DFSZ-like models.

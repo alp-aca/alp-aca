@@ -44,7 +44,9 @@ class ModelBase:
                       VuL: np.ndarray| None = None,
                       VdL: np.ndarray| None = None,
                       VuR: np.ndarray| None = None,
-                      VdR: np.ndarray| None = None
+                      VdR: np.ndarray| None = None,
+                      VeL: np.ndarray| None = None,
+                      VeR: np.ndarray| None = None,
                       ) -> ALPcouplings:
         """Substitute the symbolic variables with numerical values directly into the couplings
 
@@ -78,7 +80,7 @@ class ModelBase:
         for k, v in substituted_couplings.items():
             if np.array(v).shape == ():
                 substituted_couplings[k] = float(v)
-        return ALPcouplings(substituted_couplings, scale, 'derivative_above', ew_scale, VuL, VdL, VuR, VdR)
+        return ALPcouplings(substituted_couplings, scale, 'derivative_above', ew_scale, VuL, VdL, VuR, VdR, VeL, VeR)
     
     def couplings_latex(self, eqnumber: bool = False) -> str:
         """Return the couplings of the model in LaTeX format.
@@ -157,7 +159,7 @@ class model(ModelBase):
             if np.array(self.charges[f]).shape == ():
                 self.couplings[f'c{f}'] = -self.charges[f]
             else:
-                self.couplings[f'c{f}'] = - sp.diag(charges_np[f], unpack=True)
+                self.couplings[f'c{f}'] = - sp.diag(charges_np[f].tolist(), unpack=True)
         self.couplings['cg'] = -sp.Rational(1,2) * sp.simplify(np.sum(
             2 * charges_np['qL'] - charges_np['dR'] - charges_np['uR']
         ))
@@ -238,6 +240,41 @@ class KSVZ_model(ModelBase):
         self.couplings['cB']=-sum(f.PQ * f.color_dim * f.weak_isospin_dim * f.hypercharge**2 for f in fermions)
         self.couplings['cW']=-sum(f.PQ * f.dynkin_index_weak * f.color_dim for f in fermions)
 
+eps_flaxion = sp.symbols(r'\epsilon')
+vev = sp.symbols(r'v')
+class Flaxion(model):
+    """A class to define the Flaxion model given the PQ charges of the SM fermions."""
+    def masses_symbolic(self, fermion: str) -> list[sp.Expr]:
+        """Return the mass of the SM fermions in the model."""
+        if fermion == 'u':
+            exponents = self.charges['qL'] - self.charges['uR']
+        elif fermion == 'd':
+            exponents = self.charges['qL'] - self.charges['dR']
+        elif fermion == 'e':
+            exponents = self.charges['lL'] - self.charges['eR']
+        return [vev/sp.sqrt(2) * eps_flaxion**exponents[i] for i in range(3)]
+    def masses(self, fermion: str, eps: float) -> list[float]:
+        from ..constants import vev as vev_EW
+        return np.array([float(m.subs({eps_flaxion: eps, vev: vev_EW})) for m in self.masses_symbolic(fermion)], dtype=float)
+    def yukawas_symbolic(self, fermion: str) -> sp.Expr:
+        if fermion == 'u':
+            exponentsL = np.broadcast_to(self.charges['qL'], (3,3)).T
+            exponentsR = np.broadcast_to(self.charges['uR'], (3,3))
+        elif fermion == 'd':
+            exponentsL = np.broadcast_to(self.charges['qL'], (3,3)).T
+            exponentsR = np.broadcast_to(self.charges['dR'], (3,3))
+        elif fermion == 'e':
+            exponentsL = np.broadcast_to(self.charges['lL'], (3,3)).T
+            exponentsR = np.broadcast_to(self.charges['eR'], (3,3))
+        return sp.Matrix(eps_flaxion**(exponentsL-exponentsR))
+    def yukawas(self, fermion: str, eps: float) -> np.matrix:
+        return np.matrix(self.yukawas_symbolic(fermion).subs({eps_flaxion: eps}), dtype=float)
+    def get_couplings(self, eps: float, scale: float, ew_scale = 100) -> ALPcouplings:
+        a =  super().get_couplings({eps_flaxion: eps}, scale, ew_scale)
+        a.yu = self.yukawas('u', eps)
+        a.yd = self.yukawas('d', eps)
+        a.ye = self.yukawas('e', eps)
+        return a
 
 # Benchmark Models
 
@@ -258,3 +295,5 @@ L_KSVZ=KSVZ_model('L-KSVZ', [fermion(1,2,0,KSVZ_charge)])
 """L-KSVZ: A KSVZ-like model with a heavy vector-like lepton."""
 Y_KSVZ=KSVZ_model('Y-KSVZ', [fermion(1,1,sp.Rational(1,2),KSVZ_charge)])
 """L-KSVZ: A KSVZ-like model with a heavy vector-like lepton."""
+flaxion_benchmark = Flaxion('Flaxion', {'qL': np.array([3, 2, 0], dtype=int), 'uR': np.array([-5, -1, 0], dtype=int), 'dR': np.array([-4, -3, -3], dtype=int), 'lL': np.array([1, 0, 0], dtype=int), 'eR': np.array([-8, -5, -3], dtype=int)})
+"""Flaxion: A model with a flaxion field."""
