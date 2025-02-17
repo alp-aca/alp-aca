@@ -4,6 +4,7 @@
 import numpy as np
 from ..rge import ALPcouplings
 from . import su3
+from ..biblio.biblio import citations
 
 # It is enough for this program to give the charges for the model
 
@@ -36,6 +37,9 @@ class ModelBase:
         """ Intialize an empty model with the given name."""
         self.model_name = model_name
         self.couplings: dict[str, sp.Expr] = {}
+
+    def initialize(self):
+        pass
     
     def get_couplings(self,
                       substitutions: dict[sp.Expr, float | complex],
@@ -76,6 +80,7 @@ class ModelBase:
         ALPcouplings
             The couplings of the model with numerical values.
         """
+        self.initialize()
         substituted_couplings = {key: np.array(value.subs(substitutions), dtype=float) for key, value in self.couplings.items()}
         for k, v in substituted_couplings.items():
             if np.array(v).shape == ():
@@ -98,6 +103,7 @@ class ModelBase:
         str
             The couplings of the model in LaTeX format.
         """
+        self.initialize()
         if eqnumber:
             nn = ''
         else:
@@ -126,6 +132,7 @@ class ModelBase:
         ZeroDivisionError
             If the coupling cg is zero.
         """
+        self.initialize()
         if self.couplings.get('cg', 0) == 0:
             raise ZeroDivisionError('cg = 0')
         cgamma = self.couplings['cB'] + self.couplings['cW']
@@ -169,6 +176,8 @@ class model(ModelBase):
         self.couplings['cB'] = -sp.Rational(1,6) * sp.simplify(np.sum(
             charges_np['qL'] - 8 * charges_np['uR'] - 2 * charges_np['dR'] + 3 * charges_np['lL'] - 6 * charges_np['eR']
         ))
+    def initialize(self):
+        citations.register_inspire('DiLuzio:2020wdo')
 
 
 class fermion:
@@ -239,11 +248,17 @@ class KSVZ_model(ModelBase):
         self.couplings['cg']=-sum(f.PQ * f.weak_isospin_dim * f.dynkin_index_color for f in fermions)
         self.couplings['cB']=-sum(f.PQ * f.color_dim * f.weak_isospin_dim * f.hypercharge**2 for f in fermions)
         self.couplings['cW']=-sum(f.PQ * f.dynkin_index_weak * f.color_dim for f in fermions)
+    def initialize(self):
+        citations.register_inspire('Quevillon:2019zrd')
 
 eps_flaxion = sp.symbols(r'\epsilon')
 vev = sp.symbols(r'v')
 class Flaxion(model):
     """A class to define the Flaxion model given the PQ charges of the SM fermions."""
+    def __init__(self, model_name, charges):
+        super().__init__(model_name, charges)
+    def initialize(self):
+        citations.register_inspire('Ema:2016ops')
     def masses_symbolic(self, fermion: str) -> list[sp.Expr]:
         """Return the mass of the SM fermions in the model."""
         if fermion == 'u':
