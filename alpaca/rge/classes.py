@@ -296,6 +296,7 @@ class ALPcouplings:
             c2w = 1-s2w
             UuL, mu, UuR = ckmutil.diag.msvd(self.yu)
             UdL, md, UdR = ckmutil.diag.msvd(self.yd)
+            UeL, me, UeR = ckmutil.diag.msvd(self.ye)
 
             cgamma = self.values['cW'] + self.values['cB']
             cgammaZ = c2w * self.values['cW'] - s2w * self.values['cB']
@@ -306,25 +307,30 @@ class ALPcouplings:
                 'ku': np.matrix(UuR).H @ self.values['cuR'] @ UuR,
                 'kD': np.matrix(UdL).H @ self.values['cqL'] @ UdL,
                 'kd': np.matrix(UdR).H @ self.values['cdR'] @ UdR,
-                'kE': self.values['clL'], 'kNu': self.values['clL'], 'ke': self.values['ceR'],
+                'kE': np.matrix(UeL).H @ self.values['clL'] @ UeL,
+                'kNu': self.values['clL'],
+                'ke': np.matrix(UeR).H @ self.values['ceR'] @ UeR,
                 'cgamma': cgamma, 'cW': self.values['cW'], 'cgammaZ': cgammaZ, 'cZ': cZ, 'cg': self.values['cg']
                 }, scale=self.scale, basis='massbasis_above', ew_scale=self.ew_scale)
             a.yu = self.yu
             a.yd = self.yd
+            a.ye = self.ye
             return a
         
         if self.basis == 'massbasis_above' and basis == 'derivative_above':
             UuL, mu, UuR = ckmutil.diag.msvd(self.yu)
             UdL, md, UdR = ckmutil.diag.msvd(self.yd)
+            UeL, me, UeR = ckmutil.diag.msvd(self.ye)
             a = ALPcouplings({'cg': self.values['cg'], 'cB': self.values['cgamma'] - self.values['cW'], 'cW': self.values['cW'],
                                  'cqL': UuL @ self.values['kU'] @ np.matrix(UuL).H/2 + UdL @ self.values['kD'] @ np.matrix(UdL).H/2,
                                  'cuR': UuR @ self.values['ku'] @ np.matrix(UuR),
                                  'cdR': UdR @ self.values['kD'] @ np.matrix(UdR),
-                                 'clL': self.values['kE']/2 + self.values['kNu']/2,
-                                 'ceR': self.values['ke']
+                                 'clL': UeL @ self.values['kE'] @ np.matrix(UeL).H/2 + self.values['kNu'],
+                                 'ceR': UeR @ self.values['ke'] @ np.matrix(UeR),
                                  }, scale=self.scale, basis='derivative_above', ew_scale=self.ew_scale)
             a.yu = self.yu
             a.yd = self.yd
+            a.ye = self.ye
             return a
         
         if self.basis == 'kF_below' and basis == 'VA_below':
