@@ -46,7 +46,9 @@ class ALPcouplings:
                  VuL: np.ndarray| None = None,
                  VdL: np.ndarray| None = None,
                  VuR: np.ndarray| None = None,
-                 VdR: np.ndarray| None = None
+                 VdR: np.ndarray| None = None,
+                 VeL: np.ndarray| None = None,
+                 VeR: np.ndarray| None = None
                 ):
         """Constructor method
 
@@ -78,6 +80,12 @@ class ALPcouplings:
 
         VdR : np.ndarray, optional
             Unitary rotation of the right-handed down-type quarks to diagonalize Yd. If None, it is set to the identity.
+
+        VeL : np.ndarray, optional
+            Unitary rotation of the left-handed leptons to diagonalize Ye. If None, it is set to the identity.
+
+        VeR : np.ndarray, optional
+            Unitary rotation of the right-handed leptons to diagonalize Ye. If None, it is set to the identity.
             
         Raises
         ------
@@ -174,6 +182,7 @@ class ALPcouplings:
             wSM = wilson.classes.SMEFT(wilson.wcxf.WC('SMEFT', 'Warsaw', scale, {})).C_in
             UuL, mu, UuR = ckmutil.diag.msvd(wSM['Gu'])
             UdL, md, UdR = ckmutil.diag.msvd(wSM['Gd'])
+            UeL, me, UeR = ckmutil.diag.msvd(wSM['Ge'])
             K = UuL.conj().T @ UdL
             Vub = abs(K[0,2])
             Vcb = abs(K[1,2])
@@ -191,8 +200,13 @@ class ALPcouplings:
                 VdR = np.eye(3)
             if VuR is None:
                 VuR = np.eye(3)
+            if VeL is None:
+                VeL = np.eye(3)
+            if VeR is None:
+                VeR = np.eye(3)
             self.yu = VuL @ np.diag(mu) @ np.matrix(VuR).H
             self.yd = VdL @ np.diag(md) @ np.matrix(VdR).H
+            self.ye = VeL @ np.diag(me) @ np.matrix(VeR).H
     
     def __add__(self, other: 'ALPcouplings') -> 'ALPcouplings':
         if self.basis == other.basis and self.ew_scale == other.ew_scale and self.scale == other.scale:
@@ -200,6 +214,7 @@ class ALPcouplings:
             if 'yu' in self.__dict__.keys():
                 a.yu = self.yu
                 a.yd = self.yd
+                a.ye = self.ye
             return a
         
     def __sub__(self, other: 'ALPcouplings') -> 'ALPcouplings':
@@ -208,13 +223,15 @@ class ALPcouplings:
             if 'yu' in self.__dict__.keys():
                 a.yu = self.yu
                 a.yd = self.yd
+                a.ye = self.ye
             return a
 
     def __mul__(self, a: float) -> 'ALPcouplings':
             a1 = ALPcouplings({k: a*self.values[k] for k in self.values.keys()}, self.scale, self.basis, self.ew_scale)
             if 'yu' in self.__dict__.keys():
-                a1.yu = self.yu
+                a1.yu = self.yu 
                 a1.yd = self.yd
+                a1.ye = self.ye
             return a1
 
     def __rmul__(self, a: float) -> 'ALPcouplings':
@@ -222,6 +239,7 @@ class ALPcouplings:
             if 'yu' in self.__dict__.keys():
                 a1.yu = self.yu
                 a1.yd = self.yd
+                a1.ye = self.ye
             return a1
     
     def __truediv__(self, a: float) -> 'ALPcouplings':
@@ -229,6 +247,7 @@ class ALPcouplings:
             if 'yu' in self.__dict__.keys():
                 a1.yu = self.yu
                 a1.yd = self.yd
+                a1.ye = self.ye
             return a1
     
     def __getitem__(self, name: str):
@@ -330,9 +349,9 @@ class ALPcouplings:
     def _toarray(self) -> np.ndarray:
         "Converts the object into a vector of coefficientes"
         if self.basis == 'derivative_above':
-            return np.hstack([np.asarray(self.values[c]).ravel() for c in ['cqL', 'cuR', 'cdR', 'clL', 'ceR', 'cg', 'cB', 'cW']]+[np.asarray(self.yu).ravel()]+[np.asarray(self.yd).ravel()]).astype(dtype=complex)
+            return np.hstack([np.asarray(self.values[c]).ravel() for c in ['cqL', 'cuR', 'cdR', 'clL', 'ceR', 'cg', 'cB', 'cW']]+[np.asarray(self.yu).ravel()]+[np.asarray(self.yd).ravel()]+[np.asarray(self.ye).ravel()]).astype(dtype=complex)
         if self.basis == 'massbasis_above':
-            return np.hstack([np.asarray(self.values[c]).ravel() for c in ['kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke', 'cgamma', 'cgammaZ', 'cW', 'cZ', 'cg']]+[np.asarray(self.yu).ravel()]+[np.asarray(self.yd).ravel()]).astype(dtype=complex)
+            return np.hstack([np.asarray(self.values[c]).ravel() for c in ['kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke', 'cgamma', 'cgammaZ', 'cW', 'cZ', 'cg']]+[np.asarray(self.yu).ravel()]+[np.asarray(self.yd).ravel()]+[np.asarray(self.ye).ravel()]).astype(dtype=complex)
         if self.basis == 'kF_below':
             return np.hstack([np.asarray(self.values[c]).ravel() for c in ['kD', 'kE', 'kNu', 'kd', 'ke', 'kU', 'ku', 'cg', 'cgamma']]).astype(dtype=complex)
 
@@ -347,6 +366,7 @@ class ALPcouplings:
             a1 = ALPcouplings(vals, scale, basis, ew_scale)
             a1.yu = array[48:48+9].reshape([3,3])
             a1.yd = array[48+9: 48+18].reshape([3,3])
+            a1.ye = array[48+18: 48+27].reshape([3,3])
             return a1
         if basis == 'massbasis_above':
             vals = {}
@@ -357,6 +377,7 @@ class ALPcouplings:
             a1 = ALPcouplings(vals, scale, basis, ew_scale)
             a1.yu = array[59:59+9].reshape([3,3])
             a1.yd = array[59+9:59+18].reshape([3,3])
+            a1.ye = array[59+18:59+27].reshape([3,3])
         if basis == 'kF_below':
             vals = {}
             for i, c in enumerate(['kD', 'kE', 'kNu', 'kd', 'ke']):
@@ -525,7 +546,7 @@ class ALPcouplings:
         values = {f'{k}_Re': np.real(v) for k, v in self.values.items()} | {f'{k}_Im': np.imag(v) for k, v in self.values.items()}
         d = {'values': {k: flatten(v) for k, v in values.items()}, 'scale': self.scale, 'basis': self.basis, 'ew_scale': self.ew_scale}
         if self.basis in bases_above:
-            yukawas = {f'{k}_Re': flatten(np.real(v)) for k, v in {'yu': self.yu, 'yd': self.yd}.items()} | {f'{k}_Im': flatten(np.imag(v)) for k, v in {'yu': self.yu, 'yd': self.yd}.items()}
+            yukawas = {f'{k}_Re': flatten(np.real(v)) for k, v in {'yu': self.yu, 'yd': self.yd, 'ye': self.ye}.items()} | {f'{k}_Im': flatten(np.imag(v)) for k, v in {'yu': self.yu, 'yd': self.yd, 'ye': self.ye}.items()}
             d |= {'yukawas': yukawas}
         return d
     
@@ -552,6 +573,7 @@ class ALPcouplings:
         if 'yukawas' in data.keys():
             a.yu = unflatten(np.array(data['yukawas']['yu_Re']) + 1j*np.array(data['yukawas']['yu_Im']))
             a.yd = unflatten(np.array(data['yukawas']['yd_Re']) + 1j*np.array(data['yukawas']['yd_Im']))
+            a.ye = unflatten(np.array(data['yukawas']['ye_Re']) + 1j*np.array(data['yukawas']['ye_Im']))
         return a
     
     def save(self, file: str | PathLike | TextIOBase) -> None:

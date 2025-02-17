@@ -134,7 +134,7 @@ def beta_full(couplings: ALPcouplings) -> ALPcouplings:
     pars = runSM(couplings.scale)
     yu = np.matrix(couplings.yu)
     yd = np.matrix(couplings.yd)
-    ye = np.matrix(pars['ye'])
+    ye = np.matrix(couplings.ye)
     alpha_s = pars['alpha_s']
     alpha_1 = pars['alpha_1']
     alpha_2 = pars['alpha_2']
@@ -177,10 +177,12 @@ def beta_full(couplings: ALPcouplings) -> ALPcouplings:
     gammaH = np.trace(3* yu @ yu.H + 3* yd @ yd.H + ye @ ye.H)
     beta_yu = 3/2*(yu @ yu.H @ yu - yd @ yd.H @ yu) + (gammaH -9/4*g_2**2-17/12*g_1**2-8*g_s**2)*yu
     beta_yd = 3/2*(yd @ yd.H @ yd - yu @ yu.H @ yd) + (gammaH -9/4*g_2**2-5/12*g_1**2-8*g_s**2)*yd
+    beta_ye = 3/2*(ye @ ye.H @ ye) + (gammaH -9/4*g_2**2-15/4*g_1**2)*ye
 
     a = ALPcouplings({'cqL': betaqL, 'cuR': betauR, 'cdR': betadR, 'clL': betalL, 'ceR': betaeR}, scale=couplings.scale, basis='derivative_above', ew_scale=couplings.ew_scale)
     a.yu = beta_yu
     a.yd = beta_yd
+    a.ye = beta_ye
     return a
 
 def run_leadinglog(couplings: ALPcouplings, beta: Callable[[ALPcouplings], ALPcouplings], scale_out: float) -> ALPcouplings:
@@ -203,6 +205,7 @@ def run_leadinglog(couplings: ALPcouplings, beta: Callable[[ALPcouplings], ALPco
     result.scale = scale_out
     result.yu = couplings.yu + betac.yu * (np.log(scale_out/couplings.scale)/(16*np.pi**2))
     result.yd = couplings.yd + betac.yd * (np.log(scale_out/couplings.scale)/(16*np.pi**2))
+    result.ye = couplings.ye + betac.ye * (np.log(scale_out/couplings.scale)/(16*np.pi**2))
     return result
 
 def run_scipy(couplings: ALPcouplings, beta: Callable[[ALPcouplings], ALPcouplings], scale_out: float, scipy_options: dict) -> ALPcouplings:
