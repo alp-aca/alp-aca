@@ -283,7 +283,19 @@ class Flaxion(model):
             exponentsR = np.broadcast_to(self.charges['eR'], (3,3))
         return sp.Matrix(eps_flaxion**(exponentsL-exponentsR))
     def yukawas(self, fermion: str, eps: float) -> np.matrix:
-        return np.matrix(self.yukawas_symbolic(fermion).subs({eps_flaxion: eps}), dtype=float)
+        if fermion == 'u':
+            chargesL = np.array(self.charges['qL'], dtype=int)
+            chargesR = np.array(self.charges['uR'], dtype=int)
+        elif fermion == 'd':
+            chargesL = np.array(self.charges['qL'], dtype=int)
+            chargesR = np.array(self.charges['dR'], dtype=int)
+        elif fermion == 'e':
+            chargesL = np.array(self.charges['lL'], dtype=int)
+            chargesR = np.array(self.charges['eR'], dtype=int)
+        Lf = eps**(np.abs(np.broadcast_to(chargesL, (3,3)) - np.broadcast_to(chargesL, (3,3)).T))
+        mf = eps**np.diag(chargesL - chargesR)
+        Rfdagger = eps**(np.abs(np.broadcast_to(chargesR, (3,3)) - np.broadcast_to(chargesR, (3,3)).T))
+        return np.matrix(Lf * mf * Rfdagger, dtype=float)
     def get_couplings(self, eps: float, scale: float, ew_scale = 100) -> ALPcouplings:
         a =  super().get_couplings({eps_flaxion: eps}, scale, ew_scale)
         a.yu = self.yukawas('u', eps)
