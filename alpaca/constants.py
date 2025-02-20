@@ -139,6 +139,8 @@ Gammarho = Constant(particles.rho_770_0.width/1000, 'particle')
 GammaD0 = Constant(particles.D_0.width/1000, 'particle')
 GammaDplus = Constant(particles.D_plus.width/1000, 'particle')
 GammaDs = Constant(particles.D_s_plus.width/1000, 'particle')
+Gammatau = Constant(particles.tau_minus.width/1000, 'particle')
+Gammamu = Constant(particles.mu_minus.width/1000, 'particle')
 
 # Mixing angle
 theta_eta_etap = Constant(-14.1/180*np.pi, 'Christ:2010dd')

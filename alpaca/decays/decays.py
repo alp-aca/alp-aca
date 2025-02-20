@@ -3,6 +3,7 @@ from .alp_decays import branching_ratios
 from ..rge import ALPcouplings
 from .particles import particle_aliases
 from .mesons.decays import meson_to_alp, meson_nwa, meson_mediated
+from .leptons.decays import lepton_to_alp, lepton_nwa
 from .ee.cross_sections import xsections as xsections_ee, xsections_nwa as xsections_nwa_ee
 import numpy as np
 
@@ -92,6 +93,13 @@ def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: flo
     # Meson decays mediated by off-shell ALP
     elif len(initial) == 1 and (initial[0], tuple(final)) in meson_mediated.keys():
         br = meson_mediated[(initial[0], tuple(final))]
+    # Lepton decays to ALP
+    elif len(initial) == 1 and (initial[0], tuple(final)) in lepton_to_alp.keys():
+        br = lepton_to_alp[(initial[0], tuple(final))]
+    # Lepton decays in NWA
+    elif len(initial) == 1 and (initial[0], tuple(final)) in lepton_nwa.keys():
+        lepton_process, channel = lepton_nwa[(initial[0], tuple(final))]
+        br = lambda ma, couplings, fa, br_dark, **kwargs: lepton_to_alp[lepton_process](ma, couplings, fa, br_dark, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)[channel]
     else:
         raise NotImplementedError(f'Unknown branching ratio process {" ".join(initial)} -> {" ".join(final)}')
     

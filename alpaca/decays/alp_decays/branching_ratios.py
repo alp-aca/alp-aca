@@ -1,6 +1,6 @@
 import numpy as np
 from ...rge import ALPcouplings
-from .fermion_decays import decay_width_electron, decay_width_muon, decay_width_tau, decay_width_charm, decay_width_bottom
+from .fermion_decays import decay_width_electron, decay_width_muon, decay_width_tau, decay_width_charm, decay_width_bottom, decay_width_etau, decay_width_mutau, decay_width_mue
 from .hadronic_decays_def import decay_width_3pi000, decay_width_3pi0pm, decay_width_etapipi00, decay_width_etapipipm, decay_width_etappipi00, decay_width_etappipipm, decay_width_gammapipi, decay_width_2w
 from .gaugebosons import decay_width_2gamma, decay_width_2gluons
 from functools import cache
@@ -9,6 +9,9 @@ decay_channels =[
     ('electron', 'electron'),
     ('muon', 'muon'),
     ('tau', 'tau'),
+    ('electron', 'muon'),
+    ('electron', 'tau'),
+    ('muon', 'tau'),
     ('charm', 'charm'),
     ('bottom', 'bottom'),
     ('pion', 'pion', 'pion'),
@@ -38,6 +41,9 @@ def _total_decay_width (ma, couplings: ALPcouplings, fa, br_dark = 0.0, **kwargs
     DW_elec = decay_width_electron(ma, couplings, fa, **kwargs_nointegral)
     DW_muon = decay_width_muon(ma, couplings, fa, **kwargs_nointegral)
     DW_tau = decay_width_tau(ma, couplings, fa, **kwargs_nointegral)
+    DW_emu = decay_width_mue(ma, couplings, fa, **kwargs_nointegral)
+    DW_mutau = decay_width_mutau(ma, couplings, fa, **kwargs_nointegral)
+    DW_etau = decay_width_etau(ma, couplings, fa, **kwargs_nointegral)
     DW_charm = decay_width_charm(ma, couplings, fa, **kwargs_nointegral)
     DW_bottom = decay_width_bottom(ma, couplings, fa, **kwargs_nointegral)
     DW_3pis = decay_width_3pi000(ma, couplings, fa, **kwargs)+ decay_width_3pi0pm(ma, couplings, fa, **kwargs)
@@ -65,6 +71,9 @@ def _total_decay_width (ma, couplings: ALPcouplings, fa, br_dark = 0.0, **kwargs
         'e': DW_elec,
         'mu': DW_muon,
         'tau': DW_tau,
+        'emu': DW_emu,
+        'mutau': DW_mutau,
+        'etau': DW_etau,
         'charm': DW_charm,
         'bottom': DW_bottom,
         '3pis': DW_3pis,
@@ -150,6 +159,9 @@ def BRsalp(ma, couplings: ALPcouplings, fa, br_dark = 0, **kwargs):
         ('electron', 'electron'): DWs['e']/DWs['DW_tot'],
         ('muon', 'muon'): DWs['mu']/DWs['DW_tot'],
         ('tau', 'tau'): DWs['tau']/DWs['DW_tot'],
+        ('electron', 'muon'): DWs['emu']/DWs['DW_tot'],
+        ('electron', 'tau'): DWs['etau']/DWs['DW_tot'],
+        ('muon', 'tau'): DWs['mutau']/DWs['DW_tot'],
         ('charm', 'charm'): DWs['charm']/DWs['DW_tot'],
         ('bottom', 'bottom'): DWs['bottom']/DWs['DW_tot'],
         ('pion', 'pion', 'pion'): DWs['3pis']/DWs['DW_tot'],
