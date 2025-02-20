@@ -16,6 +16,32 @@ from cmath import phase
 
 numeric = (int, float, complex, Expr)
 matricial = (np.ndarray, np.matrix, Matrix, list)
+
+def format_number(x):
+    if isinstance(x, complex):
+        if x.imag == 0:
+            return format_number(x.real)
+        if x.real == 0:
+            return format_number(x.imag) + r'\,i'
+        if x.imag < 0:
+            return rf"{format_number(x.real)} - {format_number(-x.imag)}\,i"
+        return rf"{format_number(x.real)} + {format_number(x.imag)}\,i"
+    else:
+        f = f"{x:.2e}"
+        val = f[:-4]
+        exp = f[-3:]
+        times = r'\times'
+        if exp == '+00':
+            latex_exp = ''
+            times = ''
+        elif exp == '+01':
+            latex_exp = '10'
+        else:
+            latex_exp = f'10^{{{int(exp)}}}'
+        if val == '1.00' and latex_exp != '':
+            val = ''
+            times = ''
+        return f"{val}{times}{latex_exp}"
 class ALPcouplings:
     """Container for ALP couplings.
 
@@ -648,6 +674,101 @@ class ALPcouplings:
         wSM = wilson.classes.SMEFT(wilson.wcxf.WC('SMEFT', 'Warsaw', self.scale, {})).C_in
         UeL, me, UeR = ckmutil.diag.msvd(self.ye)
         return me * np.sqrt(wSM['m2']/wSM['Lambda'])
+    
+    def _ipython_key_completions_(self):
+        return self.values.keys()
+    
+    def _repr_markdown_(self):
+        if self.basis == 'VA_below':
+            latex_couplings = {
+                'cg': r'c_G',
+                'cgamma': r'c_\gamma',
+                'cuA': r'c_u^A',
+                'cdA': r'c_d^A',
+                'ceA': r'c_e^A',
+                'cuV': r'c_u^V',
+                'cdV': r'c_d^V',
+                'ceV': r'c_e^V',
+                'cnu': r'c_\nu',
+            }
+        elif self.basis == 'derivative_above':
+            latex_couplings = {
+                'cg': r'c_G',
+                'cW': r'c_W',
+                'cB': r'c_B',
+                'cuR': r'c_{u_R}',
+                'cdR': r'c_{d_R}',
+                'clL': r'c_{\ell_L}',
+                'ceR': r'c_{e_R}',
+                'cqL': r'c_{q_L}',
+            }
+        elif self.basis == 'massbasis_above':
+            latex_couplings = {
+                'cg': r'c_G',
+                'cW': r'c_W',
+                'cgamma': r'c_\gamma',
+                'cZ': r'c_Z',
+                'cgammaZ': r'c_{\gamma Z}',
+                'kU': r"c'_{u_L}",
+                'kD': r"c'_{d_L}",
+                'kE': r"c'_{e_L}",
+                'kNu': r"c'_{\nu_L}",
+                'ku': r"c'_{u_R}",
+                'kd': r"c'_{d_R}",
+                'ke': r"c'_{e_R}",
+            }
+        elif self.basis == 'kF_below':
+            latex_couplings = {
+                'cg': r'c_G',
+                'cgamma': r'c_\gamma',
+                'kU': r"c_{u}^L",
+                'kD': r"c_{d}^L",
+                'kE': r"c_{e}^L",
+                'kNu': r"c_{\nu}",
+                'ku': r"c_{u}^R",
+                'kd': r"c_{d}^R",
+                'ke': r"c_{e}^R",
+            }
+
+        md = f"### ALP couplings\n"
+        md += f"- Scale: ${format_number(self.scale)}$ GeV\n"
+        md += f"- Basis: ```{self.basis}```\n"
+        md += f"- EW scale: ${format_number(self.ew_scale)}$ GeV\n"
+        md += f"<details><summary>Couplings:</summary>\n\n"
+        for k, v in self.values.items():
+            if isinstance(v, np.ndarray):
+                md += f"- ${latex_couplings[k]} = \\begin{{pmatrix}}"
+                for i in range(v.shape[0]):
+                    for j in range(v.shape[1]):
+                        md += f"{format_number(v[i,j])} & "
+                    md = md[:-2] + r"\\"
+                md = md[:-2] + r"\end{pmatrix}$" + "\n"
+            else:
+                md += f"- ${latex_couplings[k]} = {format_number(v)}$\n"
+        md += "</details>\n"
+
+        if self.basis in bases_above:
+            md += f"<details><summary>Yukawa matrices:</summary>\n\n"
+            md += f"- $Y_u = \\begin{{pmatrix}}"
+            for i in range(3):
+                for j in range(3):
+                    md += f"{format_number(self.yu[i,j])} & "
+                md = md[:-2] + r"\\"
+            md = md[:-2] + r"\end{pmatrix}$" + "\n"
+            md += f"- $Y_d = \\begin{{pmatrix}}"
+            for i in range(3):
+                for j in range(3):
+                    md += f"{format_number(self.yd[i,j])} & "
+                md = md[:-2] + r"\\"
+            md = md[:-2] + r"\end{pmatrix}$" + "\n"
+            md += f"- $Y_e = \\begin{{pmatrix}}"
+            for i in range(3):
+                for j in range(3):
+                    md += f"{format_number(self.ye[i,j])} & "
+                md = md[:-2] + r"\\"
+            md = md[:-2] + r"\end{pmatrix}$" + "\n"
+            md += "</details>\n"
+        return md
 
 class ALPcouplingsEncoder(JSONEncoder):
     """ JSON encoder for ALPcouplings objects and structures containing them.
