@@ -22,10 +22,9 @@ def match_FCNC_d(couplings: ALPcouplings, two_loops = False, loopquark=2) -> np.
 
     parsSM = runSM(couplings.scale)
     s2w = parsSM['s2w']
-    yt = np.real(parsSM['yu'][loopquark,loopquark])
+    yt = np.real(couplings.yu[loopquark,loopquark])
     alpha_em = parsSM['alpha_em']
-    Vckm = parsSM['CKM']
-
+    Vckm = np.matrix(couplings.get_ckm())
     if two_loops:
         tildes = gauge_tilde(couplings)
         cW = tildes['cWtilde']
@@ -56,7 +55,6 @@ def match(couplings: ALPcouplings, two_loops = False) -> ALPcouplings:
     c2w = 1-s2w
     yt = np.real(parsSM['yu'][2,2])
     alpha_em = parsSM['alpha_em']
-    Vckm = parsSM['CKM']
 
     delta1 = -11/3
 
