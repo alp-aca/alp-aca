@@ -62,7 +62,7 @@ def _total_decay_width (ma, couplings: ALPcouplings, fa, br_dark = 0.0, **kwargs
     DWhadr_nopert = DW_3pis + DW_etapipi + DW_etappipi + DW_gammapipi + DW_2w
     DWhadr_pert = DW_charm + DW_bottom + DW_gluongluon
     DWhadr = max(DWhadr_nopert, DWhadr_pert)
-    DW_sm = DW_elec+DW_muon+DW_tau+DW_2photons+DWhadr
+    DW_sm = DW_elec+DW_muon+DW_tau+DW_2photons+DWhadr+DW_emu+DW_mutau+DW_etau
     if br_dark > 0.0:
         DW_dark = DW_sm/(1-br_dark)*br_dark
     else:
