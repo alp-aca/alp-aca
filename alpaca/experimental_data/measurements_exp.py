@@ -1354,6 +1354,176 @@ cristalbox_muegammagamma = MeasurementConstantBound(
     lab_boost=0.0
 )
 
+babar_BplusKtaumu = MeasurementConstantBound(
+    'BaBar:2012azg',
+    'prompt',
+    4.8e-5,
+    conf_level=0.9,
+    rmin=10,
+    mass_parent=mB,
+    mass_sibling=mK,
+    lab_boost=0.469/(1-0.469**2)**0.5
+)
+
+babar_BplusKtaue = MeasurementConstantBound(
+    'BaBar:2012azg',
+    'prompt',
+    3.0e-5,
+    conf_level=0.9,
+    rmin=10,
+    mass_parent=mB,
+    mass_sibling=mK,
+    lab_boost=0.469/(1-0.469**2)**0.5
+)
+
+babar_Bpluspitaumu = MeasurementConstantBound(
+    'BaBar:2012azg',
+    'prompt',
+    7.2e-5,
+    conf_level=0.9,
+    rmin=10,
+    mass_parent=mB,
+    mass_sibling=mpi_pm,
+    lab_boost=0.469/(1-0.469**2)**0.5
+)
+
+babar_Bpluspitaue = MeasurementConstantBound(
+    'BaBar:2012azg',
+    'prompt',
+    4.8e-5,
+    conf_level=0.9,
+    rmin=10,
+    mass_parent=mB,
+    mass_sibling=mpi_pm,
+    lab_boost=0.469/(1-0.469**2)**0.5
+)
+
+babar_BplusKmue = MeasurementConstantBound(
+    'BaBar:2006tnv',
+    'prompt',
+    9.1e-8,
+    rmin = 10,
+    mass_parent=mB,
+    mass_sibling=mK,
+    lab_boost=0.469/(1-0.469**2)**0.5
+)
+
+babar_B0Kmue = MeasurementConstantBound(
+    'BaBar:2006tnv',
+    'prompt',
+    27e-8,
+    rmin = 10,
+    mass_parent=mB0,
+    mass_sibling=mKL,
+    lab_boost=0.469/(1-0.469**2)**0.5
+)
+
+babar_BplusKstmue = MeasurementConstantBound(
+    'BaBar:2006tnv',
+    'prompt',
+    140e-8,
+    rmin = 10,
+    mass_parent=mB,
+    mass_sibling=mKst0,
+    lab_boost=0.469/(1-0.469**2)**0.5
+)
+
+babar_B0Kstmue = MeasurementConstantBound(
+    'BaBar:2006tnv',
+    'prompt',
+    58e-8,
+    rmin = 10,
+    mass_parent=mB0,
+    mass_sibling=mKst0,
+    lab_boost=0.469/(1-0.469**2)**0.5
+)
+
+lhcb_B0Ksttaumu = MeasurementConstantBound(
+    'LHCb:2022wrs',
+    'prompt',
+    1.82e-5,
+    rmin = 150e-4,
+    mass_parent=mB0,
+    mass_sibling=mKst0
+)
+
+lhcb_DstoKmue = MeasurementConstantBound(
+    'LHCb:2020car',
+    'prompt',
+    (790+560)*1e-9,
+    rmin = 150e-4,
+    mass_parent=mDs,
+    mass_sibling=mK
+)
+
+lhcb_Dplustopimue = MeasurementConstantBound(
+    'LHCb:2020car',
+    'prompt',
+    (230+220)*1e-9,
+    rmin = 150e-4,
+    mass_parent=mDplus,
+    mass_sibling=mpi_pm
+)
+
+e653_DstoKstmue = MeasurementConstantBound(
+    'E653:1995rpz',
+    'prompt',
+    1.4e-3,
+    rmin=1.5,
+    mass_parent=mDs,
+    mass_sibling=mKst0
+)
+
+babar_D0pi0mue = MeasurementConstantBound(
+    'BaBar:2020faa',
+    'prompt',
+    8e-7,
+    rmin=10,
+    mass_parent=mD0,
+    mass_sibling=mpi0,
+    lab_boost=0.469/(1-0.469**2)**0.5
+)
+
+babar_D0etamue = MeasurementConstantBound(
+    'BaBar:2020faa',
+    'prompt',
+    22.5e-7,
+    rmin=10,
+    mass_parent=mD0,
+    mass_sibling=meta,
+    lab_boost=0.469/(1-0.469**2)**0.5
+)
+
+babar_D0rhomue = MeasurementConstantBound(
+    'BaBar:2020faa',
+    'prompt',
+    5e-7,
+    rmin=10,
+    mass_parent=mD0,
+    mass_sibling=mrho,
+    lab_boost=0.469/(1-0.469**2)**0.5
+)
+
+na62_Kpluspimue = MeasurementConstantBound(
+    'NA62:2021zxl',
+    'prompt',
+    2*6.6e-11,
+    rmin = 14000,
+    lab_boost = 75/mK,
+    mass_parent = mK,
+    mass_sibling = mpi_pm
+    )
+
+ktev_KLtopi0mue = MeasurementConstantBound(
+    'KTeV:2007cvy',
+    'prompt',
+    0.76e-10,
+    rmin = 10500,
+    lab_boost = 70/mK,
+    mass_parent = mKL,
+    mass_sibling = mpi0
+)
+
 def get_measurements(process: str | tuple, exclude_projections: bool = True) -> dict[str, MeasurementBase]:
     """Retrieve measurements based on the given transition.
 
@@ -1407,6 +1577,10 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         return {'BaBar': babar_bptopiee, 'Belle': belle_bptopiee}
     elif initial == ['B+'] and final == sorted(['pion+', 'muon', 'muon']):
         return {'BaBar': babar_bptopimumu, 'Belle': belle_bptopimumu}
+    elif initial == ['B+'] and final == sorted(['K+', 'electron', 'tau']):
+        return {'BaBar': babar_Bpluspitaue}
+    elif initial == ['B+'] and final == sorted(['K+', 'muon', 'tau']):
+        return {'BaBar': babar_Bpluspitaumu}
     elif initial == ['B+'] and final == sorted(['K+', 'electron', 'electron']):
         return {'Belle II': belleII_bkee_displvertex}
     elif initial == ['B+'] and final == sorted(['K+', 'muon', 'muon']):
@@ -1422,6 +1596,14 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         return {'Belle': belle_bpKomega3pi}
     elif initial == ['B+'] and final == sorted(['K+', 'eta', 'pion+', 'pion-']):
         return {'BaBar': babar_BKetapipi}
+    elif initial == ['B+'] and final == sorted(['K+', 'muon', 'tau']):
+        return {'BaBar': babar_BplusKtaumu}
+    elif initial == ['B+'] and final == sorted(['K+', 'electron', 'tau']):
+        return {'BaBar': babar_BplusKtaue}
+    elif initial == ['B+'] and final == sorted(['K+', 'muon', 'electron']):
+        return {'BaBar': babar_BplusKmue}
+    elif initial == ['B+'] and final == sorted(['K*+', 'muon', 'electron']):
+        return {'BaBar': babar_BplusKstmue}
     #Initial state B0
     elif initial == ['B0'] and final == sorted(['pion0', 'alp']):
         return {'Belle': belle_B0topi0nunu}
@@ -1451,6 +1633,12 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         return {'LHCb': lhcb_B0totautau}
     elif initial == ['B0'] and final == sorted(['photon', 'photon']):
         return {'BaBar': babar_B0togammagamma}
+    elif initial == ['B0'] and final == sorted(['K0', 'muon', 'electron']):
+        return {'BaBar': babar_B0Kmue}
+    elif initial == ['B0'] and final == sorted(['K*0', 'muon', 'electron']):
+        return {'BaBar': babar_B0Kstmue}
+    elif initial == ['B0'] and final == sorted(['K*0', 'muon', 'tau']):
+        return {'LHCb': lhcb_B0Ksttaumu}
     #Initial state Bs
     elif initial == ['Bs'] and final == sorted(['phi', 'alp']):
         return {'DELPHI': delphi_Bstophinunu}
@@ -1511,6 +1699,12 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         return {'Belle': belle_D0toee}
     elif initial == ['D0'] and final == sorted(['muon', 'muon']):
         return {'LHCb': lhcb_D0tomumu}
+    elif initial == ['D0'] and final == sorted(['pion0', 'muon', 'electron']):
+        return {'BaBar': babar_D0pi0mue}
+    elif initial == ['D0'] and final == sorted(['eta', 'muon', 'electron']):
+        return {'BaBar': babar_D0etamue}
+    elif initial == ['D0'] and final == sorted(['rho0', 'muon', 'electron']):
+        return {'BaBar': babar_D0rhomue}
     #Initial state D+
     elif initial == ['D+'] and final == sorted(['pion+', 'electron', 'electron']):
         return {'LHCb': lhcb_Dptopipee}
@@ -1518,14 +1712,22 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         return {'LHCb': lhcb_Dptopipmumu}
     elif initial == ['D+'] and final == sorted(['rho+', 'muon', 'muon']):
         return {'E653': e653_Dptorhopmumu}
+    elif initial == ['D+'] and final == sorted(['pion+', 'electron', 'muon']):
+        return {'LHCb': lhcb_Dplustopimue}
     #Initial state Ds+
     elif initial == ['Ds+'] and final == sorted(['K+', 'electron', 'electron']):
         return {'LHCb': lhcb_DstoKpee}
     elif initial == ['Ds+'] and final == sorted(['K+', 'muon', 'muon']):
         return {'LHCb': lhcb_DstoKpmumu}
+    elif initial == ['Ds+'] and final == sorted(['K+', 'muon', 'electron']):
+        return {'LHCb': lhcb_DstoKmue}
+    elif initial == ['Ds+'] and final == sorted(['K*+', 'muon', 'electron']):
+        return {'E653': e653_DstoKstmue}
     #Initial state K+
     elif initial == ['K+'] and final == sorted(['pion+', 'alp']):
         return {'NA62': na62_Ktopiinv}    
+    elif initial == ['K+'] and final == sorted(['pion+', 'electron', 'muon']):
+        return {'NA62': na62_Kpluspimue}
     #elif initial == ['K+'] and final == sorted(['pion+', 'photon', 'photon']):
     #    return {'NA62+NA48/2': na62na48_kpigammagamma}
     elif initial == ['K+'] and final == sorted(['muon', 'muon', 'pion+']):
@@ -1541,6 +1743,8 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         return {'E871': e871_KLtoee}
     elif initial == ['KL'] and final == ['muon', 'muon']:
         return {'PDG': pdg_KLtomumu}
+    elif initial == ['KL'] and final == sorted(['pion0', 'muon', 'electron']):
+        return {'KTeV': ktev_KLtopi0mue}
     #Initial state KS
     elif initial == ['KS'] and final == ['electron', 'electron']:
         return {'KLOE': kloe_KStoee}
