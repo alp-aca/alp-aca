@@ -7,7 +7,7 @@ from ..constants import mUpsilon3S
 from .classes import MeasurementBase, MeasurementConstantBound, MeasurementInterpolatedBound, MeasurementInterpolated, MeasurementDisplacedVertexBound, MeasurementBinned, rmax_belle, rmax_besIII, MeasurementConstant
 from ..decays.particles import particle_aliases
 from ..decays.decays import parse
-from ..constants import mB, mB0, mBs, mK, mtau, mKst0, mKL, mpi0, mpi_pm, mphi, mZ, mDplus, mDs, mrho, mD0, meta, mUpsilon1S, mJpsi
+from ..constants import mB, mB0, mBs, mK, mtau, mKst0, mKL, mpi0, mpi_pm, mphi, mZ, mDplus, mDs, mrho, mD0, meta, mUpsilon1S, mJpsi, me, mmu
 # Get the directory of the current script
 current_dir = os.path.dirname(__file__)
 
@@ -1244,6 +1244,116 @@ lhcb_deltaMs = MeasurementConstant(
     max_ma=np.inf
 )
 
+belleII_taueinv = MeasurementInterpolatedBound(
+    'Belle-II:2022heu',
+    os.path.join(current_dir, invisible, 'BelleII_tau_e.txt'),
+    'invisible',
+    rmax=100,
+    mass_parent=mtau,
+    mass_sibling=me,
+    lab_boost=0.28
+)
+
+belleII_taumuinv = MeasurementInterpolatedBound(
+    'Belle-II:2022heu',
+    os.path.join(current_dir, invisible, 'BelleII_tau_mu.txt'),
+    'invisible',
+    rmax=100,
+    mass_parent=mtau,
+    mass_sibling=mmu,
+    lab_boost=0.28
+)
+
+belle_tau3e = MeasurementConstantBound(
+    'Hayasaka:2010np',
+    'prompt',
+    2.7e-8,
+    rmin=3.0,
+    mass_parent=mtau,
+    mass_sibling=me,
+    lab_boost=0.42
+)
+
+belle_tau3mu = MeasurementConstantBound(
+    'Hayasaka:2010np',
+    'prompt',
+    2.1e-8,
+    rmin=3.0,
+    mass_parent=mtau,
+    mass_sibling=mmu,
+    lab_boost=0.42
+)
+
+belle_tauemumu = MeasurementConstantBound(
+    'Hayasaka:2010np',
+    'prompt',
+    2.7e-8,
+    rmin=3.0,
+    mass_parent=mtau,
+    mass_sibling=me,
+    lab_boost=0.42
+)
+
+belle_taumuee = MeasurementConstantBound(
+    'Hayasaka:2010np',
+    'prompt',
+    1.8e-8,
+    rmin=3.0,
+    mass_parent=mtau,
+    mass_sibling=mmu,
+    lab_boost=0.42
+)
+
+babar_tauegammagamma = MeasurementConstantBound(
+    'Bryman:2021ilc',
+    'prompt',
+    2.5e-4,
+    rmin=3.0,
+    mass_parent=mtau,
+    mass_sibling=me,
+    lab_boost=0.469/(1-0.469**2)**0.5
+)
+
+babar_taumugammagamma = MeasurementConstantBound(
+    'Bryman:2021ilc',
+    'prompt',
+    5.8e-4,
+    rmin=3.0,
+    mass_parent=mtau,
+    mass_sibling=me,
+    lab_boost=0.469/(1-0.469**2)**0.5
+)
+
+twist_mueinv = MeasurementInterpolatedBound(
+    'TWIST:2014ymv',
+    os.path.join(current_dir, invisible, 'TWIST_muea.txt'),
+    'invisible',
+    rmax = 16.5,
+    mass_parent=mmu,
+    mass_sibling=me,
+    lab_boost=0.0
+)
+
+sindrum_mu3e = MeasurementConstantBound(
+    'SINDRUM:1987nra',
+    'prompt',
+    1e-12,
+    rmin=100,
+    mass_parent=mmu,
+    mass_sibling=me,
+    lab_boost=0.0
+)
+
+cristalbox_muegammagamma = MeasurementConstantBound(
+    'Bolton:1988af',
+    'prompt',
+    7.2e-11,
+    rmin=100,
+    mass_parent=mmu,
+    mass_sibling=me,
+    lab_boost=0.0
+)
+
 def get_measurements(process: str | tuple, exclude_projections: bool = True) -> dict[str, MeasurementBase]:
     """Retrieve measurements based on the given transition.
 
@@ -1438,5 +1548,28 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         return {'LHCb': lhcb_KStomumu}
     elif initial == ['KS'] and final == sorted(['photon', 'photon']):
         return {'NA48': na48_KStogammagamma, 'KLOE': kloe_KStogammagamma}
+    #Lepton LFV decays
+    elif initial == ['tau'] and final == sorted([('electron', 'alp')]):
+        return {'Belle II': belleII_taueinv}
+    elif initial == ['tau'] and final == sorted([('muon', 'alp')]):
+        return {'Belle II': belleII_taumuinv}
+    elif initial == ['tau'] and final == sorted([('electron', 'electron', 'electron')]):
+        return {'Belle': belle_tau3e}
+    elif initial == ['tau'] and final == sorted([('muon', 'muon', 'muon')]):
+        return {'Belle': belle_tau3mu}
+    elif initial == ['tau'] and final == sorted([('electron', 'muon', 'muon')]):
+        return {'Belle': belle_tauemumu}
+    elif initial == ['tau'] and final == sorted([('muon', 'electron', 'electron')]):
+        return {'Belle': belle_taumuee}
+    elif initial == ['tau'] and final == sorted([('electron', 'photon', 'photon')]):
+        return {'BaBar': babar_tauegammagamma}
+    elif initial == ['tau'] and final == sorted([('muon', 'photon', 'photon')]):
+        return {'BaBar': babar_taumugammagamma}
+    elif initial == ['muon'] and final == sorted([('electron', 'alp')]):
+        return {'TWIST': twist_mueinv}
+    elif initial == ['muon'] and final == sorted([('electron', 'electron', 'electron')]):
+        return {'SINDRUM': sindrum_mu3e}
+    elif initial == ['muon'] and final == sorted([('electron', 'photon', 'photon')]):
+        return {'Cristal Box': cristalbox_muegammagamma}
     else:
         raise KeyError(f"No measurements for {transition}")
