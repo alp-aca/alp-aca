@@ -42,8 +42,8 @@ def f0_BK(q2):
     return flavio.physics.bdecays.formfactors.b_p.bcl.ff('B->K', q2, pars)['f0']
 
 def f0_Bpi(q2):
-    citations.register_inspire('FlavourLatticeAveragingGroupFLAG:2021npn')
-    return flavio.physics.bdecays.formfactors.b_p.bcl.ff('B->pi', q2, pars)['f0']
+    citations.register_inspire('Leljak:2021vte')
+    return flavio.physics.bdecays.formfactors.b_p.bcl_lmvd.ff('B->pi', q2, pars)['f0']
 
 def f0_Kpi(q2):
     citations.register_inspire('FlaviaNetWorkingGrouponKaonDecays:2010lot')
