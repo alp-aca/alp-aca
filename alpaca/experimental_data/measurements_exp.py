@@ -1577,9 +1577,9 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         return {'BaBar': babar_bptopiee, 'Belle': belle_bptopiee}
     elif initial == ['B+'] and final == sorted(['pion+', 'muon', 'muon']):
         return {'BaBar': babar_bptopimumu, 'Belle': belle_bptopimumu}
-    elif initial == ['B+'] and final == sorted(['K+', 'electron', 'tau']):
+    elif initial == ['B+'] and final == sorted(['pion+', 'electron', 'tau']):
         return {'BaBar': babar_Bpluspitaue}
-    elif initial == ['B+'] and final == sorted(['K+', 'muon', 'tau']):
+    elif initial == ['B+'] and final == sorted(['pion+', 'muon', 'tau']):
         return {'BaBar': babar_Bpluspitaumu}
     elif initial == ['B+'] and final == sorted(['K+', 'electron', 'electron']):
         return {'Belle II': belleII_bkee_displvertex}
