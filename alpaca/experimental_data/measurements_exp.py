@@ -1753,27 +1753,27 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     elif initial == ['KS'] and final == sorted(['photon', 'photon']):
         return {'NA48': na48_KStogammagamma, 'KLOE': kloe_KStogammagamma}
     #Lepton LFV decays
-    elif initial == ['tau'] and final == sorted([('electron', 'alp')]):
+    elif initial == ['tau'] and final == sorted(['electron', 'alp']):
         return {'Belle II': belleII_taueinv}
-    elif initial == ['tau'] and final == sorted([('muon', 'alp')]):
+    elif initial == ['tau'] and final == sorted(['muon', 'alp']):
         return {'Belle II': belleII_taumuinv}
-    elif initial == ['tau'] and final == sorted([('electron', 'electron', 'electron')]):
+    elif initial == ['tau'] and final == sorted(['electron', 'electron', 'electron']):
         return {'Belle': belle_tau3e}
-    elif initial == ['tau'] and final == sorted([('muon', 'muon', 'muon')]):
+    elif initial == ['tau'] and final == sorted(['muon', 'muon', 'muon']):
         return {'Belle': belle_tau3mu}
-    elif initial == ['tau'] and final == sorted([('electron', 'muon', 'muon')]):
+    elif initial == ['tau'] and final == sorted(['electron', 'muon', 'muon']):
         return {'Belle': belle_tauemumu}
-    elif initial == ['tau'] and final == sorted([('muon', 'electron', 'electron')]):
+    elif initial == ['tau'] and final == sorted(['muon', 'electron', 'electron']):
         return {'Belle': belle_taumuee}
-    elif initial == ['tau'] and final == sorted([('electron', 'photon', 'photon')]):
+    elif initial == ['tau'] and final == sorted(['electron', 'photon', 'photon']):
         return {'BaBar': babar_tauegammagamma}
-    elif initial == ['tau'] and final == sorted([('muon', 'photon', 'photon')]):
+    elif initial == ['tau'] and final == sorted(['muon', 'photon', 'photon']):
         return {'BaBar': babar_taumugammagamma}
-    elif initial == ['muon'] and final == sorted([('electron', 'alp')]):
+    elif initial == ['muon'] and final == sorted(['electron', 'alp']):
         return {'TWIST': twist_mueinv}
-    elif initial == ['muon'] and final == sorted([('electron', 'electron', 'electron')]):
+    elif initial == ['muon'] and final == sorted(['electron', 'electron', 'electron']):
         return {'SINDRUM': sindrum_mu3e}
-    elif initial == ['muon'] and final == sorted([('electron', 'photon', 'photon')]):
+    elif initial == ['muon'] and final == sorted(['electron', 'photon', 'photon']):
         return {'Cristal Box': cristalbox_muegammagamma}
     else:
         raise KeyError(f"No measurements for {transition}")
