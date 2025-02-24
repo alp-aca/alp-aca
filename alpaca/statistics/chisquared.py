@@ -14,6 +14,11 @@ def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, coupling
     couplings = np.atleast_1d(couplings)
     fa = np.atleast_1d(fa).astype(float)
     br_dark = np.atleast_1d(br_dark).astype(float)
+    shape = np.broadcast_shapes(ma.shape, couplings.shape, fa.shape, br_dark.shape)
+    ma = np.broadcast_to(ma, shape)
+    couplings = np.broadcast_to(couplings, shape)
+    fa = np.broadcast_to(fa, shape)
+    br_dark = np.broadcast_to(br_dark, shape)
     if measurement.decay_type == 'flat':
         prob_decay = 1.0
         ctau = None # Arbitrary value
@@ -30,12 +35,20 @@ def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, coupling
         br = cross_section(transition[0], ma, couplings, transition[1], fa, br_dark, **kwargs_dw)
     sigma_left = measurement.get_sigma_left(ma, ctau)
     sigma_right = measurement.get_sigma_right(ma, ctau)
-    sigma = np.where(sigma_left == 0, sigma_right, (sigma_left+sigma_right)/2)
-    return (measurement.get_central(ma, ctau) - prob_decay*br - sm_pred)**2/(sigma**2 + sm_uncert**2)
+    central = measurement.get_central(ma, ctau)
+    value = prob_decay*br+sm_pred
+    if measurement.conf_level is None:
+        sigma = np.where(value > central, sigma_right, sigma_left)
+        return (central - value)**2/(sigma**2 + sm_uncert**2), np.where(np.isnan(central), 0, 1)
+    else:
+        chi2 = np.where(value > central, (central - value)**2/sigma_right**2, 0)
+        dofs = np.where(np.isnan(central), 0, np.where(value > central, 1, 0))
+        return chi2, dofs
 
 def combine_chi2(*chi2):
-    ndof = np.sum(np.where(np.isnan(m), 0, 1) for m in chi2)
-    return np.where(ndof == 0, np.nan, sum(np.nan_to_num(m) for m in chi2))/ndof
+    chivalues = [c[0] for c in chi2]
+    dofs = [c[1] for c in chi2]
+    return np.nansum(chivalues, axis=0), np.sum(dofs, axis=0)
 
 def get_chi2(transitions: list[str | tuple], ma: np.ndarray[float], couplings: np.ndarray[ALPcouplings], fa: np.ndarray[float], min_probability = 1e-3, exclude_projections=True, **kwargs) -> dict[tuple[str, str], np.array]:
     """Calculate the chi-squared values for a set of transitions.

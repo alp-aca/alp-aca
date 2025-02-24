@@ -22,10 +22,5 @@ def nsigmas(chi2, ndof):
     a $\chi^2$ with `ndof` degrees of freedom.
 
     Example: For `dof=2` and `delta_chi2=2.3`, the result is roughly 1.0."""
-    if ndof == 1:
-        # that's trivial
-        return np.sqrt(abs(chi2))
-    chi2_ndof = scipy.stats.chi2(ndof)
-    cl_delta_chi2 = chi2_ndof.cdf(chi2)
-    sigmas = scipy.stats.norm.ppf(0.5+cl_delta_chi2/2)
-    return np.where(np.isinf(sigmas), 1e6, sigmas)
+    p = 1 - scipy.stats.chi2.cdf(np.where(ndof == 0, np.nan, chi2), ndof)
+    return np.where(p < 1e-16, 8.3, scipy.stats.norm.ppf(1 - p))

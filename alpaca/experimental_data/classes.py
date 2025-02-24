@@ -16,18 +16,8 @@ rmax_babar = 100
 rmin_besIII = 0.1
 rmax_besIII = 100
 
-def sigma(cl, df, param):
-    #INPUT:
-        #cl: Confidence level of measurement
-        #df: Degrees of freedom (df)
-        #param: Measured quantity
-    #OUTPUT:
-        #Value of standard deviation of the measurement with said confidence level
-    p_value = 1 - cl
-    # Calculate the chi-squared value
-    chi_squared_value = chi2.ppf(1 - p_value, df)
-    return param/np.sqrt(chi_squared_value)
-
+def sigma(cl, param):
+    return np.sqrt(2/np.pi)*param*(1-cl)/cl
 
 class MeasurementBase:
     def __init__(self, inspire_id: str, decay_type: str, rmin: float|None = None, rmax: float|None = None, lab_boost: float = 0.0, mass_parent: float = 0.0, mass_sibling: float = 0.0):
@@ -51,6 +41,7 @@ class MeasurementBase:
         self.lab_boost = lab_boost
         self.mass_parent = mass_parent
         self.mass_sibling = mass_sibling
+        self.conf_level = None
 
     def initiate(self):
         if not self.initiated:
@@ -126,7 +117,8 @@ class MeasurementConstant(MeasurementBase):
     
 class MeasurementConstantBound(MeasurementConstant):
     def __init__(self, inspire_id: str, decay_type: str, bound: float, min_ma: float = 0, max_ma: float|None = None, conf_level: float = 0.9, rmin: float | None = None, rmax: float | None = None, lab_boost: float = 0, mass_parent: float = 0, mass_sibling: float = 0):
-        super().__init__(inspire_id, decay_type, 0, 0, sigma(conf_level, 1, bound), min_ma, max_ma, rmin, rmax, lab_boost, mass_parent, mass_sibling)
+        super().__init__(inspire_id, decay_type, bound, 0, sigma(conf_level, bound), min_ma, max_ma, rmin, rmax, lab_boost, mass_parent, mass_sibling)
+        self.conf_level = conf_level
 
 class MeasurementInterpolatedBound(MeasurementBase):
     def __init__(self, inspire_id, filepath: str, decay_type: str, conf_level: float = 0.9, rmin = None, rmax = None, lab_boost = 0, mass_parent = 0, mass_sibling = 0):
@@ -137,13 +129,17 @@ class MeasurementInterpolatedBound(MeasurementBase):
     def initiate(self):
         super().initiate()
         df = pd.read_csv(self.filepath, sep='\t', header=None)
-        self.interpolator = interp1d((df[0]+df[1])/2, sigma(self.conf_level, 1, df[2]), kind='linear')
+        self.interpolator = interp1d((df[0]+df[1])/2, df[2], kind='linear')
         self.min_ma = np.min(self.interpolator.x)
         self.max_ma = np.max(self.interpolator.x)
 
     def get_central(self, ma: float, ctau: float | None = None) -> float:
         self.initiate()
-        return np.where((ma >= self.min_ma) & (ma <= self.max_ma), 0, np.nan)
+        valid_ma = np.where((ma >= self.min_ma) & (ma <= self.max_ma))
+        valid_value = self.interpolator(ma[valid_ma])
+        value = np.full_like(ma, np.nan)
+        value[valid_ma] = valid_value
+        return value
     
     def get_sigma_left(self, ma: float, ctau: float | None = None) -> float:
         self.initiate()
@@ -151,11 +147,7 @@ class MeasurementInterpolatedBound(MeasurementBase):
     
     def get_sigma_right(self, ma: float, ctau: float | None = None) -> float:
         self.initiate()
-        valid_ma = np.where((ma >= self.min_ma) & (ma <= self.max_ma))
-        valid_sigmar = self.interpolator(ma[valid_ma])
-        sigmar = np.full_like(ma, np.nan)
-        sigmar[valid_ma] = valid_sigmar
-        return sigmar
+        return sigma(self.conf_level, self.get_central(ma, ctau))
     
 class MeasurementInterpolated(MeasurementBase):
     def __init__(self, inspire_id, filepath: str, decay_type: str, rmin = None, rmax = None, lab_boost = 0, mass_parent = 0, mass_sibling = 0):
@@ -284,8 +276,14 @@ class MeasurementDisplacedVertexBound(MeasurementBase):
 
     def get_central(self, ma: float, ctau: float) -> float:
         self.initiate()
-        tau = ctau*1e7/c_nm_per_ps
-        return np.where((ma >= self.min_ma) & (ma <= self.max_ma), 0, np.nan)
+        ma = np.atleast_1d(ma)
+        tau0 = np.atleast_1d(ctau)*1e7/c_nm_per_ps
+        shape = np.broadcast_shapes(ma.shape, tau0.shape)
+        ma = np.broadcast_to(ma, shape)
+        tau0 = np.broadcast_to(tau0, shape)
+        tau = np.where(tau0 <= self.max_tau, np.where(tau0 < self.min_tau, self.min_tau, tau0), self.max_tau)
+        points = np.vstack((ma.ravel(), np.log10(tau).ravel())).T
+        return 10**self.interpolator(points).reshape(shape)
     
     def get_sigma_left(self, ma: float, ctau: float) -> float:
         self.initiate()
@@ -294,14 +292,7 @@ class MeasurementDisplacedVertexBound(MeasurementBase):
     
     def get_sigma_right(self, ma: float, ctau: float) -> float:
         self.initiate()
-        ma = np.atleast_1d(ma)
-        tau0 = np.atleast_1d(ctau)*1e7/c_nm_per_ps
-        shape = np.broadcast_shapes(ma.shape, tau0.shape)
-        ma = np.broadcast_to(ma, shape)
-        tau0 = np.broadcast_to(tau0, shape)
-        tau = np.where(tau0 <= self.max_tau, np.where(tau0 < self.min_tau, self.min_tau, tau0), self.max_tau)
-        points = np.vstack((ma.ravel(), np.log10(tau).ravel())).T
-        return sigma(self.conf_level, 1, 10**self.interpolator(points).reshape(shape))
+        return sigma(self.conf_level, self.get_central(ma, ctau))
     
     def decay_probability(self, ctau, ma, theta = None, br_dark = 0):
         self.initiate()
