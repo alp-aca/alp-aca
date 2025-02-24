@@ -17,13 +17,14 @@ def exclusionplot(x, y, chi2, xlabel, ylabel, title, tex):
     lss = {k: s for k, s in zip(chi2.keys(), styles_list)}
     fig, ax = plt.subplots()
     legend_elements = []
-    pl = plt.contourf(x,y, nsigmas(chi2[('', 'Global')],2), levels=list(np.linspace(0, 3, 100)), cmap=cmap_newmaga, vmax=3, extend='max')
+    pl = plt.contourf(x,y, nsigmas(chi2[('', 'Global')][0],chi2[('', 'Global')][1]), levels=list(np.linspace(0, 3, 100)), cmap=cmap_newmaga, vmax=3, extend='max')
+    
     for observable, chi2_obs in chi2.items():
         if observable == ('', 'Global'):
             continue
-        if max_finite(nsigmas(chi2_obs, 2)) < 2:
+        if max_finite(nsigmas(chi2_obs[0], chi2_obs[1])) < 2:
             continue
-        mask = np.where(np.isnan(chi2_obs), 0, nsigmas(chi2_obs, 2))
+        mask = np.nan_to_num(nsigmas(chi2_obs[0], chi2_obs[1]))
         plt.contour(x, y, mask, levels=[2], colors = colors[observable], linestyles=lss[observable])
         if isinstance(observable, tuple):
             label = tex[observable[0]] + ' (' + observable[1] + ')'
