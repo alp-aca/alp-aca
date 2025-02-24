@@ -27,7 +27,7 @@ def g_photonloop(tau):
     def int_g(x, tau):
         tau *= (1-1e-8j)
         den = np.sqrt(tau*(1-x)**2-x**2)
-        atan = np.atan(x/den)
+        atan = np.arctan(x/den)
         num = 1-4*tau*(1-x)**2-2*x+4*x**2
         return num/den*atan
     with warnings.catch_warnings():
