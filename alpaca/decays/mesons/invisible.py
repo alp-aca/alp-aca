@@ -294,7 +294,7 @@ class ftilde_JpsiClass:
         from scipy.interpolate import interp1d
         current_dir = os.path.dirname(__file__)
         data = pd.read_csv(os.path.join(current_dir, 'HPQCD_Ftilde.txt'), sep=' ', names=['x', 'ftilde', 'sigma'], skiprows=6)
-        self.interpolator = interp1d(data['x'], data['ftilde'], kind='cubic')
+        self.interpolator = interp1d(data['x'], data['ftilde'], kind='cubic', bounds_error=False)
     def __call__(self, x):
         if not self.initialized:
             self.init()
