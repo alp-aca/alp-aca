@@ -1524,6 +1524,69 @@ ktev_KLtopi0mue = MeasurementConstantBound(
     mass_sibling = mpi0
 )
 
+belle_Y1S_mue = MeasurementConstantBound(
+    'Belle:2022cce',
+    'prompt',
+    4.2e-7,
+    lab_boost=0.42,
+    mass_parent=mUpsilon1S,
+    mass_sibling=0,
+    rmin=4
+)
+
+belle_Y1S_taue = MeasurementConstantBound(
+    'Belle:2022cce',
+    'prompt',
+    6.5e-6,
+    lab_boost=0.42,
+    mass_parent=mUpsilon1S,
+    mass_sibling=0,
+    rmin=4
+)
+
+belle_Y1S_taumu = MeasurementConstantBound(
+    'Belle:2022cce',
+    'prompt',
+    6.1e-6,
+    lab_boost=0.42,
+    mass_parent=mUpsilon1S,
+    mass_sibling=0,
+    rmin=4
+)
+
+belleII_tau3mu = MeasurementConstantBound(
+    'Belle-II:2024sce',
+    'prompt',
+    1.9e-8,
+    rmin=0.1,
+    lab_boost=0.28,
+    mass_parent=mtau,
+    conf_level=0.95,
+    mass_sibling=mmu
+)
+
+belleII_B0KStaumu = MeasurementConstantBound(
+    'Belle-II:2024qod',
+    'prompt',
+    4.7e-5,
+    rmin=0.1,
+    lab_boost=0.28,
+    mass_parent=mB0,
+    conf_level=0.95,
+    mass_sibling=mKL
+)
+
+belleII_B0KStaue = MeasurementConstantBound(
+    'Belle-II:2024qod',
+    'prompt',
+    2.3e-5,
+    rmin=0.1,
+    lab_boost=0.28,
+    mass_parent=mB0,
+    conf_level=0.95,
+    mass_sibling=mKL
+)
+
 def get_measurements(process: str | tuple, exclude_projections: bool = True) -> dict[str, MeasurementBase]:
     """Retrieve measurements based on the given transition.
 
@@ -1654,7 +1717,7 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     elif initial == ['J/psi'] and final == sorted(['photon', 'alp']):
         return {'BESIII': besIII_Jpsiinv}
     elif initial == ['J/psi'] and final == ['photon', 'photon', 'photon']:
-        return {'BESeIII': besIII_Jpsi_3gamma}
+        return {'BESIII': besIII_Jpsi_3gamma}
     elif initial == ['J/psi'] and final == sorted(['muon', 'muon', 'photon']):
         return {'BESIII': besIII_Jpsi_mumu}
     #Initial state Y(1S)
@@ -1666,6 +1729,12 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         return {'Belle': belle_Y1S_tautau}
     elif initial == ['Upsilon(1S)'] and final == sorted(['photon', 'charm', 'charm']):
         return {'BaBar': babar_Y1s_cc}
+    elif initial == ['Upsilon(1S)'] and final == sorted(['photon', 'electron', 'muon']):
+        return {'Belle': belle_Y1S_mue}
+    elif initial == ['Upsilon(1S)'] and final == sorted(['photon', 'tau', 'electron']):
+        return {'Belle': belle_Y1S_taue}
+    elif initial == ['Upsilon(1S)'] and final == sorted(['photon', 'tau', 'muon']):
+        return {'Belle': belle_Y1S_taumu}
     #Initial state Upsilon(3S)
     elif initial == ['Upsilon(3S)'] and final == sorted(['photon', 'alp']):
         return {'BaBar': babar_Y3S_inv}
@@ -1760,7 +1829,7 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     elif initial == ['tau'] and final == sorted(['electron', 'electron', 'electron']):
         return {'Belle': belle_tau3e}
     elif initial == ['tau'] and final == sorted(['muon', 'muon', 'muon']):
-        return {'Belle': belle_tau3mu}
+        return {'Belle': belle_tau3mu, 'Belle II': belleII_tau3mu}
     elif initial == ['tau'] and final == sorted(['electron', 'muon', 'muon']):
         return {'Belle': belle_tauemumu}
     elif initial == ['tau'] and final == sorted(['muon', 'electron', 'electron']):
