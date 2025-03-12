@@ -129,6 +129,9 @@ class ALPcouplings:
         if basis == 'derivative_above':
             self.scale = scale
             self.basis = basis
+            unknown_keys = set(values.keys()) - {'cg', 'cW', 'cB', 'cqL', 'cuR', 'cdR', 'clL', 'ceR'}
+            if unknown_keys:
+                raise KeyError(f'Unknown ALP couplings {unknown_keys} in basis {basis}')
             values = {'cg':0, 'cB': 0, 'cW':0, 'cqL': 0, 'cuR':0, 'cdR':0, 'clL':0, 'ceR':0} | values
             for c in ['cqL', 'cuR', 'cdR', 'clL', 'ceR']:
                 if isinstance(values[c], numeric):
@@ -144,6 +147,9 @@ class ALPcouplings:
         elif basis == 'massbasis_above':
             self.scale = scale
             self.basis = basis
+            unknown_keys = set(values.keys()) - {'cg', 'cgamma', 'cgammaZ', 'cW', 'cZ', 'cg', 'kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke'}
+            if unknown_keys:
+                raise KeyError(f'Unknown ALP couplings {unknown_keys} in basis {basis}')
             values = {'cg': 0, 'cgamma':0, 'cgammaZ': 0, 'cW':0, 'cZ': 0, 'kU': 0, 'ku':0, 'kD':0, 'kd':0, 'kE':0, 'kNu': 0, 'ke': 0} | values
             for c in ['kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke']:
                 if isinstance(values[c], numeric):
@@ -159,6 +165,9 @@ class ALPcouplings:
         elif basis == 'kF_below':
             self.scale = scale
             self.basis = basis
+            unknown_keys = set(values.keys()) - {'cg', 'cgamma', 'kU', 'kD', 'kE', 'kNu', 'ku', 'kd', 'ke'}
+            if unknown_keys:
+                raise KeyError(f'Unknown ALP couplings {unknown_keys} in basis {basis}')
             values = {'cg':0, 'cgamma': 0, 'kU': 0, 'kD': 0, 'kE': 0, 'kNu': 0, 'ku': 0, 'kd': 0, 'ke': 0} | values
             for c in ['kD', 'kE', 'kNu', 'kd', 'ke']:
                 if isinstance(values[c], numeric):
@@ -181,6 +190,9 @@ class ALPcouplings:
         elif basis == 'VA_below':
             self.scale = scale
             self.basis = basis
+            unknown_keys = set(values.keys()) - {'cg', 'cgamma', 'cuV', 'cuA', 'cdV', 'cdA', 'ceV', 'ceA', 'cnu'}
+            if unknown_keys:
+                raise KeyError(f'Unknown ALP couplings {unknown_keys} in basis {basis}')
             values = {'cg':0, 'cgamma': 0, 'cuV': 0, 'cuA': 0, 'cdV': 0, 'cdA': 0, 'ceV': 0, 'ceA': 0, 'cnu': 0} | values
             for c in ['cdV', 'cdA', 'ceV', 'ceA', 'cnu']:
                 if isinstance(values[c], numeric):
