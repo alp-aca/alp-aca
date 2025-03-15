@@ -5,7 +5,7 @@ import numpy as np
 from ..statistics.functions import nsigmas
 from .palettes import darker_set3, newmagma
 
-def exclusionplot(x, y, chi2, xlabel, ylabel, title, tex):
+def exclusionplot(x, y, chi2, xlabel, ylabel, title, tex, ax=None):
     def max_finite(x):
         finite = x[np.isfinite(x)]
         if len(finite) == 0:
@@ -15,7 +15,9 @@ def exclusionplot(x, y, chi2, xlabel, ylabel, title, tex):
     colors = {k: c for k, c in zip(chi2.keys(), darker_set3*4)}
     styles_list = ['solid']*len(darker_set3) + ['dashed']*len(darker_set3) + ['dotted']*len(darker_set3) + ['dashdot']*len(darker_set3)
     lss = {k: s for k, s in zip(chi2.keys(), styles_list)}
-    fig, ax = plt.subplots()
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1, xticks=[], yticks=[])
     legend_elements = []
     pl = plt.contourf(x,y, nsigmas(chi2[('', 'Global')][0],chi2[('', 'Global')][1]), levels=list(np.linspace(0, 3, 100)), cmap=cmap_newmaga, vmax=3, extend='max')
     
@@ -42,4 +44,4 @@ def exclusionplot(x, y, chi2, xlabel, ylabel, title, tex):
     plt.legend(handles = legend_elements, loc='center left', bbox_to_anchor=(1, 0.5), borderaxespad=9, fontsize=8)
     plt.tight_layout()
 
-    return fig, ax
+    return ax
