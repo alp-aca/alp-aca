@@ -28,11 +28,12 @@ def exclusionplot(x, y, chi2, xlabel, ylabel, title, tex, ax=None):
             continue
         mask = np.nan_to_num(nsigmas(chi2_obs[0], chi2_obs[1]))
         plt.contour(x, y, mask, levels=[2], colors = colors[observable], linestyles=lss[observable])
-        if isinstance(observable, tuple):
-            label = tex[observable[0]] + ' (' + observable[1] + ')'
-        else:
-            label = tex[observable]
-        legend_elements.append(plt.Line2D([0], [0], color=colors[observable], ls=lss[observable], label=label))
+        if tex != None:
+            if isinstance(observable, tuple):
+                label = tex[observable[0]] + ' (' + observable[1] + ')'
+            else:
+                label = tex[observable]
+            legend_elements.append(plt.Line2D([0], [0], color=colors[observable], ls=lss[observable], label=label))
     ax.set_xscale('log')
     ax.set_yscale('log')
     cb = plt.colorbar(pl, extend='max')
