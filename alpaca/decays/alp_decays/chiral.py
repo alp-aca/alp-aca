@@ -1,6 +1,6 @@
 from ...rge import ALPcouplings 
 import numpy as np
-from ...constants import mu, md, ms, mpi0, meta, metap, fpi
+from ...constants import mu, md, ms, mpi0, fpi, theta_eta_etap
 from ...common import alpha_s
 from . import u3reprs
 from ...biblio.biblio import citations
@@ -14,40 +14,89 @@ import os
 
 kappa = np.diag([1/m for m in [mu, md, ms]])/sum(1/m for m in [mu, md, ms])
 
-def kinetic_mixing(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> np.ndarray:
-    citations.register_inspire('Aloni:2018vki')
-    cc = couplings.match_run(ma, 'VA_below', **kwargs)
-    cq_eff = np.array([cc['cuA'][0,0], cc['cdA'][0,0], cc['cdA'][1,1]]) - 2*cc['cg']*kappa
-    eps = fpi/fa
-    return np.array([eps/4*(cq_eff[0,0]-cq_eff[1,1]), eps/2/np.sqrt(6)*(cq_eff[0,0]+cq_eff[1,1]-cq_eff[2,2]), eps/4/np.sqrt(3)*(cq_eff[0,0]+cq_eff[1,1]+2*cq_eff[2,2])])
 
-def mass_mixing(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> np.ndarray:
-    citations.register_inspire('Aloni:2018vki')
+def cqhat(couplings: ALPcouplings, ma: float, **kwargs) -> np.ndarray:
     cc = couplings.match_run(ma, 'VA_below', **kwargs)
-    m0 = mpi0**2/(mu+md)*mu*md*ms/(mu*md+mu*ms+md*ms)
-    eps = fpi/fa
-    return np.array([0, -cc['cg']*eps*np.sqrt(2/3)*m0, -cc['cg']*eps*np.sqrt(2/3)*m0*2*np.sqrt(2)])
+    cq = np.array([[cc['cuA'][0,0], 0, 0], [0, cc['cdA'][0,0], cc['cdA'][0,1]], [0, cc['cdA'][1,0], cc['cdA'][1,1]]])
+    return cq + 2 * cc['cg'] * kappa
 
-def a_U3_proj(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> np.ndarray:
+def mesonmass_chiPT():
+    c_eta = np.cos(theta_eta_etap)
+    s_eta = np.sin(theta_eta_etap)
+    return {
+        'pi0': mpi0,
+        'eta': mpi0/np.sqrt(3*c_eta) * np.sqrt((c_eta-np.sqrt(2)*s_eta) +2*ms/(mu+md)*(2*c_eta+np.sqrt(2)*s_eta)),
+        'etap': mpi0*np.sqrt(((s_eta+np.sqrt(2)*c_eta) +2*ms/(mu+md)*(2*s_eta-np.sqrt(2)*c_eta))/3/s_eta),
+        'K0': mpi0 * np.sqrt((md+ms)/(md+mu)),
+        'K0bar': mpi0 * np.sqrt((md+ms)/(md+mu)),
+    }
+
+def kinetic_mixing(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> dict[str, complex]:
     citations.register_inspire('Aloni:2018vki')
-    m_mesons = np.array([mpi0, meta, metap])
-    return (mass_mixing(ma, couplings, fa, **kwargs)-ma**2*kinetic_mixing(ma, couplings, fa, **kwargs))/(ma**2-m_mesons**2)
+    citations.register_inspire('Ovchynnikov:2025gpx')
+    cq_eff = cqhat(couplings, ma, **kwargs)
+    eps = fpi/np.sqrt(2)/fa
+    c_eta = np.cos(theta_eta_etap)
+    s_eta = np.sin(theta_eta_etap)
+    return {
+        'pi0': eps*(cq_eff[0,0]-cq_eff[1,1])/2,
+        'eta': eps*np.sqrt(3)/6*((cq_eff[0,0]+cq_eff[1,1])*(c_eta-np.sqrt(2)*s_eta) - cq_eff[2,2]*(2*c_eta+np.sqrt(2)*s_eta)),
+        'etap': eps/2/np.sqrt(3)*((np.sqrt(2)*c_eta + s_eta)*(cq_eff[0,0]+cq_eff[1,1]) + cq_eff[2,2]*(np.sqrt(2)*c_eta-2*np.sqrt(2)*s_eta)),
+        'K0': eps/np.sqrt(2)*cq_eff[1,2],
+        'K0bar': eps/np.sqrt(2)*cq_eff[2,1],
+        }
+
+def mass_mixing(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> dict[str, complex]:
+    citations.register_inspire('Aloni:2018vki')
+    citations.register_inspire('Ovchynnikov:2025gpx')
+    eps = fpi/np.sqrt(2)/fa
+    c_eta = np.cos(theta_eta_etap)
+    s_eta = np.sin(theta_eta_etap)
+    deltaI = (md-mu)/(md+mu)
+    cG = couplings['cg']
+    return {
+        'pi0': -eps*cG*mpi0**2*(kappa[1,1]*(deltaI+1)+kappa[0,0]*(deltaI-1)),
+        'eta': -2*eps*cG*mpi0**2/np.sqrt(3)/(mu+md) *((np.sqrt(2)*s_eta-c_eta)*(kappa[0,0]*mu + kappa[1,1]*md)+(2*c_eta+np.sqrt(2)*s_eta)*kappa[2,2]*ms),
+        'etap': 2*eps*cG*mpi0**2/np.sqrt(3)/(mu+md) *((s_eta+np.sqrt(2)*c_eta)*(kappa[0,0]*mu + kappa[1,1]*md)+(np.sqrt(2)*c_eta-2*s_eta)*kappa[2,2]*ms),
+        'K0': 0,
+        'K0bar': 0,
+    }
+
+def sm_massmixing():
+    c_eta = np.cos(theta_eta_etap)
+    s_eta = np.sin(theta_eta_etap)
+    sm_mixing = dict()
+    sm_mixing[('pi0', 'eta')] = sm_mixing[('eta', 'pi0')] = - (md-mu)/(md+mu)*mpi0**2*(c_eta-np.sqrt(2)*s_eta)/np.sqrt(3)
+    sm_mixing[('pi0', 'etap')] = sm_mixing[('etap', 'pi0')] = - (md-mu)/(md+mu)*mpi0**2*(s_eta+np.sqrt(2)*c_eta)/np.sqrt(3)
+    return sm_mixing
+
+def sm_mixingangles():
+    res = dict()
+    sm_mixing = sm_massmixing()
+    masses = mesonmass_chiPT()
+    for m1 in ('pi0', 'eta', 'etap'):
+        for m2 in ('pi0', 'eta', 'etap'):
+            if m1 == m2:
+                continue
+            res[(m1, m2)] = sm_mixing.get((m1, m2),0)/(masses[m1]**2-masses[m2]**2)
+    return res
 
 @lru_cache
-def a_U3_repr(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> np.matrix:
+def a_U3_repr(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> np.ndarray:
     citations.register_inspire('Aloni:2018vki')
-    cc = couplings.match_run(ma, 'VA_below', **kwargs)
-    coup_q = ALPcouplings({'cuA': cc['cuA'], 'cdA': cc['cdA']}, ma, 'VA_below')
-    coup_g = ALPcouplings({'cg': cc['cg']}, ma, 'VA_below')
-    components_q = a_U3_proj(ma, coup_q, fa, **kwargs)
-    components_g = a_U3_proj(ma, coup_g, fa, **kwargs)
-    u3repr_q = components_q[0]*u3reprs.pi0 + components_q[1]*u3reprs.eta + components_q[2]*u3reprs.etap
-    u3repr_g = components_g[0]*u3reprs.pi0 + components_g[1]*u3reprs.eta + components_g[2]*u3reprs.etap
-    if ma > 1.0:
-        u3repr_g[0,0] = u3repr_g[1,1]
-    if ma > 1.15:
-        u3repr_g[0,0] = u3repr_g[1,1] = u3repr_g[2,2] = cc['cg']* fpi/fa*alphas_tilde(ma)/np.sqrt(6)
-    return u3repr_q + u3repr_g
+    mesons = ('pi0', 'eta', 'etap', 'K0', 'K0bar')
+    sm_mixing = sm_massmixing()
+    alp_mixing = dict()
+    kmix = kinetic_mixing(ma, couplings, fa, **kwargs)
+    mmix = mass_mixing(ma, couplings, fa, **kwargs)
+    mesonmass = mesonmass_chiPT()
+    for m1 in mesons:
+        h = mmix[m1] - ma**2 * kmix[m1]
+        for m2 in mesons:
+            h += sm_mixing.get((m1, m2), 0) * (mmix[m2] - ma**2 * kmix[m2])/(ma**2-mesonmass[m2]**2)
+        h /= (ma**2-mesonmass[m1]**2)
+        alp_mixing[m1] = h
+    return (u3reprs.pi0 * alp_mixing['pi0'] + u3reprs.eta * alp_mixing['eta'] + u3reprs.etap * alp_mixing['etap'] + u3reprs.K0 * alp_mixing['K0'] + u3reprs.K0bar * alp_mixing['K0bar'])*ffunction(ma)**2
 
 def alphas_tilde(ma: float) -> float:
     if ma < 1.0:
