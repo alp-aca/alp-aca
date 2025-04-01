@@ -1,5 +1,5 @@
-from .chiral import a_U3_repr, kappa, ffunction
-from . import u3reprs
+from ...chiPT.chiral import a_U3_repr, kappa, ffunction
+from ...chiPT import u3reprs
 from ...rge import ALPcouplings, bases_above
 from ...constants import mpi0, metap, mK, mu, md, ms, mc, mb, mt, mW, s2w, me, mmu, mtau, fpi
 from ...common import alpha_s, alpha_em, B1, B2

@@ -1,9 +1,9 @@
-from ...rge import ALPcouplings 
+from ..rge import ALPcouplings 
 import numpy as np
-from ...constants import mu, md, ms, mpi0, fpi, theta_eta_etap
-from ...common import alpha_s
+from ..constants import mu, md, ms, mpi0, fpi, theta_eta_etap
+from ..common import alpha_s
 from . import u3reprs
-from ...biblio.biblio import citations
+from ..biblio.biblio import citations
 from functools import lru_cache
 import pickle
 import os
@@ -12,8 +12,8 @@ import os
 #with open(os.path.join(path, 'ffunction.pickle'), 'rb') as f:
 #    ffunction_interp = pickle.load(f)
 
-kappa = np.diag([1/m for m in [mu, md, ms]])/sum(1/m for m in [mu, md, ms])
-
+#kappa = np.diag([1/m for m in [mu, md, ms]])/sum(1/m for m in [mu, md, ms])
+kappa = np.diag([0,1,0])
 
 def cqhat(couplings: ALPcouplings, ma: float, **kwargs) -> np.ndarray:
     cc = couplings.match_run(ma, 'VA_below', **kwargs)

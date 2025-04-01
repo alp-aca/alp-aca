@@ -1,5 +1,5 @@
 import numpy as np
-from ...constants import theta_eta_etap
+from ..constants import theta_eta_etap
 
 ###### Pseudoscalar mesons ###################
 pi0 = np.diag([1, -1, 0])/2
