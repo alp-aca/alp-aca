@@ -12,8 +12,8 @@ import os
 #with open(os.path.join(path, 'ffunction.pickle'), 'rb') as f:
 #    ffunction_interp = pickle.load(f)
 
-#kappa = np.diag([1/m for m in [mu, md, ms]])/sum(1/m for m in [mu, md, ms])
-kappa = np.diag([0,1,0])
+kappa = np.diag([1/m for m in [mu, md, ms]])/sum(1/m for m in [mu, md, ms])
+#kappa = np.diag([0,1,0])
 
 def cqhat(couplings: ALPcouplings, ma: float, **kwargs) -> np.ndarray:
     cc = couplings.match_run(ma, 'VA_below', **kwargs)
@@ -41,7 +41,7 @@ def kinetic_mixing(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> d
     return {
         'pi0': eps*(cq_eff[0,0]-cq_eff[1,1])/2,
         'eta': eps*np.sqrt(3)/6*((cq_eff[0,0]+cq_eff[1,1])*(c_eta-np.sqrt(2)*s_eta) - cq_eff[2,2]*(2*c_eta+np.sqrt(2)*s_eta)),
-        'etap': eps/2/np.sqrt(3)*((np.sqrt(2)*c_eta + s_eta)*(cq_eff[0,0]+cq_eff[1,1]) + cq_eff[2,2]*(np.sqrt(2)*c_eta-2*np.sqrt(2)*s_eta)),
+        'etap': eps/2/np.sqrt(3)*((np.sqrt(2)*c_eta + s_eta)*(cq_eff[0,0]+cq_eff[1,1]) + cq_eff[2,2]*(np.sqrt(2)*c_eta-2*s_eta)),
         'K0': eps/np.sqrt(2)*cq_eff[1,2],
         'K0bar': eps/np.sqrt(2)*cq_eff[2,1],
         }
@@ -73,7 +73,9 @@ def sm_massmixing():
 def sm_mixingangles():
     res = dict()
     sm_mixing = sm_massmixing()
-    masses = mesonmass_chiPT()
+    #masses = mesonmass_chiPT()
+    from ..constants import mpi0, meta, metap, mK0
+    masses = {'pi0': mpi0, 'eta': meta, 'etap': metap, 'K0': mK0, 'K0bar': mK0}
     for m1 in ('pi0', 'eta', 'etap'):
         for m2 in ('pi0', 'eta', 'etap'):
             if m1 == m2:
@@ -89,14 +91,16 @@ def a_U3_repr(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> np.nda
     alp_mixing = dict()
     kmix = kinetic_mixing(ma, couplings, fa, **kwargs)
     mmix = mass_mixing(ma, couplings, fa, **kwargs)
-    mesonmass = mesonmass_chiPT()
+    #mesonmass = mesonmass_chiPT()
+    from ..constants import mpi0, meta, metap, mK0
+    mesonmass = {'pi0': mpi0, 'eta': meta, 'etap': metap, 'K0': mK0, 'K0bar': mK0}
     for m1 in mesons:
         h = mmix[m1] - ma**2 * kmix[m1]
         for m2 in mesons:
             h += sm_mixing.get((m1, m2), 0) * (mmix[m2] - ma**2 * kmix[m2])/(ma**2-mesonmass[m2]**2)
         h /= (ma**2-mesonmass[m1]**2)
         alp_mixing[m1] = h
-    return (u3reprs.pi0 * alp_mixing['pi0'] + u3reprs.eta * alp_mixing['eta'] + u3reprs.etap * alp_mixing['etap'] + u3reprs.K0 * alp_mixing['K0'] + u3reprs.K0bar * alp_mixing['K0bar'])*ffunction(ma)**2
+    return (u3reprs.pi0 * alp_mixing['pi0'] + u3reprs.eta * alp_mixing['eta'] + u3reprs.etap * alp_mixing['etap'] + u3reprs.K0 * alp_mixing['K0'] + u3reprs.K0bar * alp_mixing['K0bar'])
 
 def alphas_tilde(ma: float) -> float:
     if ma < 1.0:
@@ -128,8 +132,8 @@ class _ffunction:
         citations.register_inspire('BaBar:2017zmc')
         citations.register_inspire('BaBar:2007ceh')
         citations.register_inspire('BaBar:2004ytv')
-        if ma < 1.4: fun = 1
-        elif ma >= 1.4 and ma <= 2: 
+        if ma < 1.45: fun = 1
+        elif ma >= 1.45 and ma <= 2: 
             fun = self.ffunction_interp(ma)
         else: fun = (1.4/ma)**4
         return fun
