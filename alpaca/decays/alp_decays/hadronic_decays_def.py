@@ -4,10 +4,11 @@ import vegas as vegas
 import functools
 from . import threebody_decay
 from ...rge import ALPcouplings, bases_above
-from ...chiPT.chiral import ffunction, kappa, mesonmass_chiPT, sm_mixingangles, cqhat, a_U3_repr
+from ...chiPT.chiral import ffunction, kappa, mesonmass_chiPT, sm_mixingangles, cqhat, a_U3_repr, mass_mixing
 from ...chiPT.u3reprs import pi0, eta, etap, rho0, omega, phi, sigma, f0, a0, f2, eta0, eta8
 from ...constants import mu, md, ms, mc, mb, mt, me, mmu, mtau, mpi0, meta, metap, mK, mrho, fpi, mpi_pm, ma0, msigma, mf0, mf2, momega, Gammaa0, Gammasigma, Gammaf0, Gammaf2, Gammarho, theta_eta_etap
 from ...biblio.biblio import citations
+from ...chiPT.svt_lagrangians import gTf2, CoefA, CoefB, CoefC, CoefD, theta_S
 
 #ALP decays to different channels (leptonic, hadronic, photons)
 
@@ -147,9 +148,11 @@ def bw(s, m, Gamma, c):
         result = 0
     return result
 
+UnitStep = lambda x: np.heaviside(x, 0.0) #Heaviside function
+
 ###########################    DECAY TO 3 PIONS a-> pi pi pi    ###########################
 #Decay to 3 neutral pions 3 pi0
-def ampato3pi0(ma, model, fa, Ener3, **kwargs): #Eq. S31
+def ampato3pi0(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs): #Eq. S31
     #INPUT
         #ma: Mass of decaying particle (in GeV)
         #mi: Mass of daughter particle [i=1,2,3] (in GeV)
@@ -159,25 +162,31 @@ def ampato3pi0(ma, model, fa, Ener3, **kwargs): #Eq. S31
     #OUTPUT
         #Amplitude a->3 pi0 (without prefactor)
     citations.register_inspire('Aloni:2018vki')
+    m12 = kinematics[7] + kinematics[8] + 2*kinematics[3]
+    m23 = kinematics[8] + kinematics[9] + 2*kinematics[5]
+    kappau = kappa[0,0]
+    kappad = kappa[1,1]
     deltaI = (md-mu)/(md+mu)
-    aU3 = a_U3_repr(ma, model, fa, **kwargs)
     F0 = fpi/np.sqrt(2)
     cg = model['cg']*F0/fa
-    th_pia = np.trace(np.dot(aU3, pi0))*2
-    th_etaa = np.trace(np.dot(aU3, eta))*2
-    th_etap = np.trace(np.dot(aU3, etap))*2
+    aU3 = a_U3_repr(ma, model, fa, **kwargs)
+    thpiALP = np.trace(np.dot(aU3, pi0))*2
+    thetaa = np.trace(np.dot(aU3, eta))*2
+    thetap = np.trace(np.dot(aU3, etap))*2
     c_eta = np.cos(theta_eta_etap)
     s_eta = np.sin(theta_eta_etap)
     sm_angles = sm_mixingangles()
-    etapi0 = (c_eta-np.sqrt(2)*s_eta)*sm_angles[('eta', 'pi0')]+(s_eta+np.sqrt(2)*c_eta)*sm_angles[('etap', 'pi0')]
-    etaalp = (c_eta-np.sqrt(2)*s_eta)*th_etaa+(s_eta+np.sqrt(2)*c_eta)*th_etap
-    aux = th_pia + cg*(kappa[0,0]-kappa[1,1]) \
-        - cg * deltaI * (kappa[0,0]+kappa[1,1]) * (1 + np.sqrt(3)*etapi0) \
-        - deltaI *etaalp *(etapi0 + 1/np.sqrt(3))
-    return mpi0**2*aux/F0**2
+    thetaALP = (c_eta-np.sqrt(2)*s_eta)/np.sqrt(2)*thetaa
+    thetaprALP = (s_eta+np.sqrt(2)*c_eta)*thetap
+    thetapi = (c_eta-np.sqrt(2)*s_eta)/np.sqrt(2)* sm_angles[('eta', 'pi0')]
+    thetaprpi = (s_eta+np.sqrt(2)*c_eta)*sm_angles[('etap', 'pi0')]
+    kfact = 2.7 # Mean value of k-factor to reproduce decay rates of eta, eta'
+
+    amptot = -np.sqrt(kfact)*mpi0**2*(3*cg*(kappad*(np.sqrt(6)*deltaI*thetapi + np.sqrt(3)*deltaI*thetaprpi + deltaI + 1) + kappau*(np.sqrt(6)*deltaI*thetapi + np.sqrt(3)*deltaI*thetaprpi + deltaI - 1)) + deltaI*thetaALP*(6*thetapi + 3*np.sqrt(2)*thetaprpi + np.sqrt(6)) + deltaI*thetaprALP*(3*np.sqrt(2)*thetapi + 3*thetaprpi + np.sqrt(3)) - 3*thpiALP)*UnitStep(-ma + metap)/(3*F0**2)
+    return amptot * ffunction(ma)
 
 #Decay to pi+ pi- pi0
-def ampatopicharged(ma, model, fa, Ener3, **kwargs): #Eq.S32
+def ampatopicharged(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs): #Eq.S32
     #INPUT
         #ma: Mass of decaying particle (in GeV)
         #mi: Mass of daughter particle [i=1,2,3] (in GeV)
@@ -187,24 +196,33 @@ def ampatopicharged(ma, model, fa, Ener3, **kwargs): #Eq.S32
     #OUTPUT
         #Amplitude a->3 pi0 (without prefactor)
     citations.register_inspire('Aloni:2018vki')
+    citations.register_inspire('Aloni:2018vki')
+    m12 = kinematics[7] + kinematics[8] + 2*kinematics[3]
+    m23 = kinematics[8] + kinematics[9] + 2*kinematics[5]
+    kappau = kappa[0,0]
+    kappad = kappa[1,1]
     deltaI = (md-mu)/(md+mu)
-    aU3 = a_U3_repr(ma, model, fa, **kwargs)
     F0 = fpi/np.sqrt(2)
     cg = model['cg']*F0/fa
-    cq = cqhat(model, ma, **kwargs)*F0/fa
-    th_pia = np.trace(np.dot(aU3, pi0))*2
-    th_etaa = np.trace(np.dot(aU3, eta))*2
-    th_etap = np.trace(np.dot(aU3, etap))*2
+    aU3 = a_U3_repr(ma, model, fa, **kwargs)
+    thpiALP = np.trace(np.dot(aU3, pi0))*2
+    thetaa = np.trace(np.dot(aU3, eta))*2
+    thetap = np.trace(np.dot(aU3, etap))*2
     c_eta = np.cos(theta_eta_etap)
     s_eta = np.sin(theta_eta_etap)
     sm_angles = sm_mixingangles()
-    etapi0 = (c_eta-np.sqrt(2)*s_eta)*sm_angles[('eta', 'pi0')]+(s_eta+np.sqrt(2)*c_eta)*sm_angles[('etap', 'pi0')]
-    etaalp = (c_eta-np.sqrt(2)*s_eta)*th_etaa+(s_eta+np.sqrt(2)*c_eta)*th_etap
-    mpipipm = Ener3
-    aux = 0.5*(cq[0,0]-cq[1,1])*(3*mpipipm**2-ma**2-3*mpi0**2) + cg*(kappa[0,0]-kappa[1,1])*mpi0**2 \
-        - cg * mpi0**2 * deltaI * (kappa[0,0]+kappa[1,1]) * (1 + np.sqrt(3)*etapi0) + \
-        th_pia *(3*mpipipm**2-ma**2-2*mpi0**2) -mpi0**2*deltaI*etaalp *(etapi0 + 1/np.sqrt(3))
-    return aux/F0**2/3
+    thetaALP = (c_eta-np.sqrt(2)*s_eta)/np.sqrt(2)*thetaa
+    thetaprALP = (s_eta+np.sqrt(2)*c_eta)*thetap
+    thetapi = (c_eta-np.sqrt(2)*s_eta)/np.sqrt(2)* sm_angles[('eta', 'pi0')]
+    thetaprpi = (s_eta+np.sqrt(2)*c_eta)*sm_angles[('etap', 'pi0')]
+    kfact = 2.7 # Mean value of k-factor to reproduce decay rates of eta, eta'
+    cq = cqhat(model, ma, **kwargs)*F0/fa
+    cuhat = cq[0,0]
+    cdhat = cq[1,1]
+
+    amp_tot = -np.sqrt(kfact)*(cdhat*(9*m12 - 3*ma**2 - 9*mpi0**2) + 6*cg*mpi0**2*(kappad*(np.sqrt(6)*deltaI*thetapi + np.sqrt(3)*deltaI*thetaprpi + deltaI + 1) + kappau*(np.sqrt(6)*deltaI*thetapi + np.sqrt(3)*deltaI*thetaprpi + deltaI - 1)) + cuhat*(-9*m12 + 3*ma**2 + 9*mpi0**2) + 2*deltaI*mpi0**2*(thetaALP*(6*thetapi + 3*np.sqrt(2)*thetaprpi + np.sqrt(6)) + thetaprALP*(3*np.sqrt(2)*thetapi + 3*thetaprpi + np.sqrt(3))) + 6*thpiALP*(-3*m12 + ma**2 + 2*mpi0**2))*UnitStep(-ma + metap)/(18*F0**2)
+
+    return amp_tot * ffunction(ma)
 
 
 #Decay rate (numerical integration)
@@ -217,20 +235,20 @@ def ato3pi(ma, m1, m2, m3, model, fa, c, **kwargs): #Eq. S33
     #OUTPUT: 
         #Decay rate including symmetry factors
     citations.register_inspire('Aloni:2018vki')
-    k = 2.7 # Mean value of k-factor to reproduce decay rates of eta, eta'
+    
     if c == 0:
         s = 3*2 #Symmetry factor
-        if ma > 3*mpi0+0.001 and ma<metap: 
-            result, error = threebody_decay.decay3body_spheric(ampato3pi0, ma, m1, m2, m3, model, fa, **kwargs) #Amplitude of decay to 3 neutral pions
+        if ma > 3*mpi0+0.001: 
+            result, error = threebody_decay.decay3body(ampato3pi0, ma, m1, m2, m3, model, fa, **kwargs) #Amplitude of decay to 3 neutral pions
         else: result, error = [0.0,0.0]
         #result2, error2 = threebody_decay2.decay3body(ampato3pi0, ma, m1, m2, m3) #Amplitude of decay to 3 neutral pions
     elif c == 1:
         s = 1 #Symmetry factor
-        if ma > mpi0+2*mpi_pm+0.001 and ma<metap:  #mpi0+mpim+mpip
-            result, error = threebody_decay.decay3body_spheric(ampatopicharged, ma, m1, m2, m3, model, fa, **kwargs) #Amplitude of decay to pi+ pi- pi0
+        if ma > mpi0+2*mpi_pm+0.001:  #mpi0+mpim+mpip
+            result, error = threebody_decay.decay3body(ampatopicharged, ma, m1, m2, m3, model, fa, **kwargs) #Amplitude of decay to pi+ pi- pi0
         else: result, error = [0.0,0.0] 
         #result2, error2 = threebody_decay2.decay3body(ampato3pi0, ma, m1, m2, m3) #Amplitude of decay to 3 neutral pions
-    return k/(2*ma*s)*result, k/(2*ma*s)*error#,k/(2*ma*s)*1/pow(fpi*fa,2)*result2, k/(2*ma*s)*1/pow(fpi*fa,2)*error2
+    return 1/(2*ma*s)*result, 1/(2*ma*s)*error#,k/(2*ma*s)*1/pow(fpi*fa,2)*result2, k/(2*ma*s)*1/pow(fpi*fa,2)*error2
 
 def decay_width_3pi0pm(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
     return ato3pi(ma, mpi0, mpi_pm, mpi_pm, couplings, fa, 1, **kwargs)[0]
