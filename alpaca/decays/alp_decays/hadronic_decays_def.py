@@ -279,6 +279,54 @@ def decay_width_3pi000(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
 ###########################    DECAY TO  a-> eta pi pi    ###########################
 #It is assumed that Fpppp(m)=Fspp(m)=Ftpp(m)=F(m)
 
+def ampatoetapi0pi0(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs):
+    #INPUT
+        #ma: Mass of decaying particle (in GeV)
+        #mi: Mass of daughter particle [i=1,2,3] (in GeV) (1,2: pi, 3: eta)
+        #model: Coefficients
+        #x: Integration variables (m12, phi, costheta, phiast, costhetaast)
+        #kinematics: Kinematical relationships
+    #OUTPUT
+        #Amplitude a-> eta pi pi (without prefactor)
+    
+    #(obtained from hep-ph/9902238, Tab.II, first column)
+    #xsigmapipi = 7.27    xsigmaetaeta = 3.90    xsigmaetaetap = 1.25    xsigmaetapetap = -3.82
+    #xf0pipi = 1.47    xf0etaeta = 1.50    xf0etaetap = -10.19    xf0etapetap = 1.04
+    #xa0pieta = -6.87    xa0pietap = -8.02
+
+    citations.register_inspire('Aloni:2018vki')
+    m12 = ma**2 + m3**2 -2*ma*x[:,0]
+    m23 = ma**2 + m1**2 -2*kinematics[0]
+    kappau = kappa[0,0]
+    kappad = kappa[1,1]
+    deltaI = (md-mu)/(md+mu)
+    F0 = fpi/np.sqrt(2)
+    cg = model['cg']*F0/fa
+    aU3 = a_U3_repr(ma, model, fa, **kwargs)
+    thpiALP = np.trace(np.dot(aU3, pi0))*2
+    thetaa = np.trace(np.dot(aU3, eta))*2
+    thetap = np.trace(np.dot(aU3, etap))*2
+    c_eta = np.cos(theta_eta_etap)
+    s_eta = np.sin(theta_eta_etap)
+    sm_angles = sm_mixingangles()
+    thetaALP = (c_eta-np.sqrt(2)*s_eta)/np.sqrt(2)*thetaa
+    thetaprALP = (s_eta+np.sqrt(2)*c_eta)*thetap
+    thetapi = (c_eta-np.sqrt(2)*s_eta)/np.sqrt(2)* sm_angles[('eta', 'pi0')]
+    thetaprpi = (s_eta+np.sqrt(2)*c_eta)*sm_angles[('etap', 'pi0')]
+    I = 1j
+
+    amp_tot = mpi0**2*(cg*kappad*(deltaI*(thetapi + 2*np.sqrt(2)*thetaprpi + np.sqrt(6)) + np.sqrt(6)) + cg*kappau*(-deltaI*(thetapi + 2*np.sqrt(2)*thetaprpi + np.sqrt(6)) + np.sqrt(6)) - deltaI*thetapi*thpiALP - 2*np.sqrt(2)*deltaI*thetaprpi*thpiALP - np.sqrt(6)*deltaI*thpiALP + 2*thetaALP + np.sqrt(2)*thetaprALP)/(3*F0**2)
+
+    amp_tot += -deltaI*gTf2**2*(-thetapi + np.sqrt(2)*thetaprpi)*(-((m23 - 2*mpi0**2)*(-meta**2*(m12 + m23 - ma**2 + 3*mf2**2 - 5*mpi0**2) + (mf2**2 - mpi0**2)*(m12 + m23 - ma**2 + 3*mf2**2 - mpi0**2)) + (2*mpi0**2*(2*meta**2 - 3*mf2**2) + (meta**2 - mf2**2 + mpi0**2)*(-m12 - m23 + ma**2 + mpi0**2))*(m12 - meta**2 - mpi0**2))*(-m23 + ma**2 + meta**2) - ((m23 - 2*mpi0**2)*(-meta**2*(m12 + m23 - ma**2 + 6*mf2**2 - 5*mpi0**2) + (-mf2**2 + mpi0**2)*(-m12 - m23 + ma**2 + mpi0**2)) + (-meta**2*(m12 + m23 - ma**2 + 3*mf2**2 - 5*mpi0**2) + (mf2**2 - mpi0**2)*(m12 + m23 - ma**2 + 3*mf2**2 - mpi0**2))*(m12 - meta**2 - mpi0**2))*(-m12 + ma**2 + mpi0**2) + (4*meta**2*mpi0**2*(meta**2 - 2*mf2**2 + mpi0**2) + (meta**2 - mf2**2 + mpi0**2)*(m12 + m23 - ma**2 - mpi0**2)**2 + (-m12 - m23 + ma**2 + mpi0**2)*(meta**4 - 3*meta**2*(mf2**2 - 2*mpi0**2) + 2*mf2**4 - 3*mf2**2*mpi0**2 + mpi0**4))*(m12 + m23 - meta**2 - mpi0**2))*(3*cg*(kappad - kappau) + deltaI*thetaALP*(2*thetapi + np.sqrt(2)*thetaprpi) + deltaI*(np.sqrt(2)*thetapi + thetaprpi)*(np.sqrt(3)*cg*(kappad + kappau) + thetaprALP) - 3*thpiALP)*UnitStep(-m12 - m23 + ma**2 + meta**2 + 2*mpi0**2 - (Gammaf2 - mf2)**2)/(432*mf2**4*(I*Gammaf2*mf2 - m12 - m23 + ma**2 + meta**2 - mf2**2 + 2*mpi0**2)) - deltaI*gTf2**2*(thetapi - np.sqrt(2)*thetaprpi)*(cg*kappad*(np.sqrt(3)*deltaI*(np.sqrt(2)*thetapi + thetaprpi) + 3) + cg*kappau*(np.sqrt(3)*deltaI*(np.sqrt(2)*thetapi + thetaprpi) - 3) + deltaI*(2*thetaALP*thetapi + np.sqrt(2)*thetaALP*thetaprpi + np.sqrt(2)*thetapi*thetaprALP + thetaprALP*thetaprpi) - 3*thpiALP)*(m12**2*(ma**2 - mf2**2 + mpi0**2)*(meta**2 - mf2**2 + mpi0**2) - m12*(-6*m23*mf2**4 + ma**4*(meta**2 - mf2**2 + mpi0**2) + ma**2*(meta**4 - 2*meta**2*(mf2**2 + 2*mpi0**2) + mf2**4 + 6*mf2**2*mpi0**2 - mpi0**4) + meta**4*(-mf2**2 + mpi0**2) + meta**2*(mf2**4 + 6*mf2**2*mpi0**2 - mpi0**4) + 2*(-mf2**2*mpi0 + mpi0**3)**2) + 6*m23**2*mf2**4 - 6*m23*meta**2*mf2**4 - 6*m23*meta**2*mf2**2*mpi0**2 - 12*m23*mf2**4*mpi0**2 + 6*m23*mf2**2*mpi0**4 + ma**4*(meta**4 - meta**2*(mf2**2 + 2*mpi0**2) + 5*mf2**2*mpi0**2 + mpi0**4) + ma**2*(-6*m23*mf2**2*(-meta**2 + mf2**2 + mpi0**2) - meta**4*(mf2**2 + 2*mpi0**2) + meta**2*(mf2**4 - 8*mf2**2*mpi0**2 + 4*mpi0**4) + 7*mf2**4*mpi0**2 + mf2**2*mpi0**4 - 2*mpi0**6) + 5*meta**4*mf2**2*mpi0**2 + meta**4*mpi0**4 + 7*meta**2*mf2**4*mpi0**2 + meta**2*mf2**2*mpi0**4 - 2*meta**2*mpi0**6 + mf2**4*mpi0**4 - 2*mf2**2*mpi0**6 + mpi0**8)*UnitStep(m12 - (Gammaf2 - mf2)**2)/(432*mf2**4*(-m12 + mf2*(-I*Gammaf2 + mf2))) - gTf2**2*(m23**2*(mf2**2 - 2*mpi0**2)*(ma**2 + meta**2 - mf2**2) + m23*(-ma**4*(mf2**2 - 2*mpi0**2) + ma**2*(2*meta**2*(mf2**2 - 2*mpi0**2) + mf2**4 + 2*mf2**2*mpi0**2) - meta**4*(mf2**2 - 2*mpi0**2) + meta**2*(mf2**4 + 2*mf2**2*mpi0**2) + 2*mf2**4*(-3*m12 + mpi0**2)) - 2*mf2**2*(3*m12**2*mf2**2 - 3*m12*mf2**2*(ma**2 + meta**2 + 2*mpi0**2) + 2*ma**4*mpi0**2 + ma**2*(meta**2*(3*mf2**2 - 4*mpi0**2) + mf2**2*mpi0**2) + mpi0**2*(2*meta**4 + meta**2*mf2**2 + 3*mf2**2*mpi0**2)))*(cg*kappad*(-3*deltaI*thetapi + np.sqrt(6)) + cg*kappau*(3*deltaI*thetapi + np.sqrt(6)) + 3*deltaI*thetapi*thpiALP + 2*thetaALP + np.sqrt(2)*thetaprALP)*UnitStep(m23 - (Gammaf2 - mf2)**2)/(144*mf2**4*(-m23 + mf2*(-I*Gammaf2 + mf2)))
+
+    amp_tot += np.sqrt(3)*(2*deltaI*(m23 - 2*mpi0**2)*(cg*(2*CoefA*(6*deltaI*kappad*thetapi + 6*deltaI*kappau*thetapi - 6*deltaI*thetapi - np.sqrt(6)*kappad + np.sqrt(6)*kappau) + CoefC*(6*deltaI*thetapi - np.sqrt(6)*kappad + np.sqrt(6)*kappau)) + np.sqrt(3)*(2*CoefA*deltaI*thetapi*(np.sqrt(2)*thetaALP - 2*thetaprALP) + 2*np.sqrt(2)*CoefA*thpiALP + CoefC*deltaI*thetapi*(np.sqrt(2)*thetaALP + 4*thetaprALP) + np.sqrt(2)*CoefC*thpiALP))*(m23 - ma**2 - meta**2)*(2*np.sqrt(2)*CoefA*thetapi - 4*CoefA*thetaprpi + np.sqrt(2)*CoefC*thetapi + 4*CoefC*thetaprpi)/(m23 + I*ma0*(Gammaa0 + I*ma0)) + np.sqrt(2)*(2*CoefA + CoefC)*(cg*(2*CoefA*(kappad*(np.sqrt(6)*deltaI*thetapi - 2*np.sqrt(3)*deltaI*thetaprpi + 6) + kappau*(-np.sqrt(6)*deltaI*thetapi + 2*np.sqrt(3)*deltaI*thetaprpi + 6) - 6) + CoefC*(np.sqrt(3)*deltaI*(kappad - kappau)*(np.sqrt(2)*thetapi + 4*thetaprpi) + 6)) + np.sqrt(3)*(2*CoefA*(deltaI*thpiALP*(-np.sqrt(2)*thetapi + 2*thetaprpi) + np.sqrt(2)*thetaALP - 2*thetaprALP) + CoefC*(-deltaI*thpiALP*(np.sqrt(2)*thetapi + 4*thetaprpi) + np.sqrt(2)*thetaALP + 4*thetaprALP)))*(m12 + m23 - ma**2 - mpi0**2)*(m12 + m23 - meta**2 - mpi0**2)/(-I*Gammaa0*ma0 + m12 + m23 - ma**2 + ma0**2 - meta**2 - 2*mpi0**2) - np.sqrt(2)*(2*CoefA + CoefC)*(cg*(2*CoefA*(kappad*(np.sqrt(6)*deltaI*thetapi - 2*np.sqrt(3)*deltaI*thetaprpi + 6) + kappau*(-np.sqrt(6)*deltaI*thetapi + 2*np.sqrt(3)*deltaI*thetaprpi + 6) - 6) + CoefC*(np.sqrt(3)*deltaI*(kappad - kappau)*(np.sqrt(2)*thetapi + 4*thetaprpi) + 6)) + np.sqrt(3)*(2*CoefA*(deltaI*thpiALP*(-np.sqrt(2)*thetapi + 2*thetaprpi) + np.sqrt(2)*thetaALP - 2*thetaprALP) + CoefC*(-deltaI*thpiALP*(np.sqrt(2)*thetapi + 4*thetaprpi) + np.sqrt(2)*thetaALP + 4*thetaprALP)))*(m12 - ma**2 - mpi0**2)*(m12 - meta**2 - mpi0**2)/(m12 + I*ma0*(Gammaa0 + I*ma0)))/144
+
+    amp_tot += deltaI*((-8*CoefA*thetapi + 2*np.sqrt(2)*CoefA*thetaprpi + 4*CoefC*thetapi + 5*np.sqrt(2)*CoefC*thetaprpi + 4*CoefD*thetapi + 8*np.sqrt(2)*CoefD*thetaprpi)*np.cos(theta_S) + 2*(5*np.sqrt(2)*CoefA*thetapi + 2*CoefA*thetaprpi - np.sqrt(2)*CoefC*thetapi - CoefC*thetaprpi + np.sqrt(2)*CoefD*thetapi + 4*CoefD*thetaprpi)*np.sin(theta_S))*((-8*CoefA*deltaI*thetaALP*thetapi + 2*np.sqrt(2)*CoefA*deltaI*thetaALP*thetaprpi + 2*np.sqrt(2)*CoefA*deltaI*thetapi*thetaprALP + 8*CoefA*deltaI*thetaprALP*thetaprpi + 4*CoefB*cg*(-np.sqrt(6)*deltaI*thetapi + 2*np.sqrt(3)*deltaI*thetaprpi + kappad*(2*np.sqrt(6)*deltaI*thetapi - np.sqrt(3)*deltaI*thetaprpi + 3) + kappau*(2*np.sqrt(6)*deltaI*thetapi - np.sqrt(3)*deltaI*thetaprpi - 3)) + 12*CoefB*deltaI*thetaALP*thetapi + 12*CoefB*deltaI*thetaprALP*thetaprpi - 12*CoefB*thpiALP + 4*CoefC*deltaI*thetaALP*thetapi + 5*np.sqrt(2)*CoefC*deltaI*thetaALP*thetaprpi + 5*np.sqrt(2)*CoefC*deltaI*thetapi*thetaprALP + 8*CoefC*deltaI*thetaprALP*thetaprpi + 4*CoefD*deltaI*thetaALP*thetapi + 8*np.sqrt(2)*CoefD*deltaI*thetaALP*thetaprpi + 8*np.sqrt(2)*CoefD*deltaI*thetapi*thetaprALP + 32*CoefD*deltaI*thetaprALP*thetaprpi + np.sqrt(3)*cg*deltaI*(-2*np.sqrt(2)*CoefA*thetapi*(3*kappad + 3*kappau - 2) + 4*CoefA*thetaprpi + np.sqrt(2)*CoefC*thetapi*(kappad + kappau + 2) + 2*CoefC*thetaprpi*(2*kappad + 2*kappau + 1) + 4*CoefD*(np.sqrt(2)*thetapi + 4*thetaprpi)))*np.cos(theta_S) + 2*(2*np.sqrt(2)*CoefA*deltaI*thetaALP*thetapi + 2*CoefA*deltaI*thetaALP*thetaprpi + 2*CoefA*deltaI*thetapi*thetaprALP + np.sqrt(2)*CoefA*deltaI*thetaprALP*thetaprpi + 3*np.sqrt(2)*CoefA*thpiALP + 3*np.sqrt(2)*CoefB*deltaI*thetaALP*thetapi + 3*np.sqrt(2)*CoefB*deltaI*thetaprALP*thetaprpi - 3*np.sqrt(2)*CoefB*thpiALP - np.sqrt(2)*CoefC*deltaI*thetaALP*thetapi - CoefC*deltaI*thetaALP*thetaprpi - CoefC*deltaI*thetapi*thetaprALP + 4*np.sqrt(2)*CoefC*deltaI*thetaprALP*thetaprpi + np.sqrt(2)*CoefD*deltaI*thetaALP*thetapi + 4*CoefD*deltaI*thetaALP*thetaprpi + 4*CoefD*deltaI*thetapi*thetaprALP + 8*np.sqrt(2)*CoefD*deltaI*thetaprALP*thetaprpi + cg*(CoefA*(kappad*(2*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi - 3*np.sqrt(2)) + kappau*(2*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi + 3*np.sqrt(2))) - CoefB*(-4*np.sqrt(3)*deltaI*kappau*thetapi + np.sqrt(6)*deltaI*kappau*thetaprpi + 2*np.sqrt(3)*deltaI*thetapi - 2*np.sqrt(6)*deltaI*thetaprpi + kappad*(-4*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi - 3*np.sqrt(2)) + 3*np.sqrt(2)*kappau) + np.sqrt(3)*deltaI*(-CoefC*(kappad*thetapi + 2*np.sqrt(2)*kappad*thetaprpi + kappau*thetapi + 2*np.sqrt(2)*kappau*thetaprpi - 3*np.sqrt(2)*thetaprpi) + 2*CoefD*(thetapi + 2*np.sqrt(2)*thetaprpi))))*np.sin(theta_S))*(m12 + m23 - ma**2 - mpi0**2)*(m12 + m23 - meta**2 - mpi0**2)/(-144*I*Gammaf0*mf0 + 144*m12 + 144*m23 - 144*ma**2 - 144*meta**2 + 144*mf0**2 - 288*mpi0**2) - deltaI*((-8*CoefA*thetapi + 2*np.sqrt(2)*CoefA*thetaprpi + 4*CoefC*thetapi + 5*np.sqrt(2)*CoefC*thetaprpi + 4*CoefD*thetapi + 8*np.sqrt(2)*CoefD*thetaprpi)*np.cos(theta_S) + 2*(5*np.sqrt(2)*CoefA*thetapi + 2*CoefA*thetaprpi - np.sqrt(2)*CoefC*thetapi - CoefC*thetaprpi + np.sqrt(2)*CoefD*thetapi + 4*CoefD*thetaprpi)*np.sin(theta_S))*((-8*CoefA*deltaI*thetaALP*thetapi + 2*np.sqrt(2)*CoefA*deltaI*thetaALP*thetaprpi + 2*np.sqrt(2)*CoefA*deltaI*thetapi*thetaprALP + 8*CoefA*deltaI*thetaprALP*thetaprpi + 4*CoefB*cg*(-np.sqrt(6)*deltaI*thetapi + 2*np.sqrt(3)*deltaI*thetaprpi + kappad*(2*np.sqrt(6)*deltaI*thetapi - np.sqrt(3)*deltaI*thetaprpi + 3) + kappau*(2*np.sqrt(6)*deltaI*thetapi - np.sqrt(3)*deltaI*thetaprpi - 3)) + 12*CoefB*deltaI*thetaALP*thetapi + 12*CoefB*deltaI*thetaprALP*thetaprpi - 12*CoefB*thpiALP + 4*CoefC*deltaI*thetaALP*thetapi + 5*np.sqrt(2)*CoefC*deltaI*thetaALP*thetaprpi + 5*np.sqrt(2)*CoefC*deltaI*thetapi*thetaprALP + 8*CoefC*deltaI*thetaprALP*thetaprpi + 4*CoefD*deltaI*thetaALP*thetapi + 8*np.sqrt(2)*CoefD*deltaI*thetaALP*thetaprpi + 8*np.sqrt(2)*CoefD*deltaI*thetapi*thetaprALP + 32*CoefD*deltaI*thetaprALP*thetaprpi + np.sqrt(3)*cg*deltaI*(-2*np.sqrt(2)*CoefA*thetapi*(3*kappad + 3*kappau - 2) + 4*CoefA*thetaprpi + np.sqrt(2)*CoefC*thetapi*(kappad + kappau + 2) + 2*CoefC*thetaprpi*(2*kappad + 2*kappau + 1) + 4*CoefD*(np.sqrt(2)*thetapi + 4*thetaprpi)))*np.cos(theta_S) + 2*(2*np.sqrt(2)*CoefA*deltaI*thetaALP*thetapi + 2*CoefA*deltaI*thetaALP*thetaprpi + 2*CoefA*deltaI*thetapi*thetaprALP + np.sqrt(2)*CoefA*deltaI*thetaprALP*thetaprpi + 3*np.sqrt(2)*CoefA*thpiALP + 3*np.sqrt(2)*CoefB*deltaI*thetaALP*thetapi + 3*np.sqrt(2)*CoefB*deltaI*thetaprALP*thetaprpi - 3*np.sqrt(2)*CoefB*thpiALP - np.sqrt(2)*CoefC*deltaI*thetaALP*thetapi - CoefC*deltaI*thetaALP*thetaprpi - CoefC*deltaI*thetapi*thetaprALP + 4*np.sqrt(2)*CoefC*deltaI*thetaprALP*thetaprpi + np.sqrt(2)*CoefD*deltaI*thetaALP*thetapi + 4*CoefD*deltaI*thetaALP*thetaprpi + 4*CoefD*deltaI*thetapi*thetaprALP + 8*np.sqrt(2)*CoefD*deltaI*thetaprALP*thetaprpi + cg*(CoefA*(kappad*(2*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi - 3*np.sqrt(2)) + kappau*(2*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi + 3*np.sqrt(2))) - CoefB*(-4*np.sqrt(3)*deltaI*kappau*thetapi + np.sqrt(6)*deltaI*kappau*thetaprpi + 2*np.sqrt(3)*deltaI*thetapi - 2*np.sqrt(6)*deltaI*thetaprpi + kappad*(-4*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi - 3*np.sqrt(2)) + 3*np.sqrt(2)*kappau) + np.sqrt(3)*deltaI*(-CoefC*(kappad*thetapi + 2*np.sqrt(2)*kappad*thetaprpi + kappau*thetapi + 2*np.sqrt(2)*kappau*thetaprpi - 3*np.sqrt(2)*thetaprpi) + 2*CoefD*(thetapi + 2*np.sqrt(2)*thetaprpi))))*np.sin(theta_S))*(m12 - ma**2 - mpi0**2)*(m12 - meta**2 - mpi0**2)/(144*(m12 + I*mf0*(Gammaf0 + I*mf0))) - (m23 - 2*mpi0**2)*(2*CoefB*np.cos(theta_S) + np.sqrt(2)*(-CoefA + CoefB)*np.sin(theta_S))*(2*(CoefA*(-3*np.sqrt(2)*deltaI*thetapi*thpiALP + 2*np.sqrt(2)*thetaALP + 2*thetaprALP) + 3*np.sqrt(2)*CoefB*deltaI*thetapi*thpiALP + 3*np.sqrt(2)*CoefB*thetaALP - np.sqrt(2)*CoefC*thetaALP - CoefC*thetaprALP + np.sqrt(2)*CoefD*thetaALP + 4*CoefD*thetaprALP + cg*(3*np.sqrt(2)*CoefA*deltaI*kappad*thetapi - 3*np.sqrt(2)*CoefA*deltaI*kappau*thetapi + 2*np.sqrt(3)*CoefA*kappad + 2*np.sqrt(3)*CoefA*kappau + CoefB*(-3*np.sqrt(2)*deltaI*kappad*thetapi + 3*np.sqrt(2)*deltaI*kappau*thetapi + 4*np.sqrt(3)*kappad + 4*np.sqrt(3)*kappau - 2*np.sqrt(3)) - np.sqrt(3)*CoefC*kappad - np.sqrt(3)*CoefC*kappau + 2*np.sqrt(3)*CoefD))*np.sin(theta_S) + (-8*CoefA*thetaALP + 2*np.sqrt(2)*CoefA*thetaprALP + 12*CoefB*deltaI*thetapi*thpiALP + 12*CoefB*thetaALP + 4*CoefC*thetaALP + 5*np.sqrt(2)*CoefC*thetaprALP + 4*CoefD*thetaALP + 8*np.sqrt(2)*CoefD*thetaprALP + cg*(-2*np.sqrt(6)*CoefA*(3*kappad + 3*kappau - 2) + 4*CoefB*(-3*deltaI*kappad*thetapi + 3*deltaI*kappau*thetapi + 2*np.sqrt(6)*kappad + 2*np.sqrt(6)*kappau - np.sqrt(6)) + np.sqrt(6)*(CoefC*(kappad + kappau + 2) + 4*CoefD)))*np.cos(theta_S))*(m23 - ma**2 - meta**2)/(24*(m23 + I*mf0*(Gammaf0 + I*mf0)))
+
+    amp_tot += deltaI*((8*CoefA*thetapi - 2*np.sqrt(2)*CoefA*thetaprpi - 4*CoefC*thetapi - 5*np.sqrt(2)*CoefC*thetaprpi - 4*CoefD*thetapi - 8*np.sqrt(2)*CoefD*thetaprpi)*np.sin(theta_S) + 2*(5*np.sqrt(2)*CoefA*thetapi + 2*CoefA*thetaprpi - np.sqrt(2)*CoefC*thetapi - CoefC*thetaprpi + np.sqrt(2)*CoefD*thetapi + 4*CoefD*thetaprpi)*np.cos(theta_S))*(-(-8*CoefA*deltaI*thetaALP*thetapi + 2*np.sqrt(2)*CoefA*deltaI*thetaALP*thetaprpi + 2*np.sqrt(2)*CoefA*deltaI*thetapi*thetaprALP + 8*CoefA*deltaI*thetaprALP*thetaprpi + 4*CoefB*cg*(-np.sqrt(6)*deltaI*thetapi + 2*np.sqrt(3)*deltaI*thetaprpi + kappad*(2*np.sqrt(6)*deltaI*thetapi - np.sqrt(3)*deltaI*thetaprpi + 3) + kappau*(2*np.sqrt(6)*deltaI*thetapi - np.sqrt(3)*deltaI*thetaprpi - 3)) + 12*CoefB*deltaI*thetaALP*thetapi + 12*CoefB*deltaI*thetaprALP*thetaprpi - 12*CoefB*thpiALP + 4*CoefC*deltaI*thetaALP*thetapi + 5*np.sqrt(2)*CoefC*deltaI*thetaALP*thetaprpi + 5*np.sqrt(2)*CoefC*deltaI*thetapi*thetaprALP + 8*CoefC*deltaI*thetaprALP*thetaprpi + 4*CoefD*deltaI*thetaALP*thetapi + 8*np.sqrt(2)*CoefD*deltaI*thetaALP*thetaprpi + 8*np.sqrt(2)*CoefD*deltaI*thetapi*thetaprALP + 32*CoefD*deltaI*thetaprALP*thetaprpi + np.sqrt(3)*cg*deltaI*(-2*np.sqrt(2)*CoefA*thetapi*(3*kappad + 3*kappau - 2) + 4*CoefA*thetaprpi + np.sqrt(2)*CoefC*thetapi*(kappad + kappau + 2) + 2*CoefC*thetaprpi*(2*kappad + 2*kappau + 1) + 4*CoefD*(np.sqrt(2)*thetapi + 4*thetaprpi)))*np.sin(theta_S) + 2*(2*np.sqrt(2)*CoefA*deltaI*thetaALP*thetapi + 2*CoefA*deltaI*thetaALP*thetaprpi + 2*CoefA*deltaI*thetapi*thetaprALP + np.sqrt(2)*CoefA*deltaI*thetaprALP*thetaprpi + 3*np.sqrt(2)*CoefA*thpiALP + 3*np.sqrt(2)*CoefB*deltaI*thetaALP*thetapi + 3*np.sqrt(2)*CoefB*deltaI*thetaprALP*thetaprpi - 3*np.sqrt(2)*CoefB*thpiALP - np.sqrt(2)*CoefC*deltaI*thetaALP*thetapi - CoefC*deltaI*thetaALP*thetaprpi - CoefC*deltaI*thetapi*thetaprALP + 4*np.sqrt(2)*CoefC*deltaI*thetaprALP*thetaprpi + np.sqrt(2)*CoefD*deltaI*thetaALP*thetapi + 4*CoefD*deltaI*thetaALP*thetaprpi + 4*CoefD*deltaI*thetapi*thetaprALP + 8*np.sqrt(2)*CoefD*deltaI*thetaprALP*thetaprpi + cg*(CoefA*(kappad*(2*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi - 3*np.sqrt(2)) + kappau*(2*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi + 3*np.sqrt(2))) - CoefB*(-4*np.sqrt(3)*deltaI*kappau*thetapi + np.sqrt(6)*deltaI*kappau*thetaprpi + 2*np.sqrt(3)*deltaI*thetapi - 2*np.sqrt(6)*deltaI*thetaprpi + kappad*(-4*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi - 3*np.sqrt(2)) + 3*np.sqrt(2)*kappau) + np.sqrt(3)*deltaI*(-CoefC*(kappad*thetapi + 2*np.sqrt(2)*kappad*thetaprpi + kappau*thetapi + 2*np.sqrt(2)*kappau*thetaprpi - 3*np.sqrt(2)*thetaprpi) + 2*CoefD*(thetapi + 2*np.sqrt(2)*thetaprpi))))*np.cos(theta_S))*(m12 + m23 - ma**2 - mpi0**2)*(m12 + m23 - meta**2 - mpi0**2)*UnitStep(m12 + m23 + 4*mK**2 - ma**2 - meta**2 - 2*mpi0**2)/(-144*I*Gammasigma*msigma + 144*m12 + 144*m23 - 144*ma**2 - 144*meta**2 - 288*mpi0**2 + 144*msigma**2) - deltaI*((8*CoefA*thetapi - 2*np.sqrt(2)*CoefA*thetaprpi - 4*CoefC*thetapi - 5*np.sqrt(2)*CoefC*thetaprpi - 4*CoefD*thetapi - 8*np.sqrt(2)*CoefD*thetaprpi)*np.sin(theta_S) + 2*(5*np.sqrt(2)*CoefA*thetapi + 2*CoefA*thetaprpi - np.sqrt(2)*CoefC*thetapi - CoefC*thetaprpi + np.sqrt(2)*CoefD*thetapi + 4*CoefD*thetaprpi)*np.cos(theta_S))*(-(-8*CoefA*deltaI*thetaALP*thetapi + 2*np.sqrt(2)*CoefA*deltaI*thetaALP*thetaprpi + 2*np.sqrt(2)*CoefA*deltaI*thetapi*thetaprALP + 8*CoefA*deltaI*thetaprALP*thetaprpi + 4*CoefB*cg*(-np.sqrt(6)*deltaI*thetapi + 2*np.sqrt(3)*deltaI*thetaprpi + kappad*(2*np.sqrt(6)*deltaI*thetapi - np.sqrt(3)*deltaI*thetaprpi + 3) + kappau*(2*np.sqrt(6)*deltaI*thetapi - np.sqrt(3)*deltaI*thetaprpi - 3)) + 12*CoefB*deltaI*thetaALP*thetapi + 12*CoefB*deltaI*thetaprALP*thetaprpi - 12*CoefB*thpiALP + 4*CoefC*deltaI*thetaALP*thetapi + 5*np.sqrt(2)*CoefC*deltaI*thetaALP*thetaprpi + 5*np.sqrt(2)*CoefC*deltaI*thetapi*thetaprALP + 8*CoefC*deltaI*thetaprALP*thetaprpi + 4*CoefD*deltaI*thetaALP*thetapi + 8*np.sqrt(2)*CoefD*deltaI*thetaALP*thetaprpi + 8*np.sqrt(2)*CoefD*deltaI*thetapi*thetaprALP + 32*CoefD*deltaI*thetaprALP*thetaprpi + np.sqrt(3)*cg*deltaI*(-2*np.sqrt(2)*CoefA*thetapi*(3*kappad + 3*kappau - 2) + 4*CoefA*thetaprpi + np.sqrt(2)*CoefC*thetapi*(kappad + kappau + 2) + 2*CoefC*thetaprpi*(2*kappad + 2*kappau + 1) + 4*CoefD*(np.sqrt(2)*thetapi + 4*thetaprpi)))*np.sin(theta_S) + 2*(2*np.sqrt(2)*CoefA*deltaI*thetaALP*thetapi + 2*CoefA*deltaI*thetaALP*thetaprpi + 2*CoefA*deltaI*thetapi*thetaprALP + np.sqrt(2)*CoefA*deltaI*thetaprALP*thetaprpi + 3*np.sqrt(2)*CoefA*thpiALP + 3*np.sqrt(2)*CoefB*deltaI*thetaALP*thetapi + 3*np.sqrt(2)*CoefB*deltaI*thetaprALP*thetaprpi - 3*np.sqrt(2)*CoefB*thpiALP - np.sqrt(2)*CoefC*deltaI*thetaALP*thetapi - CoefC*deltaI*thetaALP*thetaprpi - CoefC*deltaI*thetapi*thetaprALP + 4*np.sqrt(2)*CoefC*deltaI*thetaprALP*thetaprpi + np.sqrt(2)*CoefD*deltaI*thetaALP*thetapi + 4*CoefD*deltaI*thetaALP*thetaprpi + 4*CoefD*deltaI*thetapi*thetaprALP + 8*np.sqrt(2)*CoefD*deltaI*thetaprALP*thetaprpi + cg*(CoefA*(kappad*(2*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi - 3*np.sqrt(2)) + kappau*(2*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi + 3*np.sqrt(2))) - CoefB*(-4*np.sqrt(3)*deltaI*kappau*thetapi + np.sqrt(6)*deltaI*kappau*thetaprpi + 2*np.sqrt(3)*deltaI*thetapi - 2*np.sqrt(6)*deltaI*thetaprpi + kappad*(-4*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi - 3*np.sqrt(2)) + 3*np.sqrt(2)*kappau) + np.sqrt(3)*deltaI*(-CoefC*(kappad*thetapi + 2*np.sqrt(2)*kappad*thetaprpi + kappau*thetapi + 2*np.sqrt(2)*kappau*thetaprpi - 3*np.sqrt(2)*thetaprpi) + 2*CoefD*(thetapi + 2*np.sqrt(2)*thetaprpi))))*np.cos(theta_S))*(m12 - ma**2 - mpi0**2)*(m12 - meta**2 - mpi0**2)*UnitStep(-m12 + 4*mK**2)/(144*(m12 + I*msigma*(Gammasigma + I*msigma))) + (m23 - 2*mpi0**2)*(2*CoefB*np.sin(theta_S) + np.sqrt(2)*(CoefA - CoefB)*np.cos(theta_S))*(2*(CoefA*(-3*np.sqrt(2)*deltaI*thetapi*thpiALP + 2*np.sqrt(2)*thetaALP + 2*thetaprALP) + 3*np.sqrt(2)*CoefB*deltaI*thetapi*thpiALP + 3*np.sqrt(2)*CoefB*thetaALP - np.sqrt(2)*CoefC*thetaALP - CoefC*thetaprALP + np.sqrt(2)*CoefD*thetaALP + 4*CoefD*thetaprALP + cg*(3*np.sqrt(2)*CoefA*deltaI*kappad*thetapi - 3*np.sqrt(2)*CoefA*deltaI*kappau*thetapi + 2*np.sqrt(3)*CoefA*kappad + 2*np.sqrt(3)*CoefA*kappau + CoefB*(-3*np.sqrt(2)*deltaI*kappad*thetapi + 3*np.sqrt(2)*deltaI*kappau*thetapi + 4*np.sqrt(3)*kappad + 4*np.sqrt(3)*kappau - 2*np.sqrt(3)) - np.sqrt(3)*CoefC*kappad - np.sqrt(3)*CoefC*kappau + 2*np.sqrt(3)*CoefD))*np.cos(theta_S) + (8*CoefA*thetaALP - 2*np.sqrt(2)*CoefA*thetaprALP - 12*CoefB*deltaI*thetapi*thpiALP - 12*CoefB*thetaALP - 4*CoefC*thetaALP - 5*np.sqrt(2)*CoefC*thetaprALP - 4*CoefD*thetaALP - 8*np.sqrt(2)*CoefD*thetaprALP + cg*(2*np.sqrt(6)*CoefA*(3*kappad + 3*kappau - 2) - 4*CoefB*(-3*deltaI*kappad*thetapi + 3*deltaI*kappau*thetapi + 2*np.sqrt(6)*kappad + 2*np.sqrt(6)*kappau - np.sqrt(6)) - np.sqrt(6)*(CoefC*(kappad + kappau + 2) + 4*CoefD)))*np.sin(theta_S))*(m23 - ma**2 - meta**2)*UnitStep(-m23 + 4*mK**2)/(24*m23 + 24*I*msigma*(Gammasigma + I*msigma))
+
+    return amp_tot
+
 def ampatoetapipi(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs):
     #INPUT
         #ma: Mass of decaying particle (in GeV)
@@ -295,54 +343,40 @@ def ampatoetapipi(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs):
     #xa0pieta = -6.87    xa0pietap = -8.02
 
     citations.register_inspire('Aloni:2018vki')
-    deltaI = 0
-    #Kinematic relations
-    mpi1pi2 = np.sqrt(ma**2+m3**2-2*ma*x[:,0])
-    pappi1 = kinematics[0]
-    pappi2 = kinematics[1]
-    papeta = kinematics[2]
-    ppi1ppi2 = kinematics[3]
-    petappi1 = kinematics[4]
-    petappi2 = kinematics[5]
-    petaqpipi = petappi1 - petappi2
-    petappipi = petappi1 + petappi2
-    ppipi2 = mpi1pi2**2
-    qpipi2 = m1**2+m2**2-2*ppi1ppi2
-    metapi1 = np.sqrt(m1**2+m3**2+2*kinematics[4])
-    metapi2 = np.sqrt(m2**2+m3**2+2*kinematics[5])
-
+    m12 = ma**2 + m3**2 -2*ma*x[:,0]
+    m23 = ma**2 + m1**2 -2*kinematics[0]
+    kappau = kappa[0,0]
+    kappad = kappa[1,1]
+    deltaI = (md-mu)/(md+mu)
+    F0 = fpi/np.sqrt(2)
+    cg = model['cg']*F0/fa
     aU3 = a_U3_repr(ma, model, fa, **kwargs)
+    thpiALP = np.trace(np.dot(aU3, pi0))*2
+    thetaa = np.trace(np.dot(aU3, eta))*2
+    thetap = np.trace(np.dot(aU3, etap))*2
+    c_eta = np.cos(theta_eta_etap)
+    s_eta = np.sin(theta_eta_etap)
+    sm_angles = sm_mixingangles()
+    thetaALP = (c_eta-np.sqrt(2)*s_eta)/np.sqrt(2)*thetaa
+    thetaprALP = (s_eta+np.sqrt(2)*c_eta)*thetap
+    thetapi = (c_eta-np.sqrt(2)*s_eta)/np.sqrt(2)* sm_angles[('eta', 'pi0')]
+    thetaprpi = (s_eta+np.sqrt(2)*c_eta)*sm_angles[('etap', 'pi0')]
+    I = 1j
+    cq = cqhat(model, ma, **kwargs)*F0/fa
+    cuhat = cq[0,0]
+    cdhat = cq[1,1]
 
-    ####DECAY a->eta pi pi
-    aetasigma = alp_mixing([aU3, eta, sigma], fa)
-    aetaf0 = alp_mixing([aU3, eta, f0], fa)
-    api0a0 = alp_mixing([aU3, eta, a0], fa)
-    aetaf2 = alp_mixing([aU3, eta, f2], fa)
+    amp_tot = (6*cg*mpi0**2*(kappad*(deltaI*(-thetapi + np.sqrt(6)) + np.sqrt(6)) + kappau*(deltaI*(thetapi - np.sqrt(6)) + np.sqrt(6))) - 3*deltaI*thetapi*(cdhat*(3*m23 - ma**2 - 3*meta**2) + cuhat*(-3*m23 + ma**2 + 3*meta**2) + 2*thpiALP*(-3*m23 + ma**2 + meta**2 + 2*mpi_pm**2)) + 2*mpi0**2*(-deltaI*thpiALP*(-3*thetapi + np.sqrt(6)) + 6*thetaALP + 3*np.sqrt(2)*thetaprALP))/(18*F0**2)
 
-    ####DECAY a->etaprime pi pi
-    aetapsigma = alp_mixing([aU3, etap, sigma], fa)
-    aetapf0 = alp_mixing([aU3, etap, f0], fa)
-    aetapf2 = alp_mixing([aU3, etap, f2], fa)
+    amp_tot += -gTf2**2*(m23**2*(mf2**2 - 2*mpi_pm**2)*(ma**2 + meta**2 - mf2**2) + m23*(-ma**4*(mf2**2 - 2*mpi_pm**2) + ma**2*(2*meta**2*(mf2**2 - 2*mpi_pm**2) + mf2**4 + 2*mf2**2*mpi_pm**2) - meta**4*(mf2**2 - 2*mpi_pm**2) + meta**2*(mf2**4 + 2*mf2**2*mpi_pm**2) + 2*mf2**4*(-3*m12 + mpi_pm**2)) - 2*mf2**2*(3*m12**2*mf2**2 - 3*m12*mf2**2*(ma**2 + meta**2 + 2*mpi_pm**2) + 2*ma**4*mpi_pm**2 + ma**2*(meta**2*(3*mf2**2 - 4*mpi_pm**2) + mf2**2*mpi_pm**2) + mpi_pm**2*(2*meta**4 + meta**2*mf2**2 + 3*mf2**2*mpi_pm**2)))*(cg*kappad*(-3*deltaI*thetapi + np.sqrt(6)) + cg*kappau*(3*deltaI*thetapi + np.sqrt(6)) + 3*deltaI*thetapi*thpiALP + 2*thetaALP + np.sqrt(2)*thetaprALP)*UnitStep(m23 - (Gammaf2 - mf2)**2)/(144*mf2**4*(-m23 + mf2*(-I*Gammaf2 + mf2)))
 
+    amp_tot += np.sqrt(6)*(2*CoefA + CoefC)*(6*cg*(2*CoefA*(kappad + kappau - 1) + CoefC) + np.sqrt(3)*(2*np.sqrt(2)*CoefA*thetaALP - 4*CoefA*thetaprALP + np.sqrt(2)*CoefC*thetaALP + 4*CoefC*thetaprALP))*((m12 + m23 - ma**2 - mpi_pm**2)*(m12 + m23 - meta**2 - mpi_pm**2)/(-I*Gammaa0_pm*ma0_pm + m12 + m23 - ma**2 + ma0_pm**2 - meta**2 - 2*mpi_pm**2) - (m12 - ma**2 - mpi_pm**2)*(m12 - meta**2 - mpi_pm**2)/(m12 + I*ma0_pm*(Gammaa0_pm + I*ma0_pm)))/144
 
-    #Mix amplitude (Eq.S48)
-    #amix = 0 #Approximation --> (np.sqrt(2)*aeta0+aeta8)*mpi**2/(3*fpi**2)*ffunction(ma) 
-    amix = (np.sqrt(2)*alp_mixing([aU3, eta0], fa) + alp_mixing([aU3, eta8], fa))*m2**2/3/fpi**2*ffunction(ma)
+    amp_tot += -(m23 - 2*mpi_pm**2)*(2*CoefB*np.cos(theta_S) + np.sqrt(2)*(-CoefA + CoefB)*np.sin(theta_S))*(2*(CoefA*(-3*np.sqrt(2)*deltaI*thetapi*thpiALP + 2*np.sqrt(2)*thetaALP + 2*thetaprALP) + 3*np.sqrt(2)*CoefB*deltaI*thetapi*thpiALP + 3*np.sqrt(2)*CoefB*thetaALP - np.sqrt(2)*CoefC*thetaALP - CoefC*thetaprALP + np.sqrt(2)*CoefD*thetaALP + 4*CoefD*thetaprALP + cg*(3*np.sqrt(2)*CoefA*deltaI*kappad*thetapi - 3*np.sqrt(2)*CoefA*deltaI*kappau*thetapi + 2*np.sqrt(3)*CoefA*kappad + 2*np.sqrt(3)*CoefA*kappau + CoefB*(-3*np.sqrt(2)*deltaI*kappad*thetapi + 3*np.sqrt(2)*deltaI*kappau*thetapi + 4*np.sqrt(3)*kappad + 4*np.sqrt(3)*kappau - 2*np.sqrt(3)) - np.sqrt(3)*CoefC*kappad - np.sqrt(3)*CoefC*kappau + 2*np.sqrt(3)*CoefD))*np.sin(theta_S) + (-8*CoefA*thetaALP + 2*np.sqrt(2)*CoefA*thetaprALP + 12*CoefB*deltaI*thetapi*thpiALP + 12*CoefB*thetaALP + 4*CoefC*thetaALP + 5*np.sqrt(2)*CoefC*thetaprALP + 4*CoefD*thetaALP + 8*np.sqrt(2)*CoefD*thetaprALP + cg*(-2*np.sqrt(6)*CoefA*(3*kappad + 3*kappau - 2) + 4*CoefB*(-3*deltaI*kappad*thetapi + 3*deltaI*kappau*thetapi + 2*np.sqrt(6)*kappad + 2*np.sqrt(6)*kappau - np.sqrt(6)) + np.sqrt(6)*(CoefC*(kappad + kappau + 2) + 4*CoefD)))*np.cos(theta_S))*(m23 - ma**2 - meta**2)/(24*(m23 + I*mf0*(Gammaf0 + I*mf0)))
 
-    #a-> Sigma (Eq.S49)
-    asigma = np.where(mpi1pi2 < 2*mK, -(10)**2* aetasigma* papeta* ppi1ppi2*bw(mpi1pi2**2, msigma, Gammasigma, 0)*ffunction(ma), 0)
+    amp_tot += (m23 - 2*mpi_pm**2)*(2*CoefB*np.sin(theta_S) + np.sqrt(2)*(CoefA - CoefB)*np.cos(theta_S))*(2*(CoefA*(-3*np.sqrt(2)*deltaI*thetapi*thpiALP + 2*np.sqrt(2)*thetaALP + 2*thetaprALP) + 3*np.sqrt(2)*CoefB*deltaI*thetapi*thpiALP + 3*np.sqrt(2)*CoefB*thetaALP - np.sqrt(2)*CoefC*thetaALP - CoefC*thetaprALP + np.sqrt(2)*CoefD*thetaALP + 4*CoefD*thetaprALP + cg*(3*np.sqrt(2)*CoefA*deltaI*kappad*thetapi - 3*np.sqrt(2)*CoefA*deltaI*kappau*thetapi + 2*np.sqrt(3)*CoefA*kappad + 2*np.sqrt(3)*CoefA*kappau + CoefB*(-3*np.sqrt(2)*deltaI*kappad*thetapi + 3*np.sqrt(2)*deltaI*kappau*thetapi + 4*np.sqrt(3)*kappad + 4*np.sqrt(3)*kappau - 2*np.sqrt(3)) - np.sqrt(3)*CoefC*kappad - np.sqrt(3)*CoefC*kappau + 2*np.sqrt(3)*CoefD))*np.cos(theta_S) + (8*CoefA*thetaALP - 2*np.sqrt(2)*CoefA*thetaprALP - 12*CoefB*deltaI*thetapi*thpiALP - 12*CoefB*thetaALP - 4*CoefC*thetaALP - 5*np.sqrt(2)*CoefC*thetaprALP - 4*CoefD*thetaALP - 8*np.sqrt(2)*CoefD*thetaprALP + cg*(2*np.sqrt(6)*CoefA*(3*kappad + 3*kappau - 2) - 4*CoefB*(-3*deltaI*kappad*thetapi + 3*deltaI*kappau*thetapi + 2*np.sqrt(6)*kappad + 2*np.sqrt(6)*kappau - np.sqrt(6)) - np.sqrt(6)*(CoefC*(kappad + kappau + 2) + 4*CoefD)))*np.sin(theta_S))*(m23 - ma**2 - meta**2)*UnitStep(-m23 + 4*mK**2)/(24*m23 + 24*I*msigma*(Gammasigma + I*msigma))
 
-    #a-> f0 (Eq.S50)
-    af0 = (7.3)**2* aetaf0* papeta* ppi1ppi2* bw(mpi1pi2**2, mf0, Gammaf0, 0)*ffunction(ma) 
-
-    #a-> a0 (Eq.S51)
-    aa0 = (13)**2* api0a0* ffunction(ma)* (pappi2* petappi1*bw(metapi1**2, ma0, Gammaa0, 0) + pappi1* petappi2* bw(metapi2, ma0, Gammaa0,0)) 
-
-    #a-> f2 (Eq.)
-    af2 = (16)**2* aetaf2* (petaqpipi**2 - 1/3*qpipi2*(m3**2+ petappipi**2/ppi1ppi2**2- 2*petappipi**2/ppi1ppi2**2))*\
-          bw(mpi1pi2**2, mf2, Gammaf2, 0)* ffunction(ma)
-    aux = (amix+asigma+af0+aa0+af2) 
-    return aux
+    return amp_tot
 
 def atoetapipi(ma, m1, m2, m3, model, fa, c, **kwargs): #Eq. S33
     #INPUT:
@@ -356,8 +390,11 @@ def atoetapipi(ma, m1, m2, m3, model, fa, c, **kwargs): #Eq. S33
     if ma < m1 + m2 + m3:
         return [0.0, 0,0]
     s = 2-c # Symmetry factor: 2 for pi0 pi0, 1 for pi+ pi-
-    result, error = threebody_decay.decay3body(ampatoetapipi, ma, m1, m2, m3, model, fa, **kwargs)
-    return 1/(2*ma*s)*pow(fpi/fa,2)*result, 1/(2*ma*s)*pow(fpi/fa,2)*error
+    if c == 0:
+        result, error = threebody_decay.decay3body(ampatoetapi0pi0, ma, m1, m2, m3, model, fa, **kwargs)
+    else:
+        result, error = threebody_decay.decay3body(ampatoetapipi, ma, m1, m2, m3, model, fa, **kwargs)
+    return ffunction(ma)**2/(2*ma*s)*result, ffunction(ma)**2/(2*ma*s)*error
 
 def decay_width_etapipi00(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
     return atoetapipi(ma, meta, mpi0, mpi0, couplings, fa, 0, **kwargs)[0]
@@ -367,6 +404,52 @@ def decay_width_etapipipm(ma: float, couplings: ALPcouplings, fa: float, **kwarg
 
 ###########################    DECAY TO  a-> etap pi pi    ###########################
 #It is assumed that Fpppp(m)=Fspp(m)=Ftpp(m)=F(m)
+
+def ampatoetappi0pi0(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs):
+    #INPUT
+        #ma: Mass of decaying particle (in GeV)
+        #mi: Mass of daughter particle [i=1,2,3] (in GeV) (1,2: pi, 3: eta')
+        #model: Coefficients
+        #x: Integration variables (m12, phi, costheta, phiast, costhetaast)
+        #kinematics: Kinematical relationships
+    #OUTPUT
+        #Amplitude a-> eta pi pi (without prefactor)
+
+    citations.register_inspire('Aloni:2018vki')
+    m12 = ma**2 + m3**2 -2*ma*x[:,0]
+    m23 = ma**2 + m1**2 -2*kinematics[0]
+    kappau = kappa[0,0]
+    kappad = kappa[1,1]
+    deltaI = (md-mu)/(md+mu)
+    F0 = fpi/np.sqrt(2)
+    cg = model['cg']*F0/fa
+    aU3 = a_U3_repr(ma, model, fa, **kwargs)
+    thpiALP = np.trace(np.dot(aU3, pi0))*2
+    thetaa = np.trace(np.dot(aU3, eta))*2
+    thetap = np.trace(np.dot(aU3, etap))*2
+    c_eta = np.cos(theta_eta_etap)
+    s_eta = np.sin(theta_eta_etap)
+    sm_angles = sm_mixingangles()
+    thetaALP = (c_eta-np.sqrt(2)*s_eta)/np.sqrt(2)*thetaa
+    thetaprALP = (s_eta+np.sqrt(2)*c_eta)*thetap
+    thetapi = (c_eta-np.sqrt(2)*s_eta)/np.sqrt(2)* sm_angles[('eta', 'pi0')]
+    thetaprpi = (s_eta+np.sqrt(2)*c_eta)*sm_angles[('etap', 'pi0')]
+    I = 1j
+    cq = cqhat(model, ma, **kwargs)*F0/fa
+    cuhat = cq[0,0]
+    cdhat = cq[1,1]
+
+    amp_tot = mpi0**2*(cg*kappad*(deltaI*(2*np.sqrt(2)*thetapi - thetaprpi + np.sqrt(3)) + np.sqrt(3)) + cg*kappau*(deltaI*(-2*np.sqrt(2)*thetapi + thetaprpi - np.sqrt(3)) + np.sqrt(3)) - 2*np.sqrt(2)*deltaI*thetapi*thpiALP + deltaI*thetaprpi*thpiALP - np.sqrt(3)*deltaI*thpiALP + np.sqrt(2)*thetaALP + thetaprALP)/(3*F0**2)
+
+    amp_tot += -deltaI*gTf2**2*(-np.sqrt(2)*thetapi + 2*thetaprpi)*(((m23 - 2*mpi0**2)*(-metap**2*(m12 + m23 - ma**2 + 3*mf2**2 - 5*mpi0**2) + (mf2**2 - mpi0**2)*(m12 + m23 - ma**2 + 3*mf2**2 - mpi0**2)) + (2*mpi0**2*(2*metap**2 - 3*mf2**2) + (metap**2 - mf2**2 + mpi0**2)*(-m12 - m23 + ma**2 + mpi0**2))*(m12 - metap**2 - mpi0**2))*(-m23 + ma**2 + metap**2) + ((m23 - 2*mpi0**2)*(-metap**2*(m12 + m23 - ma**2 + 6*mf2**2 - 5*mpi0**2) + (-mf2**2 + mpi0**2)*(-m12 - m23 + ma**2 + mpi0**2)) + (-metap**2*(m12 + m23 - ma**2 + 3*mf2**2 - 5*mpi0**2) + (mf2**2 - mpi0**2)*(m12 + m23 - ma**2 + 3*mf2**2 - mpi0**2))*(m12 - metap**2 - mpi0**2))*(-m12 + ma**2 + mpi0**2) - (4*metap**2*mpi0**2*(metap**2 - 2*mf2**2 + mpi0**2) + (metap**2 - mf2**2 + mpi0**2)*(m12 + m23 - ma**2 - mpi0**2)**2 + (-m12 - m23 + ma**2 + mpi0**2)*(metap**4 - 3*metap**2*(mf2**2 - 2*mpi0**2) + 2*mf2**4 - 3*mf2**2*mpi0**2 + mpi0**4))*(m12 + m23 - metap**2 - mpi0**2))*(3*cg*(kappad - kappau) + deltaI*thetaALP*(2*thetapi + np.sqrt(2)*thetaprpi) + deltaI*(np.sqrt(2)*thetapi + thetaprpi)*(np.sqrt(3)*cg*(kappad + kappau) + thetaprALP) - 3*thpiALP)*UnitStep(-m12 - m23 + ma**2 + metap**2 + 2*mpi0**2 - (Gammaf2 - mf2)**2)/(432*mf2**4*(I*Gammaf2*mf2 - m12 - m23 + ma**2 + metap**2 - mf2**2 + 2*mpi0**2)) + deltaI*gTf2**2*(np.sqrt(2)*thetapi - 2*thetaprpi)*(cg*kappad*(np.sqrt(3)*deltaI*(np.sqrt(2)*thetapi + thetaprpi) + 3) + cg*kappau*(np.sqrt(3)*deltaI*(np.sqrt(2)*thetapi + thetaprpi) - 3) + deltaI*(2*thetaALP*thetapi + np.sqrt(2)*thetaALP*thetaprpi + np.sqrt(2)*thetapi*thetaprALP + thetaprALP*thetaprpi) - 3*thpiALP)*(m12**2*(ma**2 - mf2**2 + mpi0**2)*(metap**2 - mf2**2 + mpi0**2) - m12*(-6*m23*mf2**4 + ma**4*(metap**2 - mf2**2 + mpi0**2) + ma**2*(metap**4 - 2*metap**2*(mf2**2 + 2*mpi0**2) + mf2**4 + 6*mf2**2*mpi0**2 - mpi0**4) + metap**4*(-mf2**2 + mpi0**2) + metap**2*(mf2**4 + 6*mf2**2*mpi0**2 - mpi0**4) + 2*(-mf2**2*mpi0 + mpi0**3)**2) + 6*m23**2*mf2**4 - 6*m23*metap**2*mf2**4 - 6*m23*metap**2*mf2**2*mpi0**2 - 12*m23*mf2**4*mpi0**2 + 6*m23*mf2**2*mpi0**4 + ma**4*(metap**4 - metap**2*(mf2**2 + 2*mpi0**2) + 5*mf2**2*mpi0**2 + mpi0**4) + ma**2*(-6*m23*mf2**2*(-metap**2 + mf2**2 + mpi0**2) - metap**4*(mf2**2 + 2*mpi0**2) + metap**2*(mf2**4 - 8*mf2**2*mpi0**2 + 4*mpi0**4) + 7*mf2**4*mpi0**2 + mf2**2*mpi0**4 - 2*mpi0**6) + 5*metap**4*mf2**2*mpi0**2 + metap**4*mpi0**4 + 7*metap**2*mf2**4*mpi0**2 + metap**2*mf2**2*mpi0**4 - 2*metap**2*mpi0**6 + mf2**4*mpi0**4 - 2*mf2**2*mpi0**6 + mpi0**8)*UnitStep(m12 - (Gammaf2 - mf2)**2)/(432*mf2**4*(-m12 + mf2*(-I*Gammaf2 + mf2))) - gTf2**2*(m23**2*(mf2**2 - 2*mpi0**2)*(ma**2 + metap**2 - mf2**2) + m23*(-ma**4*(mf2**2 - 2*mpi0**2) + ma**2*(2*metap**2*(mf2**2 - 2*mpi0**2) + mf2**4 + 2*mf2**2*mpi0**2) - metap**4*(mf2**2 - 2*mpi0**2) + metap**2*(mf2**4 + 2*mf2**2*mpi0**2) + 2*mf2**4*(-3*m12 + mpi0**2)) - 2*mf2**2*(3*m12**2*mf2**2 - 3*m12*mf2**2*(ma**2 + metap**2 + 2*mpi0**2) + 2*ma**4*mpi0**2 + ma**2*(metap**2*(3*mf2**2 - 4*mpi0**2) + mf2**2*mpi0**2) + mpi0**2*(2*metap**4 + metap**2*mf2**2 + 3*mf2**2*mpi0**2)))*(cg*kappad*(-3*deltaI*thetaprpi + np.sqrt(3)) + cg*kappau*(3*deltaI*thetaprpi + np.sqrt(3)) + 3*deltaI*thetaprpi*thpiALP + np.sqrt(2)*thetaALP + thetaprALP)*UnitStep(m23 - (Gammaf2 - mf2)**2)/(144*mf2**4*(-m23 + mf2*(-I*Gammaf2 + mf2)))
+
+    amp_tot += np.sqrt(3)*(deltaI*(m23 - 2*mpi0**2)*(2*cg*(2*CoefA*(3*deltaI*kappau*thetaprpi - 3*deltaI*thetaprpi + kappad*(3*deltaI*thetaprpi + np.sqrt(3)) - np.sqrt(3)*kappau) + CoefC*(3*deltaI*thetaprpi - 2*np.sqrt(3)*kappad + 2*np.sqrt(3)*kappau)) + np.sqrt(3)*(2*CoefA*deltaI*thetaprpi*(np.sqrt(2)*thetaALP - 2*thetaprALP) - 4*CoefA*thpiALP + CoefC*deltaI*thetaprpi*(np.sqrt(2)*thetaALP + 4*thetaprALP) + 4*CoefC*thpiALP))*(m23 - ma**2 - metap**2)*(2*np.sqrt(2)*CoefA*thetapi - 4*CoefA*thetaprpi + np.sqrt(2)*CoefC*thetapi + 4*CoefC*thetaprpi)/(m23 + I*ma0*(Gammaa0 + I*ma0)) - 2*(CoefA - CoefC)*(cg*(2*CoefA*(kappad*(np.sqrt(6)*deltaI*thetapi - 2*np.sqrt(3)*deltaI*thetaprpi + 6) + kappau*(-np.sqrt(6)*deltaI*thetapi + 2*np.sqrt(3)*deltaI*thetaprpi + 6) - 6) + CoefC*(np.sqrt(3)*deltaI*(kappad - kappau)*(np.sqrt(2)*thetapi + 4*thetaprpi) + 6)) + np.sqrt(3)*(2*CoefA*(deltaI*thpiALP*(-np.sqrt(2)*thetapi + 2*thetaprpi) + np.sqrt(2)*thetaALP - 2*thetaprALP) + CoefC*(-deltaI*thpiALP*(np.sqrt(2)*thetapi + 4*thetaprpi) + np.sqrt(2)*thetaALP + 4*thetaprALP)))*(m12 + m23 - ma**2 - mpi0**2)*(m12 + m23 - metap**2 - mpi0**2)/(-I*Gammaa0*ma0 + m12 + m23 - ma**2 + ma0**2 - metap**2 - 2*mpi0**2) + 2*(CoefA - CoefC)*(cg*(2*CoefA*(kappad*(np.sqrt(6)*deltaI*thetapi - 2*np.sqrt(3)*deltaI*thetaprpi + 6) + kappau*(-np.sqrt(6)*deltaI*thetapi + 2*np.sqrt(3)*deltaI*thetaprpi + 6) - 6) + CoefC*(np.sqrt(3)*deltaI*(kappad - kappau)*(np.sqrt(2)*thetapi + 4*thetaprpi) + 6)) + np.sqrt(3)*(2*CoefA*(deltaI*thpiALP*(-np.sqrt(2)*thetapi + 2*thetaprpi) + np.sqrt(2)*thetaALP - 2*thetaprALP) + CoefC*(-deltaI*thpiALP*(np.sqrt(2)*thetapi + 4*thetaprpi) + np.sqrt(2)*thetaALP + 4*thetaprALP)))*(m12 - ma**2 - mpi0**2)*(m12 - metap**2 - mpi0**2)/(m12 + I*ma0*(Gammaa0 + I*ma0)))/72
+
+    amp_tot += deltaI*(2*(2*CoefA*(thetapi + 2*np.sqrt(2)*thetaprpi) - CoefC*thetapi + 4*np.sqrt(2)*CoefC*thetaprpi + 4*CoefD*thetapi + 8*np.sqrt(2)*CoefD*thetaprpi)*np.sin(theta_S) + (2*np.sqrt(2)*CoefA*thetapi + 8*CoefA*thetaprpi + 5*np.sqrt(2)*CoefC*thetapi + 8*CoefC*thetaprpi + 8*np.sqrt(2)*CoefD*thetapi + 32*CoefD*thetaprpi)*np.cos(theta_S))*((-8*CoefA*deltaI*thetaALP*thetapi + 2*np.sqrt(2)*CoefA*deltaI*thetaALP*thetaprpi + 2*np.sqrt(2)*CoefA*deltaI*thetapi*thetaprALP + 8*CoefA*deltaI*thetaprALP*thetaprpi + 4*CoefB*cg*(-np.sqrt(6)*deltaI*thetapi + 2*np.sqrt(3)*deltaI*thetaprpi + kappad*(2*np.sqrt(6)*deltaI*thetapi - np.sqrt(3)*deltaI*thetaprpi + 3) + kappau*(2*np.sqrt(6)*deltaI*thetapi - np.sqrt(3)*deltaI*thetaprpi - 3)) + 12*CoefB*deltaI*thetaALP*thetapi + 12*CoefB*deltaI*thetaprALP*thetaprpi - 12*CoefB*thpiALP + 4*CoefC*deltaI*thetaALP*thetapi + 5*np.sqrt(2)*CoefC*deltaI*thetaALP*thetaprpi + 5*np.sqrt(2)*CoefC*deltaI*thetapi*thetaprALP + 8*CoefC*deltaI*thetaprALP*thetaprpi + 4*CoefD*deltaI*thetaALP*thetapi + 8*np.sqrt(2)*CoefD*deltaI*thetaALP*thetaprpi + 8*np.sqrt(2)*CoefD*deltaI*thetapi*thetaprALP + 32*CoefD*deltaI*thetaprALP*thetaprpi + np.sqrt(3)*cg*deltaI*(-2*np.sqrt(2)*CoefA*thetapi*(3*kappad + 3*kappau - 2) + 4*CoefA*thetaprpi + np.sqrt(2)*CoefC*thetapi*(kappad + kappau + 2) + 2*CoefC*thetaprpi*(2*kappad + 2*kappau + 1) + 4*CoefD*(np.sqrt(2)*thetapi + 4*thetaprpi)))*np.cos(theta_S) + 2*(2*np.sqrt(2)*CoefA*deltaI*thetaALP*thetapi + 2*CoefA*deltaI*thetaALP*thetaprpi + 2*CoefA*deltaI*thetapi*thetaprALP + np.sqrt(2)*CoefA*deltaI*thetaprALP*thetaprpi + 3*np.sqrt(2)*CoefA*thpiALP + 3*np.sqrt(2)*CoefB*deltaI*thetaALP*thetapi + 3*np.sqrt(2)*CoefB*deltaI*thetaprALP*thetaprpi - 3*np.sqrt(2)*CoefB*thpiALP - np.sqrt(2)*CoefC*deltaI*thetaALP*thetapi - CoefC*deltaI*thetaALP*thetaprpi - CoefC*deltaI*thetapi*thetaprALP + 4*np.sqrt(2)*CoefC*deltaI*thetaprALP*thetaprpi + np.sqrt(2)*CoefD*deltaI*thetaALP*thetapi + 4*CoefD*deltaI*thetaALP*thetaprpi + 4*CoefD*deltaI*thetapi*thetaprALP + 8*np.sqrt(2)*CoefD*deltaI*thetaprALP*thetaprpi + cg*(CoefA*(kappad*(2*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi - 3*np.sqrt(2)) + kappau*(2*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi + 3*np.sqrt(2))) - CoefB*(-4*np.sqrt(3)*deltaI*kappau*thetapi + np.sqrt(6)*deltaI*kappau*thetaprpi + 2*np.sqrt(3)*deltaI*thetapi - 2*np.sqrt(6)*deltaI*thetaprpi + kappad*(-4*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi - 3*np.sqrt(2)) + 3*np.sqrt(2)*kappau) + np.sqrt(3)*deltaI*(-CoefC*(kappad*thetapi + 2*np.sqrt(2)*kappad*thetaprpi + kappau*thetapi + 2*np.sqrt(2)*kappau*thetaprpi - 3*np.sqrt(2)*thetaprpi) + 2*CoefD*(thetapi + 2*np.sqrt(2)*thetaprpi))))*np.sin(theta_S))*(m12 + m23 - ma**2 - mpi0**2)*(m12 + m23 - metap**2 - mpi0**2)/(-144*I*Gammaf0*mf0 + 144*m12 + 144*m23 - 144*ma**2 - 144*metap**2 + 144*mf0**2 - 288*mpi0**2) - deltaI*(2*(2*CoefA*(thetapi + 2*np.sqrt(2)*thetaprpi) - CoefC*thetapi + 4*np.sqrt(2)*CoefC*thetaprpi + 4*CoefD*thetapi + 8*np.sqrt(2)*CoefD*thetaprpi)*np.sin(theta_S) + (2*np.sqrt(2)*CoefA*thetapi + 8*CoefA*thetaprpi + 5*np.sqrt(2)*CoefC*thetapi + 8*CoefC*thetaprpi + 8*np.sqrt(2)*CoefD*thetapi + 32*CoefD*thetaprpi)*np.cos(theta_S))*((-8*CoefA*deltaI*thetaALP*thetapi + 2*np.sqrt(2)*CoefA*deltaI*thetaALP*thetaprpi + 2*np.sqrt(2)*CoefA*deltaI*thetapi*thetaprALP + 8*CoefA*deltaI*thetaprALP*thetaprpi + 4*CoefB*cg*(-np.sqrt(6)*deltaI*thetapi + 2*np.sqrt(3)*deltaI*thetaprpi + kappad*(2*np.sqrt(6)*deltaI*thetapi - np.sqrt(3)*deltaI*thetaprpi + 3) + kappau*(2*np.sqrt(6)*deltaI*thetapi - np.sqrt(3)*deltaI*thetaprpi - 3)) + 12*CoefB*deltaI*thetaALP*thetapi + 12*CoefB*deltaI*thetaprALP*thetaprpi - 12*CoefB*thpiALP + 4*CoefC*deltaI*thetaALP*thetapi + 5*np.sqrt(2)*CoefC*deltaI*thetaALP*thetaprpi + 5*np.sqrt(2)*CoefC*deltaI*thetapi*thetaprALP + 8*CoefC*deltaI*thetaprALP*thetaprpi + 4*CoefD*deltaI*thetaALP*thetapi + 8*np.sqrt(2)*CoefD*deltaI*thetaALP*thetaprpi + 8*np.sqrt(2)*CoefD*deltaI*thetapi*thetaprALP + 32*CoefD*deltaI*thetaprALP*thetaprpi + np.sqrt(3)*cg*deltaI*(-2*np.sqrt(2)*CoefA*thetapi*(3*kappad + 3*kappau - 2) + 4*CoefA*thetaprpi + np.sqrt(2)*CoefC*thetapi*(kappad + kappau + 2) + 2*CoefC*thetaprpi*(2*kappad + 2*kappau + 1) + 4*CoefD*(np.sqrt(2)*thetapi + 4*thetaprpi)))*np.cos(theta_S) + 2*(2*np.sqrt(2)*CoefA*deltaI*thetaALP*thetapi + 2*CoefA*deltaI*thetaALP*thetaprpi + 2*CoefA*deltaI*thetapi*thetaprALP + np.sqrt(2)*CoefA*deltaI*thetaprALP*thetaprpi + 3*np.sqrt(2)*CoefA*thpiALP + 3*np.sqrt(2)*CoefB*deltaI*thetaALP*thetapi + 3*np.sqrt(2)*CoefB*deltaI*thetaprALP*thetaprpi - 3*np.sqrt(2)*CoefB*thpiALP - np.sqrt(2)*CoefC*deltaI*thetaALP*thetapi - CoefC*deltaI*thetaALP*thetaprpi - CoefC*deltaI*thetapi*thetaprALP + 4*np.sqrt(2)*CoefC*deltaI*thetaprALP*thetaprpi + np.sqrt(2)*CoefD*deltaI*thetaALP*thetapi + 4*CoefD*deltaI*thetaALP*thetaprpi + 4*CoefD*deltaI*thetapi*thetaprALP + 8*np.sqrt(2)*CoefD*deltaI*thetaprALP*thetaprpi + cg*(CoefA*(kappad*(2*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi - 3*np.sqrt(2)) + kappau*(2*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi + 3*np.sqrt(2))) - CoefB*(-4*np.sqrt(3)*deltaI*kappau*thetapi + np.sqrt(6)*deltaI*kappau*thetaprpi + 2*np.sqrt(3)*deltaI*thetapi - 2*np.sqrt(6)*deltaI*thetaprpi + kappad*(-4*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi - 3*np.sqrt(2)) + 3*np.sqrt(2)*kappau) + np.sqrt(3)*deltaI*(-CoefC*(kappad*thetapi + 2*np.sqrt(2)*kappad*thetaprpi + kappau*thetapi + 2*np.sqrt(2)*kappau*thetaprpi - 3*np.sqrt(2)*thetaprpi) + 2*CoefD*(thetapi + 2*np.sqrt(2)*thetaprpi))))*np.sin(theta_S))*(m12 - ma**2 - mpi0**2)*(m12 - metap**2 - mpi0**2)/(144*(m12 + I*mf0*(Gammaf0 + I*mf0))) - (m23 - 2*mpi0**2)*(2*CoefB*np.cos(theta_S) + np.sqrt(2)*(-CoefA + CoefB)*np.sin(theta_S))*((2*np.sqrt(2)*CoefA*thetaALP + 8*CoefA*thetaprALP + 12*CoefB*deltaI*thetaprpi*thpiALP + 12*CoefB*thetaprALP + 5*np.sqrt(2)*CoefC*thetaALP + 8*CoefC*thetaprALP + 8*np.sqrt(2)*CoefD*thetaALP + 32*CoefD*thetaprALP + 2*cg*(2*np.sqrt(3)*CoefA - 2*CoefB*(3*deltaI*kappad*thetaprpi - 3*deltaI*kappau*thetaprpi + np.sqrt(3)*kappad + np.sqrt(3)*kappau - 2*np.sqrt(3)) + np.sqrt(3)*(2*CoefC*kappad + 2*CoefC*kappau + CoefC + 8*CoefD)))*np.cos(theta_S) + 2*(-3*np.sqrt(2)*CoefA*deltaI*thetaprpi*thpiALP + 2*CoefA*thetaALP + np.sqrt(2)*CoefA*thetaprALP + 3*np.sqrt(2)*CoefB*deltaI*thetaprpi*thpiALP + 3*np.sqrt(2)*CoefB*thetaprALP - CoefC*thetaALP + 4*np.sqrt(2)*CoefC*thetaprALP + 4*CoefD*thetaALP + 8*np.sqrt(2)*CoefD*thetaprALP + np.sqrt(2)*cg*(3*CoefA*deltaI*kappad*thetaprpi - 3*CoefA*deltaI*kappau*thetaprpi + np.sqrt(3)*CoefA*kappad + np.sqrt(3)*CoefA*kappau - CoefB*(-3*deltaI*kappau*thetaprpi + kappad*(3*deltaI*thetaprpi + np.sqrt(3)) + np.sqrt(3)*kappau - 2*np.sqrt(3)) + np.sqrt(3)*CoefC*(-2*kappad - 2*kappau + 3) + 4*np.sqrt(3)*CoefD))*np.sin(theta_S))*(m23 - ma**2 - metap**2)/(24*(m23 + I*mf0*(Gammaf0 + I*mf0)))
+
+    amp_tot += deltaI*(-2*(2*CoefA*(thetapi + 2*np.sqrt(2)*thetaprpi) - CoefC*thetapi + 4*np.sqrt(2)*CoefC*thetaprpi + 4*CoefD*thetapi + 8*np.sqrt(2)*CoefD*thetaprpi)*np.cos(theta_S) + (2*np.sqrt(2)*CoefA*thetapi + 8*CoefA*thetaprpi + 5*np.sqrt(2)*CoefC*thetapi + 8*CoefC*thetaprpi + 8*np.sqrt(2)*CoefD*thetapi + 32*CoefD*thetaprpi)*np.sin(theta_S))*((-8*CoefA*deltaI*thetaALP*thetapi + 2*np.sqrt(2)*CoefA*deltaI*thetaALP*thetaprpi + 2*np.sqrt(2)*CoefA*deltaI*thetapi*thetaprALP + 8*CoefA*deltaI*thetaprALP*thetaprpi + 4*CoefB*cg*(-np.sqrt(6)*deltaI*thetapi + 2*np.sqrt(3)*deltaI*thetaprpi + kappad*(2*np.sqrt(6)*deltaI*thetapi - np.sqrt(3)*deltaI*thetaprpi + 3) + kappau*(2*np.sqrt(6)*deltaI*thetapi - np.sqrt(3)*deltaI*thetaprpi - 3)) + 12*CoefB*deltaI*thetaALP*thetapi + 12*CoefB*deltaI*thetaprALP*thetaprpi - 12*CoefB*thpiALP + 4*CoefC*deltaI*thetaALP*thetapi + 5*np.sqrt(2)*CoefC*deltaI*thetaALP*thetaprpi + 5*np.sqrt(2)*CoefC*deltaI*thetapi*thetaprALP + 8*CoefC*deltaI*thetaprALP*thetaprpi + 4*CoefD*deltaI*thetaALP*thetapi + 8*np.sqrt(2)*CoefD*deltaI*thetaALP*thetaprpi + 8*np.sqrt(2)*CoefD*deltaI*thetapi*thetaprALP + 32*CoefD*deltaI*thetaprALP*thetaprpi + np.sqrt(3)*cg*deltaI*(-2*np.sqrt(2)*CoefA*thetapi*(3*kappad + 3*kappau - 2) + 4*CoefA*thetaprpi + np.sqrt(2)*CoefC*thetapi*(kappad + kappau + 2) + 2*CoefC*thetaprpi*(2*kappad + 2*kappau + 1) + 4*CoefD*(np.sqrt(2)*thetapi + 4*thetaprpi)))*np.sin(theta_S) - 2*(2*np.sqrt(2)*CoefA*deltaI*thetaALP*thetapi + 2*CoefA*deltaI*thetaALP*thetaprpi + 2*CoefA*deltaI*thetapi*thetaprALP + np.sqrt(2)*CoefA*deltaI*thetaprALP*thetaprpi + 3*np.sqrt(2)*CoefA*thpiALP + 3*np.sqrt(2)*CoefB*deltaI*thetaALP*thetapi + 3*np.sqrt(2)*CoefB*deltaI*thetaprALP*thetaprpi - 3*np.sqrt(2)*CoefB*thpiALP - np.sqrt(2)*CoefC*deltaI*thetaALP*thetapi - CoefC*deltaI*thetaALP*thetaprpi - CoefC*deltaI*thetapi*thetaprALP + 4*np.sqrt(2)*CoefC*deltaI*thetaprALP*thetaprpi + np.sqrt(2)*CoefD*deltaI*thetaALP*thetapi + 4*CoefD*deltaI*thetaALP*thetaprpi + 4*CoefD*deltaI*thetapi*thetaprALP + 8*np.sqrt(2)*CoefD*deltaI*thetaprALP*thetaprpi + cg*(CoefA*(kappad*(2*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi - 3*np.sqrt(2)) + kappau*(2*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi + 3*np.sqrt(2))) - CoefB*(-4*np.sqrt(3)*deltaI*kappau*thetapi + np.sqrt(6)*deltaI*kappau*thetaprpi + 2*np.sqrt(3)*deltaI*thetapi - 2*np.sqrt(6)*deltaI*thetaprpi + kappad*(-4*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi - 3*np.sqrt(2)) + 3*np.sqrt(2)*kappau) + np.sqrt(3)*deltaI*(-CoefC*(kappad*thetapi + 2*np.sqrt(2)*kappad*thetaprpi + kappau*thetapi + 2*np.sqrt(2)*kappau*thetaprpi - 3*np.sqrt(2)*thetaprpi) + 2*CoefD*(thetapi + 2*np.sqrt(2)*thetaprpi))))*np.cos(theta_S))*(m12 + m23 - ma**2 - mpi0**2)*(m12 + m23 - metap**2 - mpi0**2)*UnitStep(m12 + m23 + 4*mK**2 - ma**2 - metap**2 - 2*mpi0**2)/(-144*I*Gammasigma*msigma + 144*m12 + 144*m23 - 144*ma**2 - 144*metap**2 - 288*mpi0**2 + 144*msigma**2) - deltaI*(-2*(2*CoefA*(thetapi + 2*np.sqrt(2)*thetaprpi) - CoefC*thetapi + 4*np.sqrt(2)*CoefC*thetaprpi + 4*CoefD*thetapi + 8*np.sqrt(2)*CoefD*thetaprpi)*np.cos(theta_S) + (2*np.sqrt(2)*CoefA*thetapi + 8*CoefA*thetaprpi + 5*np.sqrt(2)*CoefC*thetapi + 8*CoefC*thetaprpi + 8*np.sqrt(2)*CoefD*thetapi + 32*CoefD*thetaprpi)*np.sin(theta_S))*((-8*CoefA*deltaI*thetaALP*thetapi + 2*np.sqrt(2)*CoefA*deltaI*thetaALP*thetaprpi + 2*np.sqrt(2)*CoefA*deltaI*thetapi*thetaprALP + 8*CoefA*deltaI*thetaprALP*thetaprpi + 4*CoefB*cg*(-np.sqrt(6)*deltaI*thetapi + 2*np.sqrt(3)*deltaI*thetaprpi + kappad*(2*np.sqrt(6)*deltaI*thetapi - np.sqrt(3)*deltaI*thetaprpi + 3) + kappau*(2*np.sqrt(6)*deltaI*thetapi - np.sqrt(3)*deltaI*thetaprpi - 3)) + 12*CoefB*deltaI*thetaALP*thetapi + 12*CoefB*deltaI*thetaprALP*thetaprpi - 12*CoefB*thpiALP + 4*CoefC*deltaI*thetaALP*thetapi + 5*np.sqrt(2)*CoefC*deltaI*thetaALP*thetaprpi + 5*np.sqrt(2)*CoefC*deltaI*thetapi*thetaprALP + 8*CoefC*deltaI*thetaprALP*thetaprpi + 4*CoefD*deltaI*thetaALP*thetapi + 8*np.sqrt(2)*CoefD*deltaI*thetaALP*thetaprpi + 8*np.sqrt(2)*CoefD*deltaI*thetapi*thetaprALP + 32*CoefD*deltaI*thetaprALP*thetaprpi + np.sqrt(3)*cg*deltaI*(-2*np.sqrt(2)*CoefA*thetapi*(3*kappad + 3*kappau - 2) + 4*CoefA*thetaprpi + np.sqrt(2)*CoefC*thetapi*(kappad + kappau + 2) + 2*CoefC*thetaprpi*(2*kappad + 2*kappau + 1) + 4*CoefD*(np.sqrt(2)*thetapi + 4*thetaprpi)))*np.sin(theta_S) - 2*(2*np.sqrt(2)*CoefA*deltaI*thetaALP*thetapi + 2*CoefA*deltaI*thetaALP*thetaprpi + 2*CoefA*deltaI*thetapi*thetaprALP + np.sqrt(2)*CoefA*deltaI*thetaprALP*thetaprpi + 3*np.sqrt(2)*CoefA*thpiALP + 3*np.sqrt(2)*CoefB*deltaI*thetaALP*thetapi + 3*np.sqrt(2)*CoefB*deltaI*thetaprALP*thetaprpi - 3*np.sqrt(2)*CoefB*thpiALP - np.sqrt(2)*CoefC*deltaI*thetaALP*thetapi - CoefC*deltaI*thetaALP*thetaprpi - CoefC*deltaI*thetapi*thetaprALP + 4*np.sqrt(2)*CoefC*deltaI*thetaprALP*thetaprpi + np.sqrt(2)*CoefD*deltaI*thetaALP*thetapi + 4*CoefD*deltaI*thetaALP*thetaprpi + 4*CoefD*deltaI*thetapi*thetaprALP + 8*np.sqrt(2)*CoefD*deltaI*thetaprALP*thetaprpi + cg*(CoefA*(kappad*(2*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi - 3*np.sqrt(2)) + kappau*(2*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi + 3*np.sqrt(2))) - CoefB*(-4*np.sqrt(3)*deltaI*kappau*thetapi + np.sqrt(6)*deltaI*kappau*thetaprpi + 2*np.sqrt(3)*deltaI*thetapi - 2*np.sqrt(6)*deltaI*thetaprpi + kappad*(-4*np.sqrt(3)*deltaI*thetapi + np.sqrt(6)*deltaI*thetaprpi - 3*np.sqrt(2)) + 3*np.sqrt(2)*kappau) + np.sqrt(3)*deltaI*(-CoefC*(kappad*thetapi + 2*np.sqrt(2)*kappad*thetaprpi + kappau*thetapi + 2*np.sqrt(2)*kappau*thetaprpi - 3*np.sqrt(2)*thetaprpi) + 2*CoefD*(thetapi + 2*np.sqrt(2)*thetaprpi))))*np.cos(theta_S))*(m12 - ma**2 - mpi0**2)*(m12 - metap**2 - mpi0**2)*UnitStep(-m12 + 4*mK**2)/(144*(m12 + I*msigma*(Gammasigma + I*msigma))) + (m23 - 2*mpi0**2)*(2*CoefB*np.sin(theta_S) + np.sqrt(2)*(CoefA - CoefB)*np.cos(theta_S))*(-(2*np.sqrt(2)*CoefA*thetaALP + 8*CoefA*thetaprALP + 12*CoefB*deltaI*thetaprpi*thpiALP + 12*CoefB*thetaprALP + 5*np.sqrt(2)*CoefC*thetaALP + 8*CoefC*thetaprALP + 8*np.sqrt(2)*CoefD*thetaALP + 32*CoefD*thetaprALP + 2*cg*(2*np.sqrt(3)*CoefA - 2*CoefB*(3*deltaI*kappad*thetaprpi - 3*deltaI*kappau*thetaprpi + np.sqrt(3)*kappad + np.sqrt(3)*kappau - 2*np.sqrt(3)) + np.sqrt(3)*(2*CoefC*kappad + 2*CoefC*kappau + CoefC + 8*CoefD)))*np.sin(theta_S) + 2*(-3*np.sqrt(2)*CoefA*deltaI*thetaprpi*thpiALP + 2*CoefA*thetaALP + np.sqrt(2)*CoefA*thetaprALP + 3*np.sqrt(2)*CoefB*deltaI*thetaprpi*thpiALP + 3*np.sqrt(2)*CoefB*thetaprALP - CoefC*thetaALP + 4*np.sqrt(2)*CoefC*thetaprALP + 4*CoefD*thetaALP + 8*np.sqrt(2)*CoefD*thetaprALP + np.sqrt(2)*cg*(3*CoefA*deltaI*kappad*thetaprpi - 3*CoefA*deltaI*kappau*thetaprpi + np.sqrt(3)*CoefA*kappad + np.sqrt(3)*CoefA*kappau - CoefB*(-3*deltaI*kappau*thetaprpi + kappad*(3*deltaI*thetaprpi + np.sqrt(3)) + np.sqrt(3)*kappau - 2*np.sqrt(3)) + np.sqrt(3)*CoefC*(-2*kappad - 2*kappau + 3) + 4*np.sqrt(3)*CoefD))*np.cos(theta_S))*(m23 - ma**2 - metap**2)*UnitStep(-m23 + 4*mK**2)/(24*m23 + 24*I*msigma*(Gammasigma + I*msigma))
+
+    return amp_tot
 
 def ampatoetappipi(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs):
     #INPUT
@@ -379,54 +462,40 @@ def ampatoetappipi(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs):
         #Amplitude a-> eta pi pi (without prefactor)
 
     citations.register_inspire('Aloni:2018vki')
-    deltaI = 0
-    #Kinematic relations
-    mpi1pi2 = np.sqrt(ma**2+m3**2-2*ma*x[:,0])
-    pappi1 = kinematics[0]
-    pappi2 = kinematics[1]
-    papeta = kinematics[2]
-    ppi1ppi2 = kinematics[3]
-    petappi1 = kinematics[4]
-    petappi2 = kinematics[5]
-    petaqpipi = petappi1 - petappi2
-    petappipi = petappi1 + petappi2
-    ppipi2 = mpi1pi2**2
-    qpipi2 = m1**2+m2**2-2*ppi1ppi2
-    metapi1 = np.sqrt(m1**2+m3**2+2*kinematics[4])
-    metapi2 = np.sqrt(m2**2+m3**2+2*kinematics[5])
-
+    m12 = ma**2 + m3**2 -2*ma*x[:,0]
+    m23 = ma**2 + m1**2 -2*kinematics[0]
+    kappau = kappa[0,0]
+    kappad = kappa[1,1]
+    deltaI = (md-mu)/(md+mu)
+    F0 = fpi/np.sqrt(2)
+    cg = model['cg']*F0/fa
     aU3 = a_U3_repr(ma, model, fa, **kwargs)
+    thpiALP = np.trace(np.dot(aU3, pi0))*2
+    thetaa = np.trace(np.dot(aU3, eta))*2
+    thetap = np.trace(np.dot(aU3, etap))*2
+    c_eta = np.cos(theta_eta_etap)
+    s_eta = np.sin(theta_eta_etap)
+    sm_angles = sm_mixingangles()
+    thetaALP = (c_eta-np.sqrt(2)*s_eta)/np.sqrt(2)*thetaa
+    thetaprALP = (s_eta+np.sqrt(2)*c_eta)*thetap
+    thetapi = (c_eta-np.sqrt(2)*s_eta)/np.sqrt(2)* sm_angles[('eta', 'pi0')]
+    thetaprpi = (s_eta+np.sqrt(2)*c_eta)*sm_angles[('etap', 'pi0')]
+    I = 1j
+    cq = cqhat(model, ma, **kwargs)*F0/fa
+    cuhat = cq[0,0]
+    cdhat = cq[1,1]
 
-    ####DECAY a->eta pi pi
-    aetapsigma = alp_mixing([aU3, etap, sigma], fa)
-    aetapf0 = alp_mixing([aU3, etap, f0], fa)
-    api0a0p = alp_mixing([aU3, etap, a0], fa)
-    aetapf2 = alp_mixing([aU3, etap, f2], fa)
+    amp_tot = (6*cg*mpi0**2*(kappad*(deltaI*(-thetaprpi + np.sqrt(3)) + np.sqrt(3)) + kappau*(deltaI*(thetaprpi - np.sqrt(3)) + np.sqrt(3))) - 3*deltaI*thetaprpi*(cdhat*(3*m23 - ma**2 - 3*metap**2) + cuhat*(-3*m23 + ma**2 + 3*metap**2) + 2*thpiALP*(-3*m23 + ma**2 + metap**2 + 2*mpi_pm**2)) + mpi0**2*(-2*deltaI*thpiALP*(-3*thetaprpi + np.sqrt(3)) + 6*np.sqrt(2)*thetaALP + 6*thetaprALP))/(18*F0**2)
 
-    ####DECAY a->etaprime pi pi
-    aetapsigma = alp_mixing([aU3, etap, sigma], fa)
-    aetapf0 = alp_mixing([aU3, etap, f0], fa)
-    aetapf2 = alp_mixing([aU3, etap, f2], fa)
+    amp_tot += -gTf2**2*(m23**2*(mf2**2 - 2*mpi_pm**2)*(ma**2 + metap**2 - mf2**2) + m23*(-ma**4*(mf2**2 - 2*mpi_pm**2) + ma**2*(2*metap**2*(mf2**2 - 2*mpi_pm**2) + mf2**4 + 2*mf2**2*mpi_pm**2) - metap**4*(mf2**2 - 2*mpi_pm**2) + metap**2*(mf2**4 + 2*mf2**2*mpi_pm**2) + 2*mf2**4*(-3*m12 + mpi_pm**2)) - 2*mf2**2*(3*m12**2*mf2**2 - 3*m12*mf2**2*(ma**2 + metap**2 + 2*mpi_pm**2) + 2*ma**4*mpi_pm**2 + ma**2*(metap**2*(3*mf2**2 - 4*mpi_pm**2) + mf2**2*mpi_pm**2) + mpi_pm**2*(2*metap**4 + metap**2*mf2**2 + 3*mf2**2*mpi_pm**2)))*(cg*kappad*(-3*deltaI*thetaprpi + np.sqrt(3)) + cg*kappau*(3*deltaI*thetaprpi + np.sqrt(3)) + 3*deltaI*thetaprpi*thpiALP + np.sqrt(2)*thetaALP + thetaprALP)*UnitStep(m23 - (Gammaf2 - mf2)**2)/(144*mf2**4*(-m23 + mf2*(-I*Gammaf2 + mf2)))
 
+    amp_tot += np.sqrt(3)*(CoefA - CoefC)*(6*cg*(2*CoefA*(kappad + kappau - 1) + CoefC) + np.sqrt(3)*(2*np.sqrt(2)*CoefA*thetaALP - 4*CoefA*thetaprALP + np.sqrt(2)*CoefC*thetaALP + 4*CoefC*thetaprALP))*(-(m12 + m23 - ma**2 - mpi_pm**2)*(m12 + m23 - metap**2 - mpi_pm**2)/(-I*Gammaa0_pm*ma0_pm + m12 + m23 - ma**2 + ma0_pm**2 - metap**2 - 2*mpi_pm**2) + (m12 - ma**2 - mpi_pm**2)*(m12 - metap**2 - mpi_pm**2)/(m12 + I*ma0_pm*(Gammaa0_pm + I*ma0_pm)))/36
 
-    #Mix amplitude (Eq.S48)
-    #amix = 0 #Approximation --> (np.sqrt(2)*aeta0+aeta8)*mpi**2/(3*fpi**2)*ffunction(ma) 
-    amix = (np.sqrt(2)*alp_mixing([aU3, eta0], fa) + alp_mixing([aU3, eta8], fa))*m2**2/3/fpi**2*ffunction(ma)
+    amp_tot += -(m23 - 2*mpi_pm**2)*(2*CoefB*np.cos(theta_S) + np.sqrt(2)*(-CoefA + CoefB)*np.sin(theta_S))*((2*np.sqrt(2)*CoefA*thetaALP + 8*CoefA*thetaprALP + 12*CoefB*deltaI*thetaprpi*thpiALP + 12*CoefB*thetaprALP + 5*np.sqrt(2)*CoefC*thetaALP + 8*CoefC*thetaprALP + 8*np.sqrt(2)*CoefD*thetaALP + 32*CoefD*thetaprALP + 2*cg*(2*np.sqrt(3)*CoefA - 2*CoefB*(3*deltaI*kappad*thetaprpi - 3*deltaI*kappau*thetaprpi + np.sqrt(3)*kappad + np.sqrt(3)*kappau - 2*np.sqrt(3)) + np.sqrt(3)*(2*CoefC*kappad + 2*CoefC*kappau + CoefC + 8*CoefD)))*np.cos(theta_S) + 2*(-3*np.sqrt(2)*CoefA*deltaI*thetaprpi*thpiALP + 2*CoefA*thetaALP + np.sqrt(2)*CoefA*thetaprALP + 3*np.sqrt(2)*CoefB*deltaI*thetaprpi*thpiALP + 3*np.sqrt(2)*CoefB*thetaprALP - CoefC*thetaALP + 4*np.sqrt(2)*CoefC*thetaprALP + 4*CoefD*thetaALP + 8*np.sqrt(2)*CoefD*thetaprALP + np.sqrt(2)*cg*(3*CoefA*deltaI*kappad*thetaprpi - 3*CoefA*deltaI*kappau*thetaprpi + np.sqrt(3)*CoefA*kappad + np.sqrt(3)*CoefA*kappau - CoefB*(-3*deltaI*kappau*thetaprpi + kappad*(3*deltaI*thetaprpi + np.sqrt(3)) + np.sqrt(3)*kappau - 2*np.sqrt(3)) + np.sqrt(3)*CoefC*(-2*kappad - 2*kappau + 3) + 4*np.sqrt(3)*CoefD))*np.sin(theta_S))*(m23 - ma**2 - metap**2)/(24*(m23 + I*mf0*(Gammaf0 + I*mf0)))
 
-    #a-> Sigma (Eq.S49)
-    asigma = np.where(mpi1pi2 < 2*mK, -(10)**2* aetapsigma* papeta* ppi1ppi2*bw(mpi1pi2**2, msigma, Gammasigma, 0)*ffunction(ma), 0)
+    amp_tot += (m23 - 2*mpi_pm**2)*(2*CoefB*np.sin(theta_S) + np.sqrt(2)*(CoefA - CoefB)*np.cos(theta_S))*(-(2*np.sqrt(2)*CoefA*thetaALP + 8*CoefA*thetaprALP + 12*CoefB*deltaI*thetaprpi*thpiALP + 12*CoefB*thetaprALP + 5*np.sqrt(2)*CoefC*thetaALP + 8*CoefC*thetaprALP + 8*np.sqrt(2)*CoefD*thetaALP + 32*CoefD*thetaprALP + 2*cg*(2*np.sqrt(3)*CoefA - 2*CoefB*(3*deltaI*kappad*thetaprpi - 3*deltaI*kappau*thetaprpi + np.sqrt(3)*kappad + np.sqrt(3)*kappau - 2*np.sqrt(3)) + np.sqrt(3)*(2*CoefC*kappad + 2*CoefC*kappau + CoefC + 8*CoefD)))*np.sin(theta_S) + 2*(-3*np.sqrt(2)*CoefA*deltaI*thetaprpi*thpiALP + 2*CoefA*thetaALP + np.sqrt(2)*CoefA*thetaprALP + 3*np.sqrt(2)*CoefB*deltaI*thetaprpi*thpiALP + 3*np.sqrt(2)*CoefB*thetaprALP - CoefC*thetaALP + 4*np.sqrt(2)*CoefC*thetaprALP + 4*CoefD*thetaALP + 8*np.sqrt(2)*CoefD*thetaprALP + np.sqrt(2)*cg*(3*CoefA*deltaI*kappad*thetaprpi - 3*CoefA*deltaI*kappau*thetaprpi + np.sqrt(3)*CoefA*kappad + np.sqrt(3)*CoefA*kappau - CoefB*(-3*deltaI*kappau*thetaprpi + kappad*(3*deltaI*thetaprpi + np.sqrt(3)) + np.sqrt(3)*kappau - 2*np.sqrt(3)) + np.sqrt(3)*CoefC*(-2*kappad - 2*kappau + 3) + 4*np.sqrt(3)*CoefD))*np.cos(theta_S))*(m23 - ma**2 - metap**2)*UnitStep(-m23 + 4*mK**2)/(24*m23 + 24*I*msigma*(Gammasigma + I*msigma))
 
-    #a-> f0 (Eq.S50)
-    af0 = (7.3)**2* aetapf0* papeta* ppi1ppi2* bw(mpi1pi2**2, mf0, Gammaf0, 0)*ffunction(ma) 
-
-    #a-> a0 (Eq.S51)
-    aa0 = (13)**2* api0a0p* 1.2* ffunction(ma)* (pappi2* petappi1*bw(metapi1**2, ma0, Gammaa0, 0) + pappi1* petappi2* bw(metapi2, ma0, Gammaa0,0)) 
-
-    #a-> f2 (Eq.)
-    af2 = (16)**2* aetapf2* (petaqpipi**2 - 1/3*qpipi2*(m3**2+ petappipi**2/ppi1ppi2**2- 2*petappipi**2/ppi1ppi2**2))*\
-          bw(mpi1pi2**2, mf2, Gammaf2, 0)* ffunction(ma)
-    aux = (amix+asigma+af0+aa0+af2) 
-    return aux
+    return amp_tot
 
 def atoetappipi(ma, m1, m2, m3, model, fa, c, **kwargs): #Eq. S33
     #INPUT:
@@ -440,8 +509,11 @@ def atoetappipi(ma, m1, m2, m3, model, fa, c, **kwargs): #Eq. S33
     if ma < m1 + m2 + m3:
         return [0.0, 0,0]
     s = 2-c # Symmetry factor: 2 for pi0 pi0, 1 for pi+ pi-
-    result, error = threebody_decay.decay3body(ampatoetappipi, ma, m1, m2, m3, model, fa, **kwargs)
-    return 1/(2*ma*s)*pow(fpi/fa,2)*result, 1/(2*ma*s)*pow(fpi/fa,2)*error
+    if c == 0:
+        result, error = threebody_decay.decay3body(ampatoetappi0pi0, ma, m1, m2, m3, model, fa, **kwargs)
+    else:
+        result, error = threebody_decay.decay3body(ampatoetappipi, ma, m1, m2, m3, model, fa, **kwargs)
+    return ffunction(ma)**2/(2*ma*s)*result, ffunction(ma)**2/(2*ma*s)*error
 
 def decay_width_etappipi00(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
     return atoetappipi(ma, metap, mpi0, mpi0, couplings, fa, 0, **kwargs)[0]
@@ -451,7 +523,7 @@ def decay_width_etappipipm(ma: float, couplings: ALPcouplings, fa: float, **kwar
 
 
 ###########################    DECAY TO  a-> pi pi gamma    ###########################
-def ampatogammapipi(ma, Gamma, mrho, model, fa, x, **kwargs):
+def ampatogammapipi(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs):
     #INPUT
         #ma: Mass of decaying particle (in GeV)
         #mi: Mass of daughter particle [i=1,2,3] (in GeV) (1,2: pi, 3: eta)
@@ -461,13 +533,27 @@ def ampatogammapipi(ma, Gamma, mrho, model, fa, x, **kwargs):
     #OUTPUT
         #Amplitude a-> eta pi pi (without prefactor)
     citations.register_inspire('Aloni:2018vki')
-    arhorho = alpVV(ma, model, fa, **kwargs)[0]
-    if ma > 2*mpi0+0.001:
-        a = g**2* np.sqrt(x[:,0])* bw(np.sqrt(x[:,0]), mrho, Gamma,1)*arhorho*ffunction(ma)
-        integrand = np.abs(a*np.conjugate(a)*pow(1-x[:,0]/ma**2,3)*pow(1-4*mpi0**2/x[:,0],3/2))
+    if ma > m1+m2+m3:
+        m12 = ma**2 + m3**2 -2*ma*x[:,0]
+        m23 = ma**2 + m1**2 -2*kinematics[0]
+        kappau = kappa[0,0]
+        kappad = kappa[1,1]
+        deltaI = (md-mu)/(md+mu)
+        F0 = fpi/np.sqrt(2)
+        cg = model['cg']*F0/fa
+        aU3 = a_U3_repr(ma, model, fa, **kwargs)
+        thpiALP = np.trace(np.dot(aU3, pi0))*2
+        thetaa = np.trace(np.dot(aU3, eta))*2
+        thetap = np.trace(np.dot(aU3, etap))*2
+        c_eta = np.cos(theta_eta_etap)
+        s_eta = np.sin(theta_eta_etap)
+        thetaALP = (c_eta-np.sqrt(2)*s_eta)/np.sqrt(2)*thetaa
+        thetaprALP = (s_eta+np.sqrt(2)*c_eta)*thetap
+
+        integrand = -mrho_pm**4*(m12**2*m23 + m12*(m23**2 - m23*(ma**2 + 2*mpi_pm**2) - ma**2*mpi_pm**2 + mpi_pm**4) + ma**4*mpi_pm**2)*(4*cg**2*(kappad + 2*kappau)**2 + 4*cg*(kappad + 2*kappau)*(np.sqrt(6)*thetaALP + np.sqrt(3)*thetaprALP + thpiALP) + 6*thetaALP**2 + 6*np.sqrt(2)*thetaALP*thetaprALP + 2*np.sqrt(6)*thetaALP*thpiALP + 3*thetaprALP**2 + 2*np.sqrt(3)*thetaprALP*thpiALP + thpiALP**2)/(64*np.pi**3*F0**6*(Gammarho**2*mrho**2 + m12**2 - 2*m12*mrho**2 + mrho**4))
     else:
         integrand = 0.0
-    return integrand
+    return np.sqrt(integrand)
 
 
 def decay_width_gammapipi(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
@@ -482,32 +568,10 @@ def decay_width_gammapipi(ma: float, couplings: ALPcouplings, fa: float, **kwarg
         #decayrate: Decay rate
         #edecayrate: Error in decay rate
     
-    citations.register_bibtex('vegas', """@software{peter_lepage_2024_12687656,
-  author       = {Peter Lepage},
-  title        = {gplepage/vegas: vegas version 6.1.3},
-  month        = jul,
-  year         = 2024,
-  publisher    = {Zenodo},
-  version      = {v6.1.3},
-  doi          = {10.5281/zenodo.12687656},
-  url          = {https://doi.org/10.5281/zenodo.12687656}
-}""")
-    citations.register_inspire('Lepage:2020tgj')
     if ma > 2*mpi_pm:
-        nitn_adapt = kwargs.get('nitn_adapt', 10)
-        neval_adapt = kwargs.get('neval_adapt', 10)
-        nitn = kwargs.get('nitn', 10)
-        neval = kwargs.get('neval', 100)
-        cores = kwargs.get('cores', 1)
-        kwargs_integrand = {k: v for k, v in kwargs.items() if k not in ['nitn_adapt', 'neval_adapt', 'nitn', 'neval', 'cores']}
-        #Numerical integration (using vegas integrator)
-        integrator= vegas.Integrator([[(2*mpi_pm)**2,ma**2]], nproc=cores)#,[0,1]]) #Second integration is to get mean value easily
-        # step 1 -- adapt to integrand; discard results
-        integrator(vegas.lbatchintegrand(functools.partial(ampatogammapipi, ma, Gammarho, mrho, couplings, fa, **kwargs_integrand)), nitn=nitn_adapt, neval=neval_adapt)
-        # step 2 -- integrator has adapted to integrand; keep results
-        resint = integrator(vegas.lbatchintegrand(functools.partial(ampatogammapipi, ma, Gammarho, mrho, couplings, fa, **kwargs_integrand)), nitn=nitn, neval=neval)
-        decayrate = 3*alphaem(ma)*ma**3/(2**11*np.pi**6*fa**2)* resint.mean 
-        edecayrate = 3*alphaem(ma)*ma**3/(2**11*np.pi**6*fa**2)* resint.sdev
+        result, error = threebody_decay.decay3body(ampatogammapipi, ma, 0, mpi_pm, mpi_pm, couplings, fa, **kwargs)
+        decayrate = alphaem(ma)*ffunction(ma)**2* result
+        edecayrate = alphaem(ma)*ffunction(ma)**2* error
     else: decayrate, edecayrate= [0.0,0.0]
     return decayrate
 
@@ -515,9 +579,18 @@ def decay_width_gammapipi(ma: float, couplings: ALPcouplings, fa: float, **kwarg
 def decay_width_2w(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
     citations.register_inspire('Aloni:2018vki')
     if ma > 2*momega:
+        kappau = kappa[0,0]
+        kappad = kappa[1,1]
+        F0 = fpi/np.sqrt(2)
+        cg = couplings['cg']*F0/fa
         aU3 = a_U3_repr(ma, couplings, fa, **kwargs)
-        aww = alp_mixing([aU3, omega, omega], fa)
-        aux = g**2*ffunction(ma)*aww
-        decayrate = 9*ma**3/((4*np.pi)**5*fa**2)*(1-4*momega**2/ma**2)**(3/2)*np.abs(aux)**2
+        thetaa = np.trace(np.dot(aU3, eta))*2
+        thetap = np.trace(np.dot(aU3, etap))*2
+        c_eta = np.cos(theta_eta_etap)
+        s_eta = np.sin(theta_eta_etap)
+        thetaALP = (c_eta-np.sqrt(2)*s_eta)/np.sqrt(2)*thetaa
+        thetaprALP = (s_eta+np.sqrt(2)*c_eta)*thetap
+        ampsqr = mrho_pm**4*(ma**4 - 4*ma**2*momega**2)*(3*cg*(kappad + kappau) + np.sqrt(3)*(np.sqrt(2)*thetaALP + thetaprALP))**2/(512*np.pi**4*F0**6)
+        decayrate = np.abs(ampsqr)*threebody_decay.kallen(ma, momega, momega)/(16*np.pi*ma**3)*ffunction(ma)**2
     else: decayrate= 0.0
     return decayrate
