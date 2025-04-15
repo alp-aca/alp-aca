@@ -1,5 +1,5 @@
 import numpy as np
-from ...constants import theta_eta_etap
+from ..constants import theta_eta_etap
 
 ###### Pseudoscalar mesons ###################
 pi0 = np.diag([1, -1, 0])/2
@@ -14,6 +14,10 @@ eta8 = np.diag([1/2, 1/2, -1])/np.sqrt(3)
 eta = np.cos(theta_eta_etap) * eta8 - np.sin(theta_eta_etap) * eta0
 
 etap = np.sin(theta_eta_etap) * eta8 + np.cos(theta_eta_etap) * eta0
+
+K0 = np.array([[0,0,0], [0, 0, np.sqrt(2)], [0, 0, 0]])/2
+
+K0bar = np.array([[0,0,0], [0, 0, 0], [0, np.sqrt(2), 0]])/2
 
 sigma = np.diag([np.sqrt(5), np.sqrt(5), 1])/np.sqrt(22)
 

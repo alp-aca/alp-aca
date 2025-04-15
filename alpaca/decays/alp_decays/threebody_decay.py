@@ -42,6 +42,7 @@ def kinematics(M,m1,m2,m3,Ener3,theta, thetaast, phiast):   #M,m1,m2,m3,m12,cthe
     q2ast2 = -q12CM* np.sin(thetaast)*np.sin(phiast)
     q2ast3 = -q12CM* np.cos(thetaast)
 
+
     q10 = Ener12/m12*(q1ast0+np.sqrt(1-m12**2/Ener12**2)*q1ast3)
     q11 = -q1ast1*np.cos(theta)-Ener12/m12*np.sin(theta)*(q1ast0*np.sqrt(1-m12**2/Ener12**2)+q1ast3)
     q12 = q1ast2
