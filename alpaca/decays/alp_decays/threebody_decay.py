@@ -42,18 +42,16 @@ def kinematics(M,m1,m2,m3,Ener3,theta, thetaast, phiast):   #M,m1,m2,m3,m12,cthe
     q2ast2 = -q12CM* np.sin(thetaast)*np.sin(phiast)
     q2ast3 = -q12CM* np.cos(thetaast)
 
-    gamma = Ener12/m12
-    gamma_beta = np.sqrt(gamma**2-1)
 
-    q10 = gamma * q1ast0 + gamma_beta * q1ast3
-    q11 = -q1ast1*np.cos(theta)-(gamma_beta * q1ast0 + gamma * q1ast3)*np.sin(theta)
+    q10 = Ener12/m12*(q1ast0+np.sqrt(1-m12**2/Ener12**2)*q1ast3)
+    q11 = -q1ast1*np.cos(theta)-Ener12/m12*np.sin(theta)*(q1ast0*np.sqrt(1-m12**2/Ener12**2)+q1ast3)
     q12 = q1ast2
-    q13 = q1ast1*np.sin(theta)-(gamma_beta * q1ast0 + gamma * q1ast3)*np.cos(theta)
+    q13 = q1ast1*np.sin(theta)-Ener12/m12*np.cos(theta)*(np.sqrt(1-m12**2/Ener12**2)*q1ast0+q1ast3)
 
-    q20 = gamma * q2ast0 + gamma_beta * q2ast3
-    q21 = -q2ast1*np.cos(theta)-(gamma_beta * q2ast0 + gamma * q2ast3)*np.sin(theta)
+    q20 = Ener12/m12*(q2ast0+np.sqrt(1-m12**2/Ener12**2)*q2ast3)
+    q21 = -q2ast1*np.cos(theta)-Ener12/m12*np.sin(theta)*(q2ast0*np.sqrt(1-m12**2/Ener12**2)+q2ast3)
     q22 = q2ast2
-    q23 = q2ast1*np.sin(theta)-(gamma_beta * q2ast0 + gamma * q2ast3)*np.cos(theta)
+    q23 = q2ast1*np.sin(theta)-Ener12/m12*np.cos(theta)*(np.sqrt(1-m12**2/Ener12**2)*q2ast0+q2ast3)
 
     
     p0p0 = M**2
