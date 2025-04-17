@@ -9,57 +9,67 @@ from . import transition_fv, transition_tree_level
 from ...common import ckm_xi
 
 def Kminustopia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **kwargs):
-    from ...constants import mK, mpi_pm, g8, fpi, GammaK, GF
+    from ...constants import mK, mpi_pm, g8, g2712, g2732, fpi, GammaK, GF, epsisos
     from ... common import kallen
     if ma > mK-mpi_pm:
         return 0
     citations.register_inspire('Bauer:2021wjo')
     coupl_low = couplings.match_run(ma, 'kF_below', **kwargs)
     cg = coupl_low['cg']
-    cuu = coupl_low['ku'][0,0]-coupl_low['kU'][0,0]
-    cdd = coupl_low['kd'][0,0]-coupl_low['kD'][0,0]
-    css = coupl_low['kd'][1,1]-coupl_low['kD'][1,1]
+    cAuu = coupl_low['ku'][0,0]-coupl_low['kU'][0,0]
+    cVuu = coupl_low['ku'][0,0]+coupl_low['kU'][0,0]
+    cAdd = coupl_low['kd'][0,0]-coupl_low['kD'][0,0]
+    cVdd = coupl_low['kd'][0,0]+coupl_low['kD'][0,0]
+    cAss = coupl_low['kd'][1,1]-coupl_low['kD'][1,1]
+    cVss = coupl_low['kd'][1,1]+coupl_low['kD'][1,1]
     kd = coupl_low['kd'][0,0]
     kD = coupl_low['kD'][0,0]
     ks = coupl_low['kd'][1,1]
     kS = coupl_low['kD'][1,1]
     parsSM = runSM(ma)
     Vckm = parsSM['CKM']
-    N8 = -g8*GF/np.sqrt(2)*np.conj(Vckm[0,0])*Vckm[0,1]*fpi**2*(np.cos(delta8)+1j*np.sin(delta8))
+    
+    chiralG8 = -GF/np.sqrt(2)*np.conjugate(Vckm[0,0])*Vckm[0,1]*g8
+    chiralG2712 = -GF/np.sqrt(2)*np.conjugate(Vckm[0,0])*Vckm[0,1]*g2712
+    chiralG2732 = -GF/np.sqrt(2)*np.conjugate(Vckm[0,0])*Vckm[0,1]*g2732
 
-    chiral_contrib = 16*cg*(mK**2-mpi_pm**2)*(mK**2-ma**2)/(4*mK**2-mpi_pm**2-3*ma**2)
-    chiral_contrib += 6*(cuu+cdd-2*css)*ma**2*(mK**2-ma**2)/(4*mK**2-mpi_pm**2-3*ma**2)
-    chiral_contrib += (2*cuu+cdd+css)*(mK**2-mpi_pm**2-ma**2) + 4*css*ma**2
-    chiral_contrib += (kd+kD-ks-kS)*(mK**2+mpi_pm**2-ma**2)
-
-    amp = N8*chiral_contrib/(4*f_a)-(mK**2-mpi_pm**2)/(2*f_a)*(coupl_low['kd'][0,1]+coupl_low['kD'][0,1])
+    chiral_contrib = (fpi**2*chiralG8*(16*cg*(ma**2 - mK**2)*(mK**2 - mpi_pm**2) - cVdd*(ma**2 - mK**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2) + cVss*(ma**2 - mK**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2) +2*cAuu*(mK**2 - mpi_pm**2)*(4*ma**2 - 4*mK**2 + mpi_pm**2) - cAss*(3*ma**4 - 3*ma**2*mK**2 + 4*mK**4 - 5*mK**2*mpi_pm**2 + mpi_pm**4) + cAdd*(3*ma**4 - 4*mK**4 + 5*mK**2*mpi_pm**2 - mpi_pm**4 + ma**2*(mK**2 - 4*mpi_pm**2)) + (8*epsisos*(cAuu*ma**2*(5*ma**2 - 4*mK**2 - mpi_pm**2)*(mK**2 - mpi_pm**2)**2 + (mK**2 - mpi_pm**2)*(cAdd*ma**2*(ma**2 - mK**2)*(9*ma**2 - 4*mK**2 - 5*mpi_pm**2) - (ma**2 - mpi_pm**2)*(cAss*ma**2*(9*ma**2 - 8*mK**2 - mpi_pm**2) - 16*cg*(ma**2 - mK**2)*(mK**2 - mpi_pm**2)))))/(np.sqrt(3)*(ma**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2))))/(4*f_a*(3*ma**2 - 4*mK**2 + mpi_pm**2)) #G8
+    chiral_contrib += (fpi**2*chiralG2712*(4*cAuu*(mK**2 - mpi_pm**2)*(ma**2 - 4*mK**2 + mpi_pm**2) - cVdd*(ma**2 - mK**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2) + cVss*(ma**2 - mK**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2) + 8*cg*(mK**2 - mpi_pm**2)*(ma**2 - 4*mK**2 + 3*mpi_pm**2) + 3*cAdd*(ma**4 - ma**2*mK**2 - 4*mK**4 + 5*mK**2*mpi_pm**2 - mpi_pm**4) + cAss*(-3*ma**4 - ma**2*(mK**2 - 4*mpi_pm**2) + 7*(4*mK**4 - 5*mK**2*mpi_pm**2 + mpi_pm**4)) + (8*epsisos*(2*cAuu*ma**2*(mK**2 - mpi_pm**2)**2*(5*ma**2 - 12*mK**2 + 7*mpi_pm**2) + (mK**2 - mpi_pm**2)*(-((ma**2 - mpi_pm**2)*(4*cg*(ma**2 + 4*mK**2 - 5*mpi_pm**2)*(mK**2 - mpi_pm**2) + cAss*ma**2*(9*ma**2 - 28*mK**2 + 19*mpi_pm**2))) + cAdd*ma**2*(9*ma**4 + 24*mK**4 - 10*mK**2*mpi_pm**2 - 5*mpi_pm**4 + ma**2*(-38*mK**2 + 20*mpi_pm**2)))))/(np.sqrt(3)*(ma**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2))))/(4*f_a*(3*ma**2 - 4*mK**2 + mpi_pm**2)) #G2712
+    chiral_contrib += (fpi**2*chiralG2732*(8*cg*(ma**2 - mK**2)*(mK**2 - mpi_pm**2) - cVdd*(ma**2 - mK**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2) + cVss*(ma**2 - mK**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2) +cAss*(-3*ma**4 + 4*mK**4 - 5*mK**2*mpi_pm**2 + mpi_pm**4 - ma**2*(mK**2 - 4*mpi_pm**2)) + (4*cAuu*(mK**2 - mpi_pm**2)*(ma**4 + 4*mK**2*mpi_pm**2 - mpi_pm**4 - ma**2*(mK**2 + 3*mpi_pm**2)))/(ma**2 - mpi_pm**2) + (3*cAdd*(ma**6 - ma**4*(mK**2 + mpi_pm**2) + ma**2*(4*mK**2*mpi_pm**2 - 3*mpi_pm**4) - mpi_pm**2*(4*mK**4 - 5*mK**2*mpi_pm**2 + mpi_pm**4)))/(ma**2 - mpi_pm**2) + (8*epsisos*(2*cAuu*ma**2*(mK**2 - mpi_pm**2)**2*(5*ma**2 - 6*mK**2 + mpi_pm**2) + (mK**2 - mpi_pm**2)*(cAdd*ma**2*(ma**2 - mpi_pm**2)*(9*ma**2 - 11*mK**2 + 2*mpi_pm**2) - 4*cg*(mK**2 - mpi_pm**2)*(ma**4 + 12*mK**4 - 13*mK**2*mpi_pm**2 + 2*mpi_pm**4 + ma**2*(-11*mK**2 + 9*mpi_pm**2)) + cAss*ma**2*(-9*ma**4 + 12*mK**4 - 25*mK**2*mpi_pm**2 + 4*mpi_pm**4 + ma**2*(mK**2 + 17*mpi_pm**2)))))/(np.sqrt(3)*(ma**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2))))/(4*f_a*(3*ma**2 - 4*mK**2 + mpi_pm**2)) #G2732
+    
+    amp = chiral_contrib-(mK**2-mpi_pm**2)/(2*f_a)*(coupl_low['kd'][0,1]+coupl_low['kD'][0,1])
     return np.abs(amp)**2/(16*np.pi*mK)*np.sqrt(kallen(1, mpi_pm**2/mK**2, ma**2/mK**2))/GammaK
 
 def Kplustopia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **kwargs):
-    from ...constants import mK, mpi_pm, g8, fpi, GammaK, GF
+    from ...constants import mK, mpi_pm, g8, g2712, g2732, fpi, GammaK, GF, epsisos
     from ... common import kallen
     if ma > mK-mpi_pm:
         return 0
     citations.register_inspire('Bauer:2021wjo')
     coupl_low = couplings.match_run(ma, 'kF_below', **kwargs)
     cg = coupl_low['cg']
-    cuu = coupl_low['ku'][0,0]-coupl_low['kU'][0,0]
-    cdd = coupl_low['kd'][0,0]-coupl_low['kD'][0,0]
-    css = coupl_low['kd'][1,1]-coupl_low['kD'][1,1]
+    cAuu = coupl_low['ku'][0,0]-coupl_low['kU'][0,0]
+    cVuu = coupl_low['ku'][0,0]+coupl_low['kU'][0,0]
+    cAdd = coupl_low['kd'][0,0]-coupl_low['kD'][0,0]
+    cVdd = coupl_low['kd'][0,0]+coupl_low['kD'][0,0]
+    cAss = coupl_low['kd'][1,1]-coupl_low['kD'][1,1]
+    cVss = coupl_low['kd'][1,1]+coupl_low['kD'][1,1]
     kd = coupl_low['kd'][0,0]
     kD = coupl_low['kD'][0,0]
     ks = coupl_low['kd'][1,1]
     kS = coupl_low['kD'][1,1]
     parsSM = runSM(ma)
     Vckm = parsSM['CKM']
-    N8 = -g8*GF/np.sqrt(2)*np.conj(Vckm[0,0])*Vckm[0,1]*fpi**2*(np.cos(delta8)+1j*np.sin(delta8))
 
-    chiral_contrib = 16*cg*(mK**2-mpi_pm**2)*(mK**2-ma**2)/(4*mK**2-mpi_pm**2-3*ma**2)
-    chiral_contrib += 6*(cuu+cdd-2*css)*ma**2*(mK**2-ma**2)/(4*mK**2-mpi_pm**2-3*ma**2)
-    chiral_contrib += (2*cuu+cdd+css)*(mK**2-mpi_pm**2-ma**2) + 4*css*ma**2
-    chiral_contrib += (kd+kD-ks-kS)*(mK**2+mpi_pm**2-ma**2)
+    chiralG8 = -GF/np.sqrt(2)*np.conjugate(Vckm[0,0])*Vckm[0,1]*g8
+    chiralG2712 = -GF/np.sqrt(2)*np.conjugate(Vckm[0,0])*Vckm[0,1]*g2712
+    chiralG2732 = -GF/np.sqrt(2)*np.conjugate(Vckm[0,0])*Vckm[0,1]*g2732
 
-    amp = N8*chiral_contrib/(4*f_a)-(mK**2-mpi_pm**2)/(2*f_a)*(coupl_low['kd'][1,0]+coupl_low['kD'][1,0])
+    chiral_contrib = (fpi**2*chiralG8*(16*cg*(ma**2 - mK**2)*(mK**2 - mpi_pm**2) - cVdd*(ma**2 - mK**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2) + cVss*(ma**2 - mK**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2) +2*cAuu*(mK**2 - mpi_pm**2)*(4*ma**2 - 4*mK**2 + mpi_pm**2) - cAss*(3*ma**4 - 3*ma**2*mK**2 + 4*mK**4 - 5*mK**2*mpi_pm**2 + mpi_pm**4) + cAdd*(3*ma**4 - 4*mK**4 + 5*mK**2*mpi_pm**2 - mpi_pm**4 + ma**2*(mK**2 - 4*mpi_pm**2)) + (8*epsisos*(cAuu*ma**2*(5*ma**2 - 4*mK**2 - mpi_pm**2)*(mK**2 - mpi_pm**2)**2 + (mK**2 - mpi_pm**2)*(cAdd*ma**2*(ma**2 - mK**2)*(9*ma**2 - 4*mK**2 - 5*mpi_pm**2) - (ma**2 - mpi_pm**2)*(cAss*ma**2*(9*ma**2 - 8*mK**2 - mpi_pm**2) - 16*cg*(ma**2 - mK**2)*(mK**2 - mpi_pm**2)))))/(np.sqrt(3)*(ma**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2))))/(4*f_a*(3*ma**2 - 4*mK**2 + mpi_pm**2)) #G8
+    chiral_contrib += (fpi**2*chiralG2712*(4*cAuu*(mK**2 - mpi_pm**2)*(ma**2 - 4*mK**2 + mpi_pm**2) - cVdd*(ma**2 - mK**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2) + cVss*(ma**2 - mK**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2) + 8*cg*(mK**2 - mpi_pm**2)*(ma**2 - 4*mK**2 + 3*mpi_pm**2) + 3*cAdd*(ma**4 - ma**2*mK**2 - 4*mK**4 + 5*mK**2*mpi_pm**2 - mpi_pm**4) + cAss*(-3*ma**4 - ma**2*(mK**2 - 4*mpi_pm**2) + 7*(4*mK**4 - 5*mK**2*mpi_pm**2 + mpi_pm**4)) + (8*epsisos*(2*cAuu*ma**2*(mK**2 - mpi_pm**2)**2*(5*ma**2 - 12*mK**2 + 7*mpi_pm**2) + (mK**2 - mpi_pm**2)*(-((ma**2 - mpi_pm**2)*(4*cg*(ma**2 + 4*mK**2 - 5*mpi_pm**2)*(mK**2 - mpi_pm**2) + cAss*ma**2*(9*ma**2 - 28*mK**2 + 19*mpi_pm**2))) + cAdd*ma**2*(9*ma**4 + 24*mK**4 - 10*mK**2*mpi_pm**2 - 5*mpi_pm**4 + ma**2*(-38*mK**2 + 20*mpi_pm**2)))))/(np.sqrt(3)*(ma**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2))))/(4*f_a*(3*ma**2 - 4*mK**2 + mpi_pm**2)) #G2712
+    chiral_contrib += (fpi**2*chiralG2732*(8*cg*(ma**2 - mK**2)*(mK**2 - mpi_pm**2) - cVdd*(ma**2 - mK**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2) + cVss*(ma**2 - mK**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2) +cAss*(-3*ma**4 + 4*mK**4 - 5*mK**2*mpi_pm**2 + mpi_pm**4 - ma**2*(mK**2 - 4*mpi_pm**2)) + (4*cAuu*(mK**2 - mpi_pm**2)*(ma**4 + 4*mK**2*mpi_pm**2 - mpi_pm**4 - ma**2*(mK**2 + 3*mpi_pm**2)))/(ma**2 - mpi_pm**2) + (3*cAdd*(ma**6 - ma**4*(mK**2 + mpi_pm**2) + ma**2*(4*mK**2*mpi_pm**2 - 3*mpi_pm**4) - mpi_pm**2*(4*mK**4 - 5*mK**2*mpi_pm**2 + mpi_pm**4)))/(ma**2 - mpi_pm**2) + (8*epsisos*(2*cAuu*ma**2*(mK**2 - mpi_pm**2)**2*(5*ma**2 - 6*mK**2 + mpi_pm**2) + (mK**2 - mpi_pm**2)*(cAdd*ma**2*(ma**2 - mpi_pm**2)*(9*ma**2 - 11*mK**2 + 2*mpi_pm**2) - 4*cg*(mK**2 - mpi_pm**2)*(ma**4 + 12*mK**4 - 13*mK**2*mpi_pm**2 + 2*mpi_pm**4 + ma**2*(-11*mK**2 + 9*mpi_pm**2)) + cAss*ma**2*(-9*ma**4 + 12*mK**4 - 25*mK**2*mpi_pm**2 + 4*mpi_pm**4 + ma**2*(mK**2 + 17*mpi_pm**2)))))/(np.sqrt(3)*(ma**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2))))/(4*f_a*(3*ma**2 - 4*mK**2 + mpi_pm**2)) #G2732
+
+    amp = chiral_contrib-(mK**2-mpi_pm**2)/(2*f_a)*(coupl_low['kd'][1,0]+coupl_low['kD'][1,0])
     return np.abs(amp)**2/(16*np.pi*mK)*np.sqrt(kallen(1, mpi_pm**2/mK**2, ma**2/mK**2))/GammaK
 
 def ampK0topia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **kwargs):
