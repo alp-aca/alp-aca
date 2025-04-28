@@ -366,7 +366,7 @@ def ampatoetapipi(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs):
     cuhat = cq[0,0]
     cdhat = cq[1,1]
 
-    amp_tot = (6*cg*mpi0**2*(kappad*(deltaI*(-thetapi + np.sqrt(6)) + np.sqrt(6)) + kappau*(deltaI*(thetapi - np.sqrt(6)) + np.sqrt(6))) - 3*deltaI*thetapi*(cdhat*(3*m23 - ma**2 - 3*meta**2) + cuhat*(-3*m23 + ma**2 + 3*meta**2) + 2*thpiALP*(-3*m23 + ma**2 + meta**2 + 2*mpi_pm**2)) + 2*mpi0**2*(-deltaI*thpiALP*(-3*thetapi + np.sqrt(6)) + 6*thetaALP + 3*np.sqrt(2)*thetaprALP))/(18*F0**2)
+    amp_tot = 0j + (6*cg*mpi0**2*(kappad*(deltaI*(-thetapi + np.sqrt(6)) + np.sqrt(6)) + kappau*(deltaI*(thetapi - np.sqrt(6)) + np.sqrt(6))) - 3*deltaI*thetapi*(cdhat*(3*m23 - ma**2 - 3*meta**2) + cuhat*(-3*m23 + ma**2 + 3*meta**2) + 2*thpiALP*(-3*m23 + ma**2 + meta**2 + 2*mpi_pm**2)) + 2*mpi0**2*(-deltaI*thpiALP*(-3*thetapi + np.sqrt(6)) + 6*thetaALP + 3*np.sqrt(2)*thetaprALP))/(18*F0**2)
 
     amp_tot += -gTf2**2*(m23**2*(mf2**2 - 2*mpi_pm**2)*(ma**2 + meta**2 - mf2**2) + m23*(-ma**4*(mf2**2 - 2*mpi_pm**2) + ma**2*(2*meta**2*(mf2**2 - 2*mpi_pm**2) + mf2**4 + 2*mf2**2*mpi_pm**2) - meta**4*(mf2**2 - 2*mpi_pm**2) + meta**2*(mf2**4 + 2*mf2**2*mpi_pm**2) + 2*mf2**4*(-3*m12 + mpi_pm**2)) - 2*mf2**2*(3*m12**2*mf2**2 - 3*m12*mf2**2*(ma**2 + meta**2 + 2*mpi_pm**2) + 2*ma**4*mpi_pm**2 + ma**2*(meta**2*(3*mf2**2 - 4*mpi_pm**2) + mf2**2*mpi_pm**2) + mpi_pm**2*(2*meta**4 + meta**2*mf2**2 + 3*mf2**2*mpi_pm**2)))*(cg*kappad*(-3*deltaI*thetapi + np.sqrt(6)) + cg*kappau*(3*deltaI*thetapi + np.sqrt(6)) + 3*deltaI*thetapi*thpiALP + 2*thetaALP + np.sqrt(2)*thetaprALP)*UnitStep(m23 - (Gammaf2 - mf2)**2)/(144*mf2**4*(-m23 + mf2*(-I*Gammaf2 + mf2)))
 
@@ -553,7 +553,7 @@ def ampatogammapipi(ma, m1, m2, m3, model, fa, x, kinematics, **kwargs):
         integrand = -mrho_pm**4*(m12**2*m23 + m12*(m23**2 - m23*(ma**2 + 2*mpi_pm**2) - ma**2*mpi_pm**2 + mpi_pm**4) + ma**4*mpi_pm**2)*(4*cg**2*(kappad + 2*kappau)**2 + 4*cg*(kappad + 2*kappau)*(np.sqrt(6)*thetaALP + np.sqrt(3)*thetaprALP + thpiALP) + 6*thetaALP**2 + 6*np.sqrt(2)*thetaALP*thetaprALP + 2*np.sqrt(6)*thetaALP*thpiALP + 3*thetaprALP**2 + 2*np.sqrt(3)*thetaprALP*thpiALP + thpiALP**2)/(64*np.pi**3*F0**6*(Gammarho**2*mrho**2 + m12**2 - 2*m12*mrho**2 + mrho**4))
     else:
         integrand = 0.0
-    return np.sqrt(integrand)
+    return np.sqrt(integrand+0j)
 
 
 def decay_width_gammapipi(ma: float, couplings: ALPcouplings, fa: float, **kwargs):
