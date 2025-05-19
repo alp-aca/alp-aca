@@ -20,6 +20,31 @@ def sigma(cl, param):
     return np.sqrt(2/np.pi)*param*(1-cl)/cl
 
 class MeasurementBase:
+    """
+    Base class for measurements.
+    This class provides a common interface for different types of measurements.
+    It is not intended to be instantiated directly.
+
+    Attributes:
+
+        inspire_id (str): Inspire-HEP reference of the measurement.
+        decay_type (str): The decay_type of the instance.
+        rmin (float|None): The minimum length of the detector.
+        rmax (float|None): The maximum length of the detector.
+        initiated (bool): Indicates if the instance has been initiated.
+        lab_boost (float): The laboratory boost value.
+        mass_parent (float): The mass of the parent.
+        mass_sibling (float): The mass of the sibling.
+        conf_level (float|None): The confidence level of the measurement.
+
+    Methods:
+
+        initiate(): Initializes the instance by registering the Inspire-HEP reference.
+        get_central(ma: float|None, ctau: float|None): Returns the central value of the measurement.
+        get_sigma_left(ma: float|None, ctau: float|None): Returns the left sigma of the measurement.
+        get_sigma_right(ma: float|None, ctau: float|None): Returns the right sigma of the measurement.
+        decay_probability(ctau: float|None, ma: float|None, br_dark: float=0.0): Calculates the decay probability for a given mass and ctau.
+    """
     def __init__(self, inspire_id: str, decay_type: str, rmin: float|None = None, rmax: float|None = None, lab_boost: float = 0.0, mass_parent: float = 0.0, mass_sibling: float = 0.0):
         """
         Initialize an instance of the class.
@@ -53,18 +78,63 @@ class MeasurementBase:
                     citations.register_inspire(inspire_id)
         
     def get_central(self, ma: float | None = None, ctau: float | None = None) -> float:
+        '''
+        Get the central value of the measurement.
+
+        Parameters
+        ----------
+        ma : float | None
+            The mass of the alp, in GeV.
+        ctau : float | None
+            The proper length of the alp, in cm.
+        '''
         raise NotImplementedError
     
     def get_sigma_left(self, ma: float | None = None, ctau: float | None = None) -> float:
+        '''
+        Get the left one-sided uncertainty of the measurement.
+        In the case of an upper limit bound, this is zero.
+
+        Parameters
+        ----------
+        ma : float | None
+            The mass of the alp, in GeV.
+        ctau : float | None
+            The proper length of the alp, in cm.
+        '''
         raise NotImplementedError
     
     def get_sigma_right(self, ma: float | None = None, ctau: float | None = None) -> float:
+        '''
+        Get the right one-sided uncertainty of the measurement.
+
+        Parameters
+        ----------
+        ma : float | None
+            The mass of the alp, in GeV.
+        ctau : float | None
+            The proper length of the alp, in cm.
+        '''
         raise NotImplementedError
     
-    def decay_probability(self, ctau: float | None = None, ma: float | None = None, theta: float | None = None, br_dark = 0) -> float:
+    def decay_probability(self, ctau: float | None = None, ma: float | None = None, br_dark: float = 0.0, theta: float | None = None) -> float:
+        '''
+        Calculate the probability for the decay of the alp corresponding to the decay_type.
+
+        Parameters
+        ----------
+        ctau : float | None
+            The proper length of the alp, in cm.
+        ma : float | None
+            The mass of the alp, in GeV.
+        br_dark : float
+            The branching ratio of decay into the dark sector.
+        '''
         self.initiate()
         if self.decay_type == 'flat':
             return 1
+        ma = np.atleast_1d(ma)
+        ctau = np.atleast_1d(ctau)
         kallen_M = kallen(self.mass_parent**2, ma**2, self.mass_sibling**2)
         kallen_M = np.where(kallen_M >0, kallen_M, np.nan)
         pa_parent = np.sqrt(kallen_M)/(2*self.mass_parent)
@@ -297,6 +367,7 @@ class MeasurementDisplacedVertexBound(MeasurementBase):
     def decay_probability(self, ctau, ma, theta = None, br_dark = 0):
         self.initiate()
         tau = np.atleast_1d(ctau)*1e7/c_nm_per_ps
+        ma = np.atleast_1d(ma)
         shape = np.broadcast_shapes(ma.shape, tau.shape)
         ma = np.broadcast_to(ma, shape)
         tau = np.broadcast_to(tau, shape)
