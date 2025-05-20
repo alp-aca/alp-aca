@@ -23,4 +23,5 @@ def nsigmas(chi2: np.ndarray[float], ndof: np.ndarray[float]) -> np.ndarray[floa
 
     Example: For `dof=2` and `delta_chi2=2.3`, the result is roughly 1.0."""
     p = 1 - scipy.stats.chi2.cdf(np.where(ndof == 0, np.nan, chi2), ndof)
-    return np.where(p < 1e-16, 8.3, scipy.stats.norm.ppf(1 - p))
+    p = np.clip(p, 1e-16, 1)
+    return scipy.stats.norm.ppf(1 - p/2)
