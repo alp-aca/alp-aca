@@ -45,7 +45,14 @@ def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, coupling
         dofs = np.where(np.isnan(central), 0, np.where(value > central, 1, 0))
         return chi2, dofs
 
-def combine_chi2(*chi2):
+def combine_chi2(*chi2: tuple[np.ndarray[float], np.ndarray[float]]) -> tuple[np.ndarray[float], np.ndarray[float]]:
+    """Combine chi-squared values from different measurements.
+
+    Parameters
+    ----------
+    chi2 : tuple[np.ndarray[float], np.ndarray[float]]
+        Tuple of chi-squared values and degrees of freedom from different measurements.
+    """
     chivalues = [c[0] for c in chi2]
     dofs = [c[1] for c in chi2]
     return np.nansum(chivalues, axis=0), np.sum(dofs, axis=0)
@@ -64,14 +71,11 @@ def get_chi2(transitions: list[str | tuple], ma: np.ndarray[float], couplings: n
     couplings : np.ndarray[ALPcouplings]
         Coupling constants.
 
-    fa : np[float]
+    fa : np.ndarray[float]
         Axion decay constant.
 
-    sm_pred (float, optional):
-        Standard Model prediction. Default is 0.
-
-    sm_uncert (float, optional):
-        Standard Model uncertainty. Default is 0.
+    min_probability (float, optional):
+        Minimum probability for decay. Default is 1e-3.
 
     exclude_projections (bool, optional):
         Whether to exclude projections from measurements. Default is True.

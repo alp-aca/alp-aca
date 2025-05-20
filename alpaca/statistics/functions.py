@@ -17,7 +17,7 @@ def tensor_meshgrid(*arrays):
         result.append(np.broadcast_to(np.array(a).reshape(*dim_reshape), dims_final))
     return tuple(result)
 
-def nsigmas(chi2, ndof):
+def nsigmas(chi2: np.ndarray[float], ndof: np.ndarray[float]) -> np.ndarray[float]:
     r"""Compute the pull in Gaussian standard deviations corresponding to
     a $\chi^2$ with `ndof` degrees of freedom.
 
