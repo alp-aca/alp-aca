@@ -186,6 +186,9 @@ sigmaW_BESIII = Constant(3.686*5e-4, 'Song:2022umk')
 #        Vckm[i,j] = ComplexConstant(Vckm[i,j], 'flavio')
 
 g8 = Constant(3.61, 'Cirigliano:2011ny')
+g2732= Constant(0.165, 'Cirigliano:2011ny')
+g2712= Constant(0.033, 'Cirigliano:2011ny') #Isospin limit assumed
+epsisos = Constant(0.028,'Cornella:2023kjq')
 epsilonKaon = Constant(2.228e-3, 'ParticleDataGroup:2024cfk')
 phiepsilonKaon = Constant(43.52/180*np.pi, 'ParticleDataGroup:2024cfk')
 
