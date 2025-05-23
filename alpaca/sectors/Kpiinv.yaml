@@ -1,0 +1,6 @@
+name: Kpiinv
+description: '$K \to \pi + \mathrm{inv.}$ observables'
+observables:
+- K+ -> pi+ a
+- KL -> pi0 a
+tex: '$K \to \pi + \mathrm{inv.}$'
