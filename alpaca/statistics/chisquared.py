@@ -91,7 +91,7 @@ def get_chi2(transitions: list[str | tuple], ma: np.ndarray[float], couplings: n
         ('', 'Global') for the combined chi-squared value.
     """
     dict_chi2 = {}
-    for t in transitions:
+    for t in set(transitions):
         measurements = get_measurements(t, exclude_projections=exclude_projections)
         for experiment, measurement in measurements.items():
             sm_pred = get_th_value(t)

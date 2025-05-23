@@ -1,8 +1,9 @@
 from .mesons import invisible
 from .alp_decays import branching_ratios
 from ..rge import ALPcouplings
-from .particles import particle_aliases
+from .particles import particle_aliases, tex_codes
 from .mesons.decays import meson_to_alp, meson_nwa, meson_mediated
+from .mesons.mixing import tex_codes as mixing_tex_codes
 from .leptons.decays import lepton_to_alp, lepton_nwa
 from .ee.cross_sections import xsections as xsections_ee, xsections_nwa as xsections_nwa_ee
 import numpy as np
@@ -12,6 +13,29 @@ def parse(transition: str) -> tuple[list[str], list[str]]:
     initial = sorted([particle_aliases[p.strip()] for p in initial.split()])
     final = sorted([particle_aliases[p.strip()] for p in final.split()])
     return initial, final
+
+def to_tex(transition: str) -> str:
+    """ Convert a transition string to LaTeX format.
+
+    Parameters
+    ----------
+    transition (str) : 
+        The transition string in the form 'initial -> final'.
+
+    Returns
+    -------
+    str :
+        The LaTeX formatted transition string.
+    """
+    if isinstance(transition, str):
+        if transition in mixing_tex_codes:
+            return mixing_tex_codes[transition]
+        initial, final = parse(transition)
+        tex_initial = ' '.join([tex_codes[p] for p in initial])
+        tex_final = ' '.join([tex_codes[p] for p in final])
+        return f'${tex_initial} \\to {tex_final}$'
+    elif isinstance(transition, tuple):
+        return to_tex(transition[0])[:-1] + f'\\ [s = {transition[1]:.2f}\\,\\mathrm{{GeV}}^2]$'
 
 def decay_width(transition: str, ma: float, couplings: ALPcouplings, fa: float, br_dark: float = 0.0, **kwargs) -> float:
     """ Calculate the decay width for a given transition.

@@ -4,6 +4,15 @@ from ...common import alpha_s, pars
 from ...rge.classes import ALPcouplings
 from flavio.physics.mesonmixing.amplitude import M12_d_SM, M12_u_SM, G12_u_SM
 
+tex_codes = {
+    'delta_mK0': r'\Delta m_{K^0}',
+    'epsK': r'|\epsilon_K|',
+    'x_D0': r'x_{D^0}',
+    'phi12_D0': r'\phi_{12,D^0}',
+    'delta_mB0': r'\Delta m_{B^0}',
+    'delta_mBs': r'\Delta m_{B_s^0}',
+}
+
 def eta(meson) -> np.ndarray:
     citations.register_inspire('Bagger:1997gg')
     if meson == 'K0':
