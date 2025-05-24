@@ -20,4 +20,5 @@ from . import(
     statistics as statistics,
     plotting as plotting,
     biblio as biblio,
+    sectors as sectors,
 )

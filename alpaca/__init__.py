@@ -6,6 +6,8 @@ models
     Contains the classes to define the UV models.
 experimental_data
     Contains classes and functions to handle experimental data.
+sectors
+    Contains classes and functions to handle sectors of observables.
 statistics
     Contains functions to handle statistics.
 plotting

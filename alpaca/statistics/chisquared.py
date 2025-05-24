@@ -1,12 +1,50 @@
 import numpy as np
+import scipy.stats
 from ..decays.alp_decays.branching_ratios import total_decay_width
-from ..decays.decays import branching_ratio, cross_section
+from ..decays.decays import branching_ratio, cross_section, to_tex
 from ..decays.mesons.mixing import mixing_observables, meson_mixing
 from ..constants import hbarc_GeVnm
 from ..experimental_data.classes import MeasurementBase
 from ..experimental_data.measurements_exp import get_measurements
 from ..experimental_data.theoretical_predictions import get_th_uncert, get_th_value
 from ..rge import ALPcouplings
+from ..sectors import Sector, combine_sectors
+
+class ChiSquared:
+    def __init__(self, sector: Sector,
+                 chi2_dict: dict[tuple[str, str], np.ndarray[float]],
+                 dofs_dict: dict[tuple[str, str], np.ndarray[int]]):
+        self.sector = sector
+        self.chi2_dict = chi2_dict
+        self.dofs_dict = dofs_dict
+        self.name = self.sector.name
+
+    def significance(self) -> np.ndarray[float]:
+        chi2 = np.nansum([v for v in self.chi2_dict.values()], axis=0)
+        ndof = np.sum([v for v in self.dofs_dict.values()], axis=0)
+        p = 1 - scipy.stats.chi2.cdf(np.where(ndof == 0, np.nan, chi2), ndof)
+        p = np.clip(p, 2e-16, 1)
+        return scipy.stats.norm.ppf(1 - p/2)
+
+    def __getitem__(self, meas: tuple[str, str]) -> 'ChiSquared':
+        obs, experiment = meas
+        if (obs, experiment) in self.chi2_dict.keys() and (obs, experiment) in self.dofs_dict.keys():
+            s = Sector(obs + ' @ ' + experiment, obs, to_tex(obs) + r'\ \mathrm{(' + experiment + ')}$', f'Measurement of {obs} at experiment {experiment}.')
+            return ChiSquared(s, {obs: self.chi2_dict[(obs, experiment)]}, {obs: self.dofs_dict[(obs, experiment)]})
+        
+    def get_measurements(self) -> list[tuple[str, str]]:
+        return list( set(self.chi2_dict.keys()) & set(self.dofs_dict.keys()) )
+
+    def _ipython_key_completions_(self):
+        return self.get_measurements()
+    
+    def split_measurements(self) -> list['ChiSquared']:
+        results = []
+        for m in self.get_measurements():
+            obs, experiment = m
+            s = Sector(obs + ' @ ' + experiment, [obs,],  to_tex(obs)[:-1] + r'\ \mathrm{(' + experiment + ')}$', f'Measurement of {obs} at experiment {experiment}.')
+            results.append(ChiSquared(s, {obs: self.chi2_dict[m]}, {obs: self.dofs_dict[m]}))
+        return results
 
 def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, couplings, fa, min_probability=1e-3, br_dark = 0.0, sm_pred=0, sm_uncert=0, **kwargs):
     kwargs_dw = {k: v for k, v in kwargs.items() if k != 'theta'}
@@ -45,19 +83,29 @@ def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, coupling
         dofs = np.where(np.isnan(central), 0, np.where(value > central, 1, 0))
         return chi2, dofs
 
-def combine_chi2(*chi2: tuple[np.ndarray[float], np.ndarray[float]]) -> tuple[np.ndarray[float], np.ndarray[float]]:
+def combine_chi2(chi2: list[ChiSquared], name: str, tex: str, description: str = '') -> ChiSquared:
     """Combine chi-squared values from different measurements.
 
     Parameters
     ----------
-    chi2 : tuple[np.ndarray[float], np.ndarray[float]]
-        Tuple of chi-squared values and degrees of freedom from different measurements.
+    chi2 : list[ChiSquared]
+        List of ChiSquared objects to be combined.
+    name : str
+        The name of the combined sector.
+    tex : str
+        The LaTeX representation of the combined sector name.
+    description : str, optional
+        A description of the combined sector (default is an empty string).
     """
-    chivalues = [c[0] for c in chi2]
-    dofs = [c[1] for c in chi2]
-    return np.nansum(chivalues, axis=0), np.sum(dofs, axis=0)
+    sector = combine_sectors([c.sector for c in chi2], name, tex, description)
+    chi2_dict = {}
+    dofs_dict = {}
+    for c in chi2:
+        chi2_dict |= c.chi2_dict
+        dofs_dict |= c.dofs_dict
+    return ChiSquared(sector, chi2_dict, dofs_dict)
 
-def get_chi2(transitions: list[str | tuple], ma: np.ndarray[float], couplings: np.ndarray[ALPcouplings], fa: np.ndarray[float], min_probability = 1e-3, exclude_projections=True, **kwargs) -> dict[tuple[str, str], np.array]:
+def get_chi2(transitions: list[Sector | str | tuple], ma: np.ndarray[float], couplings: np.ndarray[ALPcouplings], fa: np.ndarray[float], min_probability = 1e-3, exclude_projections=True, **kwargs) -> dict[tuple[str, str], np.array]:
     """Calculate the chi-squared values for a set of transitions.
 
     Parameters
@@ -90,12 +138,33 @@ def get_chi2(transitions: list[str | tuple], ma: np.ndarray[float], couplings: n
         and values as numpy arrays of chi-squared values. Includes a special key 
         ('', 'Global') for the combined chi-squared value.
     """
+    observables = set()
+    sectors: list[Sector] = []
+
+    for t in transitions:
+        if isinstance(t, Sector):
+            observables.update(t.observables)
+            sectors.append(t)
+        elif isinstance(t, (str, tuple)):
+            observables.update([t])
+            s = Sector(str(t), [t,], to_tex(t), f'Observable {t}')
+            sectors.append(s)
+
     dict_chi2 = {}
-    for t in set(transitions):
+    for t in observables:
         measurements = get_measurements(t, exclude_projections=exclude_projections)
         for experiment, measurement in measurements.items():
             sm_pred = get_th_value(t)
             sm_uncert = get_th_uncert(t)
             dict_chi2[(t, experiment)] = chi2_obs(measurement, t, ma, couplings, fa, min_probability=min_probability, sm_pred=sm_pred, sm_uncert=sm_uncert, **kwargs)
-    dict_chi2[('', 'Global')] = combine_chi2(*dict_chi2.values())
-    return dict_chi2
+    results = []
+    for s in sectors:
+        chi2_dict = {}
+        dofs_dict = {}
+        for obs in dict_chi2.keys():
+            if obs[0] in s.observables:
+                chi2_dict |= {obs: dict_chi2[obs][0]}
+                dofs_dict |= {obs: dict_chi2[obs][1]}
+        results.append(ChiSquared(s, chi2_dict, dofs_dict))
+
+    return results
