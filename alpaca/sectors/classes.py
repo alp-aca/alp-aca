@@ -11,15 +11,24 @@ class Sector:
     name : str
         The name of the sector.
     observables : set
-        A set of observables associated with the sector.
+        A set of observables associated with the sector. All measurements of these observables are included in the sector.
+    obs_measurements : dict
+        A dictionary of specific measurements for each observable in the sector.
     tex : str
         The LaTeX representation of the sector name.
     description : str, optional
         A description of the sector (default is an empty string).
     """
-    def __init__(self, name: str, observables: set, tex: str, description: str = ""):
+    def __init__(self, name: str, tex: str, observables: set|None = None, obs_measurements: dict[str, set[str]] | None = None, description: str = ""):
         self.name = name
-        self.observables = set(observables)
+        if observables is not None:
+            self.observables = set(observables)
+        else:
+            self.observables = None
+        if obs_measurements is not None:
+            self.obs_measurements = {k: set(v) for k, v in obs_measurements.items()}
+        else:
+            self.obs_measurements = None
         self.tex = tex
         self.description = description
 
@@ -32,7 +41,12 @@ class Sector:
         filename : str
             The name of the file to save the sector to.
         """
-        d = {'name': self.name, 'tex': self.tex, 'description': self.description, 'observables': list(self.observables)}
+        d = {'name': self.name, 'tex': self.tex, 'description': self.description}
+        if self.observables is not None:
+            d |= {'observables': list(self.observables)}
+        if self.obs_measurements is not None:
+            d |= {'obs_measurements': self.obs_measurements}
+
         with open(filename, 'w') as file:
             yaml.safe_dump(d, file)
 
@@ -54,6 +68,10 @@ class Sector:
         with open(filename, 'r') as file:
             data = yaml.safe_load(file)
             data = {'description': ''} | data
+            if 'observables' not in data:
+                data['observables'] = None
+            if 'obs_measurements' not in data:
+                data['obs_measurements'] = None
             return cls(name=data['name'], tex=data['tex'], description=data['description'], observables=set(data['observables']))
         
     def _repr_markdown_(self):
@@ -62,8 +80,12 @@ class Sector:
         if self.description != "":
             md += f"**Description**: {self.description}\n\n"
         md += f"**Observables**:"
-        for obs in self.observables:
-            md += f"\n- {to_tex(obs)}"
+        if self.observables is not None:
+            for obs in self.observables:
+                md += f"\n- {to_tex(obs)}"
+        if self.obs_measurements is not None:
+            for obs in self.obs_measurements.keys():
+                md += f"\n- {to_tex(obs)}: {self.obs_measurements[obs]}"
         return md
         
 def combine_sectors(sectors: list[Sector], name: str, tex: str, description: str = "") -> Sector:
@@ -88,9 +110,17 @@ def combine_sectors(sectors: list[Sector], name: str, tex: str, description: str
     """
     observables = set()
     for sector in sectors:
-        observables.update(sector.observables)
+        if sector.observables is not None:
+            observables.update(sector.observables)
+    obs_measurements = {}
+    for sector in sectors:
+        if sector.obs_measurements is not None:
+            for obs in sector.obs_measurements.keys():
+                if obs not in obs_measurements:
+                    obs_measurements[obs] = set()
+                obs_measurements[obs].update(sector.obs_measurements[obs])
     
-    return Sector(name=name, observables=observables, tex=tex, description=description)
+    return Sector(name=name, observables=observables, tex=tex, description=description, obs_measurements=obs_measurements)
 
 def initialize_sectors(sector_dir: str|None = None) -> dict[str, Sector]:
     """

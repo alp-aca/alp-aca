@@ -29,8 +29,10 @@ class ChiSquared:
     def __getitem__(self, meas: tuple[str, str]) -> 'ChiSquared':
         obs, experiment = meas
         if (obs, experiment) in self.chi2_dict.keys() and (obs, experiment) in self.dofs_dict.keys():
-            s = Sector(obs + ' @ ' + experiment, obs, to_tex(obs) + r'\ \mathrm{(' + experiment + ')}$', f'Measurement of {obs} at experiment {experiment}.')
-            return ChiSquared(s, {obs: self.chi2_dict[(obs, experiment)]}, {obs: self.dofs_dict[(obs, experiment)]})
+            s = Sector(obs + ' @ ' + experiment, to_tex(obs) + r'\ \mathrm{(' + experiment + ')}$', obs_measurements = {obs: set([experiment,])} , description=f'Measurement of {obs} at experiment {experiment}.')
+            return ChiSquared(s, {(obs, experiment): self.chi2_dict[(obs, experiment)]}, {(obs, experiment): self.dofs_dict[(obs, experiment)]})
+        else:
+            raise KeyError(f'Unknown experiment {obs}, {meas}')
         
     def get_measurements(self) -> list[tuple[str, str]]:
         return list( set(self.chi2_dict.keys()) & set(self.dofs_dict.keys()) )
@@ -42,8 +44,8 @@ class ChiSquared:
         results = []
         for m in self.get_measurements():
             obs, experiment = m
-            s = Sector(obs + ' @ ' + experiment, [obs,],  to_tex(obs)[:-1] + r'\ \mathrm{(' + experiment + ')}$', f'Measurement of {obs} at experiment {experiment}.')
-            results.append(ChiSquared(s, {obs: self.chi2_dict[m]}, {obs: self.dofs_dict[m]}))
+            s = Sector(obs + ' @ ' + experiment, to_tex(obs)[:-1] + r'\ \mathrm{(' + experiment + ')}$', obs_measurements = {obs: set([experiment,])}, description=f'Measurement of {obs} at experiment {experiment}.')
+            results.append(ChiSquared(s, {(obs, experiment): self.chi2_dict[m]}, {(obs, experiment): self.dofs_dict[m]}))
         return results
 
 def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, couplings, fa, min_probability=1e-3, br_dark = 0.0, sm_pred=0, sm_uncert=0, **kwargs):
@@ -139,15 +141,22 @@ def get_chi2(transitions: list[Sector | str | tuple], ma: np.ndarray[float], cou
         ('', 'Global') for the combined chi-squared value.
     """
     observables = set()
+    obs_measurements = {}
     sectors: list[Sector] = []
 
     for t in transitions:
         if isinstance(t, Sector):
-            observables.update(t.observables)
+            if t.observables is not None:
+                observables.update(t.observables)
+            if t.obs_measurements is not None:
+                for obs, measurements in t.obs_measurements.items():
+                    if obs not in obs_measurements:
+                        obs_measurements[obs] = set()
+                    obs_measurements[obs].update(measurements)
             sectors.append(t)
         elif isinstance(t, (str, tuple)):
             observables.update([t])
-            s = Sector(str(t), [t,], to_tex(t), f'Observable {t}')
+            s = Sector(str(t), to_tex(t), observables=[t,], description=f'Observable {t}')
             sectors.append(s)
 
     dict_chi2 = {}
@@ -157,14 +166,30 @@ def get_chi2(transitions: list[Sector | str | tuple], ma: np.ndarray[float], cou
             sm_pred = get_th_value(t)
             sm_uncert = get_th_uncert(t)
             dict_chi2[(t, experiment)] = chi2_obs(measurement, t, ma, couplings, fa, min_probability=min_probability, sm_pred=sm_pred, sm_uncert=sm_uncert, **kwargs)
+    for t in obs_measurements.keys():
+        if t not in dict_chi2:
+            measurements = get_measurements(t, exclude_projections=exclude_projections)
+            for experiment, measurement in measurements.items():
+                if experiment in obs_measurements[t]:
+                    sm_pred = get_th_value(t)
+                    sm_uncert = get_th_uncert(t)
+                    dict_chi2[(t, experiment)] = chi2_obs(measurement, t, ma, couplings, fa, min_probability=min_probability, sm_pred=sm_pred, sm_uncert=sm_uncert, **kwargs)
+            
     results = []
     for s in sectors:
         chi2_dict = {}
         dofs_dict = {}
         for obs in dict_chi2.keys():
-            if obs[0] in s.observables:
+            if s.observables is not None and obs[0] in s.observables:
                 chi2_dict |= {obs: dict_chi2[obs][0]}
                 dofs_dict |= {obs: dict_chi2[obs][1]}
+        for obs in obs_measurements.keys():
+            if s.obs_measurements is not None and obs in s.obs_measurements:
+                for experiment in s.obs_measurements[obs]:
+                    if (obs, experiment) in dict_chi2:
+                        chi2_dict[(obs, experiment)] = dict_chi2[(obs, experiment)][0]
+                        dofs_dict[(obs, experiment)] = dict_chi2[(obs, experiment)][1]
+        
         results.append(ChiSquared(s, chi2_dict, dofs_dict))
 
     return results
