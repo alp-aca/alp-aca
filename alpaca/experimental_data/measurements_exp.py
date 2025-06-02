@@ -208,7 +208,9 @@ belleII_bptoknunu_lightmediator = MeasurementInterpolated(['Altmannshofer:2023hk
 
 babar_btoknunu_lightmediator = MeasurementInterpolated(['Altmannshofer:2023hkn', 'BaBar:2013npw'], os.path.join(current_dir, invisible, 'Babar_BtoK_bestfit.txt'), 'invisible', rmax=50, lab_boost=0.469/(1-0.469**2)**0.5, mass_parent=mB, mass_sibling=mK)
 
-babar_btokstarnunu_lightmediator = MeasurementInterpolated(['Altmannshofer:2023hkn', 'BaBar:2013npw'], os.path.join(current_dir, invisible, 'Babar_BKstarinv.txt'), 'invisible', rmax=50, lab_boost=0.469/(1-0.469**2)**0.5, mass_parent=mB, mass_sibling=mK)
+combined_btoknunu_lightmediator = MeasurementInterpolated(['Altmannshofer:2023hkn', 'BaBar:2013npw', 'Belle-II:2023esi'], os.path.join(current_dir, invisible, 'BKinv_combined.txt'), 'invisible', rmax=50, lab_boost=0.469/(1-0.469**2)**0.5, mass_parent=mB, mass_sibling=mK)
+
+babar_btokstarnunu_lightmediator = MeasurementInterpolated(['Altmannshofer:2023hkn', 'BaBar:2013npw'], os.path.join(current_dir, invisible, 'Babar_BKstarinv.txt'), 'invisible', rmax=50, lab_boost=0.469/(1-0.469**2)**0.5, mass_parent=mB, mass_sibling=mKst0)
 
 #BaBar B->K nu nu
     #Experiment: BaBar
@@ -1632,7 +1634,9 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     initial, final = parse(transition)
     #Initial state B+
     if initial == ['B+'] and final == sorted(['K+', 'alp']):
-        return {'Belle II': belleII_bptoknunu_lightmediator, 'BaBar': babar_btoknunu_lightmediator}
+        return {'Belle II': belleII_bptoknunu_lightmediator,
+                'BaBar': babar_btoknunu_lightmediator,
+                'BaBar + Belle II': combined_btoknunu_lightmediator}
     elif initial == ['B+'] and final == sorted(['K*+', 'alp']):
         return {'BaBar': babar_btokstarnunu_lightmediator}
     elif initial == ['B+'] and final == sorted(['pion+', 'alp']):
