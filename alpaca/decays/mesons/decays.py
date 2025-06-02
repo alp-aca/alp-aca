@@ -7,10 +7,12 @@ from ...constants import(
     mJpsi, BeeJpsi,
     GammaB, GammaB0,
     GammaJpsi, GammaUpsilon1S, GammaUpsilon3S, GammaUpsilon4S,
-    GammaD0, GammaDplus, GammaDs
+    GammaD0, GammaDplus, GammaDs,
+    GammaK, GammaKL, GammaKS,
 )
 from ..nwa import transition_nwa
 from ..alp_decays.branching_ratios import decay_channels
+import numpy as np
 
 meson_to_alp = {
     ('Upsilon(1S)', ('alp', 'photon')): lambda ma, couplings, fa, br_dark, **kwargs: BR_Vagamma(ma, couplings, mUpsilon1S, BeeUpsilon1S, GammaUpsilon1S, 'b', fa, **kwargs),
@@ -71,3 +73,39 @@ meson_mediated = {
     ('KS', ('muon', 'muon')): lambda ma, couplings, fa, br_dark, **kwargs: BR_KS_leptons('mu', ma, couplings, fa, br_dark, **kwargs),
     ('KS', ('photon', 'photon')): lambda ma, couplings, fa, br_dark, **kwargs: BR_KS_photons(ma, couplings, fa, br_dark, **kwargs),
 }
+
+meson_widths = {
+    'Upsilon(1S)': GammaUpsilon1S,
+    'Upsilon(3S)': GammaUpsilon3S,
+    'Upsilon(4S)': GammaUpsilon4S,
+    'J/psi': GammaJpsi,
+    'B+': GammaB,
+    'B-': GammaB,
+    'B0': GammaB0,
+    'D0': GammaD0,
+    'D+': GammaDplus,
+    'Ds+': GammaDs,
+    'K+': GammaK,
+    'K-': GammaK,
+    'KL': GammaKL,
+    'KS': GammaKS,
+}
+
+def meson_width(meson, ma, couplings, fa, br_dark=0, **kwargs):
+    """
+    Calculate the total width of a meson decaying to ALP and other particles.
+    
+    Parameters:
+    - meson: str, name of the meson
+    - ma: float, mass of the ALP
+    - couplings: dict, couplings relevant for the decay
+    - fa: float, decay constant of the ALP
+    - br_dark: float, branching ratio to dark sector (default 0)
+    
+    Returns:
+    - float, total width of the meson decay
+    """
+    if meson not in meson_widths:
+        raise ValueError(f"Meson {meson} not recognized.")
+    
+    return meson_widths[meson] * np.sum([v(ma, couplings, fa, br_dark, **kwargs) for k, v in meson_to_alp.items() if k[0] == meson])

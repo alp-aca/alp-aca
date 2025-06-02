@@ -2,6 +2,7 @@
 import os
 import numpy as np
 from scipy.stats import chi2
+import particle.literals as particles
 from ..biblio.biblio import citations
 from ..constants import mUpsilon3S
 from .classes import MeasurementBase, MeasurementConstantBound, MeasurementInterpolatedBound, MeasurementInterpolated, MeasurementDisplacedVertexBound, MeasurementBinned, rmax_belle, rmax_besIII, MeasurementConstant
@@ -1590,6 +1591,70 @@ belleII_B0KStaue = MeasurementConstantBound(
     mass_sibling=mKL
 )
 
+dw_Bplus = MeasurementConstantBound(
+    'ParticleDataGroup:2024cfk',
+    'flat',
+    particles.B_plus.width/1000,
+    max_ma = mB,
+    conf_level= 1/(1+np.sqrt(np.pi/2)*particles.B_plus.width_upper/particles.B_plus.width)
+)
+
+dw_B0 = MeasurementConstantBound(
+    'ParticleDataGroup:2024cfk',
+    'flat',
+    particles.B_0.width/1000,
+    max_ma = mB0,
+    conf_level= 1/(1+np.sqrt(np.pi/2)*particles.B_0.width_upper/particles.B_0.width)
+)
+
+dw_D0 = MeasurementConstantBound(
+    'ParticleDataGroup:2024cfk',
+    'flat',
+    particles.D_0.width/1000,
+    max_ma = mD0,
+    conf_level= 1/(1+np.sqrt(np.pi/2)*particles.D_0.width_upper/particles.D_0.width)
+)
+
+dw_Dplus = MeasurementConstantBound(
+    'ParticleDataGroup:2024cfk',
+    'flat',
+    particles.D_plus.width/1000,
+    max_ma = mDplus,
+    conf_level= 1/(1+np.sqrt(np.pi/2)*particles.D_plus.width_upper/particles.D_plus.width)
+)
+
+dw_Dsplus = MeasurementConstantBound(
+    'ParticleDataGroup:2024cfk',
+    'flat',
+    particles.D_s_plus.width/1000,
+    max_ma = mDs,
+    conf_level= 1/(1+np.sqrt(np.pi/2)*particles.D_s_plus.width_upper/particles.D_s_plus.width)
+)
+
+dw_Kplus = MeasurementConstantBound(
+    'ParticleDataGroup:2024cfk',
+    'flat',
+    particles.K_plus.width/1000,
+    max_ma = mK,
+    conf_level= 1/(1+np.sqrt(np.pi/2)*particles.K_plus.width_upper/particles.K_plus.width)
+)
+
+dw_KL = MeasurementConstantBound(
+    'ParticleDataGroup:2024cfk',
+    'flat',
+    particles.K_L_0.width/1000,
+    max_ma = mKL,
+    conf_level= 1/(1+np.sqrt(np.pi/2)*particles.K_L_0.width_upper/particles.K_L_0.width)
+)
+
+dw_KS = MeasurementConstantBound(
+    'ParticleDataGroup:2024cfk',
+    'flat',
+    particles.K_S_0.width/1000,
+    max_ma = mKL,
+    conf_level= 1/(1+np.sqrt(np.pi/2)*particles.K_S_0.width_upper/particles.K_S_0.width)
+)
+
 def get_measurements(process: str | tuple, exclude_projections: bool = True) -> dict[str, MeasurementBase]:
     """Retrieve measurements based on the given transition.
 
@@ -1624,6 +1689,22 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         return {'Belle II': belleII_deltaMd}
     elif process == 'delta_mBs':
         return {'LHCb': lhcb_deltaMs}
+    elif process in ['B+', 'B-']:
+        return {'PDG': dw_Bplus}
+    elif process in ['B0', 'Bd0']:
+        return {'PDG': dw_B0}
+    elif process == 'D0':
+        return {'PDG': dw_D0}
+    elif process in ['D+', 'D-']:
+        return {'PDG': dw_Dplus}
+    elif process in ['Ds+', 'Ds-']:
+        return {'PDG': dw_Dsplus}
+    elif process in ['K+', 'K-']:
+        return {'PDG': dw_Kplus}
+    elif process in ['KL', 'K0L']:
+        return {'PDG': dw_KL}
+    elif process in ['KS', 'K0S']:
+        return {'PDG': dw_KS}
 
     if isinstance(process, str):
         transition = process

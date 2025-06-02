@@ -2,7 +2,7 @@ from .mesons import invisible
 from .alp_decays import branching_ratios
 from ..rge import ALPcouplings
 from .particles import particle_aliases
-from .mesons.decays import meson_to_alp, meson_nwa, meson_mediated
+from .mesons.decays import meson_to_alp, meson_nwa, meson_mediated, meson_width, meson_widths
 from .leptons.decays import lepton_to_alp, lepton_nwa
 from .ee.cross_sections import xsections as xsections_ee, xsections_nwa as xsections_nwa_ee
 import numpy as np
@@ -42,6 +42,10 @@ def decay_width(transition: str, ma: float, couplings: ALPcouplings, fa: float, 
     """
     if particle_aliases.get(transition.strip()) == 'alp':
         dw = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.total_decay_width(ma, couplings, fa, br_dark, **kwargs)['DW_tot']
+        return np.vectorize(dw)(ma, couplings, fa, br_dark, **kwargs)
+    if particle_aliases.get(transition.strip()) in meson_widths.keys():
+        meson = particle_aliases[transition.strip()]
+        dw = lambda ma, couplings, fa, br_dark, **kwargs: meson_width(meson, ma, couplings, fa, br_dark=br_dark, **kwargs)
         return np.vectorize(dw)(ma, couplings, fa, br_dark, **kwargs)
     initial, final = parse(transition)
     # ALP decays
