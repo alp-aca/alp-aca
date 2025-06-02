@@ -206,8 +206,9 @@ def babar_b0tokstar0nunu(x):
 
 belleII_bptoknunu_lightmediator = MeasurementInterpolated(['Altmannshofer:2023hkn', 'Belle-II:2023esi'], os.path.join(current_dir, invisible, 'BelleII_BtoK_bestfit.txt'), 'invisible', rmax=100, lab_boost=0.28, mass_parent=mB, mass_sibling=mK)
 
-babar_btoksnunu_lightmediator = MeasurementInterpolated(['Altmannshofer:2023hkn', 'BaBar:2013npw'], os.path.join(current_dir, invisible, 'Babar_BtoK_bestfit.txt'), 'invisible', rmax=50, lab_boost=0.469/(1-0.469**2)**0.5, mass_parent=mB, mass_sibling=mK)
+babar_btoknunu_lightmediator = MeasurementInterpolated(['Altmannshofer:2023hkn', 'BaBar:2013npw'], os.path.join(current_dir, invisible, 'Babar_BtoK_bestfit.txt'), 'invisible', rmax=50, lab_boost=0.469/(1-0.469**2)**0.5, mass_parent=mB, mass_sibling=mK)
 
+babar_btokstarnunu_lightmediator = MeasurementInterpolated(['Altmannshofer:2023hkn', 'BaBar:2013npw'], os.path.join(current_dir, invisible, 'Babar_BKstarinv.txt'), 'invisible', rmax=50, lab_boost=0.469/(1-0.469**2)**0.5, mass_parent=mB, mass_sibling=mK)
 
 #BaBar B->K nu nu
     #Experiment: BaBar
@@ -1631,7 +1632,9 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     initial, final = parse(transition)
     #Initial state B+
     if initial == ['B+'] and final == sorted(['K+', 'alp']):
-        return {'Belle II': belleII_bptoknunu_lightmediator}
+        return {'Belle II': belleII_bptoknunu_lightmediator, 'BaBar': babar_btoknunu_lightmediator}
+    elif initial == ['B+'] and final == sorted(['K*+', 'alp']):
+        return {'BaBar': babar_btokstarnunu_lightmediator}
     elif initial == ['B+'] and final == sorted(['pion+', 'alp']):
         return {'Belle': belle_Bchargedtopichargednunu}
     elif initial == ['B+'] and final == sorted(['rho+', 'alp']):
@@ -1674,8 +1677,6 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         return {'Belle': belle_B0toK0nunu}
     elif initial == ['B0'] and final == sorted(['rho0', 'alp']):
         return {'Belle': belle_B0torho0nunu}
-    elif initial == ['B0'] and final == sorted(['K*0', 'alp']):
-        return {'BaBar': babar_btoksnunu_lightmediator}
     elif initial == ['B0'] and final == sorted(['pion0', 'electron', 'electron']):
         return {'BaBar': babar_b0topiee, 'Belle': belle_b0topiee}
     elif initial == ['B0'] and final == sorted(['pion0', 'muon', 'muon']):
