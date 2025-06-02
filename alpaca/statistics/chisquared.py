@@ -1,7 +1,8 @@
 import numpy as np
 from ..decays.alp_decays.branching_ratios import total_decay_width
-from ..decays.decays import branching_ratio, cross_section
+from ..decays.decays import branching_ratio, cross_section, decay_width
 from ..decays.mesons.mixing import mixing_observables, meson_mixing
+from ..decays.mesons.decays import meson_widths
 from ..constants import hbarc_GeVnm
 from ..experimental_data.classes import MeasurementBase
 from ..experimental_data.measurements_exp import get_measurements
@@ -29,6 +30,8 @@ def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, coupling
         prob_decay = np.where(prob_decay < min_probability, np.nan, prob_decay)
     if transition in mixing_observables:
         br = meson_mixing(transition, ma, couplings, fa, **kwargs_dw)
+    elif transition in meson_widths.keys():
+        br = decay_width(transition, ma, couplings, fa, br_dark, **kwargs_dw)
     elif isinstance(transition, str):
         br = branching_ratio(transition, ma, couplings, fa, br_dark, **kwargs_dw)
     else:
