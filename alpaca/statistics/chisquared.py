@@ -117,7 +117,7 @@ def combine_chi2(chi2: list[ChiSquared], name: str, tex: str, description: str =
         dofs_dict |= c.dofs_dict
     return ChiSquared(sector, chi2_dict, dofs_dict)
 
-def get_chi2(transitions: list[Sector | str | tuple], ma: np.ndarray[float], couplings: np.ndarray[ALPcouplings], fa: np.ndarray[float], min_probability = 1e-3, exclude_projections=True, **kwargs) -> dict[tuple[str, str], np.array]:
+def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma: np.ndarray[float], couplings: np.ndarray[ALPcouplings], fa: np.ndarray[float], min_probability = 1e-3, exclude_projections=True, **kwargs) -> dict[tuple[str, str], np.ndarray]:
     """Calculate the chi-squared values for a set of transitions.
 
     Parameters
@@ -153,6 +153,9 @@ def get_chi2(transitions: list[Sector | str | tuple], ma: np.ndarray[float], cou
     observables = set()
     obs_measurements = {}
     sectors: list[Sector] = []
+
+    if isinstance(transitions, (Sector, str, tuple)):
+        transitions = [transitions,]
 
     for t in transitions:
         if isinstance(t, Sector):
