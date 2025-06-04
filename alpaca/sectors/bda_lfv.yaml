@@ -1,0 +1,6 @@
+name: bda_lfv
+description: 'LFV $b\to d a$ observables'
+observables:
+- B+ -> pi+ tau e
+- B+ -> pi+ tau mu
+tex: '$b \to d a (\mathrm{LFV})$'

@@ -1,0 +1,16 @@
+name: bda_lfu
+description: 'LFU $b\to d a$ observables'
+observables:
+- B+ -> pi+ a
+- B0 -> pi0 a
+- B+ -> rho+ a
+- B0 -> rho0 a
+- B+ -> pi+ e e
+- B0 -> pi0 e e
+- B+ -> pi+ mu mu
+- B0 -> pi0 mu mu
+- B0 -> gamma gamma
+- B0 -> e e
+- B0 -> mu mu
+- B0 -> tau tau
+tex: '$b \to d a$'

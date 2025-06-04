@@ -1,0 +1,12 @@
+name: meson_dw
+description: 'Meson decays widths'
+observables:
+- 'B+'
+- 'B0'
+- 'D0'
+- 'D+'
+- 'Ds+'
+- 'K+'
+- 'K0S'
+- 'K0L'
+tex: '$\Gamma_M$'

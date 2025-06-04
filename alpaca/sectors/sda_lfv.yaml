@@ -1,0 +1,6 @@
+name: sda_lfv
+description: 'LFV $s\to d a$ observables'
+observables:
+- K+ -> pi+ mu e
+- K0L -> pi0 mu e
+tex: '$s \to d a (\mathrm{LFV})$'

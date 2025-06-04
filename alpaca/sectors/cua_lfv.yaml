@@ -1,0 +1,9 @@
+name: cua_lfv
+description: 'LFV $c\to u a$ observables'
+observables:
+- D0 -> pi0 mu e
+- D0 -> eta mu e
+- D0 -> rho0 mu e
+- Ds+ -> K+ mu e
+- Ds+ -> K*+ mu e
+tex: '$c \to u a (\mathrm{LFV})$'

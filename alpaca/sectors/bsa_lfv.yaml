@@ -1,0 +1,11 @@
+name: bsa_lfv
+description: 'LFV $b\to s a$ observables'
+observables:
+- B+ -> K+ mu e
+- B0 -> K0 mu e
+- B+ -> K*+ mu e
+- B0 -> K*0 mu e
+- B+ -> K+ tau e
+- B+ -> K+ tau mu
+- B0 -> K*0 tau mu
+tex: '$b \to s a (\mathrm{LFV})$'

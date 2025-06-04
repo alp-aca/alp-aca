@@ -1,0 +1,15 @@
+name: lepton_lfv
+description: 'LFV lepton observables'
+observables:
+- mu -> e a
+- mu -> e gamma gamma
+- mu -> e e e
+- tau -> e a
+- tau -> e gamma gamma
+- tau -> e e e
+- tau -> e mu mu
+- tau -> mu a
+- tau -> mu gamma gamma
+- tau -> mu e e
+- tau -> mu mu mu
+tex: '$\ell \to \ell^\prime a$'

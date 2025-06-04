@@ -1,0 +1,22 @@
+name: bsa_lfu
+description: 'LFU $b\to s a$ observables'
+observables:
+- B+ -> K+ a
+- B0 -> K0 a
+- B+ -> K*+ a
+- Bs -> phi a
+- B+ -> K+ gamma gamma
+- B+ -> K+ e e
+- B0 -> K*0 e e
+- B+ -> K+ mu mu
+- B0 -> K*0 mu mu
+- B+ -> K+ tau tau
+- B0 -> K*0 tau tau
+- B+ -> K+ pi0 pi+ pi-
+- B0 -> K0 pi0 pi+ pi-
+- B+ -> K+ eta pi+ pi-
+- Bs -> gamma gamma
+- Bs -> e e
+- Bs -> mu mu
+- Bs -> tau tau
+tex: '$b \to s a$'

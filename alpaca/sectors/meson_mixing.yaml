@@ -1,0 +1,10 @@
+name: meson_mixing
+description: 'Meson mixing observables'
+observables:
+- 'delta_mK0'
+- 'epsK'
+- 'x_D0'
+- 'phi12_D0'
+- 'delta_mBs'
+- 'delta_mB0'
+tex: '$M^0 \to \bar{M}^0$'

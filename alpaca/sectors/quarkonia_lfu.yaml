@@ -1,0 +1,17 @@
+name: quarkonia_lfu
+description: 'Quarkonia decays'
+observables:
+- - e e -> gamma gamma gamma
+  - 111.9364
+- J/psi -> gamma a
+- Upsilon(1S) -> gamma a
+- Upsilon(3S) -> gamma a
+- J/psi -> gamma gamma gamma
+- J/psi -> gamma mu mu
+- Upsilon(1S) -> gamma mu mu
+- Upsilon(3S) -> gamma mu mu
+- Upsilon(1S) -> gamma tau tau
+- Upsilon(3S) -> gamma tau tau
+- Upsilon(3S) -> gamma hadrons
+- Upsilon(1S) -> gamma charm charm
+tex: $q\bar{q} \to \gamma a$

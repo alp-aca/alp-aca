@@ -1,0 +1,19 @@
+name: cua_lfu
+description: 'LFU $c\to u a$ observables'
+observables:
+- D0 -> pi0 a
+- D0 -> pi0 e e
+- D0 -> eta e e
+- D0 -> rho0 e e
+- D+ -> pi+ e e
+- Ds+ -> K+ e e
+- D0 -> pi0 mu mu
+- D0 -> eta mu mu
+- D0 -> rho0 mu mu
+- D+ -> pi+ mu mu
+- D+ -> rho+ mu mu
+- Ds+ -> K+ mu mu
+- D0 -> gamma gamma
+- D0 -> e e
+- D0 -> mu mu
+tex: '$c \to u a$'

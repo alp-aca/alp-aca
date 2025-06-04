@@ -1,0 +1,14 @@
+name: sda_lfu
+description: 'LFU $s\to d a$ observables'
+observables:
+- K+ -> pi+ a
+- K0L -> pi0 a
+- K+ -> pi+ gamma gamma
+- K+ -> pi+ e e
+- K+ -> pi+ mu mu
+- K0S -> gamma gamma
+- K0L -> e e
+- K0S -> e e
+- K0S -> mu mu
+- K0L -> mu mu
+tex: '$s \to d a$'

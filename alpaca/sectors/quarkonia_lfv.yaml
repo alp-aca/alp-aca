@@ -1,0 +1,7 @@
+name: quarkonia_lfv
+description: 'LFV quarkonia observables'
+observables:
+- Upsilon(1S) -> gamma mu e
+- Upsilon(1S) -> gamma tau e
+- Upsilon(1S) -> gamma mu tau
+tex: '$q\bar{q} \to \gamma a (\mathrm{LFV})$'
