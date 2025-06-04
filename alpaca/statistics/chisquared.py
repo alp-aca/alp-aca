@@ -47,6 +47,16 @@ class ChiSquared:
             s = Sector(obs + ' @ ' + experiment, to_tex(obs)[:-1] + r'\ \mathrm{(' + experiment + ')}$', obs_measurements = {obs: set([experiment,])}, description=f'Measurement of {obs} at experiment {experiment}.')
             results.append(ChiSquared(s, {(obs, experiment): self.chi2_dict[m]}, {(obs, experiment): self.dofs_dict[m]}))
         return results
+    
+    def split_observables(self) -> list['ChiSquared']:
+        results = []
+        observables = set([obs for obs, _ in self.get_measurements()])
+        for obs in observables:
+            chi2_dict = {k: v for k, v in self.chi2_dict.items() if k[0] == obs}
+            dofs_dict = {k: v for k, v in self.dofs_dict.items() if k[0] == obs}
+            s = Sector(obs, to_tex(obs), obs_measurements={obs: set(k[1] for k in chi2_dict.keys())}, description=f'Measurements of {obs}.')
+            results.append(ChiSquared(s, chi2_dict, dofs_dict))
+        return results
 
 def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, couplings, fa, min_probability=1e-3, br_dark = 0.0, sm_pred=0, sm_uncert=0, **kwargs):
     kwargs_dw = {k: v for k, v in kwargs.items() if k != 'theta'}
