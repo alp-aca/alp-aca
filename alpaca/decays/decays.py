@@ -14,6 +14,24 @@ def parse(transition: str) -> tuple[list[str], list[str]]:
     final = sorted([particle_aliases[p.strip()] for p in final.split()])
     return initial, final
 
+def canonical_transition(transition: str) -> str:
+    """ Convert a transition string to its canonical form.
+
+    Parameters
+    ----------
+    transition (str) : 
+        The transition string in the form 'initial -> final'.
+
+    Returns
+    -------
+    str :
+        The canonical transition string in the form 'initial -> final'.
+    """
+    if '->' not in transition:
+        return transition.strip()
+    initial, final = parse(transition)
+    return ' -> '.join([' '.join(initial), ' '.join(final)])
+
 def to_tex(transition: str) -> str:
     """ Convert a transition string to LaTeX format.
 
@@ -29,7 +47,7 @@ def to_tex(transition: str) -> str:
     """
     if isinstance(transition, str):
         if transition in mixing_tex_codes:
-            return mixing_tex_codes[transition]
+            return '$' + mixing_tex_codes[transition] + '$'
         initial, final = parse(transition)
         tex_initial = ' '.join([tex_codes[p] for p in initial])
         tex_final = ' '.join([tex_codes[p] for p in final])

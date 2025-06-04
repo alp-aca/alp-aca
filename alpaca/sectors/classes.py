@@ -1,5 +1,5 @@
 import yaml
-from ..decays.decays import to_tex
+from ..decays.decays import to_tex, canonical_transition
 import os
 
 class Sector:
@@ -22,11 +22,17 @@ class Sector:
     def __init__(self, name: str, tex: str, observables: set|None = None, obs_measurements: dict[str, set[str]] | None = None, description: str = ""):
         self.name = name
         if observables is not None:
-            self.observables = set(observables)
+            self.observables = set()
+            for obs in observables:
+                if isinstance(obs, str):
+                    self.observables.add(canonical_transition(obs))
+                elif isinstance(obs, (list, tuple)):
+                    self.observables.add((canonical_transition(obs[0]), obs[1]))
         else:
             self.observables = None
         if obs_measurements is not None:
-            self.obs_measurements = {k: set(v) for k, v in obs_measurements.items()}
+            self.obs_measurements = {canonical_transition(k): set(v) for k, v in obs_measurements.items() if isinstance(k, str)}
+            self.obs_measurements |= {(canonical_transition(k[0]), k[1]): set(v) for k, v in obs_measurements.items() if isinstance(k, (list, tuple))}
         else:
             self.obs_measurements = None
         self.tex = tex
@@ -72,8 +78,8 @@ class Sector:
                 data['observables'] = None
             if 'obs_measurements' not in data:
                 data['obs_measurements'] = None
-            return cls(name=data['name'], tex=data['tex'], description=data['description'], observables=set(data['observables']))
-        
+            return cls(name=data['name'], tex=data['tex'], description=data['description'], observables=data['observables'], obs_measurements=data['obs_measurements'])
+
     def _repr_markdown_(self):
         md = f"## {self.name}\n\n"
         md += f"**LaTeX**: {self.tex}\n\n"
