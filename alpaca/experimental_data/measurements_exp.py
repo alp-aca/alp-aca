@@ -1716,8 +1716,9 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     #Initial state B+
     if initial == ['B+'] and final == sorted(['K+', 'alp']):
         return {'Belle II': belleII_bptoknunu_lightmediator,
-                'BaBar': babar_btoknunu_lightmediator,
-                'BaBar + Belle II': combined_btoknunu_lightmediator}
+                'BaBar': babar_btoknunu_lightmediator
+                #,'BaBar + Belle II': combined_btoknunu_lightmediator
+                }
     elif initial == ['B+'] and final == sorted(['K*+', 'alp']):
         return {'BaBar': babar_btokstarnunu_lightmediator}
     elif initial == ['B+'] and final == sorted(['pion+', 'alp']):
