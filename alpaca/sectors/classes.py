@@ -119,6 +119,33 @@ class Sector:
         if style:
             md += f"\n\n<details><summary>Plot style:</summary>\n{style}</details>"
         return md
+    
+    def contains_observable(self, observable: str) -> bool:
+        """
+        Check if the sector contains a specific observable.
+
+        Parameters
+        ----------
+        observable : str
+            The observable to check for.
+
+        Returns
+        -------
+        bool
+            True if the sector contains the observable, False otherwise.
+        """
+        res = False
+        if self.observables is not None:
+            if isinstance(observable, str):
+                res = res or canonical_transition(observable) in self.observables
+            elif isinstance(observable, (list, tuple)):
+                res = res or (canonical_transition(observable[0]), observable[1]) in self.observables
+        if self.obs_measurements is not None:
+            if isinstance(observable, str):
+                res = res or canonical_transition(observable) in self.obs_measurements.keys()
+            elif isinstance(observable, (list, tuple)):
+                res = res or (canonical_transition(observable[0]), observable[1]) in self.obs_measurements.keys()
+        return res
 
 def combine_sectors(sectors: list[Sector], name: str, tex: str, description: str = "") -> Sector:
     """
