@@ -1,7 +1,7 @@
 from .mesons import invisible
 from .alp_decays import branching_ratios
 from ..rge import ALPcouplings
-from .particles import particle_aliases
+from .particles import particle_aliases, tex_codes
 from .mesons.decays import meson_to_alp, meson_nwa, meson_mediated, meson_width, meson_widths
 from .mesons.mixing import tex_codes as mixing_tex_codes
 from .leptons.decays import lepton_to_alp, lepton_nwa
