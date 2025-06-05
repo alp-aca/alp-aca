@@ -17,7 +17,8 @@ def exclusionplot(x: np.ndarray[float], y: np.ndarray[float], chi2: list[ChiSqua
     global_chi2 = combine_chi2(chi2, 'Global', 'Global', 'Global')
     pl = plt.contourf(x,y, global_chi2.significance(), levels=list(np.linspace(0, 5, 150)), cmap=cmap_trafficlights, vmax=5, extend='max', zorder=-20)
     
-    i = 0
+    i_color = 0
+    i_ls = 0
     for c in chi2:
         sigmas = c.significance()
         if np.all(np.isnan(sigmas)):
@@ -25,9 +26,22 @@ def exclusionplot(x: np.ndarray[float], y: np.ndarray[float], chi2: list[ChiSqua
         if np.nanmax(sigmas) < 2:
             continue
         mask = np.nan_to_num(sigmas)
-        plt.contour(x, y, mask, levels=[2], colors = colors[i], linestyles=lss[i])
-        legend_elements.append(plt.Line2D([0], [0], color=colors[i], ls=lss[i], label=c.sector.tex))
-        i += 1
+        if c.sector.color is not None:
+            color = c.sector.color
+        else:
+            color = colors[i_color]
+            i_color += 1
+        if c.sector.ls is not None:
+            ls = c.sector.ls
+        else:
+            ls = lss[i_ls]
+            i_ls += 1
+        if c.sector.lw is not None:
+            lw = c.sector.lw
+        else:
+            lw = 1.0
+        plt.contour(x, y, mask, levels=[2], colors = color, linestyles=ls, linewidths=lw)
+        legend_elements.append(plt.Line2D([0], [0], color=color, ls=ls, label=c.sector.tex, lw=lw))
     ax.set_xscale('log')
     ax.set_yscale('log')
     cb = plt.colorbar(pl, extend='max')

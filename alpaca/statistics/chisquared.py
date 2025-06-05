@@ -58,6 +58,29 @@ class ChiSquared:
             s = Sector(obs, to_tex(obs), obs_measurements={obs: set(k[1] for k in chi2_dict.keys())}, description=f'Measurements of {obs}.')
             results.append(ChiSquared(s, chi2_dict, dofs_dict))
         return results
+    
+    def set_plot_style(self, color: str | None = None, lw: float | None = None, ls: str | None = None):
+        """Set the plot style of the sector.
+        
+        Parameters
+        ----------
+        color : str | None
+            The color of the sector.
+        lw : float | None
+            The line width of the sector.
+        ls : str | None
+            The line style of the sector.
+        """
+        if color is not None:
+            self.sector.color = color
+        if lw is not None:
+            self.sector.lw = lw
+        if ls is not None:
+            self.sector.ls = ls
+
+    def _repr_markdown_(self) -> str:
+        """Return a Markdown representation of the ChiSquared object."""
+        return self.sector._repr_markdown_()
 
 def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, couplings, fa, min_probability=1e-3, br_dark = 0.0, sm_pred=0, sm_uncert=0, **kwargs):
     kwargs_dw = {k: v for k, v in kwargs.items() if k != 'theta'}

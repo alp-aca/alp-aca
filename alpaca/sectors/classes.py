@@ -18,8 +18,10 @@ class Sector:
         The LaTeX representation of the sector name.
     description : str, optional
         A description of the sector (default is an empty string).
+    color : str, optional
+        A color associated with the sector, used for plotting (default is None).
     """
-    def __init__(self, name: str, tex: str, observables: set|None = None, obs_measurements: dict[str, set[str]] | None = None, description: str = ""):
+    def __init__(self, name: str, tex: str, observables: set|None = None, obs_measurements: dict[str, set[str]] | None = None, description: str = "", color: str | None = None, lw: float | None = None, ls: str | None = None):
         self.name = name
         if observables is not None:
             self.observables = set()
@@ -37,6 +39,9 @@ class Sector:
             self.obs_measurements = None
         self.tex = tex
         self.description = description
+        self.color = color
+        self.lw = lw
+        self.ls = ls
 
     def save(self, filename: str):
         """
@@ -52,6 +57,12 @@ class Sector:
             d |= {'observables': list(self.observables)}
         if self.obs_measurements is not None:
             d |= {'obs_measurements': self.obs_measurements}
+        if self.color is not None:
+            d |= {'color': self.color}
+        if self.lw is not None:
+            d |= {'lw': self.lw}
+        if self.ls is not None:
+            d |= {'ls': self.ls}
 
         with open(filename, 'w') as file:
             yaml.safe_dump(d, file)
@@ -78,7 +89,13 @@ class Sector:
                 data['observables'] = None
             if 'obs_measurements' not in data:
                 data['obs_measurements'] = None
-            return cls(name=data['name'], tex=data['tex'], description=data['description'], observables=data['observables'], obs_measurements=data['obs_measurements'])
+            if 'color' not in data:
+                data['color'] = None
+            if 'lw' not in data:
+                data['lw'] = None
+            if 'ls' not in data:
+                data['ls'] = None
+            return cls(name=data['name'], tex=data['tex'], description=data['description'], observables=data['observables'], obs_measurements=data['obs_measurements'], color=data['color'], lw=data['lw'], ls=data['ls'])
 
     def _repr_markdown_(self):
         md = f"## {self.name}\n\n"
@@ -92,8 +109,17 @@ class Sector:
         if self.obs_measurements is not None:
             for obs in self.obs_measurements.keys():
                 md += f"\n- {to_tex(obs)}: {self.obs_measurements[obs]}"
+        style = ''
+        if self.color is not None:
+            style += f"\n**Color**: <span style='color:{self.color}'>{self.color}</span>"
+        if self.lw is not None:
+            style += f"\n**Line Width**: {self.lw}"
+        if self.ls is not None:
+            style += f"\n**Line Style**: {self.ls}"
+        if style:
+            md += f"\n\n<details><summary>Plot style:</summary>\n{style}</details>"
         return md
-        
+
 def combine_sectors(sectors: list[Sector], name: str, tex: str, description: str = "") -> Sector:
     """
     Combine multiple sectors into a single sector.
