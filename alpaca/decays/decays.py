@@ -48,6 +48,9 @@ def to_tex(transition: str) -> str:
     if isinstance(transition, str):
         if transition in mixing_tex_codes:
             return '$' + mixing_tex_codes[transition] + '$'
+        if particle_aliases.get(transition, '') in meson_widths.keys():
+            meson = particle_aliases[transition]
+            return rf'$\Gamma_{{{tex_codes[meson]}}}$'
         initial, final = parse(transition)
         tex_initial = ' '.join([tex_codes[p] for p in initial])
         tex_final = ' '.join([tex_codes[p] for p in final])
