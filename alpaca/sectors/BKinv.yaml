@@ -3,5 +3,5 @@ description: '$B \to K^{(*)} + \mathrm{inv.}$ observables'
 observables:
 - B+ -> K+ a
 - B0 -> K0 a
-- B0 -> K*0 a
+- B+ -> K*+ a
 tex: '$B \to K^{(*)} + \mathrm{inv.}$'
