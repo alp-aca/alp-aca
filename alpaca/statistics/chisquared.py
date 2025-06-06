@@ -46,7 +46,7 @@ class ChiSquared:
         results = []
         for m in self.get_measurements():
             obs, experiment = m
-            s = Sector(obs + ' @ ' + experiment, to_tex(obs)[:-1] + r'\ \mathrm{(' + experiment + ')}$', obs_measurements = {obs: set([experiment,])}, description=f'Measurement of {obs} at experiment {experiment}.')
+            s = Sector(str(obs) + ' @ ' + experiment, to_tex(obs)[:-1] + r'\ \mathrm{(' + experiment + ')}$', obs_measurements = {obs: set([experiment,])}, description=f'Measurement of {obs} at experiment {experiment}.')
             results.append(ChiSquared(s, {(obs, experiment): self.chi2_dict[m]}, {(obs, experiment): self.dofs_dict[m]}))
         return results
     
@@ -56,7 +56,7 @@ class ChiSquared:
         for obs in observables:
             chi2_dict = {k: v for k, v in self.chi2_dict.items() if k[0] == obs}
             dofs_dict = {k: v for k, v in self.dofs_dict.items() if k[0] == obs}
-            s = Sector(obs, to_tex(obs), obs_measurements={obs: set(k[1] for k in chi2_dict.keys())}, description=f'Measurements of {obs}.')
+            s = Sector(str(obs), to_tex(obs), obs_measurements={obs: set(k[1] for k in chi2_dict.keys())}, description=f'Measurements of {obs}.')
             results.append(ChiSquared(s, chi2_dict, dofs_dict))
         return results
     
