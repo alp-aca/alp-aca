@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.stats
 from ..decays.alp_decays.branching_ratios import total_decay_width
-from ..decays.decays import branching_ratio, cross_section, decay_width, to_tex
+from ..decays.decays import branching_ratio, cross_section, decay_width, to_tex, canonical_transition
 from ..decays.mesons.mixing import mixing_observables, meson_mixing
 from ..decays.mesons.decays import meson_widths
 from ..decays.particles import particle_aliases
@@ -195,8 +195,8 @@ def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma:
                     obs_measurements[obs].update(measurements)
             sectors.append(t)
         elif isinstance(t, (str, tuple)):
-            observables.update([t])
             s = Sector(str(t), to_tex(t), observables=[t,], description=f'Observable {t}')
+            observables.update(s.observables)
             sectors.append(s)
 
     dict_chi2 = {}
