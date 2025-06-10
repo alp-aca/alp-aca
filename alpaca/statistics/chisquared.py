@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.stats
+import contourpy
 from ..decays.alp_decays.branching_ratios import total_decay_width
 from ..decays.decays import branching_ratio, cross_section, decay_width, to_tex, canonical_transition
 from ..decays.mesons.mixing import mixing_observables, meson_mixing
@@ -82,6 +83,35 @@ class ChiSquared:
     def _repr_markdown_(self) -> str:
         """Return a Markdown representation of the ChiSquared object."""
         return self.sector._repr_markdown_()
+    
+    def contour_to_csv(self, filename: str, x: np.ndarray[float], y: np.ndarray[float], sigma: float = 2.0, xlabel: str = 'x', ylabel: str = 'y'):
+        """Export the contour data to a CSV file.
+
+        Parameters
+        ----------
+        filename : str
+            The name of the output CSV file.
+        x : np.ndarray[float]
+            The x-coordinates of the data points.
+        y : np.ndarray[float]
+            The y-coordinates of the data points.
+        sigma : float, optional
+            The significance level for the contour (default is 2.0).
+        xlabel : str, optional
+            The label for the x-axis (default is 'x').
+        ylabel : str, optional
+            The label for the y-axis (default is 'y').
+        """
+        if len(self.significance().shape) != 2:
+            raise ValueError("Significance must be a 2D array for contours.")
+        lines = contourpy.contour_generator(x, y, np.nan_to_num(self.significance()), line_type=contourpy.LineType.ChunkCombinedNan).lines(sigma)[0][0]
+        if lines is None:
+            raise ValueError(f"No contour found for significance level {sigma}.")
+        with open(filename, 'w') as f:
+            f.write(f"{xlabel},{ylabel}\n")
+            for i in range(lines.shape[0]):
+                f.write(f"{lines[i, 0]},{lines[i, 1]}\n")
+
 
 def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, couplings, fa, min_probability=1e-3, br_dark = 0.0, sm_pred=0, sm_uncert=0, **kwargs):
     kwargs_dw = {k: v for k, v in kwargs.items() if k != 'theta'}
