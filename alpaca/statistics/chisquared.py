@@ -84,17 +84,41 @@ class ChiSquared:
         """Return a Markdown representation of the ChiSquared object."""
         return self.sector._repr_markdown_()
     
-    def contour_to_csv(self, filename: str, x: np.ndarray[float], y: np.ndarray[float], sigma: float = 2.0, xlabel: str = 'x', ylabel: str = 'y'):
-        """Export the contour data to a CSV file.
+    def contour(self, x: np.ndarray[float], y: np.ndarray[float], sigma: float = 2.0) -> tuple[np.ndarray[float], np.ndarray[float]]:
+        """Generate contour lines for the chi-squared significance.
 
         Parameters
         ----------
-        filename : str
-            The name of the output CSV file.
         x : np.ndarray[float]
             The x-coordinates of the data points.
         y : np.ndarray[float]
             The y-coordinates of the data points.
+        sigma : float, optional
+            The significance level for the contour (default is 2.0).
+
+        Returns
+        -------
+        tuple[np.ndarray[float], np.ndarray[float]]
+            The x and y coordinates of the contour lines.
+        """
+        if len(self.significance().shape) != 2:
+            raise ValueError("Significance must be a 2D array for contours.")
+        lines = contourpy.contour_generator(x, y, np.nan_to_num(self.significance()), line_type=contourpy.LineType.ChunkCombinedNan).lines(sigma)[0][0]
+        if lines is None:
+            raise ValueError(f"No contour found for significance level {sigma}.")
+        return lines[:, 0], lines[:, 1]
+
+    def contour_to_csv(self, x: np.ndarray[float], y: np.ndarray[float], filename: str, sigma: float = 2.0, xlabel: str = 'x', ylabel: str = 'y'):
+        """Export the contour data to a CSV file.
+
+        Parameters
+        ----------
+        x : np.ndarray[float]
+            The x-coordinates of the data points.
+        y : np.ndarray[float]
+            The y-coordinates of the data points.
+        filename : str
+            The name of the output CSV file.
         sigma : float, optional
             The significance level for the contour (default is 2.0).
         xlabel : str, optional
@@ -102,15 +126,11 @@ class ChiSquared:
         ylabel : str, optional
             The label for the y-axis (default is 'y').
         """
-        if len(self.significance().shape) != 2:
-            raise ValueError("Significance must be a 2D array for contours.")
-        lines = contourpy.contour_generator(x, y, np.nan_to_num(self.significance()), line_type=contourpy.LineType.ChunkCombinedNan).lines(sigma)[0][0]
-        if lines is None:
-            raise ValueError(f"No contour found for significance level {sigma}.")
+        points = self.contour(x, y, sigma)
         with open(filename, 'w') as f:
             f.write(f"{xlabel},{ylabel}\n")
-            for i in range(lines.shape[0]):
-                f.write(f"{lines[i, 0]},{lines[i, 1]}\n")
+            for xi, yi in zip(points[0], points[1]):
+                f.write(f"{xi},{yi}\n")
 
 
 def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, couplings, fa, min_probability=1e-3, br_dark = 0.0, sm_pred=0, sm_uncert=0, **kwargs):
@@ -144,13 +164,14 @@ def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, coupling
     sigma_right = measurement.get_sigma_right(ma, ctau)
     central = measurement.get_central(ma, ctau)
     value = prob_decay*br+sm_pred
-    if measurement.conf_level is None:
-        sigma = np.where(value > central, sigma_right, sigma_left)
-        return (central - value)**2/(sigma**2 + sm_uncert**2), np.where(np.isnan(central), 0, 1)
-    else:
-        chi2 = np.where(value > central, (central - value)**2/sigma_right**2, 0)
-        dofs = np.where(np.isnan(central), 0, np.where(value > central, 1, 0))
-        return chi2, dofs
+    with np.errstate(divide='ignore', invalid='ignore'):
+        if measurement.conf_level is None:
+            sigma = np.where(value > central, sigma_right, sigma_left)
+            chi2, dofs = (central - value)**2/(sigma**2 + sm_uncert**2), np.where(np.isnan(central), 0, 1)
+        else:
+            chi2 = np.where(value > central, (central - value)**2/sigma_right**2, 0)
+            dofs = np.where(np.isnan(central), 0, np.where(value > central, 1, 0))
+    return chi2, dofs
 
 def combine_chi2(chi2: list[ChiSquared], name: str, tex: str, description: str = '') -> ChiSquared:
     """Combine chi-squared values from different measurements.
