@@ -36,10 +36,12 @@ def exclusionplot(x: np.ndarray[float], y: np.ndarray[float], chi2: list[ChiSqua
     if ax is None:
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1, xticks=[], yticks=[])
+    else:
+        fig = ax.get_figure()
     legend_elements = []
     if global_chi2 is None:
         global_chi2 = combine_chi2(chi2, 'Global', 'Global', 'Global')
-    pl = plt.contourf(x,y, global_chi2.significance(), levels=list(np.linspace(0, 5, 150)), cmap=cmap_trafficlights, vmax=5, extend='max', zorder=-20)
+    pl = ax.contourf(x,y, global_chi2.significance(), levels=list(np.linspace(0, 5, 150)), cmap=cmap_trafficlights, vmax=5, extend='max', zorder=-20)
     
     i_color = 0
     i_ls = 0
@@ -64,18 +66,18 @@ def exclusionplot(x: np.ndarray[float], y: np.ndarray[float], chi2: list[ChiSqua
             lw = c.sector.lw
         else:
             lw = 1.0
-        plt.contour(x, y, mask, levels=[2], colors = color, linestyles=ls, linewidths=lw)
+        ax.contour(x, y, mask, levels=[2], colors = color, linestyles=ls, linewidths=lw)
         legend_elements.append(plt.Line2D([0], [0], color=color, ls=ls, label=c.sector.tex, lw=lw))
     ax.set_xscale('log')
     ax.set_yscale('log')
-    cb = plt.colorbar(pl, extend='max')
+    cb = fig.colorbar(pl, extend='max')
     cb.set_label(r'Exclusion significance [$\sigma$]')
     cb.set_ticks([0, 1, 2, 3, 4, 5])
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
     if title is not None:
-        plt.title(title, fontsize=12)
-    plt.legend(handles = legend_elements, loc='center left', bbox_to_anchor=(1, 0.5), borderaxespad=9, fontsize=8)
+        ax.set_title(title, fontsize=12)
+    ax.legend(handles = legend_elements, loc='center left', bbox_to_anchor=(1, 0.5), borderaxespad=9, fontsize=8)
     plt.tight_layout()
 
     ax.set_rasterization_zorder(-10)
