@@ -38,7 +38,7 @@ def exclusionplot(x: np.ndarray[float], y: np.ndarray[float], chi2: list[ChiSqua
         ax = fig.add_subplot(1, 1, 1, xticks=[], yticks=[])
     else:
         fig = ax.get_figure()
-    legend_elements = []
+    legend_elements = ax.get_legend_handles_labels()[0]
     if global_chi2 is None:
         global_chi2 = combine_chi2(chi2, 'Global', 'Global', 'Global')
     pl = ax.contourf(x,y, global_chi2.significance(), levels=list(np.linspace(0, 5, 150)), cmap=cmap_trafficlights, vmax=5, extend='max', zorder=-20)
