@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
+import distinctipy
 plt.rcParams.update({'font.size': 12, 'text.usetex': True, 'font.family': 'serif', 'font.serif': 'Computer Modern Roman'})
 import numpy as np
-from ..statistics.functions import nsigmas
-from .palettes import darker_set3, trafficlights
+from .palettes import trafficlights
 from ..statistics.chisquared import ChiSquared, combine_chi2
 
 def exclusionplot(x: np.ndarray[float], y: np.ndarray[float], chi2: list[ChiSquared] | ChiSquared, xlabel: str, ylabel: str, title: str | None = None, ax: plt.Axes | None = None, global_chi2: ChiSquared | None = None) -> plt.Axes:
@@ -31,8 +31,6 @@ def exclusionplot(x: np.ndarray[float], y: np.ndarray[float], chi2: list[ChiSqua
 
     """
     cmap_trafficlights = ListedColormap(trafficlights+['#000000'])
-    colors = darker_set3*4
-    lss = ['solid']*len(darker_set3) + ['dashed']*len(darker_set3) + ['dotted']*len(darker_set3) + ['dashdot']*len(darker_set3)
     if ax is None:
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1, xticks=[], yticks=[])
@@ -48,25 +46,32 @@ def exclusionplot(x: np.ndarray[float], y: np.ndarray[float], chi2: list[ChiSqua
         global_chi2 = combine_chi2(chi2, 'Global', 'Global', 'Global')
     pl = ax.contourf(x,y, global_chi2.significance(), levels=list(np.linspace(0, 5, 150)), cmap=cmap_trafficlights, vmax=5, extend='max', zorder=-20)
     
-    i_color = 0
-    i_ls = 0
+    colors_used = ['#ffffff', '#bfff86', '#fffd66', '#f06060', '#68292a', '#000000']
+    chi2_contours = []
     for c in chi2:
         sigmas = c.significance()
         if np.all(np.isnan(sigmas)):
             continue
         if np.nanmax(sigmas) < 2:
             continue
+        chi2_contours.append(c)
+        if c.sector.color is not None:
+            colors_used.append(c.sector.color)
+    hex2rgb = lambda hex: tuple(int(hex[i:i+2], 16)/255 for i in (1, 3, 5))
+    palette = distinctipy.get_colors(len(chi2_contours)- (len(colors_used)-6), exclude_colors=[hex2rgb(c) for c in colors_used], pastel_factor=0.7)
+    i_color = 0
+    for c in chi2_contours:
+        sigmas = c.significance()
         mask = np.nan_to_num(sigmas)
         if c.sector.color is not None:
             color = c.sector.color
         else:
-            color = colors[i_color]
+            color = palette[i_color]
             i_color += 1
         if c.sector.ls is not None:
             ls = c.sector.ls
         else:
-            ls = lss[i_ls]
-            i_ls += 1
+            ls = 'solid'
         if c.sector.lw is not None:
             lw = c.sector.lw
         else:
@@ -82,7 +87,8 @@ def exclusionplot(x: np.ndarray[float], y: np.ndarray[float], chi2: list[ChiSqua
     ax.set_ylabel(ylabel)
     if title is not None:
         ax.set_title(title, fontsize=12)
-    ax.legend(handles = legend_elements, loc='center left', bbox_to_anchor=(1, 0.5), borderaxespad=9, fontsize=8)
+    if len(legend_elements) > 0:
+        ax.legend(handles = legend_elements, loc='center left', bbox_to_anchor=(1, 0.5), borderaxespad=9, fontsize=8)
     plt.tight_layout()
 
     ax.set_rasterization_zorder(-10)
