@@ -27,7 +27,7 @@ class ChiSquared:
         ndof = np.sum([v for v in self.dofs_dict.values()], axis=0)
         p = 1 - scipy.stats.chi2.cdf(np.where(ndof == 0, np.nan, chi2), ndof)
         p = np.clip(p, 2e-16, 1)
-        return scipy.stats.norm.ppf(1 - p/2)
+        return np.nan_to_num(scipy.stats.norm.ppf(1 - p/2))
 
     def __getitem__(self, meas: tuple[str, str]) -> 'ChiSquared':
         obs, experiment = meas
