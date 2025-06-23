@@ -1,6 +1,8 @@
 import yaml
 from ..decays.decays import to_tex, canonical_transition
+from ..experimental_data import get_measurements
 import os
+import copy
 
 class Sector:
     """
@@ -26,15 +28,13 @@ class Sector:
         if observables is not None:
             self.observables = set()
             for obs in observables:
-                if isinstance(obs, str):
-                    self.observables.add(canonical_transition(obs))
-                elif isinstance(obs, (list, tuple)):
-                    self.observables.add((canonical_transition(obs[0]), obs[1]))
+                self.observables.add(canonical_transition(obs))
         else:
             self.observables = None
         if obs_measurements is not None:
-            self.obs_measurements = {canonical_transition(k): set(v) for k, v in obs_measurements.items() if isinstance(k, str)}
-            self.obs_measurements |= {(canonical_transition(k[0]), k[1]): set(v) for k, v in obs_measurements.items() if isinstance(k, (list, tuple))}
+            if self.observables is not None:
+                obs_measurements = {k: v for k, v in obs_measurements.items() if canonical_transition(k) not in self.observables}
+            self.obs_measurements = {canonical_transition(k): set(v) for k, v in obs_measurements.items()}
         else:
             self.obs_measurements = None
         self.tex = tex
@@ -146,6 +146,66 @@ class Sector:
             elif isinstance(observable, (list, tuple)):
                 res = res or (canonical_transition(observable[0]), observable[1]) in self.obs_measurements.keys()
         return res
+    
+    def exclude_observables(self, observables: str | list[str]) -> 'Sector':
+        """
+        Remove an observable from the sector.
+
+        Parameters
+        ----------
+        observable : str
+            The observable to remove.
+        """
+        if isinstance(observables, str):
+            observables = [observables,]
+        s = copy.copy(self)
+        for observable in observables:
+            if not s.contains_observable(observable):
+                raise ValueError(f"Observable {observable} not found in sector {s.name}.")
+            if s.observables is not None:
+                s.observables.discard(canonical_transition(observable))
+            if s.obs_measurements is not None:
+                s.obs_measurements.pop(canonical_transition(observable), None)
+        return s
+    
+    def exclude_measurements(self, measurements: tuple[str, str] | list[tuple[str, str]]) -> 'Sector':
+        """
+        Remove specific measurements from the sector.
+
+        Parameters
+        ----------
+        measurements : tuple[str, str] | list[tuple[str, str]]
+            The measurements to remove, specified as tuples of (observable, measurement).
+
+        Returns
+        -------
+        Sector
+            A new Sector instance with the specified measurements removed.
+        """
+        s = copy.copy(self)
+        if isinstance(measurements, tuple):
+            measurements = [measurements,]
+        for measurement in measurements:
+            observable, measurement_name = measurement
+            if not s.contains_observable(observable):
+                raise ValueError(f"Observable {observable} not found in sector {s.name}.")
+            available_measurements = get_measurements(observable)
+            if measurement_name not in available_measurements:
+                raise ValueError(f"Measurement {measurement_name} not found for observable {observable} in sector {s.name}. Available measurements: {available_measurements}")
+            if s.observables is not None and canonical_transition(observable) in s.observables:
+                s.observables.remove(canonical_transition(observable))
+                d_valid = {canonical_transition(observable): set(available_measurements) - {measurement_name}}
+                if s.obs_measurements is None:
+                    s.obs_measurements = d_valid
+                else:
+                    s.obs_measurements.update(d_valid)
+            elif s.obs_measurements is not None and canonical_transition(observable) in s.obs_measurements.keys():
+                if measurement_name in s.obs_measurements[canonical_transition(observable)]:
+                    s.obs_measurements[canonical_transition(observable)].remove(measurement_name)
+                    if not s.obs_measurements[canonical_transition(observable)]:
+                        del s.obs_measurements[canonical_transition(observable)]
+        return s
+
 
 def combine_sectors(sectors: list[Sector], name: str, tex: str, description: str = "") -> Sector:
     """

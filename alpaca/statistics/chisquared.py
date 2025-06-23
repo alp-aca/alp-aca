@@ -135,6 +135,28 @@ class ChiSquared:
             for xi, yi in zip(points[0], points[1]):
                 f.write(f"{xi},{yi}\n")
 
+    def exclude_observables(self, observables: str | list[str]) -> 'ChiSquared':
+        """Exclude specific observable(s) from the ChiSquared object."""
+        if isinstance(observables, str):
+            observables = [observables,]
+        observables = [canonical_transition(obs) for obs in observables]
+        chi2_dict = {k: v for k, v in self.chi2_dict.items() if k[0] not in observables}
+        dofs_dict = {k: v for k, v in self.dofs_dict.items() if k[0] not in observables}
+
+        return ChiSquared(self.sector.exclude_observables(observables), chi2_dict, dofs_dict)
+    
+    def exclude_measurements(self, measurements: tuple[str, str] | list[tuple[str, str]]) -> 'ChiSquared':
+        """Exclude specific measurement(s) from the ChiSquared object."""
+        if not isinstance(measurements, list):
+            measurements = [measurements,]
+        exc = [(canonical_transition(m[0]), m[1]) for m in measurements]
+        chi2_dict = self.chi2_dict.copy()
+        dofs_dict = self.dofs_dict.copy()
+        for e in exc:
+            chi2_dict.pop(e)
+            dofs_dict.pop(e)
+        return ChiSquared(self.sector.exclude_measurements(measurements), chi2_dict, dofs_dict)
+
 class ChiSquaredList(list[ChiSquared]):
     """A list of ChiSquared objects with additional methods for combining and manipulating them."""
     
@@ -154,6 +176,63 @@ class ChiSquaredList(list[ChiSquared]):
         results = []
         for chi2 in self:
             results.extend(chi2.split_observables())
+        return ChiSquaredList(results)
+    
+    def extract_observables(self, observables: str | list[str]) -> 'ChiSquaredList':
+        """Extract ChiSquared objects for a specific observable(s) from the list."""
+        results = []
+        if isinstance(observables, str):
+            observables = [observables,]
+        for observable in observables:
+            for chi2 in self:
+                for c in chi2.split_observables():
+                    if c.sector.contains_observable(observable):
+                        results.append(c)
+        return ChiSquaredList(results)
+    
+    def contains_observable(self, observable: str) -> bool:
+        """Check if any ChiSquared object in the list contains a specific observable."""
+        return any(chi2.sector.contains_observable(observable) for chi2 in self)
+    
+    def get_measurements(self) -> list[tuple[str, str]]:
+        """Get a list of all measurements (observable, experiment) from the ChiSquared objects in the list."""
+        measurements = set()
+        for chi2 in self:
+            measurements.update(chi2.get_measurements())
+        return list(measurements)
+    
+    def get_observables(self) -> set[str]:
+        """Get a set of all observables from the ChiSquared objects in the list."""
+        observables = set()
+        for chi2 in self:
+            if chi2.sector.observables is not None:
+                observables.update(chi2.sector.observables)
+            if chi2.sector.obs_measurements is not None:
+                observables.update(chi2.sector.obs_measurements.keys())
+        return observables
+    
+    def exclude_observables(self, observables: str | list[str]) -> 'ChiSquaredList':
+        """Exclude specific observable(s) from all ChiSquared objects in the list."""
+        if isinstance(observables, str):
+            observables = [observables,]
+        observables = [canonical_transition(obs) for obs in observables]
+        results = []
+        for chi2 in self:
+            obs_sector = set(m[0] for m in chi2.get_measurements())
+            obs_removed = list(set(observables) & obs_sector)
+            results.append(chi2.exclude_observables(obs_removed))
+        return ChiSquaredList(results)
+    
+    def exclude_measurements(self, measurements: tuple[str, str] | list[tuple[str, str]]) -> 'ChiSquaredList':
+        """Exclude specific measurement(s) from all ChiSquared objects in the list."""
+        if not isinstance(measurements, list):
+            measurements = [measurements,]
+        exc = [(canonical_transition(m[0]), m[1]) for m in measurements]
+        results = []
+        for chi2 in self:
+            measurements_sector = set(chi2.get_measurements())
+            measurements_removed = list(set(exc) & measurements_sector)
+            results.append(chi2.exclude_measurements(measurements_removed))
         return ChiSquaredList(results)
     
     def __str__(self) -> str:

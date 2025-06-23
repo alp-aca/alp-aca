@@ -14,7 +14,7 @@ def parse(transition: str) -> tuple[list[str], list[str]]:
     final = sorted([particle_aliases[p.strip()] for p in final.split()])
     return initial, final
 
-def canonical_transition(transition: str) -> str:
+def canonical_transition(transition: str | tuple[str, float]) -> str | tuple[str, float]:
     """ Convert a transition string to its canonical form.
 
     Parameters
@@ -27,6 +27,8 @@ def canonical_transition(transition: str) -> str:
     str :
         The canonical transition string in the form 'initial -> final'.
     """
+    if isinstance(transition, (tuple, list)) and len(transition) == 2:
+        return (canonical_transition(transition[0]), transition[1])
     if '->' not in transition:
         return transition.strip()
     initial, final = parse(transition)
