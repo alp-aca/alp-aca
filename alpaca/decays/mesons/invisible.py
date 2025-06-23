@@ -26,7 +26,7 @@ def Kminustopia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, *
     kD = coupl_low['kD'][0,0]
     ks = coupl_low['kd'][1,1]
     kS = coupl_low['kD'][1,1]
-    parsSM = runSM(ma)
+    parsSM = runSM(mK)
     Vckm = parsSM['CKM']
     
     chiralG8 = -GF/np.sqrt(2)*np.conjugate(Vckm[0,0])*Vckm[0,1]*g8
@@ -58,7 +58,7 @@ def Kplustopia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **
     kD = coupl_low['kD'][0,0]
     ks = coupl_low['kd'][1,1]
     kS = coupl_low['kD'][1,1]
-    parsSM = runSM(ma)
+    parsSM = runSM(mK)
     Vckm = parsSM['CKM']
 
     chiralG8 = -GF/np.sqrt(2)*np.conjugate(Vckm[0,0])*Vckm[0,1]*g8
@@ -88,7 +88,7 @@ def ampK0topia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **
     kD = coupl_low['kD'][0,0]
     ks = coupl_low['kd'][1,1]
     kS = coupl_low['kD'][1,1]
-    parsSM = runSM(ma)
+    parsSM = runSM(mK)
     Vckm = parsSM['CKM']
     N8 = -g8*GF/np.sqrt(2)*np.conj(Vckm[0,0])*Vckm[0,1]*fpi**2*(np.cos(delta8)+1j*np.sin(delta8))
 
