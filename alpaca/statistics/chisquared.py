@@ -32,7 +32,7 @@ class ChiSquared:
     def __getitem__(self, meas: tuple[str, str]) -> 'ChiSquared':
         obs, experiment = meas
         if (obs, experiment) in self.chi2_dict.keys() and (obs, experiment) in self.dofs_dict.keys():
-            s = Sector(obs + ' @ ' + experiment, to_tex(obs) + r'\ \mathrm{(' + experiment + ')}$', obs_measurements = {obs: set([experiment,])} , description=f'Measurement of {obs} at experiment {experiment}.')
+            s = Sector(obs + ' @ ' + experiment, '$' + to_tex(obs).replace('$', '') + r'\ \mathrm{(' + experiment + ')}$', obs_measurements = {obs: set([experiment,])} , description=f'Measurement of {obs} at experiment {experiment}.')
             return ChiSquared(s, {(obs, experiment): self.chi2_dict[(obs, experiment)]}, {(obs, experiment): self.dofs_dict[(obs, experiment)]})
         else:
             raise KeyError(f'Unknown experiment {obs}, {meas}')
@@ -47,7 +47,7 @@ class ChiSquared:
         results = []
         for m in self.get_measurements():
             obs, experiment = m
-            s = Sector(str(obs) + ' @ ' + experiment, to_tex(obs)[:-1] + r'\ \mathrm{(' + experiment + ')}$', obs_measurements = {obs: set([experiment,])}, description=f'Measurement of {obs} at experiment {experiment}.')
+            s = Sector(str(obs) + ' @ ' + experiment, '$' + to_tex(obs).replace('$', '') + r'\ \mathrm{(' + experiment + ')}$', obs_measurements = {obs: set([experiment,])}, description=f'Measurement of {obs} at experiment {experiment}.')
             results.append(ChiSquared(s, {(obs, experiment): self.chi2_dict[m]}, {(obs, experiment): self.dofs_dict[m]}))
         return results
     
@@ -172,6 +172,110 @@ class ChiSquared:
         ids_tex = {f'${to_tex(k[0])}$ at {k[1]} ': v for k, v in ids.items()}
         citation_report(ids_tex, filename)
 
+    def shape(self) -> tuple[int, ...]:
+        """Get the shape of the chi-squared values."""
+        return self.significance().shape
+
+    def constraining_measurements(self, mode: str = 'y-inverted') -> 'ChiSquaredList':
+        """Get the constraining measurements for the ChiSquared object.
+
+        Parameters
+        ----------
+        mode : str, optional
+            The mode for constraining measurements. Options are:
+             - 'y-inverted': Selects the measurements that constrain high values of the y-axis.
+             - 'y': Selects the measurements that constrain low values of the y-axis.
+             - 'grid': Selects the measurements that constrain each grid point.
+
+        Returns
+        -------
+        ChiSquaredList
+            A list of ChiSquared objects representing the constraining measurements.
+        """
+        if mode not in ['y-inverted', 'y', 'grid']:
+            raise ValueError("Mode must be either 'y-inverted', 'y' or 'grid'.")
+        
+        sectors_plot = set()
+        if mode == 'y-inverted':
+            start_y = self.shape()[1] - 1
+            delta_y = -1
+            end_y = -1
+        elif mode == 'y':
+            start_y = 0
+            delta_y = 1
+            end_y = self.shape()[1]
+        if mode in ['y-inverted', 'y']:
+            if len(self.shape()) != 2:
+                raise ValueError("ChiSquared object must have a 2D shape for 'y-inverted' or 'y' mode.")
+            for x in range(self.shape()[0]):
+                new_sectors = []
+                for y in range(start_y, end_y, delta_y):
+                    for chi2 in self.split_measurements():
+                        if chi2.significance()[y, x] > 3.0:
+                            new_sectors.append(chi2.get_measurements()[0])
+                    if len(new_sectors) > 0:
+                        sectors_plot.update(set(new_sectors))
+                        break
+        elif mode == 'grid':
+            splitted = self.split_measurements()
+            sigmas = [c.significance() for c in splitted]
+            sigmas_max = np.clip(np.max(sigmas, axis=0), 2.0, 10)
+            for i, chi2 in enumerate(splitted):
+                if np.any(sigmas[i] == sigmas_max):
+                    sectors_plot.update(set(chi2.get_measurements()))
+
+        return ChiSquaredList([self[m] for m in sectors_plot])
+
+    def constraining_observables(self, mode: str = 'y-inverted') -> 'ChiSquaredList':
+        """Get the constraining observables for the ChiSquared object.
+
+        Parameters
+        ----------
+        mode : str, optional
+            The mode for constraining observables. Options are:
+             - 'y-inverted': Selects the observables that constrain high values of the y-axis.
+             - 'y': Selects the observables that constrain low values of the y-axis.
+             - 'grid': Selects the observables that constrain each grid point.
+
+        Returns
+        -------
+        ChiSquaredList
+            A list of ChiSquared objects representing the constraining observables.
+        """
+        if mode not in ['y-inverted', 'y', 'grid']:
+            raise ValueError("Mode must be either 'y-inverted', 'y' or 'grid'.")
+        
+        sectors_plot = set()
+        if mode == 'y-inverted':
+            start_y = self.shape()[1] - 1
+            delta_y = -1
+            end_y = -1
+        elif mode == 'y':
+            start_y = 0
+            delta_y = 1
+            end_y = self.shape()[1]
+        if mode in ['y-inverted', 'y']:
+            if len(self.shape()) != 2:
+                raise ValueError("ChiSquared object must have a 2D shape for 'y-inverted' or 'y' mode.")
+            for x in range(self.shape()[0]):
+                new_sectors = []
+                for y in range(start_y, end_y, delta_y):
+                    for chi2 in self.split_observables():
+                        if chi2.significance()[y, x] > 3.0:
+                            new_sectors.append(chi2.get_measurements()[0][0])
+                    if len(new_sectors) > 0:
+                        sectors_plot.update(set(new_sectors))
+                        break
+        elif mode == 'grid':
+            splitted = self.split_observables()
+            sigmas = [c.significance() for c in splitted]
+            sigmas_max = np.clip(np.max(sigmas, axis=0), 2.0, 10)
+            for i, chi2 in enumerate(splitted):
+                if np.any(sigmas[i] == sigmas_max):
+                    sectors_plot.update(set(chi2.get_measurements()))
+
+        return ChiSquaredList(self.split_observables()).extract_observables(sectors_plot)
+
 class ChiSquaredList(list[ChiSquared]):
     """A list of ChiSquared objects with additional methods for combining and manipulating them."""
     
@@ -270,6 +374,42 @@ class ChiSquaredList(list[ChiSquared]):
         ids = self.get_inspire_ids()
         ids_tex = {f'{to_tex(k[0])} at {k[1]}': v for k, v in ids.items()}
         citation_report(ids_tex, filename)
+
+    def constraining_measurements(self, mode: str = 'y-inverted') -> 'ChiSquaredList':
+        """Get the constraining measurements for the ChiSquaredList.
+
+        Parameters
+        ----------
+        mode : str, optional
+            The mode for constraining measurements. Options are:
+             - 'y-inverted': Selects the measurements that constrain high values of the y-axis.
+             - 'y': Selects the measurements that constrain low values of the y-axis.
+             - 'grid': Selects the measurements that constrain each grid point.
+
+        Returns
+        -------
+        ChiSquaredList
+            A list of ChiSquared objects representing the constraining measurements.
+        """
+        return self.combine('', '').constraining_measurements(mode)
+    
+    def constraining_observables(self, mode: str = 'y-inverted') -> 'ChiSquaredList':
+        """Get the constraining observables for the ChiSquaredList.
+
+        Parameters
+        ----------
+        mode : str, optional
+            The mode for constraining observables. Options are:
+             - 'y-inverted': Selects the observables that constrain high values of the y-axis.
+             - 'y': Selects the observables that constrain low values of the y-axis.
+             - 'grid': Selects the observables that constrain each grid point.
+
+        Returns
+        -------
+        ChiSquaredList
+            A list of ChiSquared objects representing the constraining observables.
+        """
+        return self.combine('', '').constraining_observables(mode)
 
 def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, couplings, fa, min_probability=1e-3, br_dark = 0.0, sm_pred=0, sm_uncert=0, **kwargs):
     kwargs_dw = {k: v for k, v in kwargs.items() if k != 'theta'}
