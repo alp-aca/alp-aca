@@ -80,6 +80,9 @@ class ChiSquared:
         if ls is not None:
             self.sector.ls = ls
 
+    def __repr__(self) -> str:
+        return f'ChiSquared(sector="{self.sector.name}")'
+
     def _repr_markdown_(self) -> str:
         """Return a Markdown representation of the ChiSquared object."""
         return self.sector._repr_markdown_()
@@ -132,6 +135,34 @@ class ChiSquared:
             for xi, yi in zip(points[0], points[1]):
                 f.write(f"{xi},{yi}\n")
 
+class ChiSquaredList(list[ChiSquared]):
+    """A list of ChiSquared objects with additional methods for combining and manipulating them."""
+    
+    def combine(self, name: str, tex: str, description: str = '') -> ChiSquared:
+        """Combine the chi-squared values from the list into a single ChiSquared object."""
+        return combine_chi2(self, name, tex, description)
+    
+    def split_measurements(self) -> 'ChiSquaredList':
+        """Split each ChiSquared object in the list into individual measurements."""
+        results = []
+        for chi2 in self:
+            results.extend(chi2.split_measurements())
+        return ChiSquaredList(results)
+    
+    def split_observables(self) -> 'ChiSquaredList':
+        """Split each ChiSquared object in the list into individual observables."""
+        results = []
+        for chi2 in self:
+            results.extend(chi2.split_observables())
+        return ChiSquaredList(results)
+    
+    def __str__(self) -> str:
+        lnum = len(str(len(self)-1))
+        return '\n'.join(f'{i:>{lnum}}:\t{chi2.sector.name}' for i, chi2 in enumerate(self))
+    
+    def _repr_markdown_(self) -> str:
+        """Return a Markdown representation of the ChiSquaredList."""
+        return '|Index|Sector|\n| :-: | :- |\n' + '\n'.join(f'|{i}|${chi2.sector.tex.replace('|', r'\|')}$|' for i, chi2 in enumerate(self))
 
 def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, couplings, fa, min_probability=1e-3, br_dark = 0.0, sm_pred=0, sm_uncert=0, **kwargs):
     kwargs_dw = {k: v for k, v in kwargs.items() if k != 'theta'}
@@ -195,7 +226,7 @@ def combine_chi2(chi2: list[ChiSquared], name: str, tex: str, description: str =
         dofs_dict |= c.dofs_dict
     return ChiSquared(sector, chi2_dict, dofs_dict)
 
-def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma: np.ndarray[float], couplings: np.ndarray[ALPcouplings], fa: np.ndarray[float], min_probability = 1e-3, exclude_projections=True, **kwargs) -> list[ChiSquared]:
+def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma: np.ndarray[float], couplings: np.ndarray[ALPcouplings], fa: np.ndarray[float], min_probability = 1e-3, exclude_projections=True, **kwargs) -> ChiSquaredList:
     """Calculate the chi-squared values for a set of transitions.
 
     Parameters
@@ -283,4 +314,4 @@ def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma:
         
         results.append(ChiSquared(s, chi2_dict, dofs_dict))
 
-    return results
+    return ChiSquaredList(results)
