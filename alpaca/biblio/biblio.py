@@ -98,6 +98,29 @@ def citations_context(merge: bool = True):
     '''
     return _citations_context(merge)
 
+def citation_report(inspire_ids: dict, filename: str):
+    """Generate a citation report for the measurements from a dict of InSpire ids."""
+    with open(f'{filename}.tex', 'wt') as ftex:
+        ftex.write('\\documentclass{article}\n\\begin{document}\n\\begin{itemize}\n')
+        for key, id in inspire_ids.items():
+            if isinstance(id, list):
+                id_str = ','.join(id)
+            else:
+                id_str = id
+            ftex.write(f'\\item {key}: \\cite{{{id_str}}}\n')
+        ftex.write('\\end{itemize}\n')
+        ftex.write(f'\\bibliographystyle{{plain}}\n\\bibliography{{{filename}}}\n')
+        ftex.write('\\end{document}\n')
+
+    with open(f'{filename}.tex', 'rt') as ftex:
+        r = requests.post('https://inspirehep.net/api/bibliography-generator?format=bibtex', files={'file': ftex})
+    r.raise_for_status()
+    r2 = requests.get(r.json()['data']['download_url'], stream=True)
+    r2.raise_for_status()
+    with open(f'{filename}.bib', 'wb') as f:
+        for chunck in r2.iter_content(chunk_size=16*1024):
+            f.write(chunck)
+
 class Constant(float):
     def __new__(self, val: float, source: str):
         return float.__new__(self, val)

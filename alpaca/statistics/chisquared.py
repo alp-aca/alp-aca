@@ -12,7 +12,7 @@ from ..experimental_data.measurements_exp import get_measurements
 from ..experimental_data.theoretical_predictions import get_th_uncert, get_th_value
 from ..rge import ALPcouplings
 from ..sectors import Sector, combine_sectors
-
+from ..biblio import citation_report
 class ChiSquared:
     def __init__(self, sector: Sector,
                  chi2_dict: dict[tuple[str, str], np.ndarray[float]],
@@ -156,6 +156,21 @@ class ChiSquared:
             chi2_dict.pop(e)
             dofs_dict.pop(e)
         return ChiSquared(self.sector.exclude_measurements(measurements), chi2_dict, dofs_dict)
+    
+    def get_inspire_ids(self) -> dict[tuple[str, str], str | list[str]]:
+        """Get the Inspire IDs of the measurements in the ChiSquared object."""
+        ids = {}
+        for obs, experiment in self.get_measurements():
+            measurements = get_measurements(obs)
+            if experiment in measurements:
+                ids[(obs, experiment)] = measurements[experiment].inspire_id
+        return ids
+    
+    def citation_report(self, filename: str):
+        """Generate a citation report for the measurements in the ChiSquared object."""
+        ids = self.get_inspire_ids()
+        ids_tex = {f'${to_tex(k[0])}$ at {k[1]} ': v for k, v in ids.items()}
+        citation_report(ids_tex, filename)
 
 class ChiSquaredList(list[ChiSquared]):
     """A list of ChiSquared objects with additional methods for combining and manipulating them."""
@@ -242,6 +257,19 @@ class ChiSquaredList(list[ChiSquared]):
     def _repr_markdown_(self) -> str:
         """Return a Markdown representation of the ChiSquaredList."""
         return '|Index|Sector|\n| :-: | :- |\n' + '\n'.join(f'|{i}|${chi2.sector.tex.replace('|', r'\|')}$|' for i, chi2 in enumerate(self))
+    
+    def get_inspire_ids(self) -> dict[tuple[str, str], str | list[str]]:
+        """Get the Inspire IDs of the measurements in the ChiSquaredList."""
+        ids = {}
+        for chi2 in self:
+            ids.update(chi2.get_inspire_ids())
+        return ids
+    
+    def citation_report(self, filename: str):
+        """Generate a citation report for the measurements in the ChiSquared object."""
+        ids = self.get_inspire_ids()
+        ids_tex = {f'{to_tex(k[0])} at {k[1]}': v for k, v in ids.items()}
+        citation_report(ids_tex, filename)
 
 def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, couplings, fa, min_probability=1e-3, br_dark = 0.0, sm_pred=0, sm_uncert=0, **kwargs):
     kwargs_dw = {k: v for k, v in kwargs.items() if k != 'theta'}
