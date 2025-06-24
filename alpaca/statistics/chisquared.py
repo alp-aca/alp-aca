@@ -473,7 +473,7 @@ def combine_chi2(chi2: list[ChiSquared], name: str, tex: str, description: str =
         dofs_dict |= c.dofs_dict
     return ChiSquared(sector, chi2_dict, dofs_dict)
 
-def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma: np.ndarray[float], couplings: np.ndarray[ALPcouplings], fa: np.ndarray[float], min_probability = 1e-3, exclude_projections=True, **kwargs) -> ChiSquaredList:
+def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma: np.ndarray[float], couplings: np.ndarray[ALPcouplings], fa: np.ndarray[float], min_probability = 1e-3, br_dark = 0.0, exclude_projections=True, **kwargs) -> ChiSquaredList:
     """Calculate the chi-squared values for a set of transitions.
 
     Parameters
@@ -492,6 +492,9 @@ def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma:
 
     min_probability (float, optional):
         Minimum probability for decay. Default is 1e-3.
+
+    br_dark (float, optional):
+        Branching ratio for dark sector decays. Default is 0.0.
 
     exclude_projections (bool, optional):
         Whether to exclude projections from measurements. Default is True.
@@ -534,7 +537,7 @@ def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma:
         for experiment, measurement in measurements.items():
             sm_pred = get_th_value(t)
             sm_uncert = get_th_uncert(t)
-            dict_chi2[(t, experiment)] = chi2_obs(measurement, t, ma, couplings, fa, min_probability=min_probability, sm_pred=sm_pred, sm_uncert=sm_uncert, **kwargs)
+            dict_chi2[(t, experiment)] = chi2_obs(measurement, t, ma, couplings, fa, min_probability=min_probability, br_dark=br_dark, sm_pred=sm_pred, sm_uncert=sm_uncert, **kwargs)
     for t in obs_measurements.keys():
         if t not in dict_chi2:
             measurements = get_measurements(t, exclude_projections=exclude_projections)
@@ -542,7 +545,7 @@ def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma:
                 if experiment in obs_measurements[t]:
                     sm_pred = get_th_value(t)
                     sm_uncert = get_th_uncert(t)
-                    dict_chi2[(t, experiment)] = chi2_obs(measurement, t, ma, couplings, fa, min_probability=min_probability, sm_pred=sm_pred, sm_uncert=sm_uncert, **kwargs)
+                    dict_chi2[(t, experiment)] = chi2_obs(measurement, t, ma, couplings, fa, min_probability=min_probability, br_dark=br_dark, sm_pred=sm_pred, sm_uncert=sm_uncert, **kwargs)
             
     results = []
     for s in sectors:
