@@ -110,6 +110,12 @@ na62_Ktopiinv = MeasurementDisplacedVertexBound(
     decay_type = 'invisible'
 )
 
+e949_Ktopiinv = MeasurementDisplacedVertexBound(
+    'BNL-E949:2009dza',
+    os.path.join(current_dir, invisible, 'e949_kpiInv.npy'),
+    decay_type = 'invisible'
+)
+
 #J-PARC KOTO KL->pi0 nu nu
     #Experiment: KOTO
     #arXiv: 1810.09655
@@ -1881,7 +1887,7 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         return {'E653': e653_DstoKstmue}
     #Initial state K+
     elif initial == ['K+'] and final == sorted(['pion+', 'alp']):
-        return {'NA62': na62_Ktopiinv}    
+        return {'NA62': na62_Ktopiinv, 'E949': e949_Ktopiinv}    
     elif initial == ['K+'] and final == sorted(['pion+', 'electron', 'muon']):
         return {'NA62': na62_Kpluspimue}
     #elif initial == ['K+'] and final == sorted(['pion+', 'photon', 'photon']):
