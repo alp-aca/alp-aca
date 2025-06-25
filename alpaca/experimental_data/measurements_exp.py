@@ -802,6 +802,13 @@ lhcb_D0tomumu = MeasurementConstantBound(
     max_ma=np.inf,
 )
 
+cms_D0tomumu = MeasurementConstantBound(
+    'CMS:2025fmx',
+    'flat',
+    2.4e-9,
+    max_ma=np.inf,
+)
+
 #LHCb Ds+->pi+ mu mu
     #Experiment: LHCb
     #arXiv: 1304.6365
@@ -1884,7 +1891,7 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     elif initial == ['D0'] and final == sorted(['electron', 'electron']):
         return {'Belle': belle_D0toee}
     elif initial == ['D0'] and final == sorted(['muon', 'muon']):
-        return {'LHCb': lhcb_D0tomumu}
+        return {'LHCb': lhcb_D0tomumu, 'CMS': cms_D0tomumu}
     elif initial == ['D0'] and final == sorted(['pion0', 'muon', 'electron']):
         return {'BaBar': babar_D0pi0mue}
     elif initial == ['D0'] and final == sorted(['eta', 'muon', 'electron']):
