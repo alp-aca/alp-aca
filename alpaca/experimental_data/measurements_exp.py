@@ -721,6 +721,24 @@ lhcb_B0tomumu = MeasurementConstantBound(
     conf_level=0.95
 )
 
+atlasHL_Bstomumu = MeasurementConstant(
+    'ATLAS:2025eaw',
+    'flat',
+    3.68e-9,
+    0.4e-9,
+    0.4e-9,
+    max_ma=np.inf
+)
+
+atlasHL_B0tomumu = MeasurementConstant(
+    'ATLAS:2025eaw',
+    'flat',
+    1.06e-10,
+    0.48e-10,
+    0.48e-10,
+    max_ma=np.inf
+)
+
 lhcb_Bstoee = MeasurementConstantBound(
     'LHCb:2020pcv',
     'flat',
@@ -1784,7 +1802,10 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     elif initial == ['B0'] and final == ['electron', 'electron']:
         return {'LHCb': lhcb_B0toee}
     elif initial == ['B0'] and final == ['muon', 'muon']:
-        return {'LHCb': lhcb_B0tomumu, 'CMS': cms_B0tomumu}
+        if exclude_projections:
+            return {'LHCb': lhcb_B0tomumu, 'CMS': cms_B0tomumu}
+        else:
+            return {'LHCb': lhcb_B0tomumu, 'CMS': cms_B0tomumu, 'ATLAS HL-LHC': atlasHL_B0tomumu}
     elif initial == ['B0'] and final == sorted(['tau', 'tau']):
         return {'LHCb': lhcb_B0totautau}
     elif initial == ['B0'] and final == sorted(['photon', 'photon']):
@@ -1801,7 +1822,10 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     elif initial == ['Bs'] and final == ['electron', 'electron']:
         return {'LHCb': lhcb_Bstoee}
     elif initial == ['Bs'] and final == sorted(['muon', 'muon']):
-        return {'LHCb': lhcb_Bstomumu, 'CMS': cms_Bstomumu}
+        if exclude_projections:
+            return {'LHCb': lhcb_Bstomumu, 'CMS': cms_Bstomumu}
+        else:
+            return {'LHCb': lhcb_Bstomumu, 'CMS': cms_Bstomumu, 'ATLAS HL-LHC': atlasHL_Bstomumu}
     elif initial == ['Bs'] and final == sorted(['tau', 'tau']):
         return {'LHCb': lhcb_Bstotautau}
     elif initial == ['Bs'] and final == sorted(['photon', 'photon']):
