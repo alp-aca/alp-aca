@@ -2,7 +2,8 @@ from ..rge import ALPcouplings
 from ..common import B0disc_equalmass, ckm_xi
 from ..constants import GF, mu, md, ms, mc, mb, me, mmu, mtau, s2w, mW, mZ
 import numpy as np
-from ..common import g_photonloop, alpha_em, alpha_s
+from ..common import g_photonloop, alpha_em, alpha_s, B3
+from ..biblio.biblio import citations
 
 def effcoupling_ff(ma, couplings: ALPcouplings, fermion, **kwargs):
     mass = {'e': me, 'mu': mmu, 'tau': mtau, 'c': mc, 'b': mb}[fermion]
@@ -73,4 +74,19 @@ def effcouplings_cq1q2_W(couplings: ALPcouplings, pa2: float, q1: str, q2: str) 
         for iq, qloop in enumerate(['u', 'c']):
             cqloop = couplings['kU'][iq, iq] - couplings['ku'][iq, iq]
             ceff += GF/np.sqrt(2)/np.pi**2*ckm_xi(qloop, q1+q2) * cqloop * mq[qloop]**2 * (1 + B0disc_equalmass(pa2, mq[qloop]) + np.log(couplings.scale**2/mq[qloop]**2))
+    return ceff
+
+def offshellphoton(couplings: ALPcouplings, ma: float, s: float) -> complex:
+    """Effective coupling of the ALP to one on-shell and one off-shell photon."""
+    if couplings.scale > couplings.ew_scale:
+        raise NotImplementedError("The effective coupling of the ALP to one on-shell and one off-shell photon is implemented only below the EW scale.")
+    citations.register_inspire('Alda:2024cxn')
+    couplings = couplings.translate('VA_below')
+    ceff = couplings['cgamma']
+    for i, mlep in enumerate([me, mmu, mtau]):
+        ceff += couplings['ceA'][i,i] * B3(4*mlep**2/ma**2, 4*mlep**2/s)
+    for i, muq in enumerate([mu, mc]):
+        ceff += 3 * (2/3)**2 * couplings['cuA'][i,i] * B3(4*muq**2/ma**2, 4*muq**2/s)
+    for i, mdq in enumerate([md, ms, mb]):
+        ceff += 3 * (-1/3)**2 * couplings['cdA'][i,i] * B3(4*mdq**2/ma**2, 4*mdq**2/s)
     return ceff

@@ -18,6 +18,7 @@ def floop(x):
 
 B1 = lambda x: 1-x*floop(x)**2
 B2 = lambda x: 1-(x-1)*floop(x)**2
+B3 = lambda x, y: 1 + x*y/(x-y)*(floop(x)**2 - floop(y)**2)
 
 def B0disc_equalmass(q2: float, m: float) -> complex:
     return 2j*np.sqrt(1+0j-4*m**2/q2)*floop(np.sqrt(4*m**2/q2))
