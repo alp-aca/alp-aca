@@ -739,6 +739,64 @@ atlasHL_B0tomumu = MeasurementConstant(
     max_ma=np.inf
 )
 
+cmsHL_Bstomumu = MeasurementConstant(
+    'ATLAS:2025lrr',
+    'flat',
+    3.68e-9,
+    0.22e-9,
+    0.22e-9,
+    max_ma=np.inf,
+    bibtex = {'Collaboration:2928094': '''@techreport{Collaboration:2928094,
+      author        = "CMS Collaboration",
+      collaboration = "CMS",
+      title         = "{CMS flavor physics projections for the update of the
+                       European Strategy for Particle Physics}",
+      institution   = "CERN",
+      reportNumber  = "CMS-NOTE-2025-004, CERN-CMS-NOTE-2025-004",
+      address       = "Geneva",
+      year          = "2025",
+      url           = "https://cds.cern.ch/record/2928094",
+}'''}
+)
+
+cmsHL_B0tomumu = MeasurementConstant(
+    'ATLAS:2025lrr',
+    'flat',
+    1.06e-10,
+    0.12e-10,
+    0.12e-10,
+    max_ma=np.inf,
+    bibtex = {'Collaboration:2928094': '''@techreport{Collaboration:2928094,
+      author        = "CMS Collaboration",
+      collaboration = "CMS",
+      title         = "{CMS flavor physics projections for the update of the
+                       European Strategy for Particle Physics}",
+      institution   = "CERN",
+      reportNumber  = "CMS-NOTE-2025-004, CERN-CMS-NOTE-2025-004",
+      address       = "Geneva",
+      year          = "2025",
+      url           = "https://cds.cern.ch/record/2928094",
+}'''}
+)
+
+lhcbHL_Bstomumu = MeasurementConstant(
+    'LHCb:2018roe',
+    'flat',
+    3.09e-9,
+    0.16e-9,
+    0.16e-9,
+    max_ma=np.inf
+)
+
+lhcbHL_B0tomumu = MeasurementConstant(
+    'LHCb:2018roe',
+    'flat',
+    1.06e-10,
+    0.12e-10,
+    0.12e-10,
+    max_ma=np.inf
+)
+
 lhcb_Bstoee = MeasurementConstantBound(
     'LHCb:2020pcv',
     'flat',
@@ -788,6 +846,13 @@ belle_D0togammagamma = MeasurementConstantBound(
     max_ma=np.inf,
 )
 
+belleII_D0togammagamma = MeasurementConstantBound(
+    'Belle-II:2022cgf',
+    'flat',
+    1.5e-7,
+    max_ma=np.inf,
+)
+
 belle_D0toee = MeasurementConstantBound(
     'Belle:2010ouj',
     'flat',
@@ -828,6 +893,15 @@ lhcb_Dptopipmumu = MeasurementConstantBound(
     'LHCb:2020car',
     'prompt',
     67e-9,
+    rmin = 150e-4,
+    mass_parent=mDplus,
+    mass_sibling=mpi0
+)
+
+lhcbHL_Dptopipmumu = MeasurementConstantBound(
+    'LHCb:2018roe',
+    'prompt',
+    0.37e-8,
     rmin = 150e-4,
     mass_parent=mDplus,
     mass_sibling=mpi0
@@ -1053,6 +1127,73 @@ belleII_bks0ee_displvertex = MeasurementDisplacedVertexBound('Belle-II:2023ueh',
 babar_bkphotons_displvertex = MeasurementDisplacedVertexBound('BaBar:2021ich', os.path.join(current_dir, visible, 'babar_BKphotons_displ.npy'), 0.95)
 
 babar_bktautau = MeasurementConstantBound('BaBar:2016wgb', 'prompt', 2.25e-3, min_ma = 2*mtau, conf_level=0.9, rmin =100, mass_parent=mB, mass_sibling=mK)
+
+belleII_B0Kstautau = MeasurementConstantBound(
+    'Belle-II:2022cgf',
+    'prompt',
+    1.6e-3,
+    min_ma=2*mtau,
+    rmin=0.1,
+    rmax=100,
+    lab_boost=0.28,
+    mass_parent=mB0,
+    mass_sibling=mKst0
+)
+
+belleII_bktautau = MeasurementConstantBound(
+    'Belle-II:2018jsg',
+    'prompt',
+    2e-5,
+    2*mtau,
+    rmin=0.1,
+    rmax=100,
+    lab_boost=0.28,
+    mass_parent=mB,
+    mass_sibling=mK
+)
+
+belleII_bktaumu = MeasurementConstantBound(
+    'Belle-II:2018jsg',
+    'prompt',
+    3.3e-6,
+    mtau+mmu,
+    rmin=0.1,
+    rmax=100,
+    lab_boost=0.28,
+    mass_parent=mB,
+    mass_sibling=mK
+)
+
+belleII_bktaue = MeasurementConstantBound(
+    'Belle-II:2018jsg',
+    'prompt',
+    2.1e-6,
+    mtau+me,
+    rmin=0.1,
+    rmax=100,
+    lab_boost=0.28,
+    mass_parent=mB,
+    mass_sibling=mK,
+)
+
+belleII_B0tautau = MeasurementConstantBound(
+    'Belle-II:2018jsg',
+    'flat',
+    9.6e-5
+)
+
+belleII_Bstautau = MeasurementConstantBound(
+    'Belle-II:2018jsg',
+    'flat',
+    8.1e-4
+)
+
+lhcbHL_Bstotautau = MeasurementConstantBound(
+    'LHCb:2018roe',
+    'flat',
+    5e-4,
+    max_ma=np.inf
+)
 
 belle_B0toK0stautau = MeasurementConstantBound('Belle:2021ecr', 'prompt', 3.1e-3, conf_level=0.9, min_ma=2*mtau, mass_parent=mB0, mass_sibling=mKst0, rmin=100)
 
@@ -1357,6 +1498,50 @@ babar_taumugammagamma = MeasurementConstantBound(
     mass_parent=mtau,
     mass_sibling=me,
     lab_boost=0.469/(1-0.469**2)**0.5
+)
+
+belleII_tau_3e = MeasurementConstantBound(
+    'Belle-II:2022cgf',
+    'prompt',
+    5.088e-10,
+    rmin=0.1,
+    rmax=100,
+    mass_parent=mtau,
+    mass_sibling=me,
+    lab_boost=0.28
+)
+
+belleII_tau_muee = MeasurementConstantBound(
+    'Belle-II:2022cgf',
+    'prompt',
+    3.20e-10,
+    rmin=0.1,
+    rmax=100,
+    mass_parent=mtau,
+    mass_sibling=mmu,
+    lab_boost=0.28
+)
+
+belleII_tau_emumu = MeasurementConstantBound(
+    'Belle-II:2022cgf',
+    'prompt',
+    4.87e-10,
+    rmin=0.1,
+    rmax=100,
+    mass_parent=mtau,
+    mass_sibling=me,
+    lab_boost=0.28
+)
+
+belleII_tau_3mu = MeasurementConstantBound(
+    'Belle-II:2022cgf',
+    'prompt',
+    3.93e-10,
+    rmin=0.1,
+    rmax=100,
+    mass_parent=mtau,
+    mass_sibling=mmu,
+    lab_boost=0.28
 )
 
 twist_mueinv = MeasurementInterpolatedBound(
@@ -1772,7 +1957,10 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         else:
             return {'LHCb': lhcb_bkmumu_displvertex, 'Belle II': belleII_bkmumu_displvertex, 'CHARM': charm_bkmumu_displvertex, 'NA62': na62proj_bkmumu_displvertex, 'SHiP': shipproj_bkmumu_displvertex}  
     elif initial == ['B+'] and final == sorted(['K+', 'tau', 'tau']):
-        return {'BaBar': babar_bktautau}
+        if exclude_projections:
+            return {'BaBar': babar_bktautau}
+        else:
+            return {'BaBar': babar_bktautau, 'Belle II 50ab-1': belleII_bktautau}
     elif initial == ['B+'] and final == sorted(['K+', 'photon', 'photon']):
         return {'BaBar': babar_bkphotons_displvertex}
     elif initial == ['B+'] and final == sorted(['K+', 'pion+', 'pion-', 'pion0']):
@@ -1780,9 +1968,15 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     elif initial == ['B+'] and final == sorted(['K+', 'eta', 'pion+', 'pion-']):
         return {'BaBar': babar_BKetapipi}
     elif initial == ['B+'] and final == sorted(['K+', 'muon', 'tau']):
-        return {'BaBar': babar_BplusKtaumu}
+        if exclude_projections:
+            return {'BaBar': babar_BplusKtaumu}
+        else:
+            return {'BaBar': babar_BplusKtaumu, 'Belle II 50ab-1': belleII_bktaumu}
     elif initial == ['B+'] and final == sorted(['K+', 'electron', 'tau']):
-        return {'BaBar': babar_BplusKtaue}
+        if exclude_projections:
+            return {'BaBar': babar_BplusKtaue}
+        else:
+            return {'BaBar': babar_BplusKtaue, 'Belle II 50ab-1': belleII_bktaue}
     elif initial == ['B+'] and final == sorted(['K+', 'muon', 'electron']):
         return {'BaBar': babar_BplusKmue}
     elif initial == ['B+'] and final == sorted(['K*+', 'muon', 'electron']):
@@ -1803,7 +1997,10 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     elif initial == ['B0'] and final == sorted(['K*0', 'muon', 'muon']):
         return {'LHCb': lhcb_bks0mumu_displvertex, 'Belle II': belleII_bks0mumu_displvertex}
     elif initial == ['B0'] and final == sorted(['K*0', 'tau', 'tau']):
-        return {'Belle': belle_B0toK0stautau}
+        if exclude_projections:
+            return {'Belle': belle_B0toK0stautau}
+        else:
+            return {'Belle': belle_B0toK0stautau, 'Belle II 50ab-1': belleII_B0Kstautau}
     elif initial == ['B0'] and final == sorted(['K0', 'pion+', 'pion-', 'pion0']):
         return {'Belle': belle_b0Komega3pi}
     elif initial == ['B0'] and final == ['electron', 'electron']:
@@ -1812,8 +2009,12 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         if exclude_projections:
             return {'LHCb': lhcb_B0tomumu, 'CMS': cms_B0tomumu}
         else:
-            return {'LHCb': lhcb_B0tomumu, 'CMS': cms_B0tomumu, 'ATLAS HL-LHC': atlasHL_B0tomumu}
+            return {'LHCb': lhcb_B0tomumu, 'CMS': cms_B0tomumu, 'ATLAS HL-LHC': atlasHL_B0tomumu, 'CMS HL-LHC': cmsHL_B0tomumu, 'LHCb HL-LHC': lhcbHL_B0tomumu}
     elif initial == ['B0'] and final == sorted(['tau', 'tau']):
+        if exclude_projections:
+            return {'LHCb': lhcb_B0totautau}
+        else:
+            return {'LHCb': lhcb_B0totautau, 'Belle II 50ab-1': belleII_B0tautau}
         return {'LHCb': lhcb_B0totautau}
     elif initial == ['B0'] and final == sorted(['photon', 'photon']):
         return {'BaBar': babar_B0togammagamma}
@@ -1832,9 +2033,12 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         if exclude_projections:
             return {'LHCb': lhcb_Bstomumu, 'CMS': cms_Bstomumu}
         else:
-            return {'LHCb': lhcb_Bstomumu, 'CMS': cms_Bstomumu, 'ATLAS HL-LHC': atlasHL_Bstomumu}
+            return {'LHCb': lhcb_Bstomumu, 'CMS': cms_Bstomumu, 'ATLAS HL-LHC': atlasHL_Bstomumu, 'CMS HL-LHC': cmsHL_Bstomumu, 'LHCb HL-LHC': lhcbHL_Bstomumu}
     elif initial == ['Bs'] and final == sorted(['tau', 'tau']):
-        return {'LHCb': lhcb_Bstotautau}
+        if exclude_projections:
+            return {'LHCb': lhcb_Bstotautau}
+        else:
+            return {'LHCb': lhcb_Bstotautau, 'Belle II 5ab-1': belleII_Bstautau, 'LHCb HL-LHC': lhcbHL_Bstotautau}
     elif initial == ['Bs'] and final == sorted(['photon', 'photon']):
         return {'Belle': belle_Bstogammagamma}
     #Initial state J/psi
@@ -1887,7 +2091,10 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     elif initial == ['D0'] and final == sorted(['rho0', 'muon', 'muon']):
         return {'E791': e791_D0torho0mumu}
     elif initial == ['D0'] and final == sorted(['photon', 'photon']):
-        return {'Belle': belle_D0togammagamma}
+        if exclude_projections:
+            return {'Belle': belle_D0togammagamma}
+        else:
+            return {'Belle': belle_D0togammagamma, 'Belle II 50ab-1': belleII_D0togammagamma}
     elif initial == ['D0'] and final == sorted(['electron', 'electron']):
         return {'Belle': belle_D0toee}
     elif initial == ['D0'] and final == sorted(['muon', 'muon']):
@@ -1902,7 +2109,10 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     elif initial == ['D+'] and final == sorted(['pion+', 'electron', 'electron']):
         return {'LHCb': lhcb_Dptopipee}
     elif initial == ['D+'] and final == sorted(['pion+', 'muon', 'muon']):
-        return {'LHCb': lhcb_Dptopipmumu}
+        if exclude_projections:
+            return {'LHCb': lhcb_Dptopipmumu}
+        else:
+            return {'LHCb': lhcb_Dptopipmumu, 'LHCb HL-LHC': lhcbHL_Dptopipmumu}
     elif initial == ['D+'] and final == sorted(['rho+', 'muon', 'muon']):
         return {'E653': e653_Dptorhopmumu}
     elif initial == ['D+'] and final == sorted(['pion+', 'electron', 'muon']):
@@ -1951,13 +2161,25 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     elif initial == ['tau'] and final == sorted(['muon', 'alp']):
         return {'Belle II': belleII_taumuinv}
     elif initial == ['tau'] and final == sorted(['electron', 'electron', 'electron']):
-        return {'Belle': belle_tau3e}
+        if exclude_projections:
+            return {'Belle': belle_tau3e}
+        else:
+            return {'Belle': belle_tau3e, 'Belle II 50ab-1': belleII_tau_3e}
     elif initial == ['tau'] and final == sorted(['muon', 'muon', 'muon']):
-        return {'Belle': belle_tau3mu, 'Belle II': belleII_tau3mu}
+        if exclude_projections:
+            return {'Belle': belle_tau3mu, 'Belle II': belleII_tau3mu}
+        else:
+            return {'Belle': belle_tau3mu, 'Belle II': belleII_tau3mu, 'Belle II 50ab-1': belleII_tau_3mu}
     elif initial == ['tau'] and final == sorted(['electron', 'muon', 'muon']):
-        return {'Belle': belle_tauemumu}
+        if exclude_projections:
+            return {'Belle': belle_tauemumu}
+        else:
+            return {'Belle': belle_tauemumu, 'Belle II 50ab-1': belleII_tau_emumu}
     elif initial == ['tau'] and final == sorted(['muon', 'electron', 'electron']):
-        return {'Belle': belle_taumuee}
+        if exclude_projections:
+            return {'Belle': belle_taumuee}
+        else:
+            return {'Belle': belle_taumuee, 'Belle II 50ab-1': belleII_tau_muee}
     elif initial == ['tau'] and final == sorted(['electron', 'photon', 'photon']):
         return {'BaBar': babar_tauegammagamma}
     elif initial == ['tau'] and final == sorted(['muon', 'photon', 'photon']):
