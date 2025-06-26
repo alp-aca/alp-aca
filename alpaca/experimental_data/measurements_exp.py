@@ -1105,6 +1105,17 @@ belleII_Upsilon4S_3gamma = MeasurementInterpolatedBound(
     mass_sibling=0
 )
 
+belleII_Upsilon4S_gammatautau = MeasurementInterpolatedBound(
+    'Alda:2024cxn',
+    os.path.join(current_dir, visible, 'BelleII_gammatautau.txt'),
+    'prompt',
+    rmin=0.1,
+    lab_boost=0.28,
+    mass_parent=10.58,
+    conf_level=0.95,
+    mass_sibling=0
+)
+
 
 lhcb_bkmumu_displvertex = MeasurementDisplacedVertexBound('LHCb:2016awg', os.path.join(current_dir, visible, 'LHCb_BKmumu_displ.npy'), 0.95)
 
@@ -2075,6 +2086,11 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     #Non-resonant e+e- -> gamma a @ mUpsilon(4S)
     elif initial == ['electron', 'electron'] and final == ['photon', 'photon', 'photon'] and len(args)==1 and args[0] == 10.58**2:
         return {'Belle II': belleII_Upsilon4S_3gamma}
+    elif initial == ['electron', 'electron'] and final == ['photon', 'tau', 'tau'] and len(args)==1 and args[0] == 10.58**2:
+        if exclude_projections:
+            raise KeyError(f"No measurements for {transition}")
+        else:
+            return {'Belle II': belleII_Upsilon4S_gammatautau}
     #initial state D0
     elif initial == ['D0'] and final == sorted(['pion0', 'alp']):
         return {'BESIII': besIII_D0topi0nunu}
