@@ -13,6 +13,7 @@ from ..experimental_data.theoretical_predictions import get_th_uncert, get_th_va
 from ..rge import ALPcouplings
 from ..sectors import Sector, combine_sectors
 from ..biblio import citation_report
+from typing import Optional
 class ChiSquared:
     def __init__(self, sector: Sector,
                  chi2_dict: dict[tuple[str, str], np.ndarray[float]],
@@ -29,21 +30,25 @@ class ChiSquared:
         p = np.clip(p, 2e-16, 1)
         return np.nan_to_num(scipy.stats.norm.ppf(1 - p/2))
 
-    def __getitem__(self, meas: tuple[str, str]) -> 'ChiSquared':
-        obs, experiment = meas
-        if (obs, experiment) in self.chi2_dict.keys() and (obs, experiment) in self.dofs_dict.keys():
-            s = Sector(obs + ' @ ' + experiment, '$' + to_tex(obs).replace('$', '') + r'\ \mathrm{(' + experiment + ')}$', obs_measurements = {obs: set([experiment,])} , description=f'Measurement of {obs} at experiment {experiment}.')
-            return ChiSquared(s, {(obs, experiment): self.chi2_dict[(obs, experiment)]}, {(obs, experiment): self.dofs_dict[(obs, experiment)]})
-        else:
-            raise KeyError(f'Unknown experiment {obs}, {meas}')
+    #def __getitem__(self, meas: tuple[str, str]) -> 'ChiSquared':
+    #    obs, experiment = meas
+    #    if (obs, experiment) in self.chi2_dict.keys() and (obs, experiment) in self.dofs_dict.keys():
+    #        s = Sector(obs + ' @ ' + experiment, '$' + to_tex(obs).replace('$', '') + r'\ \mathrm{(' + experiment + ')}$', obs_measurements = {obs: set#([experiment,])} , description=f'Measurement of {obs} at experiment {experiment}.')
+    #        return ChiSquared(s, {(obs, experiment): self.chi2_dict[(obs, experiment)]}, {(obs, experiment): self.dofs_dict[(obs, experiment)]})
+    #    else:
+    #        raise KeyError(f'Unknown experiment {obs}, {meas}')
         
     def get_measurements(self) -> list[tuple[str, str]]:
         return list( set(self.chi2_dict.keys()) & set(self.dofs_dict.keys()) )
+    
+    def get_observables(self) -> list[str]:
+        """Get a set of all observables from the ChiSquared object."""
+        return list(set(obs for obs, _ in self.get_measurements()))
 
     def _ipython_key_completions_(self):
         return self.get_measurements()
     
-    def split_measurements(self) -> list['ChiSquared']:
+    def split_measurements(self) -> 'ChiSquaredList':
         results = []
         for m in self.get_measurements():
             obs, experiment = m
@@ -51,17 +56,53 @@ class ChiSquared:
             meas_tex = f'${to_tex(obs).replace("$", "")} \\ \\mathrm{{({experiment.replace(" ", "\\ ")})}}$'
             s = Sector(meas_name, meas_tex, obs_measurements = {obs: set([experiment,])}, description=f'Measurement of {obs} at experiment {experiment}.')
             results.append(ChiSquared(s, {(obs, experiment): self.chi2_dict[m]}, {(obs, experiment): self.dofs_dict[m]}))
-        return results
-    
-    def split_observables(self) -> list['ChiSquared']:
+        return ChiSquaredList(results)
+
+    def split_observables(self) -> 'ChiSquaredList':
         results = []
-        observables = set([obs for obs, _ in self.get_measurements()])
+        observables = set(self.get_observables())
         for obs in observables:
             chi2_dict = {k: v for k, v in self.chi2_dict.items() if k[0] == obs}
             dofs_dict = {k: v for k, v in self.dofs_dict.items() if k[0] == obs}
             s = Sector(str(obs), to_tex(obs), obs_measurements={obs: set(k[1] for k in chi2_dict.keys())}, description=f'Measurements of {obs}.')
             results.append(ChiSquared(s, chi2_dict, dofs_dict))
-        return results
+        return ChiSquaredList(results)
+
+    def extract_measurements(self, measurements: list[tuple[str, str]]) -> 'ChiSquared':
+        """Extract ChiSquared objects for specific measurements from the ChiSquared object."""
+        measurements = [(canonical_transition(m[0]), m[1]) for m in measurements]
+        not_found = set(measurements) - set(self.get_measurements())
+        if not_found:
+            raise KeyError(f'Measurements {not_found} not found in ChiSquared object.')
+        results = []
+        split_measurements = self.split_measurements()
+        for m in measurements:
+            for chi2 in split_measurements:
+                if m in chi2.get_measurements():
+                    results.append(chi2)
+        s = ChiSquaredList(results).combine(
+            self.sector.name, self.sector.tex, self.sector.description)
+        s.set_plot_style(
+            color=self.sector.color, lw=self.sector.lw, ls=self.sector.ls)
+        return s
+    
+    def extract_observables(self, observables: list[str]) -> 'ChiSquared':
+        """Extract ChiSquared objects for specific observable(s) from the ChiSquared object."""
+        observables = [canonical_transition(obs) for obs in observables]
+        not_found = set(observables) - set(self.get_observables())
+        if not_found:
+            raise KeyError(f'Observables {not_found} not found in ChiSquared object.')
+        results = []
+        split_observables = self.split_observables()
+        for obs in observables:
+            for chi2 in split_observables:
+                if obs in [m[0] for m in chi2.get_measurements()]:
+                    results.append(chi2)
+        s = ChiSquaredList(results).combine(
+            self.sector.name, self.sector.tex, self.sector.description)
+        s.set_plot_style(
+            color=self.sector.color, lw=self.sector.lw, ls=self.sector.ls)
+        return s
     
     def set_plot_style(self, color: str | None = None, lw: float | None = None, ls: str | None = None):
         """Set the plot style of the sector.
@@ -137,28 +178,24 @@ class ChiSquared:
             for xi, yi in zip(points[0], points[1]):
                 f.write(f"{xi},{yi}\n")
 
-    def exclude_observables(self, observables: str | list[str]) -> 'ChiSquared':
+    def exclude_observables(self, observables: list[str]) -> Optional['ChiSquared']:
         """Exclude specific observable(s) from the ChiSquared object."""
-        if isinstance(observables, str):
-            observables = [observables,]
+        all_observables = set(self.get_observables())
         observables = [canonical_transition(obs) for obs in observables]
-        chi2_dict = {k: v for k, v in self.chi2_dict.items() if k[0] not in observables}
-        dofs_dict = {k: v for k, v in self.dofs_dict.items() if k[0] not in observables}
+        remaining_observables = list(all_observables - set(observables))
+        if not remaining_observables:
+            return None
+        return self.extract_observables(remaining_observables)
 
-        return ChiSquared(self.sector.exclude_observables(observables), chi2_dict, dofs_dict)
-    
-    def exclude_measurements(self, measurements: tuple[str, str] | list[tuple[str, str]]) -> 'ChiSquared':
+    def exclude_measurements(self, measurements: list[tuple[str, str]]) -> Optional['ChiSquared']:
         """Exclude specific measurement(s) from the ChiSquared object."""
-        if not isinstance(measurements, list):
-            measurements = [measurements,]
-        exc = [(canonical_transition(m[0]), m[1]) for m in measurements]
-        chi2_dict = self.chi2_dict.copy()
-        dofs_dict = self.dofs_dict.copy()
-        for e in exc:
-            chi2_dict.pop(e)
-            dofs_dict.pop(e)
-        return ChiSquared(self.sector.exclude_measurements(measurements), chi2_dict, dofs_dict)
-    
+        all_measurements = set(self.get_measurements())
+        measurements = [(canonical_transition(m[0]), m[1]) for m in measurements]
+        remaining_measurements = list(all_measurements - set(measurements))
+        if not remaining_measurements:
+            return None
+        return self.extract_measurements(remaining_measurements)
+
     def get_inspire_ids(self) -> tuple[dict[tuple[str, str], list[str]], dict[str, str]]:
         """Get the Inspire IDs of the measurements in the ChiSquared object."""
         ids = {}
@@ -206,34 +243,34 @@ class ChiSquared:
         
         sectors_plot = set()
         if mode == 'y-inverted':
-            start_y = self.shape()[1] - 1
+            start_y = self.shape()[0] - 1
             delta_y = -1
             end_y = -1
         elif mode == 'y':
             start_y = 0
             delta_y = 1
-            end_y = self.shape()[1]
+            end_y = self.shape()[0]
+        splitted = self.split_measurements()
+        sigmas = [c.significance() for c in splitted]
+        sigmas_max = np.clip(np.max(sigmas, axis=0), 2.0, 10)
         if mode in ['y-inverted', 'y']:
             if len(self.shape()) != 2:
                 raise ValueError("ChiSquared object must have a 2D shape for 'y-inverted' or 'y' mode.")
-            for x in range(self.shape()[0]):
-                new_sectors = []
+            for x in range(self.shape()[1]):
                 for y in range(start_y, end_y, delta_y):
+                    new_sectors = set()
                     for chi2 in self.split_measurements():
-                        if chi2.significance()[y, x] > 3.0:
-                            new_sectors.append(chi2.get_measurements()[0])
+                        if chi2.significance()[y,x] == sigmas_max[y,x]:
+                            new_sectors.update(set(chi2.get_measurements()))
                     if len(new_sectors) > 0:
-                        sectors_plot.update(set(new_sectors))
+                        sectors_plot.update(new_sectors)
                         break
         elif mode == 'grid':
-            splitted = self.split_measurements()
-            sigmas = [c.significance() for c in splitted]
-            sigmas_max = np.clip(np.max(sigmas, axis=0), 2.0, 10)
             for i, chi2 in enumerate(splitted):
                 if np.any(sigmas[i] == sigmas_max):
                     sectors_plot.update(set(chi2.get_measurements()))
 
-        return ChiSquaredList([self[m] for m in sectors_plot])
+        return self.extract_measurements(list(sectors_plot)).split_measurements()
 
     def constraining_observables(self, mode: str = 'y-inverted') -> 'ChiSquaredList':
         """Get the constraining observables for the ChiSquared object.
@@ -256,34 +293,34 @@ class ChiSquared:
         
         sectors_plot = set()
         if mode == 'y-inverted':
-            start_y = self.shape()[1] - 1
+            start_y = self.shape()[0] - 1
             delta_y = -1
             end_y = -1
         elif mode == 'y':
             start_y = 0
             delta_y = 1
-            end_y = self.shape()[1]
+            end_y = self.shape()[0]
+        splitted = self.split_observables()
+        sigmas = [c.significance() for c in splitted]
+        sigmas_max = np.clip(np.max(sigmas, axis=0), 2.0, 10)
         if mode in ['y-inverted', 'y']:
             if len(self.shape()) != 2:
                 raise ValueError("ChiSquared object must have a 2D shape for 'y-inverted' or 'y' mode.")
-            for x in range(self.shape()[0]):
-                new_sectors = []
+            for x in range(self.shape()[1]):
                 for y in range(start_y, end_y, delta_y):
+                    new_sectors = set()
                     for chi2 in self.split_observables():
-                        if chi2.significance()[y, x] > 3.0:
-                            new_sectors.append(chi2.get_measurements()[0][0])
+                        if chi2.significance()[y,x] == sigmas_max[y,x]:
+                            new_sectors.update(set(chi2.get_observables()))
                     if len(new_sectors) > 0:
                         sectors_plot.update(set(new_sectors))
                         break
         elif mode == 'grid':
-            splitted = self.split_observables()
-            sigmas = [c.significance() for c in splitted]
-            sigmas_max = np.clip(np.max(sigmas, axis=0), 2.0, 10)
             for i, chi2 in enumerate(splitted):
                 if np.any(sigmas[i] == sigmas_max):
                     sectors_plot.update(set(chi2.get_measurements()))
 
-        return ChiSquaredList(self.split_observables()).extract_observables(sectors_plot)
+        return self.extract_observables(list(sectors_plot)).split_observables()
 
 class ChiSquaredList(list[ChiSquared]):
     """A list of ChiSquared objects with additional methods for combining and manipulating them."""
@@ -294,30 +331,72 @@ class ChiSquaredList(list[ChiSquared]):
     
     def split_measurements(self) -> 'ChiSquaredList':
         """Split each ChiSquared object in the list into individual measurements."""
-        results = []
-        for chi2 in self:
-            results.extend(chi2.split_measurements())
-        return ChiSquaredList(results)
+        return self.combine('', '').split_measurements()
     
     def split_observables(self) -> 'ChiSquaredList':
         """Split each ChiSquared object in the list into individual observables."""
-        results = []
-        for chi2 in self:
-            results.extend(chi2.split_observables())
-        return ChiSquaredList(results)
-    
-    def extract_observables(self, observables: str | list[str]) -> 'ChiSquaredList':
+        return self.combine('', '').split_observables()
+
+    def extract_observables(self, observables: list[str]) -> 'ChiSquaredList':
         """Extract ChiSquared objects for a specific observable(s) from the list."""
         results = []
-        if isinstance(observables, str):
-            observables = [observables,]
-        for observable in observables:
-            for chi2 in self:
-                for c in chi2.split_observables():
-                    if c.sector.contains_observable(observable):
-                        results.append(c)
+        observables = [canonical_transition(obs) for obs in observables]
+        for chi2 in self:
+            obs_sector = set(chi2.get_observables())
+            obs_common = list(set(observables) & obs_sector)
+            if obs_common:
+                results.append(chi2.extract_observables(list(obs_common)))
+        if not results:
+            raise KeyError(f'Observables {observables} not found in ChiSquaredList.')
+        s = ChiSquaredList(results)
+        not_found = set(observables) - set(s.get_observables())
+        if not_found:
+            raise KeyError(f'Observables {not_found} not found in ChiSquaredList.')
+        return s
+    
+    def extract_measurements(self, measurements: list[tuple[str, str]]) -> 'ChiSquaredList':
+        """Extract ChiSquared objects for specific measurement(s) from the list."""
+        results = []
+        measurements = [(canonical_transition(m[0]), m[1]) for m in measurements]
+        for chi2 in self:
+            meas_sector = set(chi2.get_measurements())
+            meas_common = list(set(measurements) & meas_sector)
+            if meas_common:
+                results.append(chi2.extract_measurements(list(meas_common)))
+        if not results:
+            raise KeyError(f'Measurements {measurements} not found in ChiSquaredList.')
+        s = ChiSquaredList(results)
+        not_found = set(measurements) - set(s.get_measurements())
+        if not_found:
+            raise KeyError(f'Measurements {not_found} not found in ChiSquaredList.')
+        return s
+    
+    def exclude_observables(self, observables: list[str]) -> Optional['ChiSquaredList']:
+        """Exclude specific observable(s) from the ChiSquaredList."""
+        results = []
+        observables = [canonical_transition(obs) for obs in observables]
+        for chi2 in self:
+            common_observables = set(chi2.get_observables()) & set(observables)
+            exc_chi2 = chi2.exclude_observables(list(common_observables))
+            if exc_chi2 is not None:
+                results.append(exc_chi2)
+        if not results:
+            return None
         return ChiSquaredList(results)
     
+    def exclude_measurements(self, measurements: list[tuple[str, str]]) -> Optional['ChiSquaredList']:
+        """Exclude specific measurement(s) from the ChiSquaredList."""
+        results = []
+        measurements = [(canonical_transition(m[0]), m[1]) for m in measurements]
+        for chi2 in self:
+            common_measurements = set(chi2.get_measurements()) & set(measurements)
+            exc_chi2 = chi2.exclude_measurements(list(common_measurements))
+            if exc_chi2 is not None:
+                results.append(exc_chi2)
+        if not results:
+            return None
+        return ChiSquaredList(results)
+
     def contains_observable(self, observable: str) -> bool:
         """Check if any ChiSquared object in the list contains a specific observable."""
         return any(chi2.sector.contains_observable(observable) for chi2 in self)
@@ -329,39 +408,12 @@ class ChiSquaredList(list[ChiSquared]):
             measurements.update(chi2.get_measurements())
         return list(measurements)
     
-    def get_observables(self) -> set[str]:
+    def get_observables(self) -> list[str]:
         """Get a set of all observables from the ChiSquared objects in the list."""
         observables = set()
         for chi2 in self:
-            if chi2.sector.observables is not None:
-                observables.update(chi2.sector.observables)
-            if chi2.sector.obs_measurements is not None:
-                observables.update(chi2.sector.obs_measurements.keys())
-        return observables
-    
-    def exclude_observables(self, observables: str | list[str]) -> 'ChiSquaredList':
-        """Exclude specific observable(s) from all ChiSquared objects in the list."""
-        if isinstance(observables, str):
-            observables = [observables,]
-        observables = [canonical_transition(obs) for obs in observables]
-        results = []
-        for chi2 in self:
-            obs_sector = set(m[0] for m in chi2.get_measurements())
-            obs_removed = list(set(observables) & obs_sector)
-            results.append(chi2.exclude_observables(obs_removed))
-        return ChiSquaredList(results)
-    
-    def exclude_measurements(self, measurements: tuple[str, str] | list[tuple[str, str]]) -> 'ChiSquaredList':
-        """Exclude specific measurement(s) from all ChiSquared objects in the list."""
-        if not isinstance(measurements, list):
-            measurements = [measurements,]
-        exc = [(canonical_transition(m[0]), m[1]) for m in measurements]
-        results = []
-        for chi2 in self:
-            measurements_sector = set(chi2.get_measurements())
-            measurements_removed = list(set(exc) & measurements_sector)
-            results.append(chi2.exclude_measurements(measurements_removed))
-        return ChiSquaredList(results)
+            observables.update(chi2.get_observables())
+        return list(observables)
     
     def __str__(self) -> str:
         lnum = len(str(len(self)-1))
