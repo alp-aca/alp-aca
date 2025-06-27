@@ -29,14 +29,6 @@ class ChiSquared:
         p = 1 - scipy.stats.chi2.cdf(np.where(ndof == 0, np.nan, chi2), ndof)
         p = np.clip(p, 2e-16, 1)
         return np.nan_to_num(scipy.stats.norm.ppf(1 - p/2))
-
-    #def __getitem__(self, meas: tuple[str, str]) -> 'ChiSquared':
-    #    obs, experiment = meas
-    #    if (obs, experiment) in self.chi2_dict.keys() and (obs, experiment) in self.dofs_dict.keys():
-    #        s = Sector(obs + ' @ ' + experiment, '$' + to_tex(obs).replace('$', '') + r'\ \mathrm{(' + experiment + ')}$', obs_measurements = {obs: set#([experiment,])} , description=f'Measurement of {obs} at experiment {experiment}.')
-    #        return ChiSquared(s, {(obs, experiment): self.chi2_dict[(obs, experiment)]}, {(obs, experiment): self.dofs_dict[(obs, experiment)]})
-    #    else:
-    #        raise KeyError(f'Unknown experiment {obs}, {meas}')
         
     def get_measurements(self) -> list[tuple[str, str]]:
         return list( set(self.chi2_dict.keys()) & set(self.dofs_dict.keys()) )
@@ -321,6 +313,29 @@ class ChiSquared:
                     sectors_plot.update(set(chi2.get_measurements()))
 
         return self.extract_observables(list(sectors_plot)).split_observables()
+    
+    def __getitem__(self, idx) -> "ChiSquared":
+        return ChiSquared(self.sector,
+                          {k: v[idx].copy() for k, v in self.chi2_dict.items()},
+                          {k: v[idx].copy() for k, v in self.dofs_dict.items()})
+    
+    def slicing(self, *idx: tuple[slice|int]) -> "ChiSquared":
+        """Slice the ChiSquared object along the specified indices.
+
+        Parameters
+        ----------
+        *idx : tuple[slice|int]
+            The indices to slice the ChiSquared object.
+            At each index, you can specify a slice or an integer.
+            If a slice is provided, it will slice the data along that dimension.
+            If an integer is provided, it will select that specific index along that dimension.
+        
+        Returns
+        -------
+        ChiSquared
+            A new ChiSquared object with the sliced data.
+        """
+        return self[*idx]
 
 class ChiSquaredList(list[ChiSquared]):
     """A list of ChiSquared objects with additional methods for combining and manipulating them."""
@@ -479,6 +494,24 @@ class ChiSquaredList(list[ChiSquared]):
     def significance(self) -> np.ndarray[float]:
         """Calculate the significance for the combined."""
         return self.combine('', '').significance()
+    
+    def slicing(self, *idx: tuple[slice|int]) -> 'ChiSquaredList':
+        """Slice the ChiSquaredList along the specified indices.
+
+        Parameters
+        ----------
+        *idx : tuple[slice|int]
+            The indices to slice the ChiSquaredList.
+            At each index, you can specify a slice or an integer.
+            If a slice is provided, it will slice the data along that dimension.
+            If an integer is provided, it will select that specific index along that dimension.
+        
+        Returns
+        -------
+        ChiSquaredList
+            A new ChiSquaredList with the sliced data.
+        """
+        return ChiSquaredList([chi2.slicing(*idx) for chi2 in self])
 
 def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, couplings, fa, min_probability=1e-3, br_dark = 0.0, sm_pred=0, sm_uncert=0, **kwargs):
     kwargs_dw = {k: v for k, v in kwargs.items() if k != 'theta'}
