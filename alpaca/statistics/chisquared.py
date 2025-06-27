@@ -411,6 +411,10 @@ class ChiSquaredList(list[ChiSquared]):
         """
         return self.combine('', '').constraining_observables(mode)
 
+    def significance(self) -> np.ndarray[float]:
+        """Calculate the significance for the combined."""
+        return self.combine('', '').significance()
+
 def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, couplings, fa, min_probability=1e-3, br_dark = 0.0, sm_pred=0, sm_uncert=0, **kwargs):
     kwargs_dw = {k: v for k, v in kwargs.items() if k != 'theta'}
     ma = np.atleast_1d(ma).astype(float)
