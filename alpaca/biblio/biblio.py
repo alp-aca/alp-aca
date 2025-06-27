@@ -98,10 +98,10 @@ def citations_context(merge: bool = True):
     '''
     return _citations_context(merge)
 
-def citation_report(inspire_ids: dict, filename: str):
+def citation_report(inspire_ids: dict, bibtex: dict, filename: str):
     """Generate a citation report for the measurements from a dict of InSpire ids."""
     with open(f'{filename}.tex', 'wt') as ftex:
-        ftex.write('\\documentclass{article}\n\\begin{document}\n\\begin{itemize}\n')
+        ftex.write('\\documentclass{article}\n\\usepackage{amsmath,amsfonts,amssymb}\n\\begin{document}\n\\begin{itemize}\n')
         for key, id in inspire_ids.items():
             if isinstance(id, list):
                 id_str = ','.join(id)
@@ -120,6 +120,8 @@ def citation_report(inspire_ids: dict, filename: str):
     with open(f'{filename}.bib', 'wb') as f:
         for chunck in r2.iter_content(chunk_size=16*1024):
             f.write(chunck)
+        for v in bibtex.values():
+            f.write(str.encode('\n\n' + v))
 
 class Constant(float):
     def __new__(self, val: float, source: str):

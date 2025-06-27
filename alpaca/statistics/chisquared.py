@@ -157,20 +157,27 @@ class ChiSquared:
             dofs_dict.pop(e)
         return ChiSquared(self.sector.exclude_measurements(measurements), chi2_dict, dofs_dict)
     
-    def get_inspire_ids(self) -> dict[tuple[str, str], str | list[str]]:
+    def get_inspire_ids(self) -> tuple[dict[tuple[str, str], list[str]], dict[str, str]]:
         """Get the Inspire IDs of the measurements in the ChiSquared object."""
         ids = {}
+        bibtex = {}
         for obs, experiment in self.get_measurements():
-            measurements = get_measurements(obs)
+            measurements = get_measurements(obs, exclude_projections=False)
             if experiment in measurements:
-                ids[(obs, experiment)] = measurements[experiment].inspire_id
-        return ids
+                meas_ids = measurements[experiment].inspire_id
+                if isinstance(meas_ids, str):
+                    meas_ids = [meas_ids,]
+                ids[(obs, experiment)] = meas_ids
+                if measurements[experiment].bibtex is not None:
+                    bibtex.update(measurements[experiment].bibtex)
+                    ids[((obs, experiment))].extend(measurements[experiment].bibtex.keys())
+        return ids, bibtex
     
     def citation_report(self, filename: str):
         """Generate a citation report for the measurements in the ChiSquared object."""
         ids = self.get_inspire_ids()
-        ids_tex = {f'${to_tex(k[0])}$ at {k[1]} ': v for k, v in ids.items()}
-        citation_report(ids_tex, filename)
+        ids_tex = {f'${to_tex(k[0])}$ at {k[1]} ': v for k, v in ids[0].items()}
+        citation_report(ids_tex, ids[1], filename)
 
     def shape(self) -> tuple[int, ...]:
         """Get the shape of the chi-squared values."""
@@ -362,18 +369,22 @@ class ChiSquaredList(list[ChiSquared]):
         """Return a Markdown representation of the ChiSquaredList."""
         return '|Index|Sector|\n| :-: | :- |\n' + '\n'.join(f'|{i}|${chi2.sector.tex.replace('|', r'\|')}$|' for i, chi2 in enumerate(self))
     
-    def get_inspire_ids(self) -> dict[tuple[str, str], str | list[str]]:
+    def get_inspire_ids(self) -> tuple[dict[tuple[str, str], list[str]], dict[str, str]]:
         """Get the Inspire IDs of the measurements in the ChiSquaredList."""
         ids = {}
+        bibtex = {}
         for chi2 in self:
-            ids.update(chi2.get_inspire_ids())
-        return ids
-    
+            data = chi2.get_inspire_ids()
+            ids.update(data[0])
+            if data[1]:
+                bibtex.update(data[1])
+        return ids, bibtex
+
     def citation_report(self, filename: str):
         """Generate a citation report for the measurements in the ChiSquared object."""
         ids = self.get_inspire_ids()
-        ids_tex = {f'{to_tex(k[0])} at {k[1]}': v for k, v in ids.items()}
-        citation_report(ids_tex, filename)
+        ids_tex = {f'{to_tex(k[0])} at {k[1]}': v for k, v in ids[0].items()}
+        citation_report(ids_tex, ids[1], filename)
 
     def constraining_measurements(self, mode: str = 'y-inverted') -> 'ChiSquaredList':
         """Get the constraining measurements for the ChiSquaredList.
