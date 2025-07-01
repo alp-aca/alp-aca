@@ -310,7 +310,7 @@ class ChiSquared:
         elif mode == 'grid':
             for i, chi2 in enumerate(splitted):
                 if np.any(sigmas[i] == sigmas_max):
-                    sectors_plot.update(set(chi2.get_measurements()))
+                    sectors_plot.update(set(chi2.get_observables()))
 
         return self.extract_observables(list(sectors_plot)).split_observables()
     
