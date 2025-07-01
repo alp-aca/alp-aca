@@ -8,6 +8,7 @@ from . import bases_above, bases_below
 from functools import cache
 from json import JSONEncoder, JSONDecoder
 from sympy import Expr, Matrix
+import sympy as sp
 from os import PathLike
 from io import TextIOBase
 import wilson
@@ -18,6 +19,8 @@ numeric = (int, float, complex, Expr)
 matricial = (np.ndarray, np.matrix, Matrix, list)
 
 def format_number(x):
+    if isinstance(x, sp.Expr):
+        return str(x)
     if isinstance(x, complex):
         if x.imag == 0:
             return format_number(x.real)
@@ -126,7 +129,7 @@ class ALPcouplings:
         """
         citations.register_inspire('Bauer:2020jbp')
         self.ew_scale = ew_scale
-        if basis == 'derivative_above':
+        if basis == 'derivative_above' or basis == 'sp_derivative_above':
             self.scale = scale
             self.basis = basis
             unknown_keys = set(values.keys()) - {'cg', 'cW', 'cB', 'cqL', 'cuR', 'cdR', 'clL', 'ceR'}
@@ -144,7 +147,7 @@ class ALPcouplings:
                 if not isinstance(values[c], numeric):
                      raise TypeError
             self.values = {c: values[c] for c in ['cg', 'cB', 'cW', 'cqL', 'cuR', 'cdR', 'clL', 'ceR']}
-        elif basis == 'massbasis_above':
+        elif basis == 'massbasis_above' or basis == 'sp_massbasis_above':
             self.scale = scale
             self.basis = basis
             unknown_keys = set(values.keys()) - {'cg', 'cgamma', 'cgammaZ', 'cW', 'cZ', 'cg', 'kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke'}
@@ -162,7 +165,7 @@ class ALPcouplings:
                 if not isinstance(values[c], numeric):
                      raise TypeError
             self.values = {c: values[c] for c in ['kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke', 'cgamma', 'cgammaZ', 'cW', 'cZ', 'cg']}
-        elif basis == 'kF_below':
+        elif basis == 'kF_below' or basis == 'sp_kF_below':
             self.scale = scale
             self.basis = basis
             unknown_keys = set(values.keys()) - {'cg', 'cgamma', 'kU', 'kD', 'kE', 'kNu', 'ku', 'kd', 'ke'}
@@ -187,7 +190,7 @@ class ALPcouplings:
                 if not isinstance(values[c], numeric):
                      raise TypeError
             self.values = {c: values[c] for c in ['kD', 'kE', 'kNu', 'kd', 'ke', 'kU', 'ku', 'cg', 'cgamma']}
-        elif basis == 'VA_below':
+        elif basis == 'VA_below' or basis == 'sp_VA_below':
             self.scale = scale
             self.basis = basis
             unknown_keys = set(values.keys()) - {'cg', 'cgamma', 'cuV', 'cuA', 'cdV', 'cdA', 'ceV', 'ceA', 'cnu'}
@@ -214,7 +217,13 @@ class ALPcouplings:
             self.values = {c: values[c] for c in ['cuV', 'cuA', 'cdV', 'cdA', 'ceV', 'ceA', 'cnu', 'cg', 'cgamma']}
         else:
             raise ValueError('Unknown basis')
-        if self.basis in bases_above:
+        if self.basis.startswith('sp_'):
+            for c in self.values.keys():
+                if isinstance(self.values[c], numeric):
+                    self.values[c] = sp.N(self.values[c])
+                if isinstance(self.values[c], matricial):
+                    self.values[c] = sp.Matrix(self.values[c])
+        if self.basis in bases_above or self.basis[3:] in bases_above:
             if VuL is not None and VdL is not None:
                 raise AttributeError('It is not possible to provide VuL and VdL at the same time')
             wSM = wilson.classes.SMEFT(wilson.wcxf.WC('SMEFT', 'Warsaw', scale, {})).C_in
@@ -328,6 +337,10 @@ class ALPcouplings:
         """
         if basis == self.basis:
             return self
+        if self.basis.startswith('sp_') and basis.startswith('sp_'):
+            separated = self.separate_expressions()
+            a = {k: v.translate(basis[3:]) for k, v in separated.items()}
+            return ALPcouplings.join_expressions(a)
         if self.basis == 'derivative_above' and basis == 'massbasis_above':
             smpars = runSM(self.scale)
             s2w = smpars['s2w']
@@ -536,6 +549,10 @@ class ALPcouplings:
             raise ValueError("The final scale must be smaller than the initial scale.")
         if scale_out == self.scale:
             return self.translate(basis)
+        if self.basis.startswith('sp_') and basis.startswith('sp_'):
+            separated = self.separate_expressions()
+            a = {k: v.match_run(scale_out, basis[3:], integrator, beta, match_2loops, scipy_method=scipy_method, scipy_rtol=scipy_rtol, scipy_atol=scipy_atol) for k, v in separated.items()}
+            return ALPcouplings.join_expressions(a)
         if self.scale > self.ew_scale and scale_out < self.ew_scale:
             if self.basis in bases_above and basis in bases_below:
                 couplings_ew = self.match_run(self.ew_scale, 'massbasis_above', integrator, beta, scipy_method=scipy_method, scipy_rtol=scipy_rtol, scipy_atol=scipy_atol)
@@ -691,7 +708,7 @@ class ALPcouplings:
         return self.values.keys()
     
     def _repr_markdown_(self):
-        if self.basis == 'VA_below':
+        if self.basis == 'VA_below' or self.basis == 'sp_VA_below':
             latex_couplings = {
                 'cg': r'c_G',
                 'cgamma': r'c_\gamma',
@@ -703,7 +720,7 @@ class ALPcouplings:
                 'ceV': r'c_e^V',
                 'cnu': r'c_\nu',
             }
-        elif self.basis == 'derivative_above':
+        elif self.basis == 'derivative_above' or self.basis == 'sp_derivative_above':
             latex_couplings = {
                 'cg': r'c_G',
                 'cW': r'c_W',
@@ -714,7 +731,7 @@ class ALPcouplings:
                 'ceR': r'c_{e_R}',
                 'cqL': r'c_{q_L}',
             }
-        elif self.basis == 'massbasis_above':
+        elif self.basis == 'massbasis_above' or self.basis == 'sp_massbasis_above':
             latex_couplings = {
                 'cg': r'c_G',
                 'cW': r'c_W',
@@ -729,7 +746,7 @@ class ALPcouplings:
                 'kd': r"c'_{d_R}",
                 'ke': r"c'_{e_R}",
             }
-        elif self.basis == 'kF_below':
+        elif self.basis == 'kF_below' or self.basis == 'sp_kF_below':
             latex_couplings = {
                 'cg': r'c_G',
                 'cgamma': r'c_\gamma',
@@ -748,7 +765,7 @@ class ALPcouplings:
         md += f"- EW scale: ${format_number(self.ew_scale)}$ GeV\n"
         md += f"<details><summary>Couplings:</summary>\n\n"
         for k, v in self.values.items():
-            if isinstance(v, np.ndarray):
+            if isinstance(v, matricial):
                 md += f"- ${latex_couplings[k]} = \\begin{{pmatrix}}"
                 for i in range(v.shape[0]):
                     for j in range(v.shape[1]):
@@ -781,6 +798,85 @@ class ALPcouplings:
             md = md[:-2] + r"\end{pmatrix}$" + "\n"
             md += "</details>\n"
         return md
+    
+    def separate_expressions(self) -> dict[sp.Expr, 'ALPcouplings']:
+        if not self.basis.startswith('sp_'):
+            raise ValueError("This method is only available for sympy bases.")
+        splitted = {}
+        for k, v in self.values.items():
+            if isinstance(v, sp.Expr):
+                coeffs = v.factor().as_coefficients_dict()
+                for c, val in coeffs.items():
+                    if val == 0:
+                        continue
+                    if c not in splitted:
+                        splitted[c] = ALPcouplings({k: float(val)}, self.scale, self.basis[3:], self.ew_scale)
+                    else:
+                        splitted[c] += ALPcouplings({k: float(val)}, self.scale, self.basis[3:], self.ew_scale)
+            if isinstance(v, sp.Matrix):
+                for i in range(v.shape[0]):
+                    for j in range(v.shape[1]):
+                        coeffs = v[i,j].factor().as_coefficients_dict()
+                        for c, val in coeffs.items():
+                            if val == 0:
+                                continue
+                            matr = np.zeros(v.shape, dtype=complex)
+                            matr[i,j] = complex(val)
+                            if c not in splitted:
+                                splitted[c] = ALPcouplings({k: matr}, self.scale, self.basis[3:], self.ew_scale)
+                            else:
+                                splitted[c] += ALPcouplings({k: matr}, self.scale, self.basis[3:], self.ew_scale)
+        if self.scale > self.ew_scale:
+            for v in splitted.values():
+                v.yu = self.yu
+                v.yd = self.yd
+                v.ye = self.ye
+        return splitted
+    
+    @classmethod
+    def join_expressions(cls, dd: dict[sp.Expr, 'ALPcouplings']) -> 'ALPcouplings':
+        """Join a dictionary of ALPcouplings objects with sympy expressions as keys into a single ALPcouplings object."""
+        if not all(isinstance(k, sp.Expr) for k in dd.keys()):
+            raise ValueError("All keys must be sympy expressions.")
+        if not all(isinstance(v, ALPcouplings) for v in dd.values()):
+            raise ValueError("All values must be ALPcouplings objects.")
+        v0 = next(iter(dd.values()))
+        if not all(v.scale == v0.scale for v in dd.values()):
+            raise ValueError("All ALPcouplings objects must have the same scale.")
+        scale = v0.scale
+        if not all(v.basis == v0.basis for v in dd.values()):
+            raise ValueError("All ALPcouplings objects must have the same basis.")
+        basis = 'sp_' + v0.basis
+        if not all(v.ew_scale == v0.ew_scale for v in dd.values()):
+            raise ValueError("All ALPcouplings objects must have the same EW scale.")
+        ew_scale = v0.ew_scale
+        a = ALPcouplings({}, scale, basis, ew_scale)
+        for k, v in dd.items():
+            v.basis = basis
+            a += k*v
+        if scale > ew_scale:
+            a.yu = v0.yu
+            a.yd = v0.yd
+            a.ye = v0.ye
+        return a
+    
+    def subs(self, subs_dict: dict[sp.Expr, complex]) -> 'ALPcouplings':
+        num_values = {}
+        for k, v in self.values.items():
+            if isinstance(v, sp.Expr):
+                num_values[k] = float(v.subs(subs_dict))
+            elif isinstance(v, sp.Matrix):
+                matr = np.zeros(v.shape, dtype=complex)
+                for i in range(v.shape[0]):
+                    for j in range(v.shape[1]):
+                        matr[i,j] = complex(v[i,j].subs(subs_dict))
+                num_values[k] = matr
+        a = ALPcouplings(num_values, self.scale, self.basis[3:], self.ew_scale)
+        if self.scale > self.ew_scale:
+            a.yu = self.yu
+            a.yd = self.yd
+            a.ye = self.ye
+        return a
 
 class ALPcouplingsEncoder(JSONEncoder):
     """ JSON encoder for ALPcouplings objects and structures containing them.
