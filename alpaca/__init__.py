@@ -34,6 +34,10 @@ cross_section
     Calculates the cross section of a process.
 meson_mixing
     Calculates the value of a meson mixing observable.
+alp_channels_decay_widths
+    Calculates the decay widths for all ALP channels.
+alp_channels_branching_ratios
+    Calculates the branching ratios for all ALP channels.
 """
 
 import lazy_loader as lazy

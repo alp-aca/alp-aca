@@ -197,3 +197,49 @@ def cross_section(transition: str, ma: float, couplings: ALPcouplings, s: float,
         raise NotImplementedError(f'Unknown cross section process {" ".join(initial)} -> {" ".join(final)}')
     
     return np.vectorize(sigma, otypes=[float])(ma, couplings, s, fa, br_dark, **kwargs)
+
+def alp_channels_decay_widths(ma: float, couplings: ALPcouplings, fa: float, br_dark: float = 0.0, **kwargs) -> dict[str, float]:
+    """Calculate the decay widths for all ALP decay channels.
+
+    Parameters
+    ----------
+    ma (float) :
+        The mass of the ALP, in GeV.
+    couplings (ALPcouplings) :
+        The couplings of the ALP to other particles.
+    fa (float):
+        The decay constant of the ALP, in GeV.
+    br_dark (float, optional):
+        The branching ratio to dark sector particles. Default is 0.0.
+    **kwargs:
+        Additional parameters for the decay width calculation.
+
+    Returns
+    -------
+    dict[str, float] :
+        A dictionary with decay channels as keys and their corresponding widths as values.
+    """
+    return {'a -> ' + ' '.join(channel): decay_width('a -> ' + ' '.join(channel), ma, couplings, fa, br_dark, **kwargs) for channel in branching_ratios.decay_channels}
+
+def alp_channels_branching_ratios(ma: float, couplings: ALPcouplings, fa: float, br_dark: float = 0.0, **kwargs) -> dict[str, float]:
+    """Calculate the branching ratios for all ALP decay channels.
+
+    Parameters
+    ----------
+    ma (float) :
+        The mass of the ALP, in GeV.
+    couplings (ALPcouplings) :
+        The couplings of the ALP to other particles.
+    fa (float):
+        The decay constant of the ALP, in GeV.
+    br_dark (float, optional):
+        The branching ratio to dark sector particles. Default is 0.0.
+    **kwargs:
+        Additional parameters for the branching ratio calculation.
+
+    Returns
+    -------
+    dict[str, float] :
+        A dictionary with decay channels as keys and their corresponding branching ratios as values.
+    """
+    return {'a -> ' + ' '.join(channel): branching_ratio('a -> ' + ' '.join(channel), ma, couplings, fa, br_dark, **kwargs) for channel in branching_ratios.decay_channels}

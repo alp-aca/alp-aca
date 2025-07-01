@@ -8,6 +8,8 @@ from .decays.decays import (
     decay_width as decay_width,
     branching_ratio as branching_ratio,
     cross_section as cross_section,
+    alp_channels_decay_widths as alp_channels_decay_widths,
+    alp_channels_branching_ratios as alp_channels_branching_ratios,
 )
 
 from .decays.mesons.mixing import (
