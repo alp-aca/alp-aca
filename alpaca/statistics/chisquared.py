@@ -512,6 +512,45 @@ class ChiSquaredList(list[ChiSquared]):
             A new ChiSquaredList with the sliced data.
         """
         return ChiSquaredList([chi2.slicing(*idx) for chi2 in self])
+    
+    def contour(self, x: np.ndarray[float], y: np.ndarray[float], sigma: float = 2.0) -> tuple[np.ndarray[float], np.ndarray[float]]:
+        """Generate contour lines for the chi-squared significance across all ChiSquared objects in the list.
+
+        Parameters
+        ----------
+        x : np.ndarray[float]
+            The x-coordinates of the data points.
+        y : np.ndarray[float]
+            The y-coordinates of the data points.
+        sigma : float, optional
+            The significance level for the contour (default is 2.0).
+
+        Returns
+        -------
+        tuple[np.ndarray[float], np.ndarray[float]]
+            The x and y coordinates of the contour lines.
+        """
+        return self.combine('', '').contour(x, y, sigma)
+    
+    def contour_to_csv(self, x: np.ndarray[float], y: np.ndarray[float], filename: str, sigma: float = 2.0, xlabel: str = 'x', ylabel: str = 'y'):
+        """Export the contour data to a CSV file for all ChiSquared objects in the list.
+
+        Parameters
+        ----------
+        x : np.ndarray[float]
+            The x-coordinates of the data points.
+        y : np.ndarray[float]
+            The y-coordinates of the data points.
+        filename : str
+            The name of the output CSV file.
+        sigma : float, optional
+            The significance level for the contour (default is 2.0).
+        xlabel : str, optional
+            The label for the x-axis (default is 'x').
+        ylabel : str, optional
+            The label for the y-axis (default is 'y').
+        """
+        self.combine('', '').contour_to_csv(x, y, filename, sigma, xlabel, ylabel)
 
 def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, couplings, fa, min_probability=1e-3, br_dark = 0.0, sm_pred=0, sm_uncert=0, **kwargs):
     kwargs_dw = {k: v for k, v in kwargs.items() if k != 'theta'}
