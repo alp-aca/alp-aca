@@ -91,6 +91,7 @@ particle_aliases = {
 tex_codes = {
     'alp': r'a',
     'photon': r'\gamma',
+    'gluon': r'g',
     'electron': r'e',
     'muon': r'\mu',
     'tau': r'\tau',
@@ -105,7 +106,7 @@ tex_codes = {
     'pion+': r'\pi^+',
     'pion-': r'\pi^-',
     'eta': r'\eta',
-    'eta_prime': r'\eta\'',
+    'eta_prime': r'\eta^\prime',
     'omega': r'\omega',
     'rho0': r'\rho^0',
     'rho+': r'\rho^+',

@@ -7,6 +7,7 @@ plt.rcParams.update({'font.size': 12, 'text.usetex': True, 'font.family': 'serif
 import numpy as np
 from .palettes import trafficlights
 from ..statistics.chisquared import ChiSquared, combine_chi2
+from ..decays.decays import to_tex
 
 def exclusionplot(x: Container[float], y: Container[float], chi2: list[ChiSquared] | ChiSquared, xlabel: str, ylabel: str, title: str | None = None, ax: Axes | None = None, global_chi2: ChiSquared | bool = True) -> Axes:
     """
@@ -98,4 +99,51 @@ def exclusionplot(x: Container[float], y: Container[float], chi2: list[ChiSquare
     plt.tight_layout()
 
     ax.set_rasterization_zorder(-10)
+    return ax
+
+def alp_channels_plot(x: Container[float], channels: dict[str, Container[float]], xlabel: str, ylabel: str, ymin: float, ymax: float, title: str | None = None, ax: Axes | None = None) -> Axes:
+    """
+    Create a plot for ALP decay channels.
+
+    Parameters
+    ----------
+    x : Container[float]
+        The x-coordinates of the data points.
+    channels : dict[str, Container[float]]
+        A dictionary where keys are channel names and values are the corresponding y-coordinates.
+    xlabel : str
+        The label for the x-axis.
+    ylabel : str
+        The label for the y-axis.
+    ymin : float
+        The minimum value for the y-axis.
+    ymax : float
+        The maximum value for the y-axis.
+    title : str | None, optional
+        The title of the plot (default is None).
+    ax : plt.Axes | None, optional
+        The matplotlib Axes object to plot on (default is None, which creates a new figure).
+
+    """
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1)
+    else:
+        fig = ax.get_figure()
+    
+    ncols = sum(1 for channel in channels if np.max(channels[channel]) > ymin)
+    palette = distinctipy.get_colors(ncols, pastel_factor=0.7)
+    for channel, y in channels.items():
+        if np.max(y) > ymin:
+            ax.loglog(x, y, label=to_tex(channel), color=palette.pop(0))
+    
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.set_ylim(ymin, ymax)
+    if title is not None:
+        ax.set_title(title)
+    
+    ax.legend(loc='center left', bbox_to_anchor=(1, 0.5), borderaxespad=2, fontsize=8)
+    plt.tight_layout()
+    
     return ax
