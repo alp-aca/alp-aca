@@ -1,23 +1,25 @@
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
+from matplotlib.axes import Axes
 import distinctipy
+from collections.abc import Container
 plt.rcParams.update({'font.size': 12, 'text.usetex': True, 'font.family': 'serif', 'font.serif': 'Computer Modern Roman'})
 import numpy as np
 from .palettes import trafficlights
 from ..statistics.chisquared import ChiSquared, combine_chi2
 
-def exclusionplot(x: np.ndarray[float], y: np.ndarray[float], chi2: list[ChiSquared] | ChiSquared, xlabel: str, ylabel: str, title: str | None = None, ax: plt.Axes | None = None, global_chi2: ChiSquared | None = None) -> plt.Axes:
+def exclusionplot(x: Container[float], y: Container[float], chi2: list[ChiSquared] | ChiSquared, xlabel: str, ylabel: str, title: str | None = None, ax: Axes | None = None, global_chi2: ChiSquared | bool = True) -> Axes:
     """
     Create an exclusion plot.
 
     Parameters
     ----------
-    x : np.ndarray[float]
+    x : Container[float]
         The x-coordinates of the data points.
-    y : np.ndarray[float]
+    y : Container[float]
         The y-coordinates of the data points.
-    chi2 : list[ChiSquared]
-        A list of ChiSquared objects representing the exclusion regions.
+    chi2 : list[ChiSquared] | ChiSquared
+        The ChiSquared object(s) representing the exclusion regions. If a single ChiSquared object is provided, it will be treated as the global exclusion significance.
     xlabel : str
         The label for the x-axis.
     ylabel : str
@@ -26,8 +28,9 @@ def exclusionplot(x: np.ndarray[float], y: np.ndarray[float], chi2: list[ChiSqua
         The title of the plot (default is None).
     ax : plt.Axes | None, optional
         The matplotlib Axes object to plot on (default is None, which creates a new figure).
-    global_chi2 : ChiSquared | None, optional
-        A ChiSquared object representing the global exclusion significance (default is None, which uses the combined chi squared).
+    global_chi2 : ChiSquared | bool, optional
+        A ChiSquared object representing the global exclusion significance (default is True, which uses the combined chi squared).
+        If set to False, no global significance will be plotted.
 
     """
     cmap_trafficlights = ListedColormap(trafficlights+['#000000'])
@@ -37,14 +40,16 @@ def exclusionplot(x: np.ndarray[float], y: np.ndarray[float], chi2: list[ChiSqua
     else:
         fig = ax.get_figure()
     legend_elements = ax.get_legend_handles_labels()[0]
-    if isinstance(chi2, ChiSquared) and global_chi2 is None:
-        global_chi2 = chi2
-        chi2 = []
-    elif isinstance(chi2, ChiSquared) and global_chi2 is not None:
-        chi2 = [chi2]
-    elif global_chi2 is None:
+    if isinstance(chi2, ChiSquared):
+        if global_chi2 is True:
+            global_chi2 = chi2
+            chi2 = []
+        else:
+            chi2 = [chi2]
+    elif global_chi2 is True:
         global_chi2 = combine_chi2(chi2, 'Global', 'Global', 'Global')
-    pl = ax.contourf(x,y, global_chi2.significance(), levels=list(np.linspace(0, 5, 150)), cmap=cmap_trafficlights, vmax=5, extend='max', zorder=-20)
+    if isinstance(global_chi2, ChiSquared):
+        pl = ax.contourf(x,y, global_chi2.significance(), levels=list(np.linspace(0, 5, 150)), cmap=cmap_trafficlights, vmax=5, extend='max', zorder=-20)
     
     colors_used = ['#ffffff', '#bfff86', '#fffd66', '#f06060', '#68292a', '#000000']
     chi2_contours = []
@@ -80,9 +85,10 @@ def exclusionplot(x: np.ndarray[float], y: np.ndarray[float], chi2: list[ChiSqua
         legend_elements.append(plt.Line2D([0], [0], color=color, ls=ls, label=c.sector.tex, lw=lw))
     ax.set_xscale('log')
     ax.set_yscale('log')
-    cb = fig.colorbar(pl, extend='max')
-    cb.set_label(r'Exclusion significance [$\sigma$]')
-    cb.set_ticks([0, 1, 2, 3, 4, 5])
+    if isinstance(global_chi2, ChiSquared):
+        cb = fig.colorbar(pl, extend='max')
+        cb.set_label(r'Exclusion significance [$\sigma$]')
+        cb.set_ticks([0, 1, 2, 3, 4, 5])
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     if title is not None:
