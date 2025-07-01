@@ -119,6 +119,44 @@ class ModelBase:
         linebreak = r'\\' + '\n'
         return r'\begin{align}' + '\n' + linebreak.join(eqs) + '\n' + r'\end{align}'
     
+    def symbolic_ALPcouplings(self,
+                      scale: float,
+                      ew_scale: float = 100.0,
+                      VuL: np.ndarray| None = None,
+                      VdL: np.ndarray| None = None,
+                      VuR: np.ndarray| None = None,
+                      VdR: np.ndarray| None = None,
+                      VeL: np.ndarray| None = None,
+                      VeR: np.ndarray| None = None,
+                      ) -> ALPcouplings:
+        """Return the couplings of the model as a symbolic ALPcouplings object.
+
+        Arguments
+        scale : float
+            The scale at which the couplings are evaluated, in GeV.
+        ew_scale : float
+            The electroweak scale, in GeV. Default is 100.0 GeV.
+
+        VuL : np.ndarray, optional
+            Unitary rotation of the left-handed up-type quarks to diagonalize Yu. If None, it is set to the identity.
+
+        VdL : np.ndarray, optional
+            Unitary rotation of the left-handed down-type quarks to diagonalize Yd. If None, it is set to the CKM matrix.
+
+        VuR : np.ndarray, optional
+            Unitary rotation of the right-handed up-type quarks to diagonalize Yu. If None, it is set to the identity.
+
+        VdR : np.ndarray, optional
+            Unitary rotation of the right-handed down-type quarks to diagonalize Yd. If None, it is set to the identity.
+        
+        Returns
+        -------
+        ALPcouplings
+            The couplings of the model as a symbolic ALPcouplings object.
+        """
+        self.initialize()
+        return ALPcouplings(self.couplings, scale, 'sp_derivative_above', ew_scale, VuL, VdL, VuR, VdR, VeL, VeR)
+    
     def E_over_N(self) -> sp.Rational:
         """Return the ratio E/N for the model relating the electromagnetic and QCD anomalies.
 
@@ -302,6 +340,8 @@ class Flaxion(model):
         a.yd = self.yukawas('d', eps)
         a.ye = self.yukawas('e', eps)
         return a
+    def symbolic_ALPcouplings(self, scale: float, ew_scale: float = 100, VuL: np.ndarray | None = None, VdL: np.ndarray | None = None, VuR: np.ndarray | None = None, VdR: np.ndarray | None = None, VeL: np.ndarray | None = None, VeR: np.ndarray | None = None) -> ALPcouplings:
+        raise NotImplementedError("The symbolic ALP couplings for the Flaxion model are not implemented. Use get_couplings() instead to get numerical values.")
 
 # Benchmark Models
 
