@@ -104,6 +104,16 @@ def belleII_BtoKnunu(x):
 #     values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmap, sigmap)
 #     return values, sigmals, sigmars
 
+na62_Ktopiinv22 = MeasurementInterpolatedBound(
+    ['Guadagnoli:2025xnt', 'NA62:2024pjp'],
+    os.path.join(current_dir, invisible, 'Kpialp_na62.txt'),
+    'invisible',
+    rmax = 14000,
+    mass_parent=mK,
+    mass_sibling=mpi_pm,
+    lab_boost=75*mK
+)
+
 na62_Ktopiinv = MeasurementDisplacedVertexBound(
     'NA62:2020pwi',
     os.path.join(current_dir, invisible, 'na62_kpiInv.npy'),
@@ -2144,7 +2154,7 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         return {'E653': e653_DstoKstmue}
     #Initial state K+
     elif initial == ['K+'] and final == sorted(['pion+', 'alp']):
-        return {'NA62': na62_Ktopiinv, 'E949': e949_Ktopiinv}    
+        return {'NA62': na62_Ktopiinv, 'E949': e949_Ktopiinv, 'NA62(2022)': na62_Ktopiinv22}
     elif initial == ['K+'] and final == sorted(['pion+', 'electron', 'muon']):
         return {'NA62': na62_Kpluspimue}
     #elif initial == ['K+'] and final == sorted(['pion+', 'photon', 'photon']):
