@@ -353,9 +353,9 @@ KSVZ_charge = sp.symbols(r'\mathcal{X}')
 QED_DFSZ= model('QED-DFSZ', {'eR': -2*sp.cos(beta)**2, 'uR': -2*sp.sin(beta)**2, 'dR': 2*sp.sin(beta)**2})
 """QED-DFSZ: A DFSZ-like model with couplings to leptons and quarks that does not generate a QCD anomaly."""
 u_DFSZ= model('u-DFSZ', {'eR': 1, 'dR':-2,'uR': 0})
-"""u-DFSZ: A DFSZ-like model with couplings to leptons and up-type quarks."""
+"""u-DFSZ: A DFSZ-like model with couplings to leptons and down-type quarks."""
 e_DFSZ= model('e-DFSZ', {'uR': -1, 'dR': 1})
-"""d-DFSZ: A DFSZ-like model with couplings to leptons and down-type quarks."""
+"""e-DFSZ: A DFSZ-like model with couplings to up- and down-type quarks."""
 Q_KSVZ=KSVZ_model('Q-KSVZ', [fermion(3,1,0,KSVZ_charge)])
 """Q-KSVZ: A KSVZ-like model with a heavy vector-like quark."""
 L_KSVZ=KSVZ_model('L-KSVZ', [fermion(1,2,0,KSVZ_charge)])
@@ -364,3 +364,5 @@ Y_KSVZ=KSVZ_model('Y-KSVZ', [fermion(1,1,sp.Rational(1,2),KSVZ_charge)])
 """L-KSVZ: A KSVZ-like model with a heavy vector-like lepton."""
 flaxion_benchmark = Flaxion('Flaxion', {'qL': np.array([3, 2, 0], dtype=int), 'uR': np.array([-5, -1, 0], dtype=int), 'dR': np.array([-4, -3, -3], dtype=int), 'lL': np.array([1, 0, 0], dtype=int), 'eR': np.array([-8, -5, -3], dtype=int)})
 """Flaxion: A model with a flaxion field."""
+nonuniversal_DFSZ = model('2HDM_1', {'dR': -sp.cos(beta)**2, 'uR': -sp.sin(beta)**2, 'eR': -sp.cos(beta)**2, 'qL': [0, 0, -1], 'lL': [0,0,-1]})
+"""Nonuniversal DFSZ: A DFSZ-like model with nonuniversal couplings to quarks and leptons."""
