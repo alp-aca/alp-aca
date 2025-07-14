@@ -354,7 +354,7 @@ QED_DFSZ= model('QED-DFSZ', {'eR': -2*sp.cos(beta)**2, 'uR': -2*sp.sin(beta)**2,
 """QED-DFSZ: A DFSZ-like model with couplings to leptons and quarks that does not generate a QCD anomaly."""
 u_DFSZ= model('u-DFSZ', {'eR': 1, 'dR':-2,'uR': 0})
 """u-DFSZ: A DFSZ-like model with couplings to leptons and down-type quarks."""
-e_DFSZ= model('e-DFSZ', {'uR': -1, 'dR': 1})
+e_DFSZ= model('e-DFSZ', {'uR': 1, 'dR': 1})
 """e-DFSZ: A DFSZ-like model with couplings to up- and down-type quarks."""
 Q_KSVZ=KSVZ_model('Q-KSVZ', [fermion(3,1,0,KSVZ_charge)])
 """Q-KSVZ: A KSVZ-like model with a heavy vector-like quark."""
