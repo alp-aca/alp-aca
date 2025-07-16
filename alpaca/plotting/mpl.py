@@ -101,7 +101,7 @@ def exclusionplot(x: Container[float], y: Container[float], chi2: list[ChiSquare
     ax.set_rasterization_zorder(-10)
     return ax
 
-def alp_channels_plot(x: Container[float], channels: dict[str, Container[float]], xlabel: str, ylabel: str, ymin: float, ymax: float, title: str | None = None, ax: Axes | None = None) -> Axes:
+def alp_channels_plot(x: Container[float], channels: dict[str, Container[float]], xlabel: str, ylabel: str, ymin: float | None = None, title: str | None = None, ax: Axes | None = None) -> Axes:
     """
     Create a plot for ALP decay channels.
 
@@ -131,15 +131,19 @@ def alp_channels_plot(x: Container[float], channels: dict[str, Container[float]]
     else:
         fig = ax.get_figure()
     
-    ncols = sum(1 for channel in channels if np.max(channels[channel]) > ymin)
+    if ymin is None:
+        ncols = len(channels)
+    else:
+        ncols = sum(1 for channel in channels if np.max(channels[channel]) > ymin)
     palette = distinctipy.get_colors(ncols, pastel_factor=0.7)
     for channel, y in channels.items():
-        if np.max(y) > ymin:
+        if (ymin is None) or (np.max(y) > ymin):
             ax.loglog(x, y, label=to_tex(channel), color=palette.pop(0))
     
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
-    ax.set_ylim(ymin, ymax)
+    if ymin is not None:
+        ax.set_ylim(bottom=ymin)
     if title is not None:
         ax.set_title(title)
     
