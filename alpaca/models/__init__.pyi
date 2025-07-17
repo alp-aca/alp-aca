@@ -1,9 +1,9 @@
 from .model_library import (
     ModelBase as ModelBase,
-    model as model,
+    PQChargedModel as PQChargedModel,
     KSVZ_model as KSVZ_model,
     Flaxion as Flaxion,
-    fermion as fermion,
+    HeavyFermion as HeavyFermion,
     QED_DFSZ as QED_DFSZ,
     u_DFSZ as u_DFSZ,
     e_DFSZ as e_DFSZ,
