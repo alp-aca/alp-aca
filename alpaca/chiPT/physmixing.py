@@ -21,9 +21,9 @@ def mixing_pi0_alp(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> c
     th_pi_eta = sm_mixingangles()[('pi0', 'eta')]*(np.cos(theta_eta_etap)-np.sqrt(2)*np.sin(theta_eta_etap))/np.sqrt(2)
     th_pi_etap = sm_mixingangles()[('pi0', 'etap')]*(np.sin(theta_eta_etap)+np.sqrt(2)*np.cos(theta_eta_etap))
     F0 = fpi/np.sqrt(2)
-    cg = couplings['cg']*F0/fa
+    cG = couplings['cG']*F0/fa
 
-    return th_pi_a + cg*(kappa[0,0]-kappa[1,1]) - deltaI*(np.sqrt(3)*th_pi_etap + np.sqrt(6)*th_pi_eta + 1)*(cg*(kappa[0,0]+kappa[1,1]) + (th_etap_a + np.sqrt(2)*th_eta_a)/np.sqrt(3) )
+    return th_pi_a + cG*(kappa[0,0]-kappa[1,1]) - deltaI*(np.sqrt(3)*th_pi_etap + np.sqrt(6)*th_pi_eta + 1)*(cG*(kappa[0,0]+kappa[1,1]) + (th_etap_a + np.sqrt(2)*th_eta_a)/np.sqrt(3) )
 
 def mixing_eta_alp(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> complex:
     citations.register_inspire('Kyselov:2025uez')
@@ -35,9 +35,9 @@ def mixing_eta_alp(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> c
     th_pi_eta = sm_mixingangles()[('pi0', 'eta')]*(np.cos(theta_eta_etap)-np.sqrt(2)*np.sin(theta_eta_etap))/np.sqrt(2)
     th_pi_etap = sm_mixingangles()[('pi0', 'etap')]*(np.sin(theta_eta_etap)+np.sqrt(2)*np.cos(theta_eta_etap))
     F0 = fpi/np.sqrt(2)
-    cg = couplings['cg']*F0/fa
+    cG = couplings['cG']*F0/fa
 
-    return th_eta_a + th_etap_a/np.sqrt(2) + np.sqrt(3/2)*cg*(kappa[0,0]+kappa[1,1])-0.5*deltaI*(cg*(kappa[0,0]-kappa[1,1])+th_pi_a)*(2*np.sqrt(2)*th_pi_etap + th_pi_eta+np.sqrt(6))
+    return th_eta_a + th_etap_a/np.sqrt(2) + np.sqrt(3/2)*cG*(kappa[0,0]+kappa[1,1])-0.5*deltaI*(cG*(kappa[0,0]-kappa[1,1])+th_pi_a)*(2*np.sqrt(2)*th_pi_etap + th_pi_eta+np.sqrt(6))
 
 def mixing_etap_alp(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> complex:
     citations.register_inspire('Kyselov:2025uez')
@@ -49,6 +49,6 @@ def mixing_etap_alp(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> 
     th_pi_eta = sm_mixingangles()[('pi0', 'eta')]*(np.cos(theta_eta_etap)-np.sqrt(2)*np.sin(theta_eta_etap))/np.sqrt(2)
     th_pi_etap = sm_mixingangles()[('pi0', 'etap')]*(np.sin(theta_eta_etap)+np.sqrt(2)*np.cos(theta_eta_etap))
     F0 = fpi/np.sqrt(2)
-    cg = couplings['cg']*F0/fa
+    cG = couplings['cG']*F0/fa
 
-    return th_etap_a + np.sqrt(2)*th_eta_a + np.sqrt(3)*cg*(kappa[0,0]+kappa[1,1]) + deltaI*(cg*(kappa[0,0]-kappa[1,1])+th_pi_a)*(th_pi_etap - 2*np.sqrt(2)*th_pi_eta - np.sqrt(3))
+    return th_etap_a + np.sqrt(2)*th_eta_a + np.sqrt(3)*cG*(kappa[0,0]+kappa[1,1]) + deltaI*(cG*(kappa[0,0]-kappa[1,1])+th_pi_a)*(th_pi_etap - 2*np.sqrt(2)*th_pi_eta - np.sqrt(3))

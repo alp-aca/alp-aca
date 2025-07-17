@@ -7,7 +7,7 @@
 # using the sympy library
 #
 gT = Symbol('gT')
-cg = Symbol('cg')
+cG = Symbol('cG')
 kappad = Symbol('kappad')
 kappau = Symbol('kappau')
 deltaI = Symbol('deltaI')
@@ -23,4 +23,4 @@ ma = Symbol('ma')
 m23 = Symbol('m23')
 Gammaf2 = Symbol('Gammaf2')
 UnitStep = Function('UnitStep')
-e = gT**2*(3*cg*(kappad - kappau) + deltaI*thetaALP*(2*thetapi + sqrt(2)*thetaprpi) + deltaI*(sqrt(2)*thetapi + thetaprpi)*(sqrt(3)*cg*(kappad + kappau) + thetaprALP) - 3*thpiALP)*(m12**2*(mf2**2 - 2*mpi0**2)*(ma**2 - mf2**2 + mpi0**2) + m12*(-6*m23*mf2**4 - ma**4*(mf2**2 - 2*mpi0**2) + ma**2*(mf2**4 + 4*mf2**2*mpi0**2 - 4*mpi0**4) + 3*mf2**4*mpi0**2 + mf2**2*mpi0**4 + 2*mpi0**6) - 6*m23**2*mf2**4 + 6*m23*mf2**4*(ma**2 + 3*mpi0**2) - 4*mf2**2*mpi0**2*(ma**4 + 2*ma**2*(mf2**2 - mpi0**2) + 2*mf2**2*mpi0**2 + mpi0**4))*UnitStep(m12 - (Gammaf2 - mf2)**2)/(144*mf2**4*(-m12 + mf2*(-I*Gammaf2 + mf2)))
+e = gT**2*(3*cG*(kappad - kappau) + deltaI*thetaALP*(2*thetapi + sqrt(2)*thetaprpi) + deltaI*(sqrt(2)*thetapi + thetaprpi)*(sqrt(3)*cG*(kappad + kappau) + thetaprALP) - 3*thpiALP)*(m12**2*(mf2**2 - 2*mpi0**2)*(ma**2 - mf2**2 + mpi0**2) + m12*(-6*m23*mf2**4 - ma**4*(mf2**2 - 2*mpi0**2) + ma**2*(mf2**4 + 4*mf2**2*mpi0**2 - 4*mpi0**4) + 3*mf2**4*mpi0**2 + mf2**2*mpi0**4 + 2*mpi0**6) - 6*m23**2*mf2**4 + 6*m23*mf2**4*(ma**2 + 3*mpi0**2) - 4*mf2**2*mpi0**2*(ma**4 + 2*ma**2*(mf2**2 - mpi0**2) + 2*mf2**2*mpi0**2 + mpi0**4))*UnitStep(m12 - (Gammaf2 - mf2)**2)/(144*mf2**4*(-m12 + mf2*(-I*Gammaf2 + mf2)))

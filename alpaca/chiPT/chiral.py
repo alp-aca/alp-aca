@@ -18,7 +18,7 @@ kappa = np.diag([1/m for m in [mu, md, ms]])/sum(1/m for m in [mu, md, ms])
 def cqhat(couplings: ALPcouplings, ma: float, **kwargs) -> np.ndarray:
     cc = couplings.match_run(ma, 'VA_below', **kwargs)
     cq = np.array([[cc['cuA'][0,0], 0, 0], [0, cc['cdA'][0,0], cc['cdA'][0,1]], [0, cc['cdA'][1,0], cc['cdA'][1,1]]])
-    return cq + 2 * cc['cg'] * kappa
+    return cq + 2 * cc['cG'] * kappa
 
 def mesonmass_chiPT():
     c_eta = np.cos(theta_eta_etap)
@@ -53,7 +53,7 @@ def mass_mixing(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> dict
     c_eta = np.cos(theta_eta_etap)
     s_eta = np.sin(theta_eta_etap)
     deltaI = (md-mu)/(md+mu)
-    cG = couplings['cg']
+    cG = couplings['cG']
     return {
         'pi0': -eps*cG*mpi0**2*(kappa[1,1]*(deltaI+1)+kappa[0,0]*(deltaI-1)),
         'eta': -2*eps*cG*mpi0**2/np.sqrt(3)/(mu+md) *((np.sqrt(2)*s_eta-c_eta)*(kappa[0,0]*mu + kappa[1,1]*md)+(2*c_eta+np.sqrt(2)*s_eta)*kappa[2,2]*ms),

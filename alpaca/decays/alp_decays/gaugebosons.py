@@ -13,7 +13,7 @@ def cgamma_chiral(ma: float, couplings: ALPcouplings) -> float:
     if ma > metap:
         return 0
     charges = np.diag([2/3, -1/3, -1/3])
-    return -2*couplings['cg']*3*np.trace(kappa @ charges @ charges)
+    return -2*couplings['cG']*3*np.trace(kappa @ charges @ charges)
 
 def cgamma_VMD(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
     citations.register_inspire('Aloni:2018vki')
@@ -25,15 +25,15 @@ def cgamma_VMD(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float
 
 def cgamma_twoloops(ma: float, couplings: ALPcouplings, fa: float) -> float:
     citations.register_inspire('Bauer:2017ris')
-    if couplings['cg'] == 0.0:
+    if couplings['cG'] == 0.0:
         return 0
     if ma < metap:
         return 0
-    Lambda = np.abs(couplings['cg'])*32*np.pi**2*fa
+    Lambda = np.abs(couplings['cG'])*32*np.pi**2*fa
     charges = [2/3, -1/3, 2/3, -1/3, 2/3, -1/3]
     masses = [mu, md, mc, ms, mt, mb]
     masses_log = [mpi0, mpi0, mc, mK, mt, mb]
-    return -3/2*alpha_s(ma)**2/np.pi**2*couplings['cg']*sum(charges[i]**2*B1(4*masses[i]**2/ma**2)*np.log(Lambda**2/masses_log[i]**2) for i in range(6))
+    return -3/2*alpha_s(ma)**2/np.pi**2*couplings['cG']*sum(charges[i]**2*B1(4*masses[i]**2/ma**2)*np.log(Lambda**2/masses_log[i]**2) for i in range(6))
 
 def decay_width_2gamma(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
     cgamma_eff = 0
@@ -91,12 +91,12 @@ def decay_width_2gluons(ma: float, couplings: ALPcouplings, fa: float, **kwargs)
         cdA = cc['kd'] - cc['kD']
         mq = [mu, md, ms, mc, mb, mt]
         coupl = [cuA[0,0], cdA[0,0], cdA[1,1], cuA[1,1], cdA[2,2], cuA[2,2]]
-        cg_eff = cc['cg'] + 0.5 * sum(coupl[i]*B1(4*mq[i]**2/ma**2) for i in range(6))
+        cG_eff = cc['cG'] + 0.5 * sum(coupl[i]*B1(4*mq[i]**2/ma**2) for i in range(6))
     else:
         cc = couplings.match_run(ma, 'VA_below', **kwargs)
         cuA = cc['cuA']
         cdA = cc['cdA']
         mq = [mu, md, ms, mc, mb]
         coupl = [cuA[0,0], cdA[0,0], cdA[1,1], cuA[1,1], cdA[2,2]]
-        cg_eff = cc['cg'] + 0.5 * sum(coupl[i]*B1(4*mq[i]**2/ma**2) for i in range(5))
-    return alpha_s(ma)**2*ma**3/((4*np.pi)**3*fa**2)*np.abs(cg_eff)**2*(1+alpha_s(ma)/np.pi*83/4)#(1+alpha_s(ma)/48/np.pi*(291-sum(14 for i in range(5) if ma > mq[i])))
+        cG_eff = cc['cG'] + 0.5 * sum(coupl[i]*B1(4*mq[i]**2/ma**2) for i in range(5))
+    return alpha_s(ma)**2*ma**3/((4*np.pi)**3*fa**2)*np.abs(cG_eff)**2*(1+alpha_s(ma)/np.pi*83/4)#(1+alpha_s(ma)/48/np.pi*(291-sum(14 for i in range(5) if ma > mq[i])))

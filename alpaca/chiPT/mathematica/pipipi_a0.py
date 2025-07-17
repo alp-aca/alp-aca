@@ -7,7 +7,7 @@
 # using the sympy library
 #
 deltaI = Symbol('deltaI')
-cg = Symbol('cg')
+cG = Symbol('cG')
 CoefA = Symbol('CoefA')
 kappad = Symbol('kappad')
 kappau = Symbol('kappau')
@@ -22,4 +22,4 @@ ma = Symbol('ma')
 mpi0 = Symbol('mpi0')
 thetapi = Symbol('thetapi')
 thetaprpi = Symbol('thetaprpi')
-e = -sqrt(3)*deltaI*(6*cg*(2*CoefA*(kappad + kappau - 1) + CoefC) + sqrt(3)*(2*sqrt(2)*CoefA*thetaALP - 4*CoefA*thetaprALP + sqrt(2)*CoefC*thetaALP + 4*CoefC*thetaprALP))*(m12**2*(m23 + I*ma0plus*(Gammaa0plus + I*ma0plus)) + m12*(-I*Gammaa0plus*ma0plus*(ma**2 + 3*mpi0**2) + m23**2 + 2*I*m23*ma0plus*(Gammaa0plus + I*ma0plus) + ma**2*ma0plus**2 - 2*ma**2*mpi0**2 + 3*ma0plus**2*mpi0**2 - 2*mpi0**4) + (m23 - 2*mpi0**2)*(m23 - ma**2 - mpi0**2)*(2*I*Gammaa0plus*ma0plus + ma**2 - 2*ma0plus**2 + 3*mpi0**2))*(2*sqrt(2)*CoefA*thetapi - 4*CoefA*thetaprpi + sqrt(2)*CoefC*thetapi + 4*CoefC*thetaprpi)/(144*(m23 + I*ma0plus*(Gammaa0plus + I*ma0plus))*(-I*Gammaa0plus*ma0plus + m12 + m23 - ma**2 + ma0plus**2 - 3*mpi0**2))
+e = -sqrt(3)*deltaI*(6*cG*(2*CoefA*(kappad + kappau - 1) + CoefC) + sqrt(3)*(2*sqrt(2)*CoefA*thetaALP - 4*CoefA*thetaprALP + sqrt(2)*CoefC*thetaALP + 4*CoefC*thetaprALP))*(m12**2*(m23 + I*ma0plus*(Gammaa0plus + I*ma0plus)) + m12*(-I*Gammaa0plus*ma0plus*(ma**2 + 3*mpi0**2) + m23**2 + 2*I*m23*ma0plus*(Gammaa0plus + I*ma0plus) + ma**2*ma0plus**2 - 2*ma**2*mpi0**2 + 3*ma0plus**2*mpi0**2 - 2*mpi0**4) + (m23 - 2*mpi0**2)*(m23 - ma**2 - mpi0**2)*(2*I*Gammaa0plus*ma0plus + ma**2 - 2*ma0plus**2 + 3*mpi0**2))*(2*sqrt(2)*CoefA*thetapi - 4*CoefA*thetaprpi + sqrt(2)*CoefC*thetapi + 4*CoefC*thetaprpi)/(144*(m23 + I*ma0plus*(Gammaa0plus + I*ma0plus))*(-I*Gammaa0plus*ma0plus + m12 + m23 - ma**2 + ma0plus**2 - 3*mpi0**2))

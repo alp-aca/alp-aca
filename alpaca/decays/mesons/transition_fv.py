@@ -18,7 +18,7 @@ def Kminustopia(ma: float, couplings: ALPcouplings, f_a: float, delta8=0, **kwar
         return 0
     citations.register_inspire('Bauer:2021wjo')
     coupl_low = couplings.match_run(ma, 'kF_below', **kwargs)
-    cg = coupl_low['cg']
+    cG = coupl_low['cG']
     cuu = coupl_low['ku'][0,0]-coupl_low['kU'][0,0]
     cdd = coupl_low['kd'][0,0]-coupl_low['kD'][0,0]
     css = coupl_low['kd'][1,1]-coupl_low['kD'][1,1]
@@ -30,7 +30,7 @@ def Kminustopia(ma: float, couplings: ALPcouplings, f_a: float, delta8=0, **kwar
     Vckm = parsSM['CKM']
     N8 = -g8*GF/np.sqrt(2)*np.conj(Vckm[0,0])*Vckm[0,1]*fpi**2*(np.cos(delta8)+1j*np.sin(delta8))
 
-    chiral_contrib = 16*cg*(mK**2-mpi_pm**2)*(mK**2-ma**2)/(4*mK**2-mpi_pm**2-3*ma**2)
+    chiral_contrib = 16*cG*(mK**2-mpi_pm**2)*(mK**2-ma**2)/(4*mK**2-mpi_pm**2-3*ma**2)
     chiral_contrib += 6*(cuu+cdd-2*css)*ma**2*(mK**2-ma**2)/(4*mK**2-mpi_pm**2-3*ma**2)
     chiral_contrib += (2*cuu+cdd+css)*(mK**2-mpi_pm**2-ma**2) + 4*css*ma**2
     chiral_contrib += (kd+kD-ks-kS)*(mK**2+mpi_pm**2-ma**2)
@@ -45,7 +45,7 @@ def K0bartopia(ma: float, couplings: ALPcouplings, f_a: float, delta8=0, **kwarg
     mK = np.sqrt(B0*(ms+mu/2+md/2))
     citations.register_inspire('Bauer:2021mvw')
     coupl_low = couplings.match_run(ma, 'kF_below', **kwargs)
-    cg = coupl_low['cg']
+    cG = coupl_low['cG']
     cuu = coupl_low['ku'][0,0]-coupl_low['kU'][0,0]
     cdd = coupl_low['kd'][0,0]-coupl_low['kD'][0,0]
     css = coupl_low['kd'][1,1]-coupl_low['kD'][1,1]
@@ -57,7 +57,7 @@ def K0bartopia(ma: float, couplings: ALPcouplings, f_a: float, delta8=0, **kwarg
     Vckm = parsSM['CKM']
     N8 = -g8*GF/np.sqrt(2)*np.conj(Vckm[0,0])*Vckm[0,1]*fpi**2*(np.cos(delta8)+1j*np.sin(delta8))
 
-    chiral_contrib = 16*cg*(mK**2-mpi0**2)*(mK**2-ma**2)/(4*mK**2-mpi0**2-3*ma**2)
+    chiral_contrib = 16*cG*(mK**2-mpi0**2)*(mK**2-ma**2)/(4*mK**2-mpi0**2-3*ma**2)
     chiral_contrib -= 2*(cuu+cdd-2*css)*ma**2*(mK**2-ma**2)/(4*mK**2-mpi0**2-3*ma**2)
     chiral_contrib += (3*cdd+css)*(mK**2-mpi0**2)+(2*cuu-cdd-css)*ma**2
     chiral_contrib -= 2*(cuu-cdd)*ma**2*(mK**2-ma**2)/(mpi0**2-ma**2)

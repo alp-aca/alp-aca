@@ -7,7 +7,7 @@
 # using the sympy library
 #
 mrhoplus = Symbol('mrhoplus')
-cg = Symbol('cg')
+cG = Symbol('cG')
 kappad = Symbol('kappad')
 kappau = Symbol('kappau')
 thpiALP = Symbol('thpiALP')
@@ -17,4 +17,4 @@ ma = Symbol('ma')
 mpi0 = Symbol('mpi0')
 Gammarhoplus = Symbol('Gammarhoplus')
 F0 = Symbol('F0')
-e = mrhoplus**2*(cg*(kappad - kappau) - thpiALP)*(2*m12**2 + 2*m12*m23 - 3*m12*(ma**2 + 3*mpi0**2 + I*mrhoplus*(Gammarhoplus + I*mrhoplus)) + 2*m23**2 - 2*m23*(ma**2 + 3*mpi0**2) + (ma**2 + 3*mpi0**2)*(ma**2 + 3*mpi0**2 + I*mrhoplus*(Gammarhoplus + I*mrhoplus)))/(2*F0**2*(m23 + I*mrhoplus*(Gammarhoplus + I*mrhoplus))*(-I*Gammarhoplus*mrhoplus + m12 + m23 - ma**2 - 3*mpi0**2 + mrhoplus**2))
+e = mrhoplus**2*(cG*(kappad - kappau) - thpiALP)*(2*m12**2 + 2*m12*m23 - 3*m12*(ma**2 + 3*mpi0**2 + I*mrhoplus*(Gammarhoplus + I*mrhoplus)) + 2*m23**2 - 2*m23*(ma**2 + 3*mpi0**2) + (ma**2 + 3*mpi0**2)*(ma**2 + 3*mpi0**2 + I*mrhoplus*(Gammarhoplus + I*mrhoplus)))/(2*F0**2*(m23 + I*mrhoplus*(Gammarhoplus + I*mrhoplus))*(-I*Gammarhoplus*mrhoplus + m12 + m23 - ma**2 - 3*mpi0**2 + mrhoplus**2))

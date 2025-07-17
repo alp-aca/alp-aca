@@ -72,13 +72,13 @@ def gauge_tilde(couplings: ALPcouplings) -> dict:
     Returns
     -------
     cXtilde : dict
-        Dictionary containing `cgtilde`, `cBtilde` and `cWtilde`
+        Dictionary containing `cGtilde`, `cBtilde` and `cWtilde`
     """
     couplings = couplings.translate('derivative_above')
-    cg = couplings['cg'] - np.trace(2*couplings['cqL']-couplings['cuR']-couplings['cdR'])*sp.Rational(1,2)
+    cG = couplings['cG'] - np.trace(2*couplings['cqL']-couplings['cuR']-couplings['cdR'])*sp.Rational(1,2)
     cW = couplings['cW'] - np.trace(3*couplings['cqL']+ couplings['clL'])*sp.Rational(1,2)
     cB = couplings['cB']+np.trace(8*couplings['cuR']+2*couplings['cdR']-couplings['cqL']+6*couplings['ceR']-3*couplings['clL'])*sp.Rational(1,6)
-    return {'cgtilde': sp.nsimplify(cg), 'cBtilde': sp.nsimplify(cB), 'cWtilde': sp.nsimplify(cW)}
+    return {'cGtilde': sp.nsimplify(cG), 'cBtilde': sp.nsimplify(cB), 'cWtilde': sp.nsimplify(cW)}
 
 def beta_ytop(couplings: ALPcouplings) -> ALPcouplings:
     """beta function for the ALP couplings, including only the top Yukawa dependence
@@ -125,11 +125,11 @@ def beta_ytop(couplings: ALPcouplings) -> ALPcouplings:
     eye = sp.eye(3)
 
     # eq(18)
-    betaqL = (yu @ yu.H @ couplings['cqL'] + couplings['cqL'] @ yu @ yu.H + yd @ yd.H @ couplings['cqL'] + couplings['cqL'] @ yd @ yd.H)/2 - (yu @ couplings['cuR'] @ yu.H + yd @ couplings['cdR'] @ yd.H) + eye * (2*bQ*X - 12*alpha_s**2*CF(3)*tildes['cgtilde']- 12*alpha_2**2*CF(2)*tildes['cWtilde'] - 12*alpha_1**2*hyp_qL**2*tildes['cBtilde'])
+    betaqL = (yu @ yu.H @ couplings['cqL'] + couplings['cqL'] @ yu @ yu.H + yd @ yd.H @ couplings['cqL'] + couplings['cqL'] @ yd @ yd.H)/2 - (yu @ couplings['cuR'] @ yu.H + yd @ couplings['cdR'] @ yd.H) + eye * (2*bQ*X - 12*alpha_s**2*CF(3)*tildes['cGtilde']- 12*alpha_2**2*CF(2)*tildes['cWtilde'] - 12*alpha_1**2*hyp_qL**2*tildes['cBtilde'])
 
-    betauR = yu.H @ yu @ couplings['cuR'] + couplings['cuR'] @ yu.H @ yu - 2* yu.H @ couplings['cqL'] @ yu + eye * (2*bu*X + 12*alpha_s**2*CF(3)*tildes['cgtilde']+12*alpha_1**2*hyp_uR**2*tildes['cBtilde'])
+    betauR = yu.H @ yu @ couplings['cuR'] + couplings['cuR'] @ yu.H @ yu - 2* yu.H @ couplings['cqL'] @ yu + eye * (2*bu*X + 12*alpha_s**2*CF(3)*tildes['cGtilde']+12*alpha_1**2*hyp_uR**2*tildes['cBtilde'])
 
-    betadR = yd.H @ yd @ couplings['cdR'] + couplings['cdR'] @ yd.H @ yd - 2* yd.H @ couplings['cqL'] @ yd + eye * (2*bd*X + 12*alpha_s**2*CF(3)*tildes['cgtilde']+12*alpha_1**2*hyp_dR**2*tildes['cBtilde'])
+    betadR = yd.H @ yd @ couplings['cdR'] + couplings['cdR'] @ yd.H @ yd - 2* yd.H @ couplings['cqL'] @ yd + eye * (2*bd*X + 12*alpha_s**2*CF(3)*tildes['cGtilde']+12*alpha_1**2*hyp_dR**2*tildes['cBtilde'])
 
     betalL = (ye @ ye.H @ couplings['clL'] + couplings['clL'] @ ye @ ye.H)/2 - ye @ couplings['ceR'] @ ye.H + eye * (2*bL*X - 12*alpha_2**2*CF(2)*tildes['cWtilde']-12*alpha_1**2*hyp_lL**2*tildes['cBtilde'])
 
@@ -180,11 +180,11 @@ def beta_full(couplings: ALPcouplings) -> ALPcouplings:
     hyp_eR = -1
 
     # eq(18)
-    betaqL = (yu @ yu.H @ couplings['cqL'] + couplings['cqL'] @ yu @ yu.H + yd @ yd.H @ couplings['cqL'] + couplings['cqL'] @ yd @ yd.H)/2 - (yu @ couplings['cuR'] @ yu.H + yd @ couplings['cdR'] @ yd.H) + np.eye(3) * (2*bQ*X - 12*alpha_s**2*CF(3)*tildes['cgtilde']- 12*alpha_2**2*CF(2)*tildes['cWtilde'] - 12*alpha_1**2*hyp_qL**2*tildes['cBtilde'])
+    betaqL = (yu @ yu.H @ couplings['cqL'] + couplings['cqL'] @ yu @ yu.H + yd @ yd.H @ couplings['cqL'] + couplings['cqL'] @ yd @ yd.H)/2 - (yu @ couplings['cuR'] @ yu.H + yd @ couplings['cdR'] @ yd.H) + np.eye(3) * (2*bQ*X - 12*alpha_s**2*CF(3)*tildes['cGtilde']- 12*alpha_2**2*CF(2)*tildes['cWtilde'] - 12*alpha_1**2*hyp_qL**2*tildes['cBtilde'])
 
-    betauR = yu.H @ yu @ couplings['cuR'] + couplings['cuR'] @ yu.H @ yu - 2* yu.H @ couplings['cqL'] @ yu + np.eye(3) * (2*bu*X + 12*alpha_s**2*CF(3)*tildes['cgtilde']+12*alpha_1**2*hyp_uR**2*tildes['cBtilde'])
+    betauR = yu.H @ yu @ couplings['cuR'] + couplings['cuR'] @ yu.H @ yu - 2* yu.H @ couplings['cqL'] @ yu + np.eye(3) * (2*bu*X + 12*alpha_s**2*CF(3)*tildes['cGtilde']+12*alpha_1**2*hyp_uR**2*tildes['cBtilde'])
 
-    betadR = yd.H @ yd @ couplings['cdR'] + couplings['cdR'] @ yd.H @ yd - 2* yd.H @ couplings['cqL'] @ yd + np.eye(3) * (2*bd*X + 12*alpha_s**2*CF(3)*tildes['cgtilde']+12*alpha_1**2*hyp_dR**2*tildes['cBtilde'])
+    betadR = yd.H @ yd @ couplings['cdR'] + couplings['cdR'] @ yd.H @ yd - 2* yd.H @ couplings['cqL'] @ yd + np.eye(3) * (2*bd*X + 12*alpha_s**2*CF(3)*tildes['cGtilde']+12*alpha_1**2*hyp_dR**2*tildes['cBtilde'])
 
     betalL = (ye @ ye.H @ couplings['clL'] + couplings['clL'] @ ye @ ye.H)/2 - ye @ couplings['ceR'] @ ye.H + np.eye(3) * (2*bL*X - 12*alpha_2**2*CF(2)*tildes['cWtilde']-12*alpha_1**2*hyp_lL**2*tildes['cBtilde'])
 
@@ -192,66 +192,66 @@ def beta_full(couplings: ALPcouplings) -> ALPcouplings:
 
     return ALPcouplings({'cqL': betaqL, 'cuR': betauR, 'cdR': betadR, 'clL': betalL, 'ceR': betaeR}, scale=couplings.scale, basis='derivative_above', ew_scale=couplings.ew_scale)
 
-def cggtilde(couplings: ALPcouplings) -> complex:
+def cGtilde(couplings: ALPcouplings) -> complex:
     citations.register_particle()
-    cgg = couplings['cg']
+    cG = couplings['cG']
     if isinstance(couplings.scale, sp.Expr):
-        cgg += sp.Rational(1,2)*(couplings['ku'][0,0]-couplings['kU'][0,0]) * sp.Heaviside(couplings.scale - mu)
-        cgg += sp.Rational(1,2)*(couplings['kd'][0,0]-couplings['kD'][0,0]) * sp.Heaviside(couplings.scale - md)
-        cgg += sp.Rational(1,2)*(couplings['ku'][1,1]-couplings['kU'][1,1]) * sp.Heaviside(couplings.scale - mc)
-        cgg += sp.Rational(1,2)*(couplings['kd'][1,1]-couplings['kD'][1,1]) * sp.Heaviside(couplings.scale - ms)
-        cgg += sp.Rational(1,2)*(couplings['kd'][2,2]-couplings['kD'][2,2]) * sp.Heaviside(couplings.scale - mb)
+        cG += sp.Rational(1,2)*(couplings['ku'][0,0]-couplings['kU'][0,0]) * sp.Heaviside(couplings.scale - mu)
+        cG += sp.Rational(1,2)*(couplings['kd'][0,0]-couplings['kD'][0,0]) * sp.Heaviside(couplings.scale - md)
+        cG += sp.Rational(1,2)*(couplings['ku'][1,1]-couplings['kU'][1,1]) * sp.Heaviside(couplings.scale - mc)
+        cG += sp.Rational(1,2)*(couplings['kd'][1,1]-couplings['kD'][1,1]) * sp.Heaviside(couplings.scale - ms)
+        cG += sp.Rational(1,2)*(couplings['kd'][2,2]-couplings['kD'][2,2]) * sp.Heaviside(couplings.scale - mb)
     else:
         if couplings.scale > particle.literals.u.mass/1000:
-            cgg += 0.5*(couplings['ku'][0,0]-couplings['kU'][0,0])
+            cG += 0.5*(couplings['ku'][0,0]-couplings['kU'][0,0])
         if couplings.scale > particle.literals.d.mass/1000:
-            cgg += 0.5*(couplings['kd'][0,0]-couplings['kD'][0,0])
+            cG += 0.5*(couplings['kd'][0,0]-couplings['kD'][0,0])
         if couplings.scale > particle.literals.c.mass/1000:
-            cgg += 0.5*(couplings['ku'][1,1]-couplings['kU'][1,1])
+            cG += 0.5*(couplings['ku'][1,1]-couplings['kU'][1,1])
         if couplings.scale > particle.literals.s.mass/1000:
-            cgg += 0.5*(couplings['kd'][1,1]-couplings['kD'][1,1])
+            cG += 0.5*(couplings['kd'][1,1]-couplings['kD'][1,1])
         if couplings.scale > particle.literals.b.mass/1000:
-            cgg += 0.5*(couplings['kd'][2,2]-couplings['kD'][2,2])
-    return cgg
+            cG += 0.5*(couplings['kd'][2,2]-couplings['kD'][2,2])
+    return cG
 
 def cgammatilde(couplings: ALPcouplings) -> complex:
-    cgg = couplings['cg']
+    cG = couplings['cG']
     if isinstance(couplings.scale, sp.Expr):
-        cgg += 3*sp.Rational(2,3)**2*(couplings['ku'][0,0]-couplings['kU'][0,0]) * sp.Heaviside(couplings.scale - mu)
-        cgg += 3*sp.Rational(-1,3)**2*(couplings['kd'][0,0]-couplings['kD'][0,0]) * sp.Heaviside(couplings.scale - md)
-        cgg += 3*sp.Rational(2,3)**2*(couplings['ku'][1,1]-couplings['kU'][1,1]) * sp.Heaviside(couplings.scale - mc)
-        cgg += 3*sp.Rational(-1,3)**2*(couplings['kd'][1,1]-couplings['kD'][1,1]) * sp.Heaviside(couplings.scale - ms)
-        cgg += 3*sp.Rational(-1,3)**2*(couplings['kd'][2,2]-couplings['kD'][2,2]) * sp.Heaviside(couplings.scale - mb)
-        cgg += (couplings['ke'][0,0]-couplings['kE'][0,0]) * sp.Heaviside(couplings.scale - me)
-        cgg += (couplings['ke'][1,1]-couplings['kE'][1,1]) * sp.Heaviside(couplings.scale - mmu)
-        cgg += (couplings['ke'][2,2]-couplings['kE'][2,2]) * sp.Heaviside(couplings.scale - mtau)
+        cG += 3*sp.Rational(2,3)**2*(couplings['ku'][0,0]-couplings['kU'][0,0]) * sp.Heaviside(couplings.scale - mu)
+        cG += 3*sp.Rational(-1,3)**2*(couplings['kd'][0,0]-couplings['kD'][0,0]) * sp.Heaviside(couplings.scale - md)
+        cG += 3*sp.Rational(2,3)**2*(couplings['ku'][1,1]-couplings['kU'][1,1]) * sp.Heaviside(couplings.scale - mc)
+        cG += 3*sp.Rational(-1,3)**2*(couplings['kd'][1,1]-couplings['kD'][1,1]) * sp.Heaviside(couplings.scale - ms)
+        cG += 3*sp.Rational(-1,3)**2*(couplings['kd'][2,2]-couplings['kD'][2,2]) * sp.Heaviside(couplings.scale - mb)
+        cG += (couplings['ke'][0,0]-couplings['kE'][0,0]) * sp.Heaviside(couplings.scale - me)
+        cG += (couplings['ke'][1,1]-couplings['kE'][1,1]) * sp.Heaviside(couplings.scale - mmu)
+        cG += (couplings['ke'][2,2]-couplings['kE'][2,2]) * sp.Heaviside(couplings.scale - mtau)
     else:
         citations.register_particle()
         if couplings.scale > particle.literals.u.mass/1000:
-            cgg += 3*(2/3)**2*(couplings['ku'][0,0]-couplings['kU'][0,0])
+            cG += 3*(2/3)**2*(couplings['ku'][0,0]-couplings['kU'][0,0])
         if couplings.scale > particle.literals.d.mass/1000:
-            cgg += 3*(-1/3)**2*(couplings['kd'][0,0]-couplings['kD'][0,0])
+            cG += 3*(-1/3)**2*(couplings['kd'][0,0]-couplings['kD'][0,0])
         if couplings.scale > particle.literals.c.mass/1000:
-            cgg += 3*(2/3)**2*(couplings['ku'][1,1]-couplings['kU'][1,1])
+            cG += 3*(2/3)**2*(couplings['ku'][1,1]-couplings['kU'][1,1])
         if couplings.scale > particle.literals.s.mass/1000:
-            cgg += 3*(-1/3)**2*(couplings['kd'][1,1]-couplings['kD'][1,1])
+            cG += 3*(-1/3)**2*(couplings['kd'][1,1]-couplings['kD'][1,1])
         if couplings.scale > particle.literals.b.mass/1000:
-            cgg += 3*(-1/3)**2*(couplings['kd'][2,2]-couplings['kD'][2,2])
+            cG += 3*(-1/3)**2*(couplings['kd'][2,2]-couplings['kD'][2,2])
         if couplings.scale > particle.literals.e_minus.mass/1000:
-            cgg += (couplings['ke'][0,0]-couplings['kE'][0,0])
+            cG += (couplings['ke'][0,0]-couplings['kE'][0,0])
         if couplings.scale > particle.literals.mu_minus.mass/1000:
-            cgg += (couplings['ke'][1,1]-couplings['kE'][1,1])
+            cG += (couplings['ke'][1,1]-couplings['kE'][1,1])
         if couplings.scale > particle.literals.tau_minus.mass/1000:
-            cgg += (couplings['ke'][2,2]-couplings['kE'][2,2])
-    return cgg
+            cG += (couplings['ke'][2,2]-couplings['kE'][2,2])
+    return cG
 
 def beta_low(couplings: ALPcouplings) -> ALPcouplings:
 
-    beta_d = alpha_s**2/pi**2*cggtilde(couplings)+sp.Rational(3,4)*alpha_em**2/pi**2*sp.Rational(-1,3)**2*cgammatilde(couplings)
-    beta_u = alpha_s**2/pi**2*cggtilde(couplings)+sp.Rational(3,4)*alpha_em**2/pi**2*sp.Rational(2,3)**2*cgammatilde(couplings)
+    beta_d = alpha_s**2/pi**2*cGtilde(couplings)+sp.Rational(3,4)*alpha_em**2/pi**2*sp.Rational(-1,3)**2*cgammatilde(couplings)
+    beta_u = alpha_s**2/pi**2*cGtilde(couplings)+sp.Rational(3,4)*alpha_em**2/pi**2*sp.Rational(2,3)**2*cgammatilde(couplings)
     beta_e = sp.Rational(3,4)*alpha_em**2/pi**2*cgammatilde(couplings)
 
-    return ALPcouplings({'kd': beta_d*np.eye(3), 'kD': -beta_d*np.eye(3), 'ku': beta_u*np.eye(2), 'kU': -beta_u*np.eye(2), 'ke': beta_e * np.eye(3), 'kE': beta_e*np.eye(3), 'kNu': np.zeros((3,3)), 'cg': 0, 'cgamma': 0}, scale=couplings.scale, basis='kF_below', ew_scale=couplings.ew_scale)
+    return ALPcouplings({'kd': beta_d*np.eye(3), 'kD': -beta_d*np.eye(3), 'ku': beta_u*np.eye(2), 'kU': -beta_u*np.eye(2), 'ke': beta_e * np.eye(3), 'kE': beta_e*np.eye(3), 'kNu': np.zeros((3,3)), 'cG': 0, 'cgamma': 0}, scale=couplings.scale, basis='kF_below', ew_scale=couplings.ew_scale)
 
 def run_leadinglog(couplings: ALPcouplings, beta: Callable[[ALPcouplings], ALPcouplings], scale_out: float) -> ALPcouplings:
     """Obtain the ALP couplings at a different scale using the leading log approximation
@@ -278,7 +278,7 @@ def derivative2massbasis(couplings: ALPcouplings) -> ALPcouplings:
     cZ = c2w**2 * couplings.values['cW'] + s2w**2 *couplings.values['cB']
 
     kD = VckmH @ couplings.values['cqL'] @ Vckm
-    return ALPcouplings({'kU': couplings.values['cqL'], 'ku': couplings.values['cuR'], 'kD': kD, 'kd': couplings.values['cdR'], 'kE': couplings.values['clL'], 'kNu': couplings.values['clL'], 'ke': couplings.values['ceR'], 'cgamma': cgamma, 'cW': couplings.values['cW'], 'cgammaZ': cgammaZ, 'cZ': cZ, 'cg': couplings.values['cg']}, scale=couplings.scale, basis='massbasis_above', ew_scale=couplings.ew_scale)
+    return ALPcouplings({'kU': couplings.values['cqL'], 'ku': couplings.values['cuR'], 'kD': kD, 'kd': couplings.values['cdR'], 'kE': couplings.values['clL'], 'kNu': couplings.values['clL'], 'ke': couplings.values['ceR'], 'cgamma': cgamma, 'cW': couplings.values['cW'], 'cgammaZ': cgammaZ, 'cZ': cZ, 'cG': couplings.values['cG']}, scale=couplings.scale, basis='massbasis_above', ew_scale=couplings.ew_scale)
         
 def gauge_tilde_match(couplings):
         dcW = - np.trace(3*couplings['kU']+couplings['kE'])/2
@@ -334,7 +334,7 @@ def match(couplings: ALPcouplings, two_loops = False) -> ALPcouplings:
     values = {f'k{F}': couplings[f'k{F}'] + (3/(8*pi**2)*Delta_kF[F]*loop)*sp.eye(3) for F in ['Nu', 'E', 'd', 'e']}
     values |= {f'k{F}': couplings[f'k{F}'][0:2,0:2] + (3/(8*pi**2)*Delta_kF[F]*loop)*sp.eye(2) for F in ['U', 'u']}
     values |= {'kD': couplings['kD'] + (3/(8*pi**2)*Delta_kF['D']*loop)*sp.eye(3) + match_FCNC_d(couplings, two_loops)}
-    values |= {'cg': couplings['cg'], 'cgamma': couplings['cgamma']}
+    values |= {'cG': couplings['cG'], 'cgamma': couplings['cgamma']}
     return ALPcouplings(values, scale=couplings.scale, basis='kF_below', ew_scale=couplings.ew_scale)
 
 def clean_expression(expr: sp.Expr, order_lam: int|None = None):

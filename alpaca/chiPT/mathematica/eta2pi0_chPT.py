@@ -7,7 +7,7 @@
 # using the sympy library
 #
 mpi0 = Symbol('mpi0')
-cg = Symbol('cg')
+cG = Symbol('cG')
 kappad = Symbol('kappad')
 deltaI = Symbol('deltaI')
 thetapi = Symbol('thetapi')
@@ -17,4 +17,4 @@ thpiALP = Symbol('thpiALP')
 thetaALP = Symbol('thetaALP')
 thetaprALP = Symbol('thetaprALP')
 F0 = Symbol('F0')
-e = mpi0**2*(cg*kappad*(deltaI*(thetapi + 2*sqrt(2)*thetaprpi + sqrt(6)) + sqrt(6)) + cg*kappau*(-deltaI*(thetapi + 2*sqrt(2)*thetaprpi + sqrt(6)) + sqrt(6)) - deltaI*thetapi*thpiALP - 2*sqrt(2)*deltaI*thetaprpi*thpiALP - sqrt(6)*deltaI*thpiALP + 2*thetaALP + sqrt(2)*thetaprALP)/(3*F0**2)
+e = mpi0**2*(cG*kappad*(deltaI*(thetapi + 2*sqrt(2)*thetaprpi + sqrt(6)) + sqrt(6)) + cG*kappau*(-deltaI*(thetapi + 2*sqrt(2)*thetaprpi + sqrt(6)) + sqrt(6)) - deltaI*thetapi*thpiALP - 2*sqrt(2)*deltaI*thetaprpi*thpiALP - sqrt(6)*deltaI*thpiALP + 2*thetaALP + sqrt(2)*thetaprALP)/(3*F0**2)

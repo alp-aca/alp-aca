@@ -8,7 +8,7 @@
 #
 CoefA = Symbol('CoefA')
 CoefC = Symbol('CoefC')
-cg = Symbol('cg')
+cG = Symbol('cG')
 kappad = Symbol('kappad')
 kappau = Symbol('kappau')
 thetaALP = Symbol('thetaALP')
@@ -20,4 +20,4 @@ mpiplus = Symbol('mpiplus')
 metap = Symbol('metap')
 Gammaa0plus = Symbol('Gammaa0plus')
 ma0plus = Symbol('ma0plus')
-e = sqrt(3)*(CoefA - CoefC)*(6*cg*(2*CoefA*(kappad + kappau - 1) + CoefC) + sqrt(3)*(2*sqrt(2)*CoefA*thetaALP - 4*CoefA*thetaprALP + sqrt(2)*CoefC*thetaALP + 4*CoefC*thetaprALP))*(-(m12 + m23 - ma**2 - mpiplus**2)*(m12 + m23 - metap**2 - mpiplus**2)/(-I*Gammaa0plus*ma0plus + m12 + m23 - ma**2 + ma0plus**2 - metap**2 - 2*mpiplus**2) + (m12 - ma**2 - mpiplus**2)*(m12 - metap**2 - mpiplus**2)/(m12 + I*ma0plus*(Gammaa0plus + I*ma0plus)))/36
+e = sqrt(3)*(CoefA - CoefC)*(6*cG*(2*CoefA*(kappad + kappau - 1) + CoefC) + sqrt(3)*(2*sqrt(2)*CoefA*thetaALP - 4*CoefA*thetaprALP + sqrt(2)*CoefC*thetaALP + 4*CoefC*thetaprALP))*(-(m12 + m23 - ma**2 - mpiplus**2)*(m12 + m23 - metap**2 - mpiplus**2)/(-I*Gammaa0plus*ma0plus + m12 + m23 - ma**2 + ma0plus**2 - metap**2 - 2*mpiplus**2) + (m12 - ma**2 - mpiplus**2)*(m12 - metap**2 - mpiplus**2)/(m12 + I*ma0plus*(Gammaa0plus + I*ma0plus)))/36

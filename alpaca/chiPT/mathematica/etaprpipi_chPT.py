@@ -6,7 +6,7 @@
 # This file contains the translation of Mathematica code to Python
 # using the sympy library
 #
-cg = Symbol('cg')
+cG = Symbol('cG')
 mpi0 = Symbol('mpi0')
 kappad = Symbol('kappad')
 deltaI = Symbol('deltaI')
@@ -22,4 +22,4 @@ mpiplus = Symbol('mpiplus')
 thetaALP = Symbol('thetaALP')
 thetaprALP = Symbol('thetaprALP')
 F0 = Symbol('F0')
-e = (6*cg*mpi0**2*(kappad*(deltaI*(-thetaprpi + sqrt(3)) + sqrt(3)) + kappau*(deltaI*(thetaprpi - sqrt(3)) + sqrt(3))) - 3*deltaI*thetaprpi*(cdhat*(3*m23 - ma**2 - 3*metap**2) + cuhat*(-3*m23 + ma**2 + 3*metap**2) + 2*thpiALP*(-3*m23 + ma**2 + metap**2 + 2*mpiplus**2)) + mpi0**2*(-2*deltaI*thpiALP*(-3*thetaprpi + sqrt(3)) + 6*sqrt(2)*thetaALP + 6*thetaprALP))/(18*F0**2)
+e = (6*cG*mpi0**2*(kappad*(deltaI*(-thetaprpi + sqrt(3)) + sqrt(3)) + kappau*(deltaI*(thetaprpi - sqrt(3)) + sqrt(3))) - 3*deltaI*thetaprpi*(cdhat*(3*m23 - ma**2 - 3*metap**2) + cuhat*(-3*m23 + ma**2 + 3*metap**2) + 2*thpiALP*(-3*m23 + ma**2 + metap**2 + 2*mpiplus**2)) + mpi0**2*(-2*deltaI*thpiALP*(-3*thetaprpi + sqrt(3)) + 6*sqrt(2)*thetaALP + 6*thetaprALP))/(18*F0**2)

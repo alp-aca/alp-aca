@@ -11,7 +11,7 @@ from ..biblio.biblio import citations
 import sympy as sp
 
 
-couplings_latex = {'cg': r'c_g', 'cB': 'c_B', 'cW': 'c_W', 'cqL': r'c_{q_L}', 'cuR': r'c_{u_R}', 'cdR': r'c_{d_R}', 'clL': r'c_{\ell_L}', 'ceR': r'c_{e_R}'}
+couplings_latex = {'cG': r'c_g', 'cB': 'c_B', 'cW': 'c_W', 'cqL': r'c_{q_L}', 'cuR': r'c_{u_R}', 'cdR': r'c_{d_R}', 'clL': r'c_{\ell_L}', 'ceR': r'c_{e_R}'}
 class ModelBase:
     """
     Base class representing a UV model with couplings to ALPs.
@@ -168,13 +168,13 @@ class ModelBase:
         Raises
         ------
         ZeroDivisionError
-            If the coupling cg is zero.
+            If the coupling cG is zero.
         """
         self.initialize()
-        if self.couplings.get('cg', 0) == 0:
-            raise ZeroDivisionError('cg = 0')
+        if self.couplings.get('cG', 0) == 0:
+            raise ZeroDivisionError('cG = 0')
         cgamma = self.couplings['cB'] + self.couplings['cW']
-        return sp.Rational(sp.simplify(cgamma/self.couplings['cg'])).limit_denominator()
+        return sp.Rational(sp.simplify(cgamma/self.couplings['cG'])).limit_denominator()
 
 class PQChargedModel(ModelBase):
     """A class to define a model given the PQ charges of the SM fermions.
@@ -205,7 +205,7 @@ class PQChargedModel(ModelBase):
                 self.couplings[f'c{f}'] = -self.charges[f]
             else:
                 self.couplings[f'c{f}'] = - sp.diag(charges_np[f].tolist(), unpack=True)
-        self.couplings['cg'] = -sp.Rational(1,2) * sp.simplify(np.sum(
+        self.couplings['cG'] = -sp.Rational(1,2) * sp.simplify(np.sum(
             2 * charges_np['qL'] - charges_np['dR'] - charges_np['uR']
         ))
         self.couplings['cW'] = -sp.Rational(1,2) * sp.simplify(np.sum(
@@ -283,7 +283,7 @@ class KSVZ_model(ModelBase):
             A list with the heavy fermions of the model.
         """
         super().__init__(model_name)
-        self.couplings['cg']=-sum(f.PQ * f.weak_isospin_dim * f.dynkin_index_color for f in fermions)
+        self.couplings['cG']=-sum(f.PQ * f.weak_isospin_dim * f.dynkin_index_color for f in fermions)
         self.couplings['cB']=-sum(f.PQ * f.color_dim * f.weak_isospin_dim * f.hypercharge**2 for f in fermions)
         self.couplings['cW']=-sum(f.PQ * f.dynkin_index_weak * f.color_dim for f in fermions)
     def initialize(self):

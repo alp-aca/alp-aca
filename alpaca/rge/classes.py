@@ -132,10 +132,10 @@ class ALPcouplings:
         if basis == 'derivative_above' or basis == 'sp_derivative_above':
             self.scale = scale
             self.basis = basis
-            unknown_keys = set(values.keys()) - {'cg', 'cW', 'cB', 'cqL', 'cuR', 'cdR', 'clL', 'ceR'}
+            unknown_keys = set(values.keys()) - {'cG', 'cW', 'cB', 'cqL', 'cuR', 'cdR', 'clL', 'ceR'}
             if unknown_keys:
                 raise KeyError(f'Unknown ALP couplings {unknown_keys} in basis {basis}')
-            values = {'cg':0, 'cB': 0, 'cW':0, 'cqL': 0, 'cuR':0, 'cdR':0, 'clL':0, 'ceR':0} | values
+            values = {'cG':0, 'cB': 0, 'cW':0, 'cqL': 0, 'cuR':0, 'cdR':0, 'clL':0, 'ceR':0} | values
             for c in ['cqL', 'cuR', 'cdR', 'clL', 'ceR']:
                 if isinstance(values[c], numeric):
                     values[c] = np.matrix(values[c]*np.eye(3))
@@ -143,17 +143,17 @@ class ALPcouplings:
                     values[c] = np.matrix(values[c]).reshape([3,3])
                 else:
                     raise TypeError(f'The coupling {c} must be of a numeric or a matrix type, {type(values[c])} given')
-            for c in ['cg', 'cW', 'cB']:
+            for c in ['cG', 'cW', 'cB']:
                 if not isinstance(values[c], numeric):
                      raise TypeError(f'The coupling {c} must be of a numeric type, {type(values[c])} given')
-            self.values = {c: values[c] for c in ['cg', 'cB', 'cW', 'cqL', 'cuR', 'cdR', 'clL', 'ceR']}
+            self.values = {c: values[c] for c in ['cG', 'cB', 'cW', 'cqL', 'cuR', 'cdR', 'clL', 'ceR']}
         elif basis == 'massbasis_above' or basis == 'sp_massbasis_above':
             self.scale = scale
             self.basis = basis
-            unknown_keys = set(values.keys()) - {'cg', 'cgamma', 'cgammaZ', 'cW', 'cZ', 'cg', 'kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke'}
+            unknown_keys = set(values.keys()) - {'cG', 'cgamma', 'cgammaZ', 'cW', 'cZ', 'cG', 'kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke'}
             if unknown_keys:
                 raise KeyError(f'Unknown ALP couplings {unknown_keys} in basis {basis}')
-            values = {'cg': 0, 'cgamma':0, 'cgammaZ': 0, 'cW':0, 'cZ': 0, 'kU': 0, 'ku':0, 'kD':0, 'kd':0, 'kE':0, 'kNu': 0, 'ke': 0} | values
+            values = {'cG': 0, 'cgamma':0, 'cgammaZ': 0, 'cW':0, 'cZ': 0, 'kU': 0, 'ku':0, 'kD':0, 'kd':0, 'kE':0, 'kNu': 0, 'ke': 0} | values
             for c in ['kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke']:
                 if isinstance(values[c], numeric):
                     values[c] = np.matrix(values[c]*np.eye(3))
@@ -161,17 +161,17 @@ class ALPcouplings:
                     values[c] = np.matrix(values[c]).reshape([3,3])
                 else:
                     raise TypeError(f'The coupling {c} must be of a numeric or a matrix type, {type(values[c])} given')
-            for c in ['cgamma', 'cgammaZ', 'cW', 'cZ', 'cg']:
+            for c in ['cgamma', 'cgammaZ', 'cW', 'cZ', 'cG']:
                 if not isinstance(values[c], numeric):
                      raise TypeError(f'The coupling {c} must be of a numeric type, {type(values[c])} given')
-            self.values = {c: values[c] for c in ['kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke', 'cgamma', 'cgammaZ', 'cW', 'cZ', 'cg']}
+            self.values = {c: values[c] for c in ['kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke', 'cgamma', 'cgammaZ', 'cW', 'cZ', 'cG']}
         elif basis == 'kF_below' or basis == 'sp_kF_below':
             self.scale = scale
             self.basis = basis
-            unknown_keys = set(values.keys()) - {'cg', 'cgamma', 'kU', 'kD', 'kE', 'kNu', 'ku', 'kd', 'ke'}
+            unknown_keys = set(values.keys()) - {'cG', 'cgamma', 'kU', 'kD', 'kE', 'kNu', 'ku', 'kd', 'ke'}
             if unknown_keys:
                 raise KeyError(f'Unknown ALP couplings {unknown_keys} in basis {basis}')
-            values = {'cg':0, 'cgamma': 0, 'kU': 0, 'kD': 0, 'kE': 0, 'kNu': 0, 'ku': 0, 'kd': 0, 'ke': 0} | values
+            values = {'cG':0, 'cgamma': 0, 'kU': 0, 'kD': 0, 'kE': 0, 'kNu': 0, 'ku': 0, 'kd': 0, 'ke': 0} | values
             for c in ['kD', 'kE', 'kNu', 'kd', 'ke']:
                 if isinstance(values[c], numeric):
                     values[c] = np.matrix(values[c]*np.eye(3))
@@ -186,17 +186,17 @@ class ALPcouplings:
                     values[c] = np.matrix(values[c]).reshape([2,2])
                 else:
                     raise TypeError(f'The coupling {c} must be of a numeric or a matrix type, {type(values[c])} given')
-            for c in ['cg', 'cgamma']:
+            for c in ['cG', 'cgamma']:
                 if not isinstance(values[c], numeric):
                      raise TypeError(f'The coupling {c} must be of a numeric type, {type(values[c])} given')
-            self.values = {c: values[c] for c in ['kD', 'kE', 'kNu', 'kd', 'ke', 'kU', 'ku', 'cg', 'cgamma']}
+            self.values = {c: values[c] for c in ['kD', 'kE', 'kNu', 'kd', 'ke', 'kU', 'ku', 'cG', 'cgamma']}
         elif basis == 'VA_below' or basis == 'sp_VA_below':
             self.scale = scale
             self.basis = basis
-            unknown_keys = set(values.keys()) - {'cg', 'cgamma', 'cuV', 'cuA', 'cdV', 'cdA', 'ceV', 'ceA', 'cnu'}
+            unknown_keys = set(values.keys()) - {'cG', 'cgamma', 'cuV', 'cuA', 'cdV', 'cdA', 'ceV', 'ceA', 'cnu'}
             if unknown_keys:
                 raise KeyError(f'Unknown ALP couplings {unknown_keys} in basis {basis}')
-            values = {'cg':0, 'cgamma': 0, 'cuV': 0, 'cuA': 0, 'cdV': 0, 'cdA': 0, 'ceV': 0, 'ceA': 0, 'cnu': 0} | values
+            values = {'cG':0, 'cgamma': 0, 'cuV': 0, 'cuA': 0, 'cdV': 0, 'cdA': 0, 'ceV': 0, 'ceA': 0, 'cnu': 0} | values
             for c in ['cdV', 'cdA', 'ceV', 'ceA', 'cnu']:
                 if isinstance(values[c], numeric):
                     values[c] = np.matrix(values[c]*np.eye(3))
@@ -211,10 +211,10 @@ class ALPcouplings:
                     values[c] = np.matrix(values[c]).reshape([2,2])
                 else:
                     raise TypeError(f'The coupling {c} must be of a numeric or a matrix type, {type(values[c])} given')
-            for c in ['cg', 'cgamma']:
+            for c in ['cG', 'cgamma']:
                 if not isinstance(values[c], numeric):
                      raise TypeError(f'The coupling {c} must be of a numeric type, {type(values[c])} given')
-            self.values = {c: values[c] for c in ['cuV', 'cuA', 'cdV', 'cdA', 'ceV', 'ceA', 'cnu', 'cg', 'cgamma']}
+            self.values = {c: values[c] for c in ['cuV', 'cuA', 'cdV', 'cdA', 'ceV', 'ceA', 'cnu', 'cG', 'cgamma']}
         else:
             raise ValueError('Unknown basis')
         if self.basis.startswith('sp_'):
@@ -302,7 +302,7 @@ class ALPcouplings:
     
     def __setitem__(self, name: str, val):
         if self.basis == 'derivative_above':
-            if name in ['cg', 'cW', 'cB']:
+            if name in ['cG', 'cW', 'cB']:
                 if isinstance(val, numeric):
                     self.values[name] = val
                 else:
@@ -361,7 +361,7 @@ class ALPcouplings:
                 'kE': np.matrix(UeL).H @ self.values['clL'] @ UeL,
                 'kNu': self.values['clL'],
                 'ke': np.matrix(UeR).H @ self.values['ceR'] @ UeR,
-                'cgamma': cgamma, 'cW': self.values['cW'], 'cgammaZ': cgammaZ, 'cZ': cZ, 'cg': self.values['cg']
+                'cgamma': cgamma, 'cW': self.values['cW'], 'cgammaZ': cgammaZ, 'cZ': cZ, 'cG': self.values['cG']
                 }, scale=self.scale, basis='massbasis_above', ew_scale=self.ew_scale)
             a.yu = self.yu
             a.yd = self.yd
@@ -372,7 +372,7 @@ class ALPcouplings:
             UuL, mu, UuR = ckmutil.diag.msvd(self.yu)
             UdL, md, UdR = ckmutil.diag.msvd(self.yd)
             UeL, me, UeR = ckmutil.diag.msvd(self.ye)
-            a = ALPcouplings({'cg': self.values['cg'], 'cB': self.values['cgamma'] - self.values['cW'], 'cW': self.values['cW'],
+            a = ALPcouplings({'cG': self.values['cG'], 'cB': self.values['cgamma'] - self.values['cW'], 'cW': self.values['cW'],
                                  'cqL': UuL @ self.values['kU'] @ np.matrix(UuL).H/2 + UdL @ self.values['kD'] @ np.matrix(UdL).H/2,
                                  'cuR': UuR @ self.values['ku'] @ np.matrix(UuR),
                                  'cdR': UdR @ self.values['kD'] @ np.matrix(UdR),
@@ -391,7 +391,7 @@ class ALPcouplings:
                                  'cdA': self.values['kd'] - self.values['kD'],
                                  'ceV': self.values['ke'] + self.values['kE'],
                                  'ceA': self.values['ke'] - self.values['kE'],
-                                 'cnu': self.values['kNu'], 'cg': self.values['cg'], 'cgamma': self.values['cgamma']}, scale=self.scale, basis='VA_below', ew_scale=self.ew_scale)
+                                 'cnu': self.values['kNu'], 'cG': self.values['cG'], 'cgamma': self.values['cgamma']}, scale=self.scale, basis='VA_below', ew_scale=self.ew_scale)
         if self.basis == 'VA_below' and basis == 'kF_below':
             return ALPcouplings({'ku': (self.values['cuV'] + self.values['cuA'])/2,
                                  'kU': (self.values['cuV'] - self.values['cuA'])/2,
@@ -399,18 +399,18 @@ class ALPcouplings:
                                  'kD': (self.values['cdV'] - self.values['cdA'])/2,
                                  'ke': (self.values['ceV'] + self.values['ceA'])/2,
                                  'kE': (self.values['ceV'] - self.values['ceA'])/2,
-                                 'kNu': self.values['cnu'], 'cg': self.values['cg'], 'cgamma': self.values['cgamma']}, scale=self.scale, basis='kF_below', ew_scale=self.ew_scale)
+                                 'kNu': self.values['cnu'], 'cG': self.values['cG'], 'cgamma': self.values['cgamma']}, scale=self.scale, basis='kF_below', ew_scale=self.ew_scale)
         else:
             raise ValueError(f'Unknown basis {basis}')
         
     def _toarray(self) -> np.ndarray:
         "Converts the object into a vector of coefficientes"
         if self.basis == 'derivative_above':
-            return np.hstack([np.asarray(self.values[c]).ravel() for c in ['cqL', 'cuR', 'cdR', 'clL', 'ceR', 'cg', 'cB', 'cW']]+[np.asarray(self.yu).ravel()]+[np.asarray(self.yd).ravel()]+[np.asarray(self.ye).ravel()]).astype(dtype=complex)
+            return np.hstack([np.asarray(self.values[c]).ravel() for c in ['cqL', 'cuR', 'cdR', 'clL', 'ceR', 'cG', 'cB', 'cW']]+[np.asarray(self.yu).ravel()]+[np.asarray(self.yd).ravel()]+[np.asarray(self.ye).ravel()]).astype(dtype=complex)
         if self.basis == 'massbasis_above':
-            return np.hstack([np.asarray(self.values[c]).ravel() for c in ['kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke', 'cgamma', 'cgammaZ', 'cW', 'cZ', 'cg']]+[np.asarray(self.yu).ravel()]+[np.asarray(self.yd).ravel()]+[np.asarray(self.ye).ravel()]).astype(dtype=complex)
+            return np.hstack([np.asarray(self.values[c]).ravel() for c in ['kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke', 'cgamma', 'cgammaZ', 'cW', 'cZ', 'cG']]+[np.asarray(self.yu).ravel()]+[np.asarray(self.yd).ravel()]+[np.asarray(self.ye).ravel()]).astype(dtype=complex)
         if self.basis == 'kF_below':
-            return np.hstack([np.asarray(self.values[c]).ravel() for c in ['kD', 'kE', 'kNu', 'kd', 'ke', 'kU', 'ku', 'cg', 'cgamma']]).astype(dtype=complex)
+            return np.hstack([np.asarray(self.values[c]).ravel() for c in ['kD', 'kE', 'kNu', 'kd', 'ke', 'kU', 'ku', 'cG', 'cgamma']]).astype(dtype=complex)
 
     
     @classmethod
@@ -419,7 +419,7 @@ class ALPcouplings:
             vals = {}
             for i, c in enumerate(['cqL', 'cuR', 'cdR', 'clL', 'ceR']):
                 vals |= {c: array[9*i:9*(i+1)].reshape([3,3])}
-            vals |= {'cg': array[45], "cB": array[46], 'cW': array[47]}
+            vals |= {'cG': array[45], "cB": array[46], 'cW': array[47]}
             a1 = ALPcouplings(vals, scale, basis, ew_scale)
             a1.yu = array[48:48+9].reshape([3,3])
             a1.yd = array[48+9: 48+18].reshape([3,3])
@@ -429,7 +429,7 @@ class ALPcouplings:
             vals = {}
             for i, c in enumerate(['kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke']):
                 vals |= {c: array[9*i:9*(i+1)].reshape([3,3])}
-            for i, c in enumerate(['cgamma', 'cgammaZ', 'cW', 'cZ', 'cg']):
+            for i, c in enumerate(['cgamma', 'cgammaZ', 'cW', 'cZ', 'cG']):
                 vals |= {c: array[54+i]}
             a1 = ALPcouplings(vals, scale, basis, ew_scale)
             a1.yu = array[59:59+9].reshape([3,3])
@@ -441,7 +441,7 @@ class ALPcouplings:
                 vals |= {c: array[9*i:9*(i+1)].reshape([3,3])}
             for i, c in enumerate(['kU', 'ku']):
                 vals |= {c: array[45+4*i:45+4*(i+1)].reshape([2,2])}
-            vals |= {'cg': array[53], "cgamma": array[54]}
+            vals |= {'cG': array[53], "cgamma": array[54]}
             return ALPcouplings(vals, scale, basis, ew_scale)
     
     def match_run(
@@ -713,7 +713,7 @@ class ALPcouplings:
     def _repr_markdown_(self):
         if self.basis == 'VA_below' or self.basis == 'sp_VA_below':
             latex_couplings = {
-                'cg': r'c_G',
+                'cG': r'c_G',
                 'cgamma': r'c_\gamma',
                 'cuA': r'c_u^A',
                 'cdA': r'c_d^A',
@@ -725,7 +725,7 @@ class ALPcouplings:
             }
         elif self.basis == 'derivative_above' or self.basis == 'sp_derivative_above':
             latex_couplings = {
-                'cg': r'c_G',
+                'cG': r'c_G',
                 'cW': r'c_W',
                 'cB': r'c_B',
                 'cuR': r'c_{u_R}',
@@ -736,7 +736,7 @@ class ALPcouplings:
             }
         elif self.basis == 'massbasis_above' or self.basis == 'sp_massbasis_above':
             latex_couplings = {
-                'cg': r'c_G',
+                'cG': r'c_G',
                 'cW': r'c_W',
                 'cgamma': r'c_\gamma',
                 'cZ': r'c_Z',
@@ -751,7 +751,7 @@ class ALPcouplings:
             }
         elif self.basis == 'kF_below' or self.basis == 'sp_kF_below':
             latex_couplings = {
-                'cg': r'c_G',
+                'cG': r'c_G',
                 'cgamma': r'c_\gamma',
                 'kU': r"c_{u}^L",
                 'kD': r"c_{d}^L",
@@ -889,7 +889,7 @@ class ALPcouplingsEncoder(JSONEncoder):
     >>> import json
     >>> from alpaca import ALPcouplings, ALPcouplingsEncoder
 
-    >>> a = ALPcouplings({'cg': 1.0}, 1e3, 'derivative_above')
+    >>> a = ALPcouplings({'cG': 1.0}, 1e3, 'derivative_above')
     >>> with open('file.json', 'wt') as f:
     ...     json.dump(a, f, cls=ALPcouplingsEncoder)
      """

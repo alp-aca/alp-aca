@@ -21,16 +21,16 @@ def effcoupling_ff(ma, couplings: ALPcouplings, fermion, **kwargs):
     if ma < couplings.ew_scale:
         cc = couplings.match_run(ma, 'VA_below', **kwargs)
         cgamma = cc['cgamma']
-        cg = cc['cg']
+        cG = cc['cG']
         cf = cc[f'c{ftype}A'][gen, gen]
-        if cgamma != 0 or (cg!=0 and Nc == 3):
+        if cgamma != 0 or (cG!=0 and Nc == 3):
             g = g_photonloop(4*mass**2/ma**2)
         else:
             g = 0
         ceff = cf
         ceff -= 12 * qf**2 * aem**2 * cgamma * (np.log(ma**2/mass**2) + delta1+g)
         if Nc == 3:
-            ceff -= 12 * (4/3) * a_s**2 * cg * (np.log(ma**2/mass**2) + delta1+g)
+            ceff -= 12 * (4/3) * a_s**2 * cG * (np.log(ma**2/mass**2) + delta1+g)
         return ceff
     else:
         cc = couplings.translate('massbasis_above')
@@ -38,16 +38,16 @@ def effcoupling_ff(ma, couplings: ALPcouplings, fermion, **kwargs):
         cgammaZ = cc['cgammaZ']
         cZ = cc['cZ']
         cW = cc['cW']
-        cg = cc['cg']
+        cG = cc['cG']
         cf = cc[f'k{ftype}'][gen, gen]-cc[f'k{ftype.upper()}'][gen, gen]
-        if cgamma != 0 or (cg!=0 and Nc == 3):
+        if cgamma != 0 or (cG!=0 and Nc == 3):
             g = g_photonloop(4*mass**2/ma**2)
         else:
             g = 0
         ceff = cf
         ceff -= 12 * qf**2 * aem**2 * cgamma * (np.log(ma**2/mass**2) + delta1+g)
         if Nc == 3:
-            ceff -= 12 * (4/3) * a_s**2 * cg * (np.log(ma**2/mass**2) + delta1+g)
+            ceff -= 12 * (4/3) * a_s**2 * cG * (np.log(ma**2/mass**2) + delta1+g)
         c2w = 1-s2w
         ceff -= 3* aem**2/s2w**2 * cW * (np.log(ma**2/mW**2) + delta1 + 1/2)
         ceff -= 12*aem**2/s2w/c2w * cgammaZ * qf *(t3f - 2*qf*s2w)* (np.log(ma**2/mZ**2) + delta1 + 3/2)

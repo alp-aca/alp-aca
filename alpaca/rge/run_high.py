@@ -36,13 +36,13 @@ def gauge_tilde(couplings: ALPcouplings) -> dict:
     Returns
     -------
     cXtilde : dict
-        Dictionary containing `cgtilde`, `cBtilde` and `cWtilde`
+        Dictionary containing `cGtilde`, `cBtilde` and `cWtilde`
     """
     couplings = couplings.translate('derivative_above')
-    cg = couplings['cg'] - 0.5 *np.trace(2*couplings['cqL']-couplings['cuR']-couplings['cdR'])
+    cG = couplings['cG'] - 0.5 *np.trace(2*couplings['cqL']-couplings['cuR']-couplings['cdR'])
     cW = couplings['cW'] - 0.5*np.trace(3*couplings['cqL']+ couplings['clL'])
     cB = couplings['cB']+np.trace(4/3*couplings['cuR']+1/3*couplings['cdR']-1/6*couplings['cqL']+couplings['ceR']-1/2*couplings['clL'])
-    return {'cgtilde': cg, 'cBtilde':cB, 'cWtilde': cW}
+    return {'cGtilde': cG, 'cBtilde':cB, 'cWtilde': cW}
 
 
 def beta_ytop(couplings: ALPcouplings) -> ALPcouplings:
@@ -84,7 +84,7 @@ def beta_ytop(couplings: ALPcouplings) -> ALPcouplings:
     ctt = couplings['cuR'][2,2]-couplings['cqL'][2,2]
 
     # eq(24)
-    diag_betaqL = -2*ytop**2*np.matrix(np.diag([0,0,1]) + 3*bQ*np.eye(3))*ctt +np.eye(3)*(-16*alpha_s**2*tildes['cgtilde'] - 9*alpha_2**2*tildes['cWtilde'] - 1/3*alpha_1**2*tildes['cBtilde'])
+    diag_betaqL = -2*ytop**2*np.matrix(np.diag([0,0,1]) + 3*bQ*np.eye(3))*ctt +np.eye(3)*(-16*alpha_s**2*tildes['cGtilde'] - 9*alpha_2**2*tildes['cWtilde'] - 1/3*alpha_1**2*tildes['cBtilde'])
     offdiag_betaqL = np.matrix(np.zeros([3,3]))
     offdiag_betaqL[0,2] = couplings['cqL'][0,2]
     offdiag_betaqL[1,2] = couplings['cqL'][1,2]
@@ -92,7 +92,7 @@ def beta_ytop(couplings: ALPcouplings) -> ALPcouplings:
     offdiag_betaqL[2,1] = couplings['cqL'][2,1]
     betaqL = diag_betaqL + ytop**2/2 * offdiag_betaqL
 
-    diag_betauR = 2*ytop**2*np.matrix(np.diag([0,0,1])-3*bu*np.eye(3))*ctt + np.eye(3)*(16*alpha_s**2*tildes['cgtilde']+16/3*alpha_1**2*tildes['cBtilde'])
+    diag_betauR = 2*ytop**2*np.matrix(np.diag([0,0,1])-3*bu*np.eye(3))*ctt + np.eye(3)*(16*alpha_s**2*tildes['cGtilde']+16/3*alpha_1**2*tildes['cBtilde'])
     offdiag_betauR = np.matrix(np.zeros([3,3]))
     offdiag_betauR[0,2] = couplings['cuR'][0,2]
     offdiag_betauR[1,2] = couplings['cuR'][1,2]
@@ -100,7 +100,7 @@ def beta_ytop(couplings: ALPcouplings) -> ALPcouplings:
     offdiag_betauR[2,1] = couplings['cuR'][2,1]
     betauR = diag_betauR + ytop**2*offdiag_betauR
 
-    betadR = np.eye(3)*(-6*ytop**2*bd*ctt + 16*alpha_s**2*tildes['cgtilde']+16/12*alpha_1**2*tildes['cBtilde'])
+    betadR = np.eye(3)*(-6*ytop**2*bd*ctt + 16*alpha_s**2*tildes['cGtilde']+16/12*alpha_1**2*tildes['cBtilde'])
 
     betalL = np.eye(3)*(-6*ytop**2*bL*ctt-9*alpha_2**2*tildes['cWtilde']-3*alpha_1**2*tildes['cBtilde'])
 
@@ -164,11 +164,11 @@ def beta_full(couplings: ALPcouplings) -> ALPcouplings:
     hyp_eR = -1
 
     # eq(18)
-    betaqL = 0.5*(yu @ yu.H @ couplings['cqL'] + couplings['cqL'] @ yu @ yu.H + yd @ yd.H @ couplings['cqL'] + couplings['cqL'] @ yd @ yd.H) - (yu @ couplings['cuR'] @ yu.H + yd @ couplings['cdR'] @ yd.H) + np.eye(3) * (2*bQ*X - 12*alpha_s**2*CF(3)*tildes['cgtilde']- 12*alpha_2**2*CF(2)*tildes['cWtilde'] - 12*alpha_1**2*hyp_qL**2*tildes['cBtilde'])
+    betaqL = 0.5*(yu @ yu.H @ couplings['cqL'] + couplings['cqL'] @ yu @ yu.H + yd @ yd.H @ couplings['cqL'] + couplings['cqL'] @ yd @ yd.H) - (yu @ couplings['cuR'] @ yu.H + yd @ couplings['cdR'] @ yd.H) + np.eye(3) * (2*bQ*X - 12*alpha_s**2*CF(3)*tildes['cGtilde']- 12*alpha_2**2*CF(2)*tildes['cWtilde'] - 12*alpha_1**2*hyp_qL**2*tildes['cBtilde'])
 
-    betauR = yu.H @ yu @ couplings['cuR'] + couplings['cuR'] @ yu.H @ yu - 2* yu.H @ couplings['cqL'] @ yu + np.eye(3) * (2*bu*X + 12*alpha_s**2*CF(3)*tildes['cgtilde']+12*alpha_1**2*hyp_uR**2*tildes['cBtilde'])
+    betauR = yu.H @ yu @ couplings['cuR'] + couplings['cuR'] @ yu.H @ yu - 2* yu.H @ couplings['cqL'] @ yu + np.eye(3) * (2*bu*X + 12*alpha_s**2*CF(3)*tildes['cGtilde']+12*alpha_1**2*hyp_uR**2*tildes['cBtilde'])
 
-    betadR = yd.H @ yd @ couplings['cdR'] + couplings['cdR'] @ yd.H @ yd - 2* yd.H @ couplings['cqL'] @ yd + np.eye(3) * (2*bd*X + 12*alpha_s**2*CF(3)*tildes['cgtilde']+12*alpha_1**2*hyp_dR**2*tildes['cBtilde'])
+    betadR = yd.H @ yd @ couplings['cdR'] + couplings['cdR'] @ yd.H @ yd - 2* yd.H @ couplings['cqL'] @ yd + np.eye(3) * (2*bd*X + 12*alpha_s**2*CF(3)*tildes['cGtilde']+12*alpha_1**2*hyp_dR**2*tildes['cBtilde'])
 
     betalL = 0.5*(ye @ ye.H @ couplings['clL'] + couplings['clL'] @ ye @ ye.H) - ye @ couplings['ceR'] @ ye.H + np.eye(3) * (2*bL*X - 12*alpha_2**2*CF(2)*tildes['cWtilde']-12*alpha_1**2*hyp_lL**2*tildes['cBtilde'])
 
