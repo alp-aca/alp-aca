@@ -1,4 +1,4 @@
-"""alpaca.models
+"""alpaca.uvmodels
 
 This module contains the classes to define the UV models.
 
@@ -7,13 +7,13 @@ Classes
 ModelBase :
     A base class to define a model which generates couplings to ALPs.
 
-model :
+PQChargedModel :
     A class to define a model given the PQ charges of the SM fermions.
 
 KSVZ_model :
     A class to define the KSVZ-like models given the new heavy fermions.
 
-fermion :
+HeavyFermion :
     A class to represent a heavy fermion with specific group representations and charges.
 
 Flaxion :
@@ -25,10 +25,10 @@ QED_DFSZ :
     A DFSZ-like model with couplings to leptons and quarks that does not generate a QCD anomaly.
 
 u_DFSZ :
-    A DFSZ-like model with couplings to leptons and up-type quarks.
+    A DFSZ-like model where the up-type quarks are decoupled.
 
-d_DFSZ :
-    A DFSZ-like model with couplings to leptons and down-type quarks.
+e_DFSZ :
+    A DFSZ-like model where the leptons are decoupled.
 
 Q_KSVZ :
     A KSVZ-like model with a heavy vector-like quark.
@@ -41,6 +41,9 @@ Y_KSVZ :
 
 flaxion_benchmark :
     A benchmark model for the flaxion field.
+
+nonuniversal_DFSZ :
+    A DFSZ-like model with non-universal couplings to the SM fermions.
 
 eps_flaxion :
     A symbol representing the parameter epsilon in the flaxion model.

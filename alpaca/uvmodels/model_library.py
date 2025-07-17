@@ -353,9 +353,9 @@ KSVZ_charge = sp.symbols(r'\mathcal{X}')
 QED_DFSZ= PQChargedModel('QED-DFSZ', {'eR': -2*sp.cos(beta)**2, 'uR': -2*sp.sin(beta)**2, 'dR': 2*sp.sin(beta)**2})
 """QED-DFSZ: A DFSZ-like model with couplings to leptons and quarks that does not generate a QCD anomaly."""
 u_DFSZ= PQChargedModel('u-DFSZ', {'eR': 1, 'dR':-2,'uR': 0})
-"""u-DFSZ: A DFSZ-like model with couplings to leptons and down-type quarks."""
+"""u-DFSZ: A DFSZ-like model where the up-type quarks are decoupled."""
 e_DFSZ= PQChargedModel('e-DFSZ', {'uR': 1, 'dR': 1})
-"""e-DFSZ: A DFSZ-like model with couplings to up- and down-type quarks."""
+"""e-DFSZ: A DFSZ-like model where the leptons are decoupled."""
 Q_KSVZ=KSVZ_model('Q-KSVZ', [HeavyFermion(3,1,0,KSVZ_charge)])
 """Q-KSVZ: A KSVZ-like model with a heavy vector-like quark."""
 L_KSVZ=KSVZ_model('L-KSVZ', [HeavyFermion(1,2,0,KSVZ_charge)])

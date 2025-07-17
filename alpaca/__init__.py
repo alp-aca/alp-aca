@@ -2,7 +2,7 @@
 
 Modules
 -------
-models
+uvmodels
     Contains the classes to define the UV models.
 experimental_data
     Contains classes and functions to handle experimental data.

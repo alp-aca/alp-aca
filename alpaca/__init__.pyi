@@ -17,7 +17,7 @@ from .decays.mesons.mixing import (
 )
 
 from . import(
-    models as models,
+    uvmodels as uvmodels,
     experimental_data as experimental_data,
     statistics as statistics,
     plotting as plotting,

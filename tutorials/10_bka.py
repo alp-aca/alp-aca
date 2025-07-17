@@ -1,6 +1,6 @@
 from alpaca.statistics.chisquared import get_chi2
 from alpaca.statistics.functions import nsigmas
-from alpaca.models.model_library import QED_DFSZ, beta
+from alpaca.uvmodels.model_library import QED_DFSZ, beta
 
 import numpy as np
 import matplotlib.pyplot as plt

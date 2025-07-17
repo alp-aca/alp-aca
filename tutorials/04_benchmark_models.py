@@ -1,4 +1,4 @@
-from alpaca.models.model_library import *
+from alpaca.uvmodels.model_library import *
 import sympy as sp
 
 # Models from 1610.07593 to check we obtain the same results
