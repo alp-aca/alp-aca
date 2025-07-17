@@ -147,7 +147,7 @@ class ALPcouplings:
                 if not isinstance(values[c], numeric):
                      raise TypeError(f'The coupling {c} must be of a numeric type, {type(values[c])} given')
             self.values = {c: values[c] for c in ['cG', 'cB', 'cW', 'cqL', 'cuR', 'cdR', 'clL', 'ceR']}
-        elif basis == 'massbasis_above' or basis == 'sp_massbasis_above':
+        elif basis == 'massbasis_ew' or basis == 'sp_massbasis_ew':
             self.scale = scale
             self.basis = basis
             unknown_keys = set(values.keys()) - {'cG', 'cgamma', 'cgammaZ', 'cW', 'cZ', 'cG', 'kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke'}
@@ -165,7 +165,7 @@ class ALPcouplings:
                 if not isinstance(values[c], numeric):
                      raise TypeError(f'The coupling {c} must be of a numeric type, {type(values[c])} given')
             self.values = {c: values[c] for c in ['kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke', 'cgamma', 'cgammaZ', 'cW', 'cZ', 'cG']}
-        elif basis == 'kF_below' or basis == 'sp_kF_below':
+        elif basis == 'RL_below' or basis == 'sp_RL_below':
             self.scale = scale
             self.basis = basis
             unknown_keys = set(values.keys()) - {'cG', 'cgamma', 'kU', 'kD', 'kE', 'kNu', 'ku', 'kd', 'ke'}
@@ -341,7 +341,7 @@ class ALPcouplings:
             separated = self.separate_expressions()
             a = {k: v.translate(basis[3:]) for k, v in separated.items()}
             return ALPcouplings.join_expressions(a)
-        if self.basis == 'derivative_above' and basis == 'massbasis_above':
+        if self.basis == 'derivative_above' and basis == 'massbasis_ew':
             smpars = runSM(self.scale)
             s2w = smpars['s2w']
             c2w = 1-s2w
@@ -362,13 +362,13 @@ class ALPcouplings:
                 'kNu': self.values['clL'],
                 'ke': np.matrix(UeR).H @ self.values['ceR'] @ UeR,
                 'cgamma': cgamma, 'cW': self.values['cW'], 'cgammaZ': cgammaZ, 'cZ': cZ, 'cG': self.values['cG']
-                }, scale=self.scale, basis='massbasis_above', ew_scale=self.ew_scale)
+                }, scale=self.scale, basis='massbasis_ew', ew_scale=self.ew_scale)
             a.yu = self.yu
             a.yd = self.yd
             a.ye = self.ye
             return a
         
-        if self.basis == 'massbasis_above' and basis == 'derivative_above':
+        if self.basis == 'massbasis_ew' and basis == 'derivative_above':
             UuL, mu, UuR = ckmutil.diag.msvd(self.yu)
             UdL, md, UdR = ckmutil.diag.msvd(self.yd)
             UeL, me, UeR = ckmutil.diag.msvd(self.ye)
@@ -384,7 +384,7 @@ class ALPcouplings:
             a.ye = self.ye
             return a
         
-        if self.basis == 'kF_below' and basis == 'VA_below':
+        if self.basis == 'RL_below' and basis == 'VA_below':
             return ALPcouplings({'cuV': self.values['ku'] + self.values['kU'],
                                  'cuA': self.values['ku'] - self.values['kU'],
                                  'cdV': self.values['kd'] + self.values['kD'],
@@ -392,14 +392,14 @@ class ALPcouplings:
                                  'ceV': self.values['ke'] + self.values['kE'],
                                  'ceA': self.values['ke'] - self.values['kE'],
                                  'cnu': self.values['kNu'], 'cG': self.values['cG'], 'cgamma': self.values['cgamma']}, scale=self.scale, basis='VA_below', ew_scale=self.ew_scale)
-        if self.basis == 'VA_below' and basis == 'kF_below':
+        if self.basis == 'VA_below' and basis == 'RL_below':
             return ALPcouplings({'ku': (self.values['cuV'] + self.values['cuA'])/2,
                                  'kU': (self.values['cuV'] - self.values['cuA'])/2,
                                  'kd': (self.values['cdV'] + self.values['cdA'])/2,
                                  'kD': (self.values['cdV'] - self.values['cdA'])/2,
                                  'ke': (self.values['ceV'] + self.values['ceA'])/2,
                                  'kE': (self.values['ceV'] - self.values['ceA'])/2,
-                                 'kNu': self.values['cnu'], 'cG': self.values['cG'], 'cgamma': self.values['cgamma']}, scale=self.scale, basis='kF_below', ew_scale=self.ew_scale)
+                                 'kNu': self.values['cnu'], 'cG': self.values['cG'], 'cgamma': self.values['cgamma']}, scale=self.scale, basis='RL_below', ew_scale=self.ew_scale)
         else:
             raise ValueError(f'Unknown basis {basis}')
         
@@ -407,9 +407,9 @@ class ALPcouplings:
         "Converts the object into a vector of coefficientes"
         if self.basis == 'derivative_above':
             return np.hstack([np.asarray(self.values[c]).ravel() for c in ['cqL', 'cuR', 'cdR', 'clL', 'ceR', 'cG', 'cB', 'cW']]+[np.asarray(self.yu).ravel()]+[np.asarray(self.yd).ravel()]+[np.asarray(self.ye).ravel()]).astype(dtype=complex)
-        if self.basis == 'massbasis_above':
+        if self.basis == 'massbasis_ew':
             return np.hstack([np.asarray(self.values[c]).ravel() for c in ['kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke', 'cgamma', 'cgammaZ', 'cW', 'cZ', 'cG']]+[np.asarray(self.yu).ravel()]+[np.asarray(self.yd).ravel()]+[np.asarray(self.ye).ravel()]).astype(dtype=complex)
-        if self.basis == 'kF_below':
+        if self.basis == 'RL_below':
             return np.hstack([np.asarray(self.values[c]).ravel() for c in ['kD', 'kE', 'kNu', 'kd', 'ke', 'kU', 'ku', 'cG', 'cgamma']]).astype(dtype=complex)
 
     
@@ -425,7 +425,7 @@ class ALPcouplings:
             a1.yd = array[48+9: 48+18].reshape([3,3])
             a1.ye = array[48+18: 48+27].reshape([3,3])
             return a1
-        if basis == 'massbasis_above':
+        if basis == 'massbasis_ew':
             vals = {}
             for i, c in enumerate(['kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke']):
                 vals |= {c: array[9*i:9*(i+1)].reshape([3,3])}
@@ -435,7 +435,7 @@ class ALPcouplings:
             a1.yu = array[59:59+9].reshape([3,3])
             a1.yd = array[59+9:59+18].reshape([3,3])
             a1.ye = array[59+18:59+27].reshape([3,3])
-        if basis == 'kF_below':
+        if basis == 'RL_below':
             vals = {}
             for i, c in enumerate(['kD', 'kE', 'kNu', 'kd', 'ke']):
                 vals |= {c: array[9*i:9*(i+1)].reshape([3,3])}
@@ -528,7 +528,7 @@ class ALPcouplings:
         from . import run_high, matching, run_low, symbolic
         if integrator == 'symbolic':
             if scale_out == self.scale:
-                if self.basis == 'derivative_above' and basis == 'massbasis_above':
+                if self.basis == 'derivative_above' and basis == 'massbasis_ew':
                     return symbolic.derivative2massbasis(self)
                 return self.translate(basis)
             if self.basis in bases_above and basis in bases_above:
@@ -540,11 +540,11 @@ class ALPcouplings:
                     raise KeyError(f'beta function {beta} not recognized')
                 return symbolic.run_leadinglog(self.translate('derivative_above'), betafunc, scale_out).match_run(scale_out, basis, integrator)
             if self.basis in bases_above and basis in bases_below:
-                couplings_ew = self.match_run(self.ew_scale, 'massbasis_above', integrator, beta)
+                couplings_ew = self.match_run(self.ew_scale, 'massbasis_ew', integrator, beta)
                 couplings_below = symbolic.match(couplings_ew, match_tildecouplings)
                 return couplings_below.match_run(scale_out, basis, integrator)
             if self.basis in bases_below and basis in bases_below:
-                return symbolic.run_leadinglog(self.translate('kF_below'), symbolic.beta_low, scale_out).translate(basis)
+                return symbolic.run_leadinglog(self.translate('RL_below'), symbolic.beta_low, scale_out).translate(basis)
             if self.basis in bases_below and basis in bases_above:
                 raise ValueError(f'Attempting to run from {self.basis} below the EW scale to {basis} above the EW scale')
             raise ValueError(f'basis {basis} not recognized')
@@ -558,7 +558,7 @@ class ALPcouplings:
             return ALPcouplings.join_expressions(a)
         if self.scale > self.ew_scale and scale_out < self.ew_scale:
             if self.basis in bases_above and basis in bases_below:
-                couplings_ew = self.match_run(self.ew_scale, 'massbasis_above', integrator, beta, scipy_method=scipy_method, scipy_rtol=scipy_rtol, scipy_atol=scipy_atol)
+                couplings_ew = self.match_run(self.ew_scale, 'massbasis_ew', integrator, beta, scipy_method=scipy_method, scipy_rtol=scipy_rtol, scipy_atol=scipy_atol)
                 couplings_below = matching.match(couplings_ew, match_tildecouplings)
                 return couplings_below.match_run(scale_out, basis, integrator, beta, scipy_method=scipy_method, scipy_rtol=scipy_rtol, scipy_atol=scipy_atol)
             else:
@@ -569,9 +569,9 @@ class ALPcouplings:
         if scale_out < self.ew_scale:
             if integrator == 'scipy':
                 scipy_options = {'method': scipy_method, 'rtol': scipy_rtol, 'atol': scipy_atol}
-                return run_low.run_scipy(self.translate('kF_below'), scale_out, scipy_options).translate(basis)
+                return run_low.run_scipy(self.translate('RL_below'), scale_out, scipy_options).translate(basis)
             elif integrator == 'leadinglog':
-                return run_low.run_leadinglog(self.translate('kF_below'), scale_out).translate(basis)
+                return run_low.run_leadinglog(self.translate('RL_below'), scale_out).translate(basis)
             elif integrator == 'no_rge':
                 return ALPcouplings(self.values, scale_out, self.basis).translate(basis)
             else:
@@ -734,7 +734,7 @@ class ALPcouplings:
                 'ceR': r'c_{e_R}',
                 'cqL': r'c_{q_L}',
             }
-        elif self.basis == 'massbasis_above' or self.basis == 'sp_massbasis_above':
+        elif self.basis == 'massbasis_ew' or self.basis == 'sp_massbasis_ew':
             latex_couplings = {
                 'cG': r'c_G',
                 'cW': r'c_W',
@@ -749,7 +749,7 @@ class ALPcouplings:
                 'kd': r"c'_{d_R}",
                 'ke': r"c'_{e_R}",
             }
-        elif self.basis == 'kF_below' or self.basis == 'sp_kF_below':
+        elif self.basis == 'RL_below' or self.basis == 'sp_RL_below':
             latex_couplings = {
                 'cG': r'c_G',
                 'cgamma': r'c_\gamma',

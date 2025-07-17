@@ -33,7 +33,7 @@ def effcoupling_ff(ma, couplings: ALPcouplings, fermion, **kwargs):
             ceff -= 12 * (4/3) * a_s**2 * cG * (np.log(ma**2/mass**2) + delta1+g)
         return ceff
     else:
-        cc = couplings.translate('massbasis_above')
+        cc = couplings.translate('massbasis_ew')
         cgamma = cc['cgamma']
         cgammaZ = cc['cgammaZ']
         cZ = cc['cZ']
@@ -57,7 +57,7 @@ def effcoupling_ff(ma, couplings: ALPcouplings, fermion, **kwargs):
 def effcouplings_cq1q2_W(couplings: ALPcouplings, pa2: float, q1: str, q2: str) -> complex:
     if couplings.scale > couplings.ew_scale:
         raise NotImplementedError(f"The effective couplings c_{q1}{q2} are implemented only below the EW scale.")
-    couplings = couplings.translate('kF_below')
+    couplings = couplings.translate('RL_below')
     mq = {'u': mu, 'd': md, 's': ms, 'c': mc, 'b': mb}
     ceff = 0
     if q1 == q2:

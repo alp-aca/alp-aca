@@ -251,7 +251,7 @@ def beta_low(couplings: ALPcouplings) -> ALPcouplings:
     beta_u = alpha_s**2/pi**2*cGtilde(couplings)+sp.Rational(3,4)*alpha_em**2/pi**2*sp.Rational(2,3)**2*cgammatilde(couplings)
     beta_e = sp.Rational(3,4)*alpha_em**2/pi**2*cgammatilde(couplings)
 
-    return ALPcouplings({'kd': beta_d*np.eye(3), 'kD': -beta_d*np.eye(3), 'ku': beta_u*np.eye(2), 'kU': -beta_u*np.eye(2), 'ke': beta_e * np.eye(3), 'kE': beta_e*np.eye(3), 'kNu': np.zeros((3,3)), 'cG': 0, 'cgamma': 0}, scale=couplings.scale, basis='kF_below', ew_scale=couplings.ew_scale)
+    return ALPcouplings({'kd': beta_d*np.eye(3), 'kD': -beta_d*np.eye(3), 'ku': beta_u*np.eye(2), 'kU': -beta_u*np.eye(2), 'ke': beta_e * np.eye(3), 'kE': beta_e*np.eye(3), 'kNu': np.zeros((3,3)), 'cG': 0, 'cgamma': 0}, scale=couplings.scale, basis='RL_below', ew_scale=couplings.ew_scale)
 
 def run_leadinglog(couplings: ALPcouplings, beta: Callable[[ALPcouplings], ALPcouplings], scale_out: float) -> ALPcouplings:
     """Obtain the ALP couplings at a different scale using the leading log approximation
@@ -278,7 +278,7 @@ def derivative2massbasis(couplings: ALPcouplings) -> ALPcouplings:
     cZ = c2w**2 * couplings.values['cW'] + s2w**2 *couplings.values['cB']
 
     kD = VckmH @ couplings.values['cqL'] @ Vckm
-    return ALPcouplings({'kU': couplings.values['cqL'], 'ku': couplings.values['cuR'], 'kD': kD, 'kd': couplings.values['cdR'], 'kE': couplings.values['clL'], 'kNu': couplings.values['clL'], 'ke': couplings.values['ceR'], 'cgamma': cgamma, 'cW': couplings.values['cW'], 'cgammaZ': cgammaZ, 'cZ': cZ, 'cG': couplings.values['cG']}, scale=couplings.scale, basis='massbasis_above', ew_scale=couplings.ew_scale)
+    return ALPcouplings({'kU': couplings.values['cqL'], 'ku': couplings.values['cuR'], 'kD': kD, 'kd': couplings.values['cdR'], 'kE': couplings.values['clL'], 'kNu': couplings.values['clL'], 'ke': couplings.values['ceR'], 'cgamma': cgamma, 'cW': couplings.values['cW'], 'cgammaZ': cgammaZ, 'cZ': cZ, 'cG': couplings.values['cG']}, scale=couplings.scale, basis='massbasis_ew', ew_scale=couplings.ew_scale)
         
 def gauge_tilde_match(couplings):
         dcW = - np.trace(3*couplings['kU']+couplings['kE'])/2
@@ -335,7 +335,7 @@ def match(couplings: ALPcouplings, two_loops = False) -> ALPcouplings:
     values |= {f'k{F}': couplings[f'k{F}'][0:2,0:2] + (3/(8*pi**2)*Delta_kF[F]*loop)*sp.eye(2) for F in ['U', 'u']}
     values |= {'kD': couplings['kD'] + (3/(8*pi**2)*Delta_kF['D']*loop)*sp.eye(3) + match_FCNC_d(couplings, two_loops)}
     values |= {'cG': couplings['cG'], 'cgamma': couplings['cgamma']}
-    return ALPcouplings(values, scale=couplings.scale, basis='kF_below', ew_scale=couplings.ew_scale)
+    return ALPcouplings(values, scale=couplings.scale, basis='RL_below', ew_scale=couplings.ew_scale)
 
 def clean_expression(expr: sp.Expr, order_lam: int|None = None):
     """Simplifies a given symbolic expression and optionally substitutes the Wolfenstein parameterization of the CKM matrix.

@@ -14,9 +14,9 @@ def amp_Bs_leptons_SM(lepton: str) -> complex:
 
 def amp_Bs_leptons_ALP(lepton: str, ma: float, couplings: ALPcouplings, fa: float, br_dark: float, **kwargs) -> complex:
     if ma > couplings.ew_scale:
-        basis = 'massbasis_above'
+        basis = 'massbasis_ew'
     else:
-        basis = 'kF_below'
+        basis = 'RL_below'
     cc = couplings.match_run(ma, basis, **kwargs)
     clep = cc['ke'][genlepton[lepton],genlepton[lepton]] - cc['kE'][genlepton[lepton],genlepton[lepton]]
     cbs = np.array([cc['kD'][2,1] - cc['kd'][2,1], cc['kD'][1,2] - cc['kd'][1,2]])
@@ -36,9 +36,9 @@ def amp_Bd_leptons_SM(lepton: str) -> complex:
 
 def amp_Bd_leptons_ALP(lepton: str, ma: float, couplings: ALPcouplings, fa: float, br_dark: float, **kwargs) -> complex:
     if ma > couplings.ew_scale:
-        basis = 'massbasis_above'
+        basis = 'massbasis_ew'
     else:
-        basis = 'kF_below'
+        basis = 'RL_below'
     cc = couplings.match_run(ma, basis, **kwargs)
     clep = cc['ke'][genlepton[lepton],genlepton[lepton]] - cc['kE'][genlepton[lepton],genlepton[lepton]]
     cbs = np.array([cc['kD'][2,0] - cc['kd'][2,0], cc['kD'][0,2] - cc['kd'][0,2]])
@@ -58,9 +58,9 @@ def amp_Bs_photons_SM() -> complex:
 
 def amp_Bs_photons_ALP(ma: float, couplings: ALPcouplings, fa: float, br_dark: float, **kwargs) -> complex:
     if ma > couplings.ew_scale:
-        basis = 'massbasis_above'
+        basis = 'massbasis_ew'
     else:
-        basis = 'kF_below'
+        basis = 'RL_below'
     cc = couplings.match_run(ma, basis, **kwargs)
     cbs = np.array([cc['kD'][2,1] - cc['kd'][2,1], cc['kD'][1,2] - cc['kd'][1,2]])
     cgamma = cc['cgamma']
@@ -81,9 +81,9 @@ def amp_Bd_photons_SM() -> complex:
 
 def amp_Bd_photons_ALP(ma: float, couplings: ALPcouplings, fa: float, br_dark: float, **kwargs) -> complex:
     if ma > couplings.ew_scale:
-        basis = 'massbasis_above'
+        basis = 'massbasis_ew'
     else:
-        basis = 'kF_below'
+        basis = 'RL_below'
     cc = couplings.match_run(ma, basis, **kwargs)
     cbd = np.array([cc['kD'][2,0] - cc['kd'][2,0], cc['kD'][0,2] - cc['kd'][0,2]])
     cgamma = cc['cgamma']
@@ -99,9 +99,9 @@ def BR_Bd_photons_ALP(ma: float, couplings: ALPcouplings, fa: float, br_dark: fl
 
 def amp_D0_photons_ALP(ma: float, couplings: ALPcouplings, fa: float, br_dark: float, **kwargs) -> complex:
     if ma > couplings.ew_scale:
-        basis = 'massbasis_above'
+        basis = 'massbasis_ew'
     else:
-        basis = 'kF_below'
+        basis = 'RL_below'
     citations.register_inspire('Burdman:2001tf')
     cc = couplings.match_run(ma, basis, **kwargs)
     ccu = cc['kU'][1,0] - cc['ku'][1,0]
@@ -118,9 +118,9 @@ def BR_D0_photons_ALP(ma: float, couplings: ALPcouplings, fa: float, br_dark: fl
 
 def amp_D0_leptons_ALP(lepton: str, ma: float, couplings: ALPcouplings, fa: float, br_dark: float, **kwargs) -> complex:
     if ma > couplings.ew_scale:
-        basis = 'massbasis_above'
+        basis = 'massbasis_ew'
     else:
-        basis = 'kF_below'
+        basis = 'RL_below'
     citations.register_inspire('Burdman:2001tf')
     cc = couplings.match_run(ma, basis, **kwargs)
     ccu = cc['kU'][1,0] - cc['ku'][1,0]
@@ -170,9 +170,9 @@ def amp_KS_leptons_LD(lepton: str) -> complex:
 
 def amp_K0_leptons_ALP(lepton: str, ma: float, couplings: ALPcouplings, fa: float, br_dark: float, **kwargs) -> complex:
     if ma > couplings.ew_scale:
-        basis = 'massbasis_above'
+        basis = 'massbasis_ew'
     else:
-        basis = 'kF_below'
+        basis = 'RL_below'
     cc = couplings.match_run(ma, basis, **kwargs)
     clep = cc['ke'][genlepton[lepton],genlepton[lepton]] - cc['kE'][genlepton[lepton],genlepton[lepton]]
     csd = np.array([cc['kD'][1,0] - cc['kd'][1,0], cc['kD'][0,1] - cc['kd'][0,1]])
@@ -213,9 +213,9 @@ def BR_KS_leptons(lepton: str, ma: float, couplings: ALPcouplings, fa: float, br
 def BR_KS_photons(ma: float, couplings: ALPcouplings, fa: float, br_dark: float, **kwargs) -> float:
     from ...constants import br_ksphotons_LD
     if ma > couplings.ew_scale:
-        basis = 'massbasis_above'
+        basis = 'massbasis_ew'
     else:
-        basis = 'kF_below'
+        basis = 'RL_below'
     cc = couplings.match_run(ma, basis, **kwargs)
     csd = cc['kD'][1,0] - cc['kd'][1,0]
     cgamma = cc['cgamma']

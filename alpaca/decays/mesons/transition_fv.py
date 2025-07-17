@@ -17,7 +17,7 @@ def Kminustopia(ma: float, couplings: ALPcouplings, f_a: float, delta8=0, **kwar
     if ma > mK-mpi_pm:
         return 0
     citations.register_inspire('Bauer:2021wjo')
-    coupl_low = couplings.match_run(ma, 'kF_below', **kwargs)
+    coupl_low = couplings.match_run(ma, 'RL_below', **kwargs)
     cG = coupl_low['cG']
     cuu = coupl_low['ku'][0,0]-coupl_low['kU'][0,0]
     cdd = coupl_low['kd'][0,0]-coupl_low['kD'][0,0]
@@ -44,7 +44,7 @@ def K0bartopia(ma: float, couplings: ALPcouplings, f_a: float, delta8=0, **kwarg
     B0 = mpi0**2/(mu+md)
     mK = np.sqrt(B0*(ms+mu/2+md/2))
     citations.register_inspire('Bauer:2021mvw')
-    coupl_low = couplings.match_run(ma, 'kF_below', **kwargs)
+    coupl_low = couplings.match_run(ma, 'RL_below', **kwargs)
     cG = coupl_low['cG']
     cuu = coupl_low['ku'][0,0]-coupl_low['kU'][0,0]
     cdd = coupl_low['kd'][0,0]-coupl_low['kD'][0,0]

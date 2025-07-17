@@ -76,9 +76,9 @@ def run_coeffs(coeffs: np.ndarray, mq1: float, scale: float) -> np.ndarray:
 
 def coeffs_heavyALP(meson: str, couplings: ALPcouplings, ma, fa, **kwargs) -> np.ndarray:
     if ma < couplings.ew_scale:
-        coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
+        coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
     else:
-        coup_low = couplings.match_run(ma, 'massbasis_above', **kwargs)
+        coup_low = couplings.match_run(ma, 'massbasis_ew', **kwargs)
     if meson == 'K0':
         from ...constants import md, ms
         mq1 = ms
@@ -110,7 +110,7 @@ def coeffs_heavyALP(meson: str, couplings: ALPcouplings, ma, fa, **kwargs) -> np
 
 def coeffs_lightALP(meson: str, couplings: ALPcouplings, ma, fa, **kwargs) -> np.ndarray:
     citations.register_inspire('Bauer:2021mvw')
-    coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
+    coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
     if meson == 'B0':
         from ...constants import md, mb, mB0
         mq1 = mb

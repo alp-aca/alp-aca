@@ -38,7 +38,7 @@ def cgamma_twoloops(ma: float, couplings: ALPcouplings, fa: float) -> float:
 def decay_width_2gamma(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
     cgamma_eff = 0
     if ma > couplings.ew_scale:
-        cc = couplings.match_run(ma, 'massbasis_above', **kwargs)
+        cc = couplings.match_run(ma, 'massbasis_ew', **kwargs)
         cgamma_eff += 2*alpha_em/np.pi*cc['cW']/s2w*B2(4*mW**2/ma**2)
         cuA = cc['ku'] - cc['kU']
         cdA = cc['kd'] - cc['kD']
@@ -86,7 +86,7 @@ def decay_width_2gluons(ma: float, couplings: ALPcouplings, fa: float, **kwargs)
 
     match_scale = couplings.ew_scale
     if ma > match_scale:
-        cc = couplings.match_run(ma, 'massbasis_above', **kwargs)
+        cc = couplings.match_run(ma, 'massbasis_ew', **kwargs)
         cuA = cc['ku'] - cc['kU']
         cdA = cc['kd'] - cc['kD']
         mq = [mu, md, ms, mc, mb, mt]

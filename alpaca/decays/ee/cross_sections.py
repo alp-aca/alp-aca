@@ -10,7 +10,7 @@ def sigmaNR_gammaALP(ma: float, couplings: ALPcouplings, s: float, f_a: float=10
     citations.register_inspire('DiLuzio:2024jip')
     from ...constants import hbarc2_GeV2pb
     from ...common import alpha_em
-    coup_low = couplings.match_run(ma, 'kF_below', **kwargs)
+    coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
     gaphoton = offshellphoton(coup_low, ma, s)*alpha_em(np.sqrt(s))/(np.pi*f_a)
     return hbarc2_GeV2pb*(((alpha_em(np.sqrt(s))*np.abs(gaphoton)**2)/24)*(1-(ma**2)/s)**3)
 
