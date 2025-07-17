@@ -11,7 +11,7 @@ from ..biblio.biblio import citations
 import sympy as sp
 
 
-couplings_latex = {'cG': r'c_g', 'cB': 'c_B', 'cW': 'c_W', 'cqL': r'c_{q_L}', 'cuR': r'c_{u_R}', 'cdR': r'c_{d_R}', 'clL': r'c_{\ell_L}', 'ceR': r'c_{e_R}'}
+couplings_latex = {'cG': r'c_G', 'cB': 'c_B', 'cW': 'c_W', 'cqL': r'c_{q_L}', 'cuR': r'c_{u_R}', 'cdR': r'c_{d_R}', 'clL': r'c_{\ell_L}', 'ceR': r'c_{e_R}'}
 class ModelBase:
     """
     Base class representing a UV model with couplings to ALPs.
