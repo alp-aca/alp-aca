@@ -142,10 +142,10 @@ class ALPcouplings:
                 elif isinstance(values[c], matricial):
                     values[c] = np.matrix(values[c]).reshape([3,3])
                 else:
-                    raise TypeError
+                    raise TypeError(f'The coupling {c} must be of a numeric or a matrix type, {type(values[c])} given')
             for c in ['cg', 'cW', 'cB']:
                 if not isinstance(values[c], numeric):
-                     raise TypeError
+                     raise TypeError(f'The coupling {c} must be of a numeric type, {type(values[c])} given')
             self.values = {c: values[c] for c in ['cg', 'cB', 'cW', 'cqL', 'cuR', 'cdR', 'clL', 'ceR']}
         elif basis == 'massbasis_above' or basis == 'sp_massbasis_above':
             self.scale = scale
@@ -160,10 +160,10 @@ class ALPcouplings:
                 elif isinstance(values[c], matricial):
                     values[c] = np.matrix(values[c]).reshape([3,3])
                 else:
-                    raise TypeError
+                    raise TypeError(f'The coupling {c} must be of a numeric or a matrix type, {type(values[c])} given')
             for c in ['cgamma', 'cgammaZ', 'cW', 'cZ', 'cg']:
                 if not isinstance(values[c], numeric):
-                     raise TypeError
+                     raise TypeError(f'The coupling {c} must be of a numeric type, {type(values[c])} given')
             self.values = {c: values[c] for c in ['kU', 'ku', 'kD', 'kd', 'kE', 'kNu', 'ke', 'cgamma', 'cgammaZ', 'cW', 'cZ', 'cg']}
         elif basis == 'kF_below' or basis == 'sp_kF_below':
             self.scale = scale
@@ -178,17 +178,17 @@ class ALPcouplings:
                 elif isinstance(values[c], matricial):
                     values[c] = np.matrix(values[c]).reshape([3,3])
                 else:
-                    raise TypeError
+                    raise TypeError(f'The coupling {c} must be of a numeric or a matrix type, {type(values[c])} given')
             for c in ['kU', 'ku']:
                 if isinstance(values[c], numeric):
                     values[c] = np.matrix(values[c]*np.eye(2))
                 elif isinstance(values[c], matricial):
                     values[c] = np.matrix(values[c]).reshape([2,2])
                 else:
-                    raise TypeError
+                    raise TypeError(f'The coupling {c} must be of a numeric or a matrix type, {type(values[c])} given')
             for c in ['cg', 'cgamma']:
                 if not isinstance(values[c], numeric):
-                     raise TypeError
+                     raise TypeError(f'The coupling {c} must be of a numeric type, {type(values[c])} given')
             self.values = {c: values[c] for c in ['kD', 'kE', 'kNu', 'kd', 'ke', 'kU', 'ku', 'cg', 'cgamma']}
         elif basis == 'VA_below' or basis == 'sp_VA_below':
             self.scale = scale
@@ -203,17 +203,17 @@ class ALPcouplings:
                 elif isinstance(values[c], matricial):
                     values[c] = np.matrix(values[c]).reshape([3,3])
                 else:
-                    raise TypeError
+                    raise TypeError(f'The coupling {c} must be of a numeric or a matrix type, {type(values[c])} given')
             for c in ['cuV', 'cuA']:
                 if isinstance(values[c], numeric):
                     values[c] = np.matrix(values[c]*np.eye(2))
                 elif isinstance(values[c], matricial):
                     values[c] = np.matrix(values[c]).reshape([2,2])
                 else:
-                    raise TypeError
+                    raise TypeError(f'The coupling {c} must be of a numeric or a matrix type, {type(values[c])} given')
             for c in ['cg', 'cgamma']:
                 if not isinstance(values[c], numeric):
-                     raise TypeError
+                     raise TypeError(f'The coupling {c} must be of a numeric type, {type(values[c])} given')
             self.values = {c: values[c] for c in ['cuV', 'cuA', 'cdV', 'cdA', 'ceV', 'ceA', 'cnu', 'cg', 'cgamma']}
         else:
             raise ValueError('Unknown basis')
@@ -306,16 +306,16 @@ class ALPcouplings:
                 if isinstance(val, numeric):
                     self.values[name] = val
                 else:
-                    raise TypeError
+                    raise TypeError(f'The coupling {name} must be of a numeric type, {type(val)} given')
             elif name in ['cqL', 'cuR', 'cdR', 'clL', 'ceR']:
                 if isinstance(val, numeric):
                     self.values[name] = val * np.eye(3)
                 elif isinstance(val, matricial):
                     self.values[name] = np.matrix(val).reshape([3,3])
                 else:
-                    raise TypeError
+                    raise TypeError(f'The coupling {name} must be of a numeric or a matrix type, {type(val)} given')
             else:
-                raise KeyError
+                raise KeyError(f'Unknown ALP coupling {name} in basis {self.basis}')
 
     def translate(self, basis: str) -> 'ALPcouplings':
         """Translate the couplings to another basis at the same energy scale.
@@ -401,7 +401,7 @@ class ALPcouplings:
                                  'kE': (self.values['ceV'] - self.values['ceA'])/2,
                                  'kNu': self.values['cnu'], 'cg': self.values['cg'], 'cgamma': self.values['cgamma']}, scale=self.scale, basis='kF_below', ew_scale=self.ew_scale)
         else:
-            raise ValueError('Unknown basis')
+            raise ValueError(f'Unknown basis {basis}')
         
     def _toarray(self) -> np.ndarray:
         "Converts the object into a vector of coefficientes"
@@ -450,7 +450,7 @@ class ALPcouplings:
             basis: str,
             integrator: str='scipy',
             beta: str='full',
-            match_2loops = False,
+            match_tildecouplings = True,
             scipy_method: str = 'RK45',
             scipy_rtol: float = 1e-3,
             scipy_atol: float = 1e-6,
@@ -486,8 +486,11 @@ class ALPcouplings:
             - 'full':
                 Use the full beta function.
 
-        match_2loops : bool, optional
-            Whether to include 2-loop matching corrections.
+        match_tildecouplings : bool, optional
+            Whether to implement the matching conditions with the 'tilde' version of the gauge couplings instead of the bare ones.
+            The use of the 'tilde' coefficients partially captures 2-loop effects in the matching,
+            and ensures RG invariance, as discussed in Bauer et al. (2020) arXiv:2012.12272.
+            Defaults to True.
 
         scipy_method : str, optional
             Method to use for the scipy integrator. Defaults to 'RK45'. Other available options are 'RK23', 'DOP853', and 'BDF'. See the documentation of scipy.integrate.solve_ivp for more information.
@@ -508,7 +511,7 @@ class ALPcouplings:
         KeyError
             If attempting to translate to an unrecognized basis.
         """
-        return self._match_run(scale_out, basis, integrator, beta, match_2loops, scipy_method, scipy_rtol, scipy_atol)
+        return self._match_run(scale_out, basis, integrator, beta, match_tildecouplings, scipy_method, scipy_rtol, scipy_atol)
     
     @cache
     def _match_run(
@@ -517,7 +520,7 @@ class ALPcouplings:
             basis: str,
             integrator: str='scipy',
             beta: str='full',
-            match_2loops = False,
+            match_tildecouplings = False,
             scipy_method: str = 'RK45',
             scipy_rtol: float = 1e-3,
             scipy_atol: float = 1e-6,
@@ -538,7 +541,7 @@ class ALPcouplings:
                 return symbolic.run_leadinglog(self.translate('derivative_above'), betafunc, scale_out).match_run(scale_out, basis, integrator)
             if self.basis in bases_above and basis in bases_below:
                 couplings_ew = self.match_run(self.ew_scale, 'massbasis_above', integrator, beta)
-                couplings_below = symbolic.match(couplings_ew, match_2loops)
+                couplings_below = symbolic.match(couplings_ew, match_tildecouplings)
                 return couplings_below.match_run(scale_out, basis, integrator)
             if self.basis in bases_below and basis in bases_below:
                 return symbolic.run_leadinglog(self.translate('kF_below'), symbolic.beta_low, scale_out).translate(basis)
@@ -551,17 +554,17 @@ class ALPcouplings:
             return self.translate(basis)
         if self.basis.startswith('sp_') and basis.startswith('sp_'):
             separated = self.separate_expressions()
-            a = {k: v.match_run(scale_out, basis[3:], integrator, beta, match_2loops, scipy_method=scipy_method, scipy_rtol=scipy_rtol, scipy_atol=scipy_atol) for k, v in separated.items()}
+            a = {k: v.match_run(scale_out, basis[3:], integrator, beta, match_tildecouplings, scipy_method=scipy_method, scipy_rtol=scipy_rtol, scipy_atol=scipy_atol) for k, v in separated.items()}
             return ALPcouplings.join_expressions(a)
         if self.scale > self.ew_scale and scale_out < self.ew_scale:
             if self.basis in bases_above and basis in bases_below:
                 couplings_ew = self.match_run(self.ew_scale, 'massbasis_above', integrator, beta, scipy_method=scipy_method, scipy_rtol=scipy_rtol, scipy_atol=scipy_atol)
-                couplings_below = matching.match(couplings_ew, match_2loops)
+                couplings_below = matching.match(couplings_ew, match_tildecouplings)
                 return couplings_below.match_run(scale_out, basis, integrator, beta, scipy_method=scipy_method, scipy_rtol=scipy_rtol, scipy_atol=scipy_atol)
             else:
                 raise KeyError(basis)
         if self.scale == self.ew_scale and self.basis in bases_above and basis in bases_below:
-                couplings_below = matching.match(self, match_2loops)
+                couplings_below = matching.match(self, match_tildecouplings)
                 return couplings_below.match_run(scale_out, basis, integrator, beta, scipy_method=scipy_method, scipy_rtol=scipy_rtol, scipy_atol=scipy_atol)
         if scale_out < self.ew_scale:
             if integrator == 'scipy':
@@ -572,14 +575,14 @@ class ALPcouplings:
             elif integrator == 'no_rge':
                 return ALPcouplings(self.values, scale_out, self.basis).translate(basis)
             else:
-                raise KeyError(integrator)
+                raise KeyError(f'Integrator {integrator} not recognized')
         if basis in bases_above and self.basis in bases_above:
             if beta == 'ytop':
                 betafunc = run_high.beta_ytop
             elif beta == 'full':
                 betafunc = run_high.beta_full
             else:
-                raise KeyError(beta)
+                raise KeyError(f'Option for beta function {beta} not recognized')
             if integrator == 'scipy':
                 scipy_options = {'method': scipy_method, 'rtol': scipy_rtol, 'atol': scipy_atol}
                 return run_high.run_scipy(self, betafunc, scale_out, scipy_options).translate(basis)
@@ -588,9 +591,9 @@ class ALPcouplings:
             elif integrator == 'no_rge':
                 return ALPcouplings(self.values, scale_out, self.basis).translate(basis)
             else:
-                raise KeyError(integrator)
+                raise KeyError(f'Integrator {integrator} not recognized')
         else:
-            raise KeyError(basis)
+            raise KeyError(f'Unknown basis {basis} the ALP couplings')
 
     def to_dict(self) -> dict:
         """Convert the object into a dictionary.
