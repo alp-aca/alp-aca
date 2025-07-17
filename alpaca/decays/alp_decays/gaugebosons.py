@@ -40,9 +40,9 @@ def decay_width_2gamma(ma: float, couplings: ALPcouplings, fa: float, **kwargs) 
     if ma > couplings.ew_scale:
         cc = couplings.match_run(ma, 'massbasis_ew', **kwargs)
         cgamma_eff += 2*alpha_em/np.pi*cc['cW']/s2w*B2(4*mW**2/ma**2)
-        cuA = cc['ku'] - cc['kU']
-        cdA = cc['kd'] - cc['kD']
-        ceA = cc['ke'] - cc['kE']
+        cuA = cc['cuR'] - cc['cuL']
+        cdA = cc['cdR'] - cc['cdL']
+        ceA = cc['ceR'] - cc['ceL']
         masses = [me, mmu, mtau, mc, mb, mt]
         charges = [-1, -1, -1, 2/3, -1/3, 2/3]
         Nc = [1, 1, 1, 3, 3, 3]
@@ -87,8 +87,8 @@ def decay_width_2gluons(ma: float, couplings: ALPcouplings, fa: float, **kwargs)
     match_scale = couplings.ew_scale
     if ma > match_scale:
         cc = couplings.match_run(ma, 'massbasis_ew', **kwargs)
-        cuA = cc['ku'] - cc['kU']
-        cdA = cc['kd'] - cc['kD']
+        cuA = cc['cuR'] - cc['cuL']
+        cdA = cc['cdR'] - cc['cdL']
         mq = [mu, md, ms, mc, mb, mt]
         coupl = [cuA[0,0], cdA[0,0], cdA[1,1], cuA[1,1], cdA[2,2], cuA[2,2]]
         cG_eff = cc['cG'] + 0.5 * sum(coupl[i]*B1(4*mq[i]**2/ma**2) for i in range(6))

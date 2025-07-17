@@ -9,36 +9,36 @@ def cGtilde(couplings: ALPcouplings) -> complex:
     citations.register_particle()
     cG = couplings['cG']
     if couplings.scale > particle.literals.u.mass/1000:
-        cG += 0.5*(couplings['ku'][0,0]-couplings['kU'][0,0])
+        cG += 0.5*(couplings['cuR'][0,0]-couplings['cuL'][0,0])
     if couplings.scale > particle.literals.d.mass/1000:
-        cG += 0.5*(couplings['kd'][0,0]-couplings['kD'][0,0])
+        cG += 0.5*(couplings['cdR'][0,0]-couplings['cdL'][0,0])
     if couplings.scale > particle.literals.c.mass/1000:
-        cG += 0.5*(couplings['ku'][1,1]-couplings['kU'][1,1])
+        cG += 0.5*(couplings['cuR'][1,1]-couplings['cuL'][1,1])
     if couplings.scale > particle.literals.s.mass/1000:
-        cG += 0.5*(couplings['kd'][1,1]-couplings['kD'][1,1])
+        cG += 0.5*(couplings['cdR'][1,1]-couplings['cdL'][1,1])
     if couplings.scale > particle.literals.b.mass/1000:
-        cG += 0.5*(couplings['kd'][2,2]-couplings['kD'][2,2])
+        cG += 0.5*(couplings['cdR'][2,2]-couplings['cdL'][2,2])
     return cG
 
 def cgammatilde(couplings: ALPcouplings) -> complex:
     citations.register_particle()
     cG = couplings['cG']
     if couplings.scale > particle.literals.u.mass/1000:
-        cG += 3*(2/3)**2*(couplings['ku'][0,0]-couplings['kU'][0,0])
+        cG += 3*(2/3)**2*(couplings['cuR'][0,0]-couplings['cuL'][0,0])
     if couplings.scale > particle.literals.d.mass/1000:
-        cG += 3*(-1/3)**2*(couplings['kd'][0,0]-couplings['kD'][0,0])
+        cG += 3*(-1/3)**2*(couplings['cdR'][0,0]-couplings['cdL'][0,0])
     if couplings.scale > particle.literals.c.mass/1000:
-        cG += 3*(2/3)**2*(couplings['ku'][1,1]-couplings['kU'][1,1])
+        cG += 3*(2/3)**2*(couplings['cuR'][1,1]-couplings['cuL'][1,1])
     if couplings.scale > particle.literals.s.mass/1000:
-        cG += 3*(-1/3)**2*(couplings['kd'][1,1]-couplings['kD'][1,1])
+        cG += 3*(-1/3)**2*(couplings['cdR'][1,1]-couplings['cdL'][1,1])
     if couplings.scale > particle.literals.b.mass/1000:
-        cG += 3*(-1/3)**2*(couplings['kd'][2,2]-couplings['kD'][2,2])
+        cG += 3*(-1/3)**2*(couplings['cdR'][2,2]-couplings['cdL'][2,2])
     if couplings.scale > particle.literals.e_minus.mass/1000:
-        cG += (couplings['ke'][0,0]-couplings['kE'][0,0])
+        cG += (couplings['ceR'][0,0]-couplings['ceL'][0,0])
     if couplings.scale > particle.literals.mu_minus.mass/1000:
-        cG += (couplings['ke'][1,1]-couplings['kE'][1,1])
+        cG += (couplings['ceR'][1,1]-couplings['ceL'][1,1])
     if couplings.scale > particle.literals.tau_minus.mass/1000:
-        cG += (couplings['ke'][2,2]-couplings['kE'][2,2])
+        cG += (couplings['ceR'][2,2]-couplings['ceL'][2,2])
     return cG
 
 def beta(couplings: ALPcouplings) -> ALPcouplings:
@@ -48,7 +48,7 @@ def beta(couplings: ALPcouplings) -> ALPcouplings:
     beta_u = parsSM['alpha_s']**2/np.pi**2*cGtilde(couplings)+0.75*parsSM['alpha_em']**2/np.pi**2*(2/3)**2*cgammatilde(couplings)
     beta_e = 0.75*parsSM['alpha_em']**2/np.pi**2*cgammatilde(couplings)
 
-    return ALPcouplings({'kd': beta_d*np.eye(3), 'kD': -beta_d*np.eye(3), 'ku': beta_u*np.eye(2), 'kU': -beta_u*np.eye(2), 'ke': beta_e * np.eye(3), 'kE': beta_e*np.eye(3), 'kNu': np.zeros((3,3)), 'cG': 0, 'cgamma': 0}, scale=couplings.scale, basis='RL_below', ew_scale=couplings.ew_scale)
+    return ALPcouplings({'cdR': beta_d*np.eye(3), 'cdL': -beta_d*np.eye(3), 'cuR': beta_u*np.eye(2), 'cuL': -beta_u*np.eye(2), 'ceR': beta_e * np.eye(3), 'ceL': beta_e*np.eye(3), 'cnuL': np.zeros((3,3)), 'cG': 0, 'cgamma': 0}, scale=couplings.scale, basis='RL_below', ew_scale=couplings.ew_scale)
 
 
 def run_leadinglog(couplings: ALPcouplings, scale_out: float) -> ALPcouplings:

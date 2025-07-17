@@ -7,8 +7,8 @@ def gauge_tilde(couplings):
         parsSM = runSM(couplings.scale)
         s2w = parsSM['s2w']
         c2w = 1-s2w
-        dcW = - 0.5*np.trace(3*couplings['kU']+couplings['kE'])
-        dcB = np.trace(4/3*couplings['ku']+couplings['kd']/3-couplings['kU']/6+couplings['ke']-couplings['kE']/2)
+        dcW = - 0.5*np.trace(3*couplings['cuL']+couplings['ceL'])
+        dcB = np.trace(4/3*couplings['cuR']+couplings['cdR']/3-couplings['cuL']/6+couplings['ceR']-couplings['ceL']/2)
         cW = couplings['cW'] + dcW
         cZ = couplings['cZ'] + c2w**2 * dcW + s2w**2 * dcB
         cgammaZ = couplings['cgammaZ'] + c2w *dcW - s2w * dcB
@@ -36,9 +36,9 @@ def match_FCNC_d(couplings: ALPcouplings, two_loops = False, loopquark=2) -> np.
     gx = (1-xt+np.log(xt))/(1-xt)**2
     logm = np.log(couplings.scale**2/mquark**2)
     kFCNC = 0
-    kFCNC += (np.einsum('im,nj,mn->ijm', Vckm.H, Vckm, couplings['kU'])[:,:,2] + np.einsum('im,nj,mn->ijn', Vckm.H, Vckm, couplings['kU'])[:,:,2]) * (-0.25*logm-0.375+0.75*gx)
-    kFCNC += Vtop*couplings['kU'][2,2]
-    kFCNC += Vtop*couplings['ku'][2,2]*(0.5*logm-0.25-1.5*gx)
+    kFCNC += (np.einsum('im,nj,mn->ijm', Vckm.H, Vckm, couplings['cuL'])[:,:,2] + np.einsum('im,nj,mn->ijn', Vckm.H, Vckm, couplings['cuL'])[:,:,2]) * (-0.25*logm-0.375+0.75*gx)
+    kFCNC += Vtop*couplings['cuL'][2,2]
+    kFCNC += Vtop*couplings['cuR'][2,2]*(0.5*logm-0.25-1.5*gx)
     kFCNC -= 1.5*alpha_em/np.pi/s2w * cW * Vtop * (1-xt+xt*np.log(xt))/(1-xt)**2
     return yt**2/(16*np.pi**2) * kFCNC
 
@@ -58,7 +58,7 @@ def match(couplings: ALPcouplings, two_loops = False) -> ALPcouplings:
 
     delta1 = -11/3
 
-    ctt = couplings['ku'][2,2] - couplings['kU'][2,2]
+    ctt = couplings['cuR'][2,2] - couplings['cuL'][2,2]
     if two_loops:
         tildes = gauge_tilde(couplings)
         cW = tildes['cWtilde']
@@ -75,7 +75,7 @@ def match(couplings: ALPcouplings, two_loops = False) -> ALPcouplings:
 
     values = {f'k{F}': couplings[f'k{F}'] + 3/(8*np.pi**2)*Delta_kF[F]*np.eye(3) for F in ['Nu', 'E', 'd', 'e']}
     values |= {f'k{F}': couplings[f'k{F}'][0:2,0:2] + 3/(8*np.pi**2)*Delta_kF[F]*np.eye(2) for F in ['U', 'u']}
-    values |= {'kD': couplings['kD'] + 3/(8*np.pi**2)*Delta_kF['D']*np.eye(3) + match_FCNC_d(couplings, two_loops)}
+    values |= {'cdL': couplings['cdL'] + 3/(8*np.pi**2)*Delta_kF['D']*np.eye(3) + match_FCNC_d(couplings, two_loops)}
     values |= {'cG': couplings['cG'], 'cgamma': couplings['cgamma']}
     return ALPcouplings(values, scale=couplings.scale, basis='RL_below', ew_scale=couplings.ew_scale)
 

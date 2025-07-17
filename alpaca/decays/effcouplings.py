@@ -64,15 +64,15 @@ def effcouplings_cq1q2_W(couplings: ALPcouplings, pa2: float, q1: str, q2: str) 
         return ceff
     if q1 in ['u', 'c'] and q2 in ['u', 'c']:
         gen = {'u': 0, 'c': 1}
-        ceff = couplings['kU'][gen[q1], gen[q2]]
+        ceff = couplings['cuL'][gen[q1], gen[q2]]
         for iq, qloop in enumerate(['d', 's', 'b']):
-            cqloop = couplings['kD'][iq, iq] - couplings['kd'][iq, iq]
+            cqloop = couplings['cdL'][iq, iq] - couplings['cdR'][iq, iq]
             ceff += GF/np.sqrt(2)/np.pi**2*ckm_xi(qloop, q1+q2)*cqloop * mq[qloop]**2 * (1 + B0disc_equalmass(pa2, mq[qloop]) + np.log(couplings.scale**2/mq[qloop]**2))
     elif q1 in ['d', 's', 'b'] and q2 in ['d', 's', 'b']:
         gen = {'d': 0, 's': 1, 'b': 2}
-        ceff = couplings['kD'][gen[q1], gen[q2]]
+        ceff = couplings['cdL'][gen[q1], gen[q2]]
         for iq, qloop in enumerate(['u', 'c']):
-            cqloop = couplings['kU'][iq, iq] - couplings['ku'][iq, iq]
+            cqloop = couplings['cuL'][iq, iq] - couplings['cuR'][iq, iq]
             ceff += GF/np.sqrt(2)/np.pi**2*ckm_xi(qloop, q1+q2) * cqloop * mq[qloop]**2 * (1 + B0disc_equalmass(pa2, mq[qloop]) + np.log(couplings.scale**2/mq[qloop]**2))
     return ceff
 

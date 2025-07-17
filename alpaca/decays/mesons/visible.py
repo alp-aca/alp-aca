@@ -18,8 +18,8 @@ def amp_Bs_leptons_ALP(lepton: str, ma: float, couplings: ALPcouplings, fa: floa
     else:
         basis = 'RL_below'
     cc = couplings.match_run(ma, basis, **kwargs)
-    clep = cc['ke'][genlepton[lepton],genlepton[lepton]] - cc['kE'][genlepton[lepton],genlepton[lepton]]
-    cbs = np.array([cc['kD'][2,1] - cc['kd'][2,1], cc['kD'][1,2] - cc['kd'][1,2]])
+    clep = cc['ceR'][genlepton[lepton],genlepton[lepton]] - cc['ceL'][genlepton[lepton],genlepton[lepton]]
+    cbs = np.array([cc['cdL'][2,1] - cc['cdR'][2,1], cc['cdL'][1,2] - cc['cdR'][1,2]])
     Gamma_a = total_decay_width(ma, couplings, fa, br_dark, **kwargs)['DW_tot']
     return - cbs*clep/fa**2 *fBs*mlepton[lepton]/np.sqrt(2)*mBs**3/(mBs**2-ma**2+1j*ma*Gamma_a)
 
@@ -40,8 +40,8 @@ def amp_Bd_leptons_ALP(lepton: str, ma: float, couplings: ALPcouplings, fa: floa
     else:
         basis = 'RL_below'
     cc = couplings.match_run(ma, basis, **kwargs)
-    clep = cc['ke'][genlepton[lepton],genlepton[lepton]] - cc['kE'][genlepton[lepton],genlepton[lepton]]
-    cbs = np.array([cc['kD'][2,0] - cc['kd'][2,0], cc['kD'][0,2] - cc['kd'][0,2]])
+    clep = cc['ceR'][genlepton[lepton],genlepton[lepton]] - cc['ceL'][genlepton[lepton],genlepton[lepton]]
+    cbs = np.array([cc['cdL'][2,0] - cc['cdR'][2,0], cc['cdL'][0,2] - cc['cdR'][0,2]])
     Gamma_a = total_decay_width(ma, couplings, fa, br_dark, **kwargs)['DW_tot']
     return - cbs*clep/fa**2 *fB*mlepton[lepton]/np.sqrt(2)*mB0**3/(mB0**2-ma**2+1j*ma*Gamma_a)
 
@@ -62,7 +62,7 @@ def amp_Bs_photons_ALP(ma: float, couplings: ALPcouplings, fa: float, br_dark: f
     else:
         basis = 'RL_below'
     cc = couplings.match_run(ma, basis, **kwargs)
-    cbs = np.array([cc['kD'][2,1] - cc['kd'][2,1], cc['kD'][1,2] - cc['kd'][1,2]])
+    cbs = np.array([cc['cdL'][2,1] - cc['cdR'][2,1], cc['cdL'][1,2] - cc['cdR'][1,2]])
     cgamma = cc['cgamma']
     Gamma_a = total_decay_width(ma, couplings, fa, br_dark, **kwargs)['DW_tot']
     return 0.5*alpha_em(mBs)/np.pi * cgamma*cbs/fa**2 *fBs*mBs**3/(mBs**2-ma**2+1j*ma*Gamma_a)
@@ -85,7 +85,7 @@ def amp_Bd_photons_ALP(ma: float, couplings: ALPcouplings, fa: float, br_dark: f
     else:
         basis = 'RL_below'
     cc = couplings.match_run(ma, basis, **kwargs)
-    cbd = np.array([cc['kD'][2,0] - cc['kd'][2,0], cc['kD'][0,2] - cc['kd'][0,2]])
+    cbd = np.array([cc['cdL'][2,0] - cc['cdR'][2,0], cc['cdL'][0,2] - cc['cdR'][0,2]])
     cgamma = cc['cgamma']
     Gamma_a = total_decay_width(ma, couplings, fa, br_dark, **kwargs)['DW_tot']
     return 0.5*alpha_em(mB0)/np.pi * cgamma*cbd/fa**2 *fB*mB0**3/(mB0**2-ma**2+1j*ma*Gamma_a)
@@ -104,7 +104,7 @@ def amp_D0_photons_ALP(ma: float, couplings: ALPcouplings, fa: float, br_dark: f
         basis = 'RL_below'
     citations.register_inspire('Burdman:2001tf')
     cc = couplings.match_run(ma, basis, **kwargs)
-    ccu = cc['kU'][1,0] - cc['ku'][1,0]
+    ccu = cc['cuL'][1,0] - cc['cuR'][1,0]
     cgamma = cc['cgamma']
     Gamma_a = total_decay_width(ma, couplings, fa, br_dark, **kwargs)['DW_tot']
     return 0.5*alpha_em(mD0)/np.pi * cgamma*ccu/fa**2 *fD0*mD0**3/(mD0**2-ma**2+1j*ma*Gamma_a)
@@ -123,8 +123,8 @@ def amp_D0_leptons_ALP(lepton: str, ma: float, couplings: ALPcouplings, fa: floa
         basis = 'RL_below'
     citations.register_inspire('Burdman:2001tf')
     cc = couplings.match_run(ma, basis, **kwargs)
-    ccu = cc['kU'][1,0] - cc['ku'][1,0]
-    clep = cc['ke'][genlepton[lepton],genlepton[lepton]] - cc['kE'][genlepton[lepton],genlepton[lepton]]
+    ccu = cc['cuL'][1,0] - cc['cuR'][1,0]
+    clep = cc['ceR'][genlepton[lepton],genlepton[lepton]] - cc['ceL'][genlepton[lepton],genlepton[lepton]]
     Gamma_a = total_decay_width(ma, couplings, fa, br_dark, **kwargs)['DW_tot']
     return - ccu*clep/fa**2 *fD0*mlepton[lepton]/2*mD0**3/(mD0**2-ma**2+1j*ma*Gamma_a)
 
@@ -174,8 +174,8 @@ def amp_K0_leptons_ALP(lepton: str, ma: float, couplings: ALPcouplings, fa: floa
     else:
         basis = 'RL_below'
     cc = couplings.match_run(ma, basis, **kwargs)
-    clep = cc['ke'][genlepton[lepton],genlepton[lepton]] - cc['kE'][genlepton[lepton],genlepton[lepton]]
-    csd = np.array([cc['kD'][1,0] - cc['kd'][1,0], cc['kD'][0,1] - cc['kd'][0,1]])
+    clep = cc['ceR'][genlepton[lepton],genlepton[lepton]] - cc['ceL'][genlepton[lepton],genlepton[lepton]]
+    csd = np.array([cc['cdL'][1,0] - cc['cdR'][1,0], cc['cdL'][0,1] - cc['cdR'][0,1]])
     Gamma_a = total_decay_width(ma, couplings, fa, br_dark, **kwargs)['DW_tot']
     return - csd*clep/fa**2 *fK0*mlepton[lepton]/np.sqrt(2)*mK0**3/(mK0**2-ma**2+1j*ma*Gamma_a)
 
@@ -217,7 +217,7 @@ def BR_KS_photons(ma: float, couplings: ALPcouplings, fa: float, br_dark: float,
     else:
         basis = 'RL_below'
     cc = couplings.match_run(ma, basis, **kwargs)
-    csd = cc['kD'][1,0] - cc['kd'][1,0]
+    csd = cc['cdL'][1,0] - cc['cdR'][1,0]
     cgamma = cc['cgamma']
     Gamma_a = total_decay_width(ma, couplings, fa, br_dark, **kwargs)['DW_tot']
     ampK0 = 0.5*alpha_em(mK0)/np.pi * cgamma*csd/fa**2 *fD0*mK0**3/(mK0**2-ma**2+1j*ma*Gamma_a)

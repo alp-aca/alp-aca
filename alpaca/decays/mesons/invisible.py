@@ -16,16 +16,16 @@ def Kminustopia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, *
     citations.register_inspire('Bauer:2021wjo')
     coupl_low = couplings.match_run(ma, 'RL_below', **kwargs)
     cG = coupl_low['cG']
-    cAuu = coupl_low['ku'][0,0]-coupl_low['kU'][0,0]
-    cVuu = coupl_low['ku'][0,0]+coupl_low['kU'][0,0]
-    cAdd = coupl_low['kd'][0,0]-coupl_low['kD'][0,0]
-    cVdd = coupl_low['kd'][0,0]+coupl_low['kD'][0,0]
-    cAss = coupl_low['kd'][1,1]-coupl_low['kD'][1,1]
-    cVss = coupl_low['kd'][1,1]+coupl_low['kD'][1,1]
-    kd = coupl_low['kd'][0,0]
-    kD = coupl_low['kD'][0,0]
-    ks = coupl_low['kd'][1,1]
-    kS = coupl_low['kD'][1,1]
+    cAuu = coupl_low['cuR'][0,0]-coupl_low['cuL'][0,0]
+    cVuu = coupl_low['cuR'][0,0]+coupl_low['cuL'][0,0]
+    cAdd = coupl_low['cdR'][0,0]-coupl_low['cdL'][0,0]
+    cVdd = coupl_low['cdR'][0,0]+coupl_low['cdL'][0,0]
+    cAss = coupl_low['cdR'][1,1]-coupl_low['cdL'][1,1]
+    cVss = coupl_low['cdR'][1,1]+coupl_low['cdL'][1,1]
+    kd = coupl_low['cdR'][0,0]
+    kD = coupl_low['cdL'][0,0]
+    ks = coupl_low['cdR'][1,1]
+    kS = coupl_low['cdL'][1,1]
     parsSM = runSM(mK)
     Vckm = parsSM['CKM']
     
@@ -37,7 +37,7 @@ def Kminustopia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, *
     chiral_contrib += (fpi**2*chiralG2712*(4*cAuu*(mK**2 - mpi_pm**2)*(ma**2 - 4*mK**2 + mpi_pm**2) - cVdd*(ma**2 - mK**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2) + cVss*(ma**2 - mK**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2) + 8*cG*(mK**2 - mpi_pm**2)*(ma**2 - 4*mK**2 + 3*mpi_pm**2) + 3*cAdd*(ma**4 - ma**2*mK**2 - 4*mK**4 + 5*mK**2*mpi_pm**2 - mpi_pm**4) + cAss*(-3*ma**4 - ma**2*(mK**2 - 4*mpi_pm**2) + 7*(4*mK**4 - 5*mK**2*mpi_pm**2 + mpi_pm**4)) + (8*epsisos*(2*cAuu*ma**2*(mK**2 - mpi_pm**2)**2*(5*ma**2 - 12*mK**2 + 7*mpi_pm**2) + (mK**2 - mpi_pm**2)*(-((ma**2 - mpi_pm**2)*(4*cG*(ma**2 + 4*mK**2 - 5*mpi_pm**2)*(mK**2 - mpi_pm**2) + cAss*ma**2*(9*ma**2 - 28*mK**2 + 19*mpi_pm**2))) + cAdd*ma**2*(9*ma**4 + 24*mK**4 - 10*mK**2*mpi_pm**2 - 5*mpi_pm**4 + ma**2*(-38*mK**2 + 20*mpi_pm**2)))))/(np.sqrt(3)*(ma**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2))))/(4*f_a*(3*ma**2 - 4*mK**2 + mpi_pm**2)) #G2712
     chiral_contrib += (fpi**2*chiralG2732*(8*cG*(ma**2 - mK**2)*(mK**2 - mpi_pm**2) - cVdd*(ma**2 - mK**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2) + cVss*(ma**2 - mK**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2) +cAss*(-3*ma**4 + 4*mK**4 - 5*mK**2*mpi_pm**2 + mpi_pm**4 - ma**2*(mK**2 - 4*mpi_pm**2)) + (4*cAuu*(mK**2 - mpi_pm**2)*(ma**4 + 4*mK**2*mpi_pm**2 - mpi_pm**4 - ma**2*(mK**2 + 3*mpi_pm**2)))/(ma**2 - mpi_pm**2) + (3*cAdd*(ma**6 - ma**4*(mK**2 + mpi_pm**2) + ma**2*(4*mK**2*mpi_pm**2 - 3*mpi_pm**4) - mpi_pm**2*(4*mK**4 - 5*mK**2*mpi_pm**2 + mpi_pm**4)))/(ma**2 - mpi_pm**2) + (8*epsisos*(2*cAuu*ma**2*(mK**2 - mpi_pm**2)**2*(5*ma**2 - 6*mK**2 + mpi_pm**2) + (mK**2 - mpi_pm**2)*(cAdd*ma**2*(ma**2 - mpi_pm**2)*(9*ma**2 - 11*mK**2 + 2*mpi_pm**2) - 4*cG*(mK**2 - mpi_pm**2)*(ma**4 + 12*mK**4 - 13*mK**2*mpi_pm**2 + 2*mpi_pm**4 + ma**2*(-11*mK**2 + 9*mpi_pm**2)) + cAss*ma**2*(-9*ma**4 + 12*mK**4 - 25*mK**2*mpi_pm**2 + 4*mpi_pm**4 + ma**2*(mK**2 + 17*mpi_pm**2)))))/(np.sqrt(3)*(ma**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2))))/(4*f_a*(3*ma**2 - 4*mK**2 + mpi_pm**2)) #G2732
     
-    amp = chiral_contrib-(mK**2-mpi_pm**2)/(2*f_a)*(coupl_low['kd'][0,1]+coupl_low['kD'][0,1])
+    amp = chiral_contrib-(mK**2-mpi_pm**2)/(2*f_a)*(coupl_low['cdR'][0,1]+coupl_low['cdL'][0,1])
     return np.abs(amp)**2/(16*np.pi*mK)*np.sqrt(kallen(1, mpi_pm**2/mK**2, ma**2/mK**2))/GammaK
 
 def Kplustopia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **kwargs):
@@ -48,16 +48,16 @@ def Kplustopia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **
     citations.register_inspire('Bauer:2021wjo')
     coupl_low = couplings.match_run(ma, 'RL_below', **kwargs)
     cG = coupl_low['cG']
-    cAuu = coupl_low['ku'][0,0]-coupl_low['kU'][0,0]
-    cVuu = coupl_low['ku'][0,0]+coupl_low['kU'][0,0]
-    cAdd = coupl_low['kd'][0,0]-coupl_low['kD'][0,0]
-    cVdd = coupl_low['kd'][0,0]+coupl_low['kD'][0,0]
-    cAss = coupl_low['kd'][1,1]-coupl_low['kD'][1,1]
-    cVss = coupl_low['kd'][1,1]+coupl_low['kD'][1,1]
-    kd = coupl_low['kd'][0,0]
-    kD = coupl_low['kD'][0,0]
-    ks = coupl_low['kd'][1,1]
-    kS = coupl_low['kD'][1,1]
+    cAuu = coupl_low['cuR'][0,0]-coupl_low['cuL'][0,0]
+    cVuu = coupl_low['cuR'][0,0]+coupl_low['cuL'][0,0]
+    cAdd = coupl_low['cdR'][0,0]-coupl_low['cdL'][0,0]
+    cVdd = coupl_low['cdR'][0,0]+coupl_low['cdL'][0,0]
+    cAss = coupl_low['cdR'][1,1]-coupl_low['cdL'][1,1]
+    cVss = coupl_low['cdR'][1,1]+coupl_low['cdL'][1,1]
+    kd = coupl_low['cdR'][0,0]
+    kD = coupl_low['cdL'][0,0]
+    ks = coupl_low['cdR'][1,1]
+    kS = coupl_low['cdL'][1,1]
     parsSM = runSM(mK)
     Vckm = parsSM['CKM']
 
@@ -69,7 +69,7 @@ def Kplustopia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **
     chiral_contrib += (fpi**2*chiralG2712*(4*cAuu*(mK**2 - mpi_pm**2)*(ma**2 - 4*mK**2 + mpi_pm**2) - cVdd*(ma**2 - mK**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2) + cVss*(ma**2 - mK**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2) + 8*cG*(mK**2 - mpi_pm**2)*(ma**2 - 4*mK**2 + 3*mpi_pm**2) + 3*cAdd*(ma**4 - ma**2*mK**2 - 4*mK**4 + 5*mK**2*mpi_pm**2 - mpi_pm**4) + cAss*(-3*ma**4 - ma**2*(mK**2 - 4*mpi_pm**2) + 7*(4*mK**4 - 5*mK**2*mpi_pm**2 + mpi_pm**4)) + (8*epsisos*(2*cAuu*ma**2*(mK**2 - mpi_pm**2)**2*(5*ma**2 - 12*mK**2 + 7*mpi_pm**2) + (mK**2 - mpi_pm**2)*(-((ma**2 - mpi_pm**2)*(4*cG*(ma**2 + 4*mK**2 - 5*mpi_pm**2)*(mK**2 - mpi_pm**2) + cAss*ma**2*(9*ma**2 - 28*mK**2 + 19*mpi_pm**2))) + cAdd*ma**2*(9*ma**4 + 24*mK**4 - 10*mK**2*mpi_pm**2 - 5*mpi_pm**4 + ma**2*(-38*mK**2 + 20*mpi_pm**2)))))/(np.sqrt(3)*(ma**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2))))/(4*f_a*(3*ma**2 - 4*mK**2 + mpi_pm**2)) #G2712
     chiral_contrib += (fpi**2*chiralG2732*(8*cG*(ma**2 - mK**2)*(mK**2 - mpi_pm**2) - cVdd*(ma**2 - mK**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2) + cVss*(ma**2 - mK**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2) +cAss*(-3*ma**4 + 4*mK**4 - 5*mK**2*mpi_pm**2 + mpi_pm**4 - ma**2*(mK**2 - 4*mpi_pm**2)) + (4*cAuu*(mK**2 - mpi_pm**2)*(ma**4 + 4*mK**2*mpi_pm**2 - mpi_pm**4 - ma**2*(mK**2 + 3*mpi_pm**2)))/(ma**2 - mpi_pm**2) + (3*cAdd*(ma**6 - ma**4*(mK**2 + mpi_pm**2) + ma**2*(4*mK**2*mpi_pm**2 - 3*mpi_pm**4) - mpi_pm**2*(4*mK**4 - 5*mK**2*mpi_pm**2 + mpi_pm**4)))/(ma**2 - mpi_pm**2) + (8*epsisos*(2*cAuu*ma**2*(mK**2 - mpi_pm**2)**2*(5*ma**2 - 6*mK**2 + mpi_pm**2) + (mK**2 - mpi_pm**2)*(cAdd*ma**2*(ma**2 - mpi_pm**2)*(9*ma**2 - 11*mK**2 + 2*mpi_pm**2) - 4*cG*(mK**2 - mpi_pm**2)*(ma**4 + 12*mK**4 - 13*mK**2*mpi_pm**2 + 2*mpi_pm**4 + ma**2*(-11*mK**2 + 9*mpi_pm**2)) + cAss*ma**2*(-9*ma**4 + 12*mK**4 - 25*mK**2*mpi_pm**2 + 4*mpi_pm**4 + ma**2*(mK**2 + 17*mpi_pm**2)))))/(np.sqrt(3)*(ma**2 - mpi_pm**2)*(3*ma**2 - 4*mK**2 + mpi_pm**2))))/(4*f_a*(3*ma**2 - 4*mK**2 + mpi_pm**2)) #G2732
 
-    amp = chiral_contrib-(mK**2-mpi_pm**2)/(2*f_a)*(coupl_low['kd'][1,0]+coupl_low['kD'][1,0])
+    amp = chiral_contrib-(mK**2-mpi_pm**2)/(2*f_a)*(coupl_low['cdR'][1,0]+coupl_low['cdL'][1,0])
     return np.abs(amp)**2/(16*np.pi*mK)*np.sqrt(kallen(1, mpi_pm**2/mK**2, ma**2/mK**2))/GammaK
 
 def ampK0topia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **kwargs):
@@ -81,13 +81,13 @@ def ampK0topia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **
     citations.register_inspire('Bauer:2021mvw')
     coupl_low = couplings.match_run(ma, 'RL_below', **kwargs)
     cG = coupl_low['cG']
-    cuu = coupl_low['ku'][0,0]-coupl_low['kU'][0,0]
-    cdd = coupl_low['kd'][0,0]-coupl_low['kD'][0,0]
-    css = coupl_low['kd'][1,1]-coupl_low['kD'][1,1]
-    kd = coupl_low['kd'][0,0]
-    kD = coupl_low['kD'][0,0]
-    ks = coupl_low['kd'][1,1]
-    kS = coupl_low['kD'][1,1]
+    cuu = coupl_low['cuR'][0,0]-coupl_low['cuL'][0,0]
+    cdd = coupl_low['cdR'][0,0]-coupl_low['cdL'][0,0]
+    css = coupl_low['cdR'][1,1]-coupl_low['cdL'][1,1]
+    kd = coupl_low['cdR'][0,0]
+    kD = coupl_low['cdL'][0,0]
+    ks = coupl_low['cdR'][1,1]
+    kS = coupl_low['cdL'][1,1]
     parsSM = runSM(mK)
     Vckm = parsSM['CKM']
     N8 = -g8*GF/np.sqrt(2)*np.conj(Vckm[0,0])*Vckm[0,1]*fpi**2*(np.cos(delta8)+1j*np.sin(delta8))
@@ -98,8 +98,8 @@ def ampK0topia(ma: float, couplings: ALPcouplings, f_a: float=1000, delta8=0, **
     chiral_contrib -= 2*(cuu-cdd)*ma**2*(mK**2-ma**2)/(mpi0**2-ma**2)
     chiral_contrib += (kd+kD-ks-kS)*(mK**2+mpi0**2-ma**2)
 
-    amp_K0bar = N8*chiral_contrib/(4*f_a*2**0.5)-(mKL**2-mpi0**2)/(2*f_a*2**0.5)*(coupl_low['kd'][0,1]+coupl_low['kD'][0,1])
-    amp_K0 = -N8*chiral_contrib/(4*f_a*2**0.5)+(mKL**2-mpi0**2)/(2*f_a*2**0.5)*(coupl_low['kd'][1,0]+coupl_low['kD'][1,0])
+    amp_K0bar = N8*chiral_contrib/(4*f_a*2**0.5)-(mKL**2-mpi0**2)/(2*f_a*2**0.5)*(coupl_low['cdR'][0,1]+coupl_low['cdL'][0,1])
+    amp_K0 = -N8*chiral_contrib/(4*f_a*2**0.5)+(mKL**2-mpi0**2)/(2*f_a*2**0.5)*(coupl_low['cdR'][1,0]+coupl_low['cdL'][1,0])
     return (amp_K0, amp_K0bar)
 
 def KLtopia(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
@@ -212,7 +212,7 @@ def D0topi0a(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
     if ma > mD0-mpi0:
         return 0
     coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
-    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + coup_low['ku'][1,0])/f_a
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + coup_low['cuR'][1,0])/f_a
     kallen_factor = kallen(1, mpi0**2/mD0**2, ma**2/mD0**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mD0**3*abs(gq_eff)**2/(128*np.pi) * f0_Dpi(ma**2)**2*np.sqrt(kallen_factor)*(1-mpi0**2/mD0**2)**2
@@ -223,7 +223,7 @@ def Dplustopiplusa(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
     if ma > mDplus-mpi_pm:
         return 0
     coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
-    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + coup_low['ku'][1,0])/f_a
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + coup_low['cuR'][1,0])/f_a
     kallen_factor = kallen(1, mpi_pm**2/mDplus**2, ma**2/mDplus**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mDplus**3*abs(gq_eff)**2/(64*np.pi) * f0_Dpi(ma**2)**2*np.sqrt(kallen_factor)*(1-mpi_pm**2/mDplus**2)**2
@@ -234,7 +234,7 @@ def D0toetaa(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
     if ma > mD0-meta:
         return 0
     coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
-    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + coup_low['ku'][1,0])/f_a
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + coup_low['cuR'][1,0])/f_a
     kallen_factor = kallen(1, meta**2/mD0**2, ma**2/mD0**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mD0**3*abs(gq_eff)**2/(128*np.pi) * f0_Deta(ma**2)**2*np.sqrt(kallen_factor)*(1-meta**2/mD0**2)**2
@@ -245,7 +245,7 @@ def D0toetapa(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
     if ma > mD0-metap:
         return 0
     coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
-    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + coup_low['ku'][1,0])/f_a
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + coup_low['cuR'][1,0])/f_a
     kallen_factor = kallen(1, metap**2/mD0**2, ma**2/mD0**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mD0**3*abs(gq_eff)**2/(128*np.pi) * f0_Detap(ma**2)**2*np.sqrt(kallen_factor)*(1-metap**2/mD0**2)**2
@@ -256,7 +256,7 @@ def DstoKa(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
     if ma > mDs-mK:
         return 0
     coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
-    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + coup_low['ku'][1,0])/f_a
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') + coup_low['cuR'][1,0])/f_a
     kallen_factor = kallen(1, mK**2/mDs**2, ma**2/mDs**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mDs**3*abs(gq_eff)**2/(64*np.pi) * f0_DsK(ma**2)**2*np.sqrt(kallen_factor)*(1-mK**2/mDs**2)**2
@@ -267,7 +267,7 @@ def D0torhoa(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
     if ma > mD0-mrho:
         return 0
     coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
-    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') - coup_low['ku'][1,0])/f_a
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') - coup_low['cuR'][1,0])/f_a
     kallen_factor = kallen(1, mrho**2/mD0**2, ma**2/mD0**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mD0**3*abs(gq_eff)**2/(64*np.pi) * A0_Drho(ma**2)**2 * kallen_factor**1.5
@@ -278,7 +278,7 @@ def Dplustorhoa(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
     if ma > mDplus-mrho_pm:
         return 0
     coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
-    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') - coup_low['ku'][1,0])/f_a
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') - coup_low['cuR'][1,0])/f_a
     kallen_factor = kallen(1, mrho_pm**2/mDplus**2, ma**2/mDplus**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mDplus**3*abs(gq_eff)**2/(64*np.pi) * A0_Drho(ma**2)**2 * kallen_factor**1.5
@@ -289,7 +289,7 @@ def DstoKsta(ma: float, couplings: ALPcouplings, f_a: float, **kwargs):
     if ma > mDs-mKst_plus:
         return 0
     coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
-    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') - coup_low['ku'][1,0])/f_a
+    gq_eff = (effcouplings_cq1q2_W(coup_low, ma**2, 'c', 'u') - coup_low['cuR'][1,0])/f_a
     kallen_factor = kallen(1, mKst_plus**2/mDs**2, ma**2/mDs**2)
     kallen_factor = np.where(kallen_factor>0, kallen_factor, np.nan)
     return mDs**3*abs(gq_eff)**2/(64*np.pi) * A0_DsKst(ma**2)**2 * kallen_factor**1.5
@@ -380,14 +380,14 @@ def brBplusKa(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
         return 0
     if ma < couplings.ew_scale:
         clow = couplings.match_run(ma, 'RL_below', **kwargs)
-        csb = clow['kD'][1,2]+clow['kd'][1,2]
-        cbb = clow['kd'][2,2]-clow['kD'][2,2]
-        css = clow['kd'][1,1]-clow['kD'][1,1]
+        csb = clow['cdL'][1,2]+clow['cdR'][1,2]
+        cbb = clow['cdR'][2,2]-clow['cdL'][2,2]
+        css = clow['cdR'][1,1]-clow['cdL'][1,1]
     else:
         clow = couplings.match_run(ma, 'massbasis_ew', **kwargs)
-        csb = clow['kD'][1,2]+clow['kd'][1,2]+effcouplings_cq1q2_W(clow, ma**2, 's', 'b')
-        cbb = clow['kd'][2,2]-clow['kD'][2,2]
-        css = clow['kd'][1,1]-clow['kD'][1,1]
+        csb = clow['cdL'][1,2]+clow['cdR'][1,2]+effcouplings_cq1q2_W(clow, ma**2, 's', 'b')
+        cbb = clow['cdR'][2,2]-clow['cdL'][2,2]
+        css = clow['cdR'][1,1]-clow['cdL'][1,1]
     amp = 0
     if diags != 'tree':
         amp += transition_fv.amp_PtoP(mB, mK, f0_BK(ma**2), f_a, csb)
@@ -403,10 +403,10 @@ def brB0Ka(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
         return 0
     if ma < couplings.ew_scale:
         clow = couplings.match_run(ma, 'RL_below', **kwargs)
-        csb = clow['kD'][1,2]+clow['kd'][1,2]
+        csb = clow['cdL'][1,2]+clow['cdR'][1,2]
     else:
         clow = couplings.match_run(ma, 'massbasis_ew', **kwargs)
-        csb = clow['kD'][1,2]+clow['kd'][1,2]+effcouplings_cq1q2_W(clow, ma**2, 's', 'b')
+        csb = clow['cdL'][1,2]+clow['cdR'][1,2]+effcouplings_cq1q2_W(clow, ma**2, 's', 'b')
     amp = transition_fv.amp_PtoP(mB0, mK0, f0_BK(ma**2), f_a, csb)/2
     return dwPtoPa(np.abs(amp)**2, mB0, mK0, ma)/GammaB0
 
@@ -420,14 +420,14 @@ def brBplusKsta(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
         return 0
     if ma < couplings.ew_scale:
         clow = couplings.match_run(ma, 'RL_below', **kwargs)
-        csb = clow['kD'][1,2]+clow['kd'][1,2]
-        cbb = clow['kd'][2,2]-clow['kD'][2,2]
-        css = clow['kd'][1,1]-clow['kD'][1,1]
+        csb = clow['cdL'][1,2]+clow['cdR'][1,2]
+        cbb = clow['cdR'][2,2]-clow['cdL'][2,2]
+        css = clow['cdR'][1,1]-clow['cdL'][1,1]
     else:
         clow = couplings.match_run(ma, 'massbasis_ew', **kwargs)
-        csb = clow['kD'][1,2]+clow['kd'][1,2]+effcouplings_cq1q2_W(clow, ma**2, 's', 'b')
-        cbb = clow['kd'][2,2]-clow['kD'][2,2]
-        css = clow['kd'][1,1]-clow['kD'][1,1]
+        csb = clow['cdL'][1,2]+clow['cdR'][1,2]+effcouplings_cq1q2_W(clow, ma**2, 's', 'b')
+        cbb = clow['cdR'][2,2]-clow['cdL'][2,2]
+        css = clow['cdR'][1,1]-clow['cdL'][1,1]
     amp = 0
     if diags != 'tree':
         amp += transition_fv.amp_PtoV(mKst_plus, A0_BKst(ma**2), f_a, csb)
@@ -444,9 +444,9 @@ def brB0Ksta(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
         return 0
     if ma < couplings.ew_scale:
         clow = couplings.match_run(ma, 'RL_below', **kwargs)
-        csb = clow['kD'][1,2]+clow['kd'][1,2]
+        csb = clow['cdL'][1,2]+clow['cdR'][1,2]
     else:
         clow = couplings.match_run(ma, 'massbasis_ew', **kwargs)
-        csb = clow['kD'][1,2]+clow['kd'][1,2]+effcouplings_cq1q2_W(clow, ma**2, 's', 'b')
+        csb = clow['cdL'][1,2]+clow['cdR'][1,2]+effcouplings_cq1q2_W(clow, ma**2, 's', 'b')
     amp = transition_fv.amp_PtoV(mKst0, A0_BKst(ma**2), f_a, csb)/2
     return dwPtoVa(np.abs(amp)**2, mB0, mKst0, ma)/GammaB0

@@ -83,26 +83,26 @@ def coeffs_heavyALP(meson: str, couplings: ALPcouplings, ma, fa, **kwargs) -> np
         from ...constants import md, ms
         mq1 = ms
         mq2 = md
-        cL = coup_low['kD'][0,1]
-        cR = coup_low['kd'][0,1]
+        cL = coup_low['cdL'][0,1]
+        cR = coup_low['cdR'][0,1]
     if meson == 'B0':
         from ...constants import md, mb
         mq1 = mb
         mq2 = md
-        cL = coup_low['kD'][0,2]
-        cR = coup_low['kd'][0,2]
+        cL = coup_low['cdL'][0,2]
+        cR = coup_low['cdR'][0,2]
     if meson == 'Bs':
         from ...constants import ms, mb
         mq1 = mb
         mq2 = ms
-        cL = coup_low['kD'][1,2]
-        cR = coup_low['kd'][1,2]
+        cL = coup_low['cdL'][1,2]
+        cR = coup_low['cdR'][1,2]
     if meson == 'D0':
         from ...constants import mu, mc
         mq1 = mc
         mq2 = mu
-        cL = coup_low['kU'][0,1]
-        cR = coup_low['ku'][0,1]
+        cL = coup_low['cuL'][0,1]
+        cR = coup_low['cuR'][0,1]
     c2 = (cR*mq1-cL*mq2)**2/(2*ma**2*fa**2)
     c2tilde = (cL*mq1-cR*mq2)**2/(2*ma**2*fa**2)
     c4 = (cR*mq1-cL*mq2)*(cL*mq1-cR*mq2)/(ma**2*fa**2)
@@ -116,15 +116,15 @@ def coeffs_lightALP(meson: str, couplings: ALPcouplings, ma, fa, **kwargs) -> np
         mq1 = mb
         mq2 = md
         mM = mB0
-        cL = coup_low['kD'][0,2]
-        cR = coup_low['kd'][0,2]
+        cL = coup_low['cdL'][0,2]
+        cR = coup_low['cdR'][0,2]
     if meson == 'Bs':
         from ...constants import ms, mb, mBs
         mq1 = mb
         mq2 = ms
         mM = mBs
-        cL = coup_low['kD'][1,2]
-        cR = coup_low['kd'][1,2]
+        cL = coup_low['cdL'][1,2]
+        cR = coup_low['cdR'][1,2]
     Lam = mM - mq1
     prop_s = 1/(mM**2 - ma**2)
     prop_t = 1/((mq1-Lam)**2 - ma**2)
