@@ -552,7 +552,7 @@ class ChiSquaredList(list[ChiSquared]):
         """
         self.combine('', '').contour_to_csv(x, y, filename, sigma, xlabel, ylabel)
 
-def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, couplings, fa, min_probability=1e-3, br_dark = 0.0, sm_pred=0, sm_uncert=0, **kwargs):
+def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, couplings, fa, min_probability=0.0, br_dark = 0.0, sm_pred=0, sm_uncert=0, **kwargs):
     kwargs_dw = {k: v for k, v in kwargs.items() if k != 'theta'}
     ma = np.atleast_1d(ma).astype(float)
     couplings = np.atleast_1d(couplings)
@@ -614,7 +614,7 @@ def combine_chi2(chi2: list[ChiSquared], name: str, tex: str, description: str =
         dofs_dict |= c.dofs_dict
     return ChiSquared(sector, chi2_dict, dofs_dict)
 
-def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma: np.ndarray[float], couplings: np.ndarray[ALPcouplings], fa: np.ndarray[float], min_probability = 1e-3, br_dark = 0.0, exclude_projections=True, **kwargs) -> ChiSquaredList:
+def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma: np.ndarray[float], couplings: np.ndarray[ALPcouplings], fa: np.ndarray[float], min_probability: float = 0.0, br_dark = 0.0, exclude_projections=True, **kwargs) -> ChiSquaredList:
     """Calculate the chi-squared values for a set of transitions.
 
     Parameters
@@ -632,7 +632,10 @@ def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma:
         Axion decay constant.
 
     min_probability (float, optional):
-        Minimum probability for decay. Default is 1e-3.
+        Minimum probability for decay. Default is 0.0.
+        If greater than 0, the processes with an on-shell ALP will only be included
+        if the probability of the ALP decaying in the designated region (prompt, long-lived, etc.)
+        is greater than this value.
 
     br_dark (float, optional):
         Branching ratio for dark sector decays. Default is 0.0.
