@@ -61,7 +61,12 @@ def _total_decay_width (ma, couplings: ALPcouplings, fa, br_dark = 0.0, **kwargs
     DW_2photons = decay_width_2gamma(ma, couplings, fa, **kwargs_nointegral)
     DWhadr_nopert = DW_3pis + DW_etapipi + DW_etappipi + DW_gammapipi + DW_2w
     DWhadr_pert = DW_charm + DW_bottom + DW_gluongluon
-    DWhadr = max(DWhadr_nopert, DWhadr_pert)
+    if (DWhadr_pert > DWhadr_nopert) and (ma > 1.4):
+        DWhadr = DWhadr_pert
+        nopert = 0.0
+    else:
+        DWhadr = DWhadr_nopert
+        nopert = 1.0
     DW_sm = DW_elec+DW_muon+DW_tau+DW_2photons+DWhadr+DW_emu+DW_mutau+DW_etau
     if br_dark > 0.0:
         DW_dark = DW_sm/(1-br_dark)*br_dark
@@ -74,20 +79,20 @@ def _total_decay_width (ma, couplings: ALPcouplings, fa, br_dark = 0.0, **kwargs
         'emu': DW_emu,
         'mutau': DW_mutau,
         'etau': DW_etau,
-        'charm': DW_charm,
-        'bottom': DW_bottom,
-        '3pis': DW_3pis,
-        'pi0pippim': DW_3pi0pm,
-        'pi0pi0pi0': DW_3pi000,
-        'etapipi': DW_etapipi,
-        'etapi0pi0': DW_etapi0pi0,
-        'etapippim': DW_etapippim,
-        'etappipi': DW_etappipi,
-        'etappi0pi0': DW_etappi0pi0,
-        'etappippim': DW_etappippim,
-        'gammapipi': DW_gammapipi,
-        '2omega': DW_2w,
-        'gluongluon': DW_gluongluon, 
+        'charm': DW_charm * (1.0-nopert),
+        'bottom': DW_bottom * (1.0-nopert),
+        '3pis': DW_3pis * nopert,
+        'pi0pippim': DW_3pi0pm * nopert,
+        'pi0pi0pi0': DW_3pi000 * nopert,
+        'etapipi': DW_etapipi * nopert,
+        'etapi0pi0': DW_etapi0pi0 * nopert,
+        'etapippim': DW_etapippim * nopert,
+        'etappipi': DW_etappipi * nopert,
+        'etappi0pi0': DW_etappi0pi0 * nopert,
+        'etappippim': DW_etappippim * nopert,
+        'gammapipi': DW_gammapipi * nopert,
+        '2omega': DW_2w * nopert,
+        'gluongluon': DW_gluongluon * (1.0-nopert),
         '2photons': DW_2photons,
         'hadrons': DWhadr,
         'DW_SM': DW_sm,
