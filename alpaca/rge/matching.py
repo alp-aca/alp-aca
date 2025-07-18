@@ -44,8 +44,8 @@ def match_FCNC_d(couplings: ALPcouplings, two_loops = False, loopquark=2) -> np.
 
 def match(couplings: ALPcouplings, two_loops = False) -> ALPcouplings:
     citations.register_particle()
-    T3f = {'U': 1/2, 'D': -1/2, 'Nu': 1/2, 'E': -1/2, 'u': 0, 'd': 0, 'e': 0}
-    Qf = {'U': 2/3, 'D': -1/3, 'Nu': 0, 'E': -1, 'u': 2/3, 'd': -1/3, 'e': -1}
+    T3f = {'uL': 1/2, 'dL': -1/2, 'nuL': 1/2, 'eL': -1/2, 'uR': 0, 'dR': 0, 'eR': 0}
+    Qf = {'uL': 2/3, 'dL': -1/3, 'nuL': 0, 'eL': -1, 'uR': 2/3, 'dR': -1/3, 'eR': -1}
     mtop = particle.literals.t.mass / 1000
     mW = particle.literals.W_minus.mass / 1000
     mZ = particle.literals.Z_0.mass / 1000
@@ -71,11 +71,11 @@ def match(couplings: ALPcouplings, two_loops = False) -> ALPcouplings:
         cgammaZ = couplings['cgammaZ']
 
     Delta_kF = {F: yt**2*ctt*(T3f[F]-Qf[F]*s2w)*np.log(couplings.scale**2/mtop**2) + \
-        alpha_em**2*(0.5*cW/s2w**2*(np.log(couplings.scale**2/mW**2) + 0.5 + delta1) + 2*cgammaZ/s2w/c2w*Qf[F]*(T3f[F]-Qf[F] * s2w)*(np.log(couplings.scale**2/mZ**2) + 1.5 + delta1) + cZ/s2w**2/c2w**2 *(T3f[F]-Qf[F]*s2w)**2 *(np.log(couplings.scale**2/mZ**2) + 0.5 + delta1) ) for F in ['U', 'D', 'Nu', 'E', 'u', 'd', 'e']}
+        alpha_em**2*(0.5*cW/s2w**2*(np.log(couplings.scale**2/mW**2) + 0.5 + delta1) + 2*cgammaZ/s2w/c2w*Qf[F]*(T3f[F]-Qf[F] * s2w)*(np.log(couplings.scale**2/mZ**2) + 1.5 + delta1) + cZ/s2w**2/c2w**2 *(T3f[F]-Qf[F]*s2w)**2 *(np.log(couplings.scale**2/mZ**2) + 0.5 + delta1) ) for F in ['uL', 'dL', 'nuL', 'eL', 'uR', 'dR', 'eR']}
 
-    values = {f'k{F}': couplings[f'k{F}'] + 3/(8*np.pi**2)*Delta_kF[F]*np.eye(3) for F in ['Nu', 'E', 'd', 'e']}
-    values |= {f'k{F}': couplings[f'k{F}'][0:2,0:2] + 3/(8*np.pi**2)*Delta_kF[F]*np.eye(2) for F in ['U', 'u']}
-    values |= {'cdL': couplings['cdL'] + 3/(8*np.pi**2)*Delta_kF['D']*np.eye(3) + match_FCNC_d(couplings, two_loops)}
+    values = {f'c{F}': couplings[f'c{F}'] + 3/(8*np.pi**2)*Delta_kF[F]*np.eye(3) for F in ['nuL', 'eL', 'dR', 'eR']}
+    values |= {f'c{F}': couplings[f'c{F}'][0:2,0:2] + 3/(8*np.pi**2)*Delta_kF[F]*np.eye(2) for F in ['uL', 'uR']}
+    values |= {'cdL': couplings['cdL'] + 3/(8*np.pi**2)*Delta_kF['dL']*np.eye(3) + match_FCNC_d(couplings, two_loops)}
     values |= {'cG': couplings['cG'], 'cgamma': couplings['cgamma']}
     return ALPcouplings(values, scale=couplings.scale, basis='RL_below', ew_scale=couplings.ew_scale)
 
