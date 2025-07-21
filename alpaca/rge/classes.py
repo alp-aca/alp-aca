@@ -923,7 +923,7 @@ def _yukawa_matrices(
     Vckm = ckmutil.ckm.ckm_tree(Vus, Vub, Vcb, gamma)
     if VdL is not None:
         VuL_arr = np.array(VdL).reshape(3, 3) @ Vckm
-        VdL_arr = np.array(VuL).reshape(3, 3)
+        VdL_arr = np.eye(3, dtype=complex)
     elif VuL is not None:
         VdL_arr = np.array(VuL).reshape(3, 3) @ np.matrix(Vckm).H
         VuL_arr = np.eye(3, dtype=complex)
