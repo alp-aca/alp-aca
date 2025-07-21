@@ -224,37 +224,20 @@ class ALPcouplings:
                 if isinstance(self.values[c], matricial):
                     self.values[c] = sp.Matrix(self.values[c])
         if self.basis in bases_above or self.basis[3:] in bases_above:
-            if VuL is not None and VdL is not None:
-                raise AttributeError('It is not possible to provide VuL and VdL at the same time')
-            wSM = wilson.classes.SMEFT(wilson.wcxf.WC('SMEFT', 'Warsaw', scale, {})).C_in
-            UuL, mu, UuR = ckmutil.diag.msvd(wSM['Gu'])
-            UdL, md, UdR = ckmutil.diag.msvd(wSM['Gd'])
-            UeL, me, UeR = ckmutil.diag.msvd(wSM['Ge'])
-            K = UuL.conj().T @ UdL
-            Vub = abs(K[0,2])
-            Vcb = abs(K[1,2])
-            Vus = abs(K[0,1])
-            gamma = phase(-K[0,0]*K[0,2].conj()/(K[1,0]*K[1,2].conj()))
-            Vckm = ckmutil.ckm.ckm_tree(Vus, Vub, Vcb, gamma)
-            if VdL is not None:
-                VuL = VdL @ Vckm
-            elif VuL is not None:
-                VdL = VuL @ np.matrix(Vckm).H
-            else:
-                VuL = np.eye(3)
-                VdL = Vckm
-            if VdR is None:
-                VdR = np.eye(3)
-            if VuR is None:
-                VuR = np.eye(3)
-            if VeL is None:
-                VeL = np.eye(3)
-            if VeR is None:
-                VeR = np.eye(3)
-            self.yu = VuL @ np.diag(mu) @ np.matrix(VuR).H
-            self.yd = VdL @ np.diag(md) @ np.matrix(VdR).H
-            self.ye = VeL @ np.diag(me) @ np.matrix(VeR).H
-    
+            def tuplize(V: np.ndarray | None) -> tuple[complex,...] | None:
+                if V is not None:
+                    return tuple(V.ravel())
+                return None
+            self.yu, self.yd, self.ye = _yukawa_matrices(
+                scale,
+                tuplize(VuL),
+                tuplize(VuR),
+                tuplize(VdL),
+                tuplize(VdR),
+                tuplize(VeL),
+                tuplize(VeR)
+            )
+
     def __add__(self, other: 'ALPcouplings') -> 'ALPcouplings':
         if self.basis == other.basis and self.ew_scale == other.ew_scale and self.scale == other.scale:
             a = ALPcouplings({k: self.values[k]+other.values[k] for k in self.values.keys()}, self.scale, self.basis, self.ew_scale)
@@ -917,3 +900,54 @@ class ALPcouplingsDecoder(JSONDecoder):
         if o.get('__class__') == 'ALPcouplings':
             return ALPcouplings.from_dict(o)
         return o
+    
+@cache
+def _yukawa_matrices(
+    scale: float,
+    VuL: tuple[complex,...],
+    VuR: tuple[complex,...],
+    VdL: tuple[complex,...],
+    VdR: tuple[complex,...],
+    VeL: tuple[complex,...],
+    VeR: tuple[complex,...],
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    wSM = wilson.classes.SMEFT(wilson.wcxf.WC('SMEFT', 'Warsaw', scale, {})).C_in
+    UuL, mu, UuR = ckmutil.diag.msvd(wSM['Gu'])
+    UdL, md, UdR = ckmutil.diag.msvd(wSM['Gd'])
+    UeL, me, UeR = ckmutil.diag.msvd(wSM['Ge'])
+    K = UuL.conj().T @ UdL
+    Vub = abs(K[0,2])
+    Vcb = abs(K[1,2])
+    Vus = abs(K[0,1])
+    gamma = phase(-K[0,0]*K[0,2].conj()/(K[1,0]*K[1,2].conj()))
+    Vckm = ckmutil.ckm.ckm_tree(Vus, Vub, Vcb, gamma)
+    if VdL is not None:
+        VuL_arr = np.array(VdL).reshape(3, 3) @ Vckm
+        VdL_arr = np.array(VuL).reshape(3, 3)
+    elif VuL is not None:
+        VdL_arr = np.array(VuL).reshape(3, 3) @ np.matrix(Vckm).H
+        VuL_arr = np.eye(3, dtype=complex)
+    else:
+        VuL_arr = np.eye(3, dtype=complex)
+        VdL_arr = Vckm
+    if VdR is None:
+        VdR_arr = np.eye(3, dtype=complex)
+    else:
+        VdR_arr = np.array(VdR).reshape(3, 3)
+    if VuR is None:
+        VuR_arr = np.eye(3, dtype=complex)
+    else:
+        VuR_arr = np.array(VuR).reshape(3, 3)
+    if VeL is None:
+        VeL_arr = np.eye(3, dtype=complex)
+    else:
+        VeL_arr = np.array(VeL).reshape(3, 3)
+    if VeR is None:
+        VeR_arr = np.eye(3, dtype=complex)
+    else:
+        VeR_arr = np.array(VeR).reshape(3, 3)
+    yu = VuL_arr @ np.diag(mu) @ np.matrix(VuR_arr).H
+    yd = VdL_arr @ np.diag(md) @ np.matrix(VdR_arr).H
+    ye = VeL_arr @ np.diag(me) @ np.matrix(VeR_arr).H
+
+    return yu, yd, ye
