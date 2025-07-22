@@ -5,6 +5,21 @@ from cmath import phase
 from ..biblio.biblio import citations
 from functools import lru_cache
 
+def svd(A):
+    u, s, vh = np.linalg.svd(A)
+    pmatrix = np.array([[0, 0, 1], [0, 1, 0], [1, 0, 0]])
+    u = u @ pmatrix
+    s = s[[2,1,0]]
+    vh = pmatrix @ vh
+    t = np.eye(3)
+    if np.real(u[0,0]) < 0:
+        t[0,0] = -1
+    if np.real(u[1,1]) < 0:
+        t[1,1] = -1
+    if np.real(u[2,2]) < 0:
+        t[2,2] = -1
+    return u @ t, s, t @ vh
+
 def runSM(scale: float) -> dict:
     """SM parameters at an energy scale
     
@@ -26,8 +41,8 @@ def _runSM(scale):
     citations.register_inspire('Straub:2018kue') # ckmutil is inside flavio's repo
     wSM = wilson.classes.SMEFT(wilson.wcxf.WC('SMEFT', 'Warsaw', scale, {})).C_in # For the moment we reuse wilson's code for the SM case, i.e, with all Wilson coefficients set to zero. Maybe at some point we should implement our own version.
 
-    UuL, mu, UuR = ckmutil.diag.msvd(wSM['Gu'])
-    UdL, md, UdR = ckmutil.diag.msvd(wSM['Gd'])
+    UuL, mu, UuR = svd(wSM['Gu'])
+    UdL, md, UdR = svd(wSM['Gd'])
     K = UuL.conj().T @ UdL
     Vub = abs(K[0,2])
     Vcb = abs(K[1,2])

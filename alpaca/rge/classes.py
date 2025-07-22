@@ -18,6 +18,21 @@ from cmath import phase
 numeric = (int, float, complex, Expr)
 matricial = (np.ndarray, np.matrix, Matrix, list)
 
+def svd(A):
+    u, s, vh = np.linalg.svd(A)
+    pmatrix = np.array([[0, 0, 1], [0, 1, 0], [1, 0, 0]])
+    u = u @ pmatrix
+    s = s[[2,1,0]]
+    vh = pmatrix @ vh
+    t = np.eye(3)
+    if np.real(u[0,0]) < 0:
+        t[0,0] = -1
+    if np.real(u[1,1]) < 0:
+        t[1,1] = -1
+    if np.real(u[2,2]) < 0:
+        t[2,2] = -1
+    return u @ t, s, t @ vh
+
 def format_number(x):
     if isinstance(x, sp.Expr):
         return str(x)
@@ -328,9 +343,9 @@ class ALPcouplings:
             smpars = runSM(self.scale)
             s2w = smpars['s2w']
             c2w = 1-s2w
-            UuL, mu, UuR = ckmutil.diag.msvd(self.yu)
-            UdL, md, UdR = ckmutil.diag.msvd(self.yd)
-            UeL, me, UeR = ckmutil.diag.msvd(self.ye)
+            UuL, mu, UuR = svd(self.yu)
+            UdL, md, UdR = svd(self.yd)
+            UeL, me, UeR = svd(self.ye)
 
             cgamma = self.values['cW'] + self.values['cB']
             cgammaZ = c2w * self.values['cW'] - s2w * self.values['cB']
@@ -352,9 +367,9 @@ class ALPcouplings:
             return a
         
         if self.basis == 'massbasis_ew' and basis == 'derivative_above':
-            UuL, mu, UuR = ckmutil.diag.msvd(self.yu)
-            UdL, md, UdR = ckmutil.diag.msvd(self.yd)
-            UeL, me, UeR = ckmutil.diag.msvd(self.ye)
+            UuL, mu, UuR = svd(self.yu)
+            UdL, md, UdR = svd(self.yd)
+            UeL, me, UeR = svd(self.ye)
             a = ALPcouplings({'cG': self.values['cG'], 'cB': self.values['cgamma'] - self.values['cW'], 'cW': self.values['cW'],
                                  'cqL': UuL @ self.values['cuL'] @ np.matrix(UuL).H/2 + UdL @ self.values['cdL'] @ np.matrix(UdL).H/2,
                                  'cuR': UuR @ self.values['cuR'] @ np.matrix(UuR),
@@ -660,8 +675,8 @@ class ALPcouplings:
         if self.scale < self.ew_scale:
             raise ValueError("The running of the CKM matrix is only computed above the EW scale")
         wSM = wilson.classes.SMEFT(wilson.wcxf.WC('SMEFT', 'Warsaw', self.scale, {})).C_in
-        UuL, mu, UuR = ckmutil.diag.msvd(self.yu)
-        UdL, md, UdR = ckmutil.diag.msvd(self.yd)
+        UuL, mu, UuR = svd(self.yu)
+        UdL, md, UdR = svd(self.yd)
         K = UuL.conj().T @ UdL
         Vub = abs(K[0,2])
         Vcb = abs(K[1,2])
@@ -673,21 +688,21 @@ class ALPcouplings:
         if self.scale < self.ew_scale:
             raise ValueError("The running of the quark masses is only computed above the EW scale")
         wSM = wilson.classes.SMEFT(wilson.wcxf.WC('SMEFT', 'Warsaw', self.scale, {})).C_in
-        UuL, mu, UuR = ckmutil.diag.msvd(self.yu)
+        UuL, mu, UuR = svd(self.yu)
         return mu * np.sqrt(wSM['m2']/wSM['Lambda'])
     
     def get_mdown(self):
         if self.scale < self.ew_scale:
             raise ValueError("The running of the quark masses is only computed above the EW scale")
         wSM = wilson.classes.SMEFT(wilson.wcxf.WC('SMEFT', 'Warsaw', self.scale, {})).C_in
-        UdL, md, UdR = ckmutil.diag.msvd(self.yd)
+        UdL, md, UdR = svd(self.yd)
         return md * np.sqrt(wSM['m2']/wSM['Lambda'])
     
     def get_mlept(self):
         if self.scale < self.ew_scale:
             raise ValueError("The running of the quark masses is only computed above the EW scale")
         wSM = wilson.classes.SMEFT(wilson.wcxf.WC('SMEFT', 'Warsaw', self.scale, {})).C_in
-        UeL, me, UeR = ckmutil.diag.msvd(self.ye)
+        UeL, me, UeR = svd(self.ye)
         return me * np.sqrt(wSM['m2']/wSM['Lambda'])
     
     def _ipython_key_completions_(self):
@@ -912,9 +927,9 @@ def _yukawa_matrices(
     VeR: tuple[complex,...],
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     wSM = wilson.classes.SMEFT(wilson.wcxf.WC('SMEFT', 'Warsaw', scale, {})).C_in
-    UuL, mu, UuR = ckmutil.diag.msvd(wSM['Gu'])
-    UdL, md, UdR = ckmutil.diag.msvd(wSM['Gd'])
-    UeL, me, UeR = ckmutil.diag.msvd(wSM['Ge'])
+    UuL, mu, UuR = svd(wSM['Gu'])
+    UdL, md, UdR = svd(wSM['Gd'])
+    UeL, me, UeR = svd(wSM['Ge'])
     K = UuL.conj().T @ UdL
     Vub = abs(K[0,2])
     Vcb = abs(K[1,2])
