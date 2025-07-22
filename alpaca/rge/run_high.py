@@ -84,8 +84,8 @@ def beta_ytop(couplings: ALPcouplings) -> ALPcouplings:
     ctt = couplings['cuR'][2,2]-couplings['cqL'][2,2]
 
     # eq(24)
-    diag_betaqL = -2*ytop**2*np.matrix(np.diag([0,0,1]) + 3*bQ*np.eye(3))*ctt +np.eye(3)*(-16*alpha_s**2*tildes['cGtilde'] - 9*alpha_2**2*tildes['cWtilde'] - 1/3*alpha_1**2*tildes['cBtilde'])
-    offdiag_betaqL = np.matrix(np.zeros([3,3]))
+    diag_betaqL = -2*ytop**2*np.matrix(np.diag([0,0,1])/2 + 3*bQ*np.eye(3))*ctt +np.eye(3)*(-16*alpha_s**2*tildes['cGtilde'] - 9*alpha_2**2*tildes['cWtilde'] - 1/3*alpha_1**2*tildes['cBtilde'])
+    offdiag_betaqL = np.matrix(np.zeros([3,3]), dtype=complex)
     offdiag_betaqL[0,2] = couplings['cqL'][0,2]
     offdiag_betaqL[1,2] = couplings['cqL'][1,2]
     offdiag_betaqL[2,0] = couplings['cqL'][2,0]
@@ -93,7 +93,7 @@ def beta_ytop(couplings: ALPcouplings) -> ALPcouplings:
     betaqL = diag_betaqL + ytop**2/2 * offdiag_betaqL
 
     diag_betauR = 2*ytop**2*np.matrix(np.diag([0,0,1])-3*bu*np.eye(3))*ctt + np.eye(3)*(16*alpha_s**2*tildes['cGtilde']+16/3*alpha_1**2*tildes['cBtilde'])
-    offdiag_betauR = np.matrix(np.zeros([3,3]))
+    offdiag_betauR = np.matrix(np.zeros([3,3]), dtype=complex)
     offdiag_betauR[0,2] = couplings['cuR'][0,2]
     offdiag_betauR[1,2] = couplings['cuR'][1,2]
     offdiag_betauR[2,0] = couplings['cuR'][2,0]
