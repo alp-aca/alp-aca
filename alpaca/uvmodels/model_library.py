@@ -333,7 +333,7 @@ class Flaxion(PQChargedModel):
         Lf = eps**(np.abs(np.broadcast_to(chargesL, (3,3)) - np.broadcast_to(chargesL, (3,3)).T))
         mf = np.diag(eps**(chargesL - chargesR))
         Rfdagger = eps**(np.abs(np.broadcast_to(chargesR, (3,3)) - np.broadcast_to(chargesR, (3,3)).T))
-        return np.matrix(Lf * mf * Rfdagger, dtype=float)
+        return np.matrix(Lf @ mf @ Rfdagger, dtype=float)
     def get_couplings(self, eps: float, scale: float, ew_scale = 100) -> ALPcouplings:
         a =  super().get_couplings({eps_flaxion: eps}, scale, ew_scale)
         a.yu = self.yukawas('u', eps)
