@@ -339,7 +339,7 @@ class Flaxion(PQChargedModel):
         rng = np.random.default_rng(seed)
         if coeffs is None:
             coeffs = np.exp(rng.lognormal(sigma=0.5, size=(3,3))) * np.exp(2*np.pi*1j *rng.uniform(low=0, high=1, size=(3,3)))
-        return np.matrix(coeffs*(Lf @ mf @ Rfdagger), dtype=float)
+        return np.matrix(coeffs*(Lf @ mf @ Rfdagger), dtype=complex)
     def get_couplings(self, eps: float, scale: float, ew_scale = 100,
                       coeffs_yu: np.ndarray | None = None,
                       coeffs_yd: np.ndarray | None = None,
