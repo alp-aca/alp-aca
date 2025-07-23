@@ -320,25 +320,34 @@ class Flaxion(PQChargedModel):
             exponentsL = np.broadcast_to(self.charges['lL'], (3,3)).T
             exponentsR = np.broadcast_to(self.charges['eR'], (3,3))
         return sp.Matrix(eps_flaxion**(exponentsL-exponentsR))
-    def yukawas(self, fermion: str, eps: float) -> np.matrix:
+    def yukawas(self, fermion: str, eps: float, coeffs: np.ndarray | None) -> np.matrix:
         if fermion == 'u':
             chargesL = np.array(self.charges['qL'], dtype=int)
             chargesR = np.array(self.charges['uR'], dtype=int)
+            seed = 42
         elif fermion == 'd':
             chargesL = np.array(self.charges['qL'], dtype=int)
             chargesR = np.array(self.charges['dR'], dtype=int)
+            seed = 43
         elif fermion == 'e':
             chargesL = np.array(self.charges['lL'], dtype=int)
             chargesR = np.array(self.charges['eR'], dtype=int)
+            seed = 44
         Lf = eps**(np.abs(np.broadcast_to(chargesL, (3,3)) - np.broadcast_to(chargesL, (3,3)).T))
         mf = np.diag(eps**(chargesL - chargesR))
         Rfdagger = eps**(np.abs(np.broadcast_to(chargesR, (3,3)) - np.broadcast_to(chargesR, (3,3)).T))
-        return np.matrix(Lf @ mf @ Rfdagger, dtype=float)
-    def get_couplings(self, eps: float, scale: float, ew_scale = 100) -> ALPcouplings:
+        rng = np.random.default_rng(seed)
+        if coeffs is None:
+            coeffs = np.exp(rng.lognormal(sigma=0.5, size=(3,3))) * np.exp(2*np.pi*1j *rng.uniform(low=0, high=1, size=(3,3)))
+        return np.matrix(coeffs*(Lf @ mf @ Rfdagger), dtype=float)
+    def get_couplings(self, eps: float, scale: float, ew_scale = 100,
+                      coeffs_yu: np.ndarray | None = None,
+                      coeffs_yd: np.ndarray | None = None,
+                      coeffs_ye: np.ndarray | None = None) -> ALPcouplings:
         a =  super().get_couplings({eps_flaxion: eps}, scale, ew_scale)
-        a.yu = self.yukawas('u', eps)
-        a.yd = self.yukawas('d', eps)
-        a.ye = self.yukawas('e', eps)
+        a.yu = self.yukawas('u', eps, coeffs_yu)
+        a.yd = self.yukawas('d', eps, coeffs_yd)
+        a.ye = self.yukawas('e', eps, coeffs_ye)
         return a
     def symbolic_ALPcouplings(self, scale: float, ew_scale: float = 100, VuL: np.ndarray | None = None, VdL: np.ndarray | None = None, VuR: np.ndarray | None = None, VdR: np.ndarray | None = None, VeL: np.ndarray | None = None, VeR: np.ndarray | None = None) -> ALPcouplings:
         raise NotImplementedError("The symbolic ALP couplings for the Flaxion model are not implemented. Use get_couplings() instead to get numerical values.")
