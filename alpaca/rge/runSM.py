@@ -4,21 +4,7 @@ import numpy as np
 from cmath import phase
 from ..biblio.biblio import citations
 from functools import lru_cache
-
-def svd(A):
-    u, s, vh = np.linalg.svd(A)
-    pmatrix = np.array([[0, 0, 1], [0, 1, 0], [1, 0, 0]])
-    u = u @ pmatrix
-    s = s[[2,1,0]]
-    vh = pmatrix @ vh
-    t = np.eye(3)
-    if np.real(u[0,0]) < 0:
-        t[0,0] = -1
-    if np.real(u[1,1]) < 0:
-        t[1,1] = -1
-    if np.real(u[2,2]) < 0:
-        t[2,2] = -1
-    return u @ t, s, t @ vh
+from ..common import svd
 
 def runSM(scale: float) -> dict:
     """SM parameters at an energy scale

@@ -14,24 +14,10 @@ from io import TextIOBase
 import wilson
 import ckmutil
 from cmath import phase
+from ..common import svd
 
 numeric = (int, float, complex, Expr)
 matricial = (np.ndarray, np.matrix, Matrix, list)
-
-def svd(A):
-    u, s, vh = np.linalg.svd(A)
-    pmatrix = np.array([[0, 0, 1], [0, 1, 0], [1, 0, 0]])
-    u = u @ pmatrix
-    s = s[[2,1,0]]
-    vh = pmatrix @ vh
-    t = np.eye(3)
-    if np.real(u[0,0]) < 0:
-        t[0,0] = -1
-    if np.real(u[1,1]) < 0:
-        t[1,1] = -1
-    if np.real(u[2,2]) < 0:
-        t[2,2] = -1
-    return u @ t, s, t @ vh
 
 def format_number(x):
     if isinstance(x, sp.Expr):

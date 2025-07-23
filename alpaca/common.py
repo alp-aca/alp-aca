@@ -109,3 +109,12 @@ def A0_DsKst(q2):
     b = 0.26
     from .constants import mDs
     return A0_0/(1-a*q2/mDs+b*q2**2/mDs**2)
+
+def svd(A):
+    u, s, vh = np.linalg.svd(A)
+    pmatrix = np.array([[0, 0, 1], [0, 1, 0], [1, 0, 0]])
+    u = u @ pmatrix
+    s = s[[2,1,0]]
+    vh = pmatrix @ vh
+    t = np.diag(vh)
+    return u @ np.diag(t), s, np.diag(1/t) @ vh
