@@ -1,3 +1,53 @@
-# ALP-ACA
+# ALPaca
 
-Welcome to the ALP Automated Computed Algorithm (ALP-ACA)!
+Welcome to the ALP Automated Computed Algorithm (ALPaca)!
+
+ALPaca is an open-source Python library for the phenomenology of Axion-Like Particles (ALPs) with masses in the ranges of $m_a \sim 0.01 - 10\,\mathrm{GeV}$, mainly in processes involving mesons.
+
+ALPaca integrates the full analysis with an easy-to-use syntax:
+
+* Matching of selected UV-complete models (DFSZ-like, KSVZ-like, flaxions, etc.) to the ALP-EFT.
+* Numerical running and matching of the ALP-EFT coefficients down to the physical relevant scales, including ALP-$\chi\!$ PT.
+* Calulation of decay rates for processes involving ALPs:
+  * ALP production in rare meson decays $M_1\to M_2 a$, quarkonia decays $V\to \gamma a$ and non-resonant production $e^+e^- \to \gamma a$,
+  * ALP decays into photons, leptons and mesons,
+  * Processes mediated by on-shell ALPs in the Narrow Width Approximation,
+  * Leptonic and radiative meson decays, and meson mixing, with off-shell ALPs.
+* Calculation of ALP decay lengths and probability of decaying outside the detector, with a displaced vertex or in the prompt region.
+* $\chi^2$ statistical analysis, with fine-grained control of the observables and experimental measurements included.
+* Generation of publication-grade exclusion plots.
+* Automatic management of the bibliographical references used in the analysis.
+
+## The ALPaca team
+
+* **Jorge Alda** (@Jorge-Alda): Università degli Studi di Padova & INFN Sezione di Padova & CAPA Zaragoza.
+* **Marta Fuentes Zamoro** (@mfzaso): Universidad Autónoma de Madrid & IFT Madrid.
+* **Luca Merlo**: Universidad Autónoma de Madrid & IFT Madrid.
+* **Xavier Ponce Díaz** (@xavipondi): University of Basel.
+* **Stefano Rigolin**: Università degli Studi di Padova & INFN Sezione di Padova.
+
+## ALPaca in action
+
+In [this repositoy](https://github.com/alp-aca/example) you can find examples, tutorials and applications of ALPaca.
+
+ALPaca has been used in the following publications:
+
+* J. Alda, M. Fuentes Zamoro, L. Merlo, X. Ponce Díaz, S. Rigolin: *Comprehensive ALP searches in Meson Decays*.
+
+If you have used ALPaca in your publication and want to be featured in this list, please [contact us](https://github.com/alp-aca/alp-aca/issues/new/choose).
+
+## Citing ALPaca
+
+If you use ALPaca, please cite
+
+```bibtex
+@article{ALPaca:2025Manual,
+    author = "Alda, J. and Fuentes Zamoro, M., and Merlo, L., and Ponce Diaz, X., and Rigolin, S.",
+    title = "ALPaca: the ALP Automatic Computing Algorithm",
+    journal = "In preparation."
+}
+```
+
+## Feedback
+
+If you encounter bugs or want to propose a new feature, you can contact us using [Gihub issues](https://github.com/alp-aca/alp-aca/issues/new/choose).
