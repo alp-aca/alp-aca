@@ -6,115 +6,32 @@
 #
 alabaster==1.0.0
     # via sphinx
-appdirs==1.4.4
-    # via parton
-attrs==25.1.0
-    # via particle
 babel==2.17.0
     # via sphinx
 certifi==2025.7.14
     # via requests
 charset-normalizer==3.4.2
     # via requests
-ckmutil==1.2.0
-    # via
-    #   flavio
-    #   wilson
-contourpy==1.3.1
-    # via matplotlib
-cycler==0.12.1
-    # via matplotlib
-distinctipy==1.3.4
-    # via -r requirements.in
 docutils==0.21.2
     # via
     #   sphinx
     #   sphinx-rtd-theme
-flavio==2.6.2
-    # via -r requirements.in
-fonttools==4.56.0
-    # via matplotlib
-gvar==13.1.5
-    # via vegas
-hepunits==2.3.5
-    # via particle
 idna==3.10
     # via requests
 imagesize==1.4.1
     # via sphinx
 jinja2==3.1.6
     # via sphinx
-kiwisolver==1.4.8
-    # via matplotlib
-lazy-loader==0.4
-    # via -r requirements.in
 markupsafe==3.0.2
     # via jinja2
-matplotlib==3.10.3
-    # via -r requirements.in
-mpmath==1.3.0
-    # via sympy
-numpy==2.2.3
-    # via
-    #   ckmutil
-    #   contourpy
-    #   distinctipy
-    #   flavio
-    #   gvar
-    #   matplotlib
-    #   pandas
-    #   parton
-    #   scipy
-    #   vegas
-    #   wilson
 packaging==25.0
-    # via
-    #   lazy-loader
-    #   matplotlib
-    #   sphinx
-pandas==2.2.3
-    # via wilson
-particle==0.25.2
-    # via flavio
-parton==0.2.1
-    # via flavio
-pillow==11.1.0
-    # via matplotlib
+    # via sphinx
 pygments==2.19.2
     # via sphinx
-pylha==0.4
-    # via wilson
-pyparsing==3.2.1
-    # via matplotlib
-python-dateutil==2.9.0.post0
-    # via
-    #   matplotlib
-    #   pandas
-pytz==2025.1
-    # via pandas
-pyyaml==6.0.2
-    # via
-    #   flavio
-    #   parton
-    #   pylha
-    #   wilson
-requests==2.32.3
-    # via
-    #   -r requirements.in
-    #   sphinx
+requests==2.32.4
+    # via sphinx
 roman-numerals-py==3.1.0
     # via sphinx
-rundec==0.6
-    # via wilson
-scipy==1.15.2
-    # via
-    #   ckmutil
-    #   flavio
-    #   gvar
-    #   parton
-    #   wilson
-six==1.17.0
-    # via python-dateutil
 snowballstemmer==3.0.1
     # via sphinx
 sphinx==8.2.3
@@ -138,18 +55,5 @@ sphinxcontrib-qthelp==2.0.0
     # via sphinx
 sphinxcontrib-serializinghtml==2.0.0
     # via sphinx
-sympy==1.13.3
-    # via -r requirements.in
-tzdata==2025.1
-    # via pandas
 urllib3==2.5.0
     # via requests
-vegas==6.1.1
-    # via -r requirements.in
-voluptuous==0.15.2
-    # via wilson
-wilson==2.4
-    # via flavio
-
-# The following packages are considered to be unsafe in a requirements file:
-# setuptools
