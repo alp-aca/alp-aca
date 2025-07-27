@@ -60,13 +60,18 @@ class ALPcouplings:
     basis : str
         Basis in which the couplings are defined. The available bases are:
 
-        * 'derivative_above':
+        - 'derivative_above':
             Basis with the explicitly shift-symmetric couplings of the fermion currents to the derivative of the ALP; above the EW scale.
+        - 'massbasis_ew':
+            Basis with the couplings of the fermion currents to the ALP in the mass basis of the fermions, at the EW scale.
+        - 'RL_below':
+            Basis with the couplings of the fermion currents to the ALP in the mass basis of the fermions, below the EW scale.
+        - 'VA_below':
+            Basis with the couplings of the fermion currents to the ALP in the mass basis of the fermions, below the EW scale, with vector and axial-vector couplings.
 
-    Raises
-    ------
-    ValueError
-        If attempting to translate to an unrecognized basis.
+    ew_scale : float
+        Energy scale of the electroweak symmetry breaking scale, in GeV.
+
     """
     def __init__(self,
                  values: dict,
@@ -83,7 +88,7 @@ class ALPcouplings:
         """Constructor method
 
         Parameters
-        -------
+        ------------
         values : dict
             dict containing the ALP couplings.
 
@@ -95,28 +100,34 @@ class ALPcouplings:
 
             - 'derivative_above':
                 Basis with the explicitly shift-symmetric couplings of the fermion currents to the derivative of the ALP; above the EW scale.
+            - 'massbasis_ew':
+                Basis with the couplings of the fermion currents to the ALP in the mass basis of the fermions, at the EW scale.
+            - 'RL_below':
+                Basis with the couplings of the fermion currents to the ALP in the mass basis of the fermions, below the EW scale.
+            - 'VA_below':
+                Basis with the couplings of the fermion currents to the ALP in the mass basis of the fermions, below the EW scale, with vector and axial-vector couplings.
 
         ew_scale : float, optional
             Energy scale of the electroweak symmetry breaking scale, in GeV. Defaults to 100 GeV
 
         VuL : np.ndarray, optional
-            Unitary rotation of the left-handed up-type quarks to diagonalize Yu. If None, it is set to the identity.
+            Unitary rotation of the left-handed up-type quarks to diagonalize Yu. If None, it is set to the identity. (Only used in 'derivative_above' and 'massbasis_ew' bases)
 
         VdL : np.ndarray, optional
-            Unitary rotation of the left-handed down-type quarks to diagonalize Yd. If None, it is set to the CKM matrix.
+            Unitary rotation of the left-handed down-type quarks to diagonalize Yd. If None, it is set to the CKM matrix. (Only used in 'derivative_above' and 'massbasis_ew' bases)
 
         VuR : np.ndarray, optional
-            Unitary rotation of the right-handed up-type quarks to diagonalize Yu. If None, it is set to the identity.
+            Unitary rotation of the right-handed up-type quarks to diagonalize Yu. If None, it is set to the identity. (Only used in 'derivative_above' and 'massbasis_ew' bases)
 
         VdR : np.ndarray, optional
-            Unitary rotation of the right-handed down-type quarks to diagonalize Yd. If None, it is set to the identity.
+            Unitary rotation of the right-handed down-type quarks to diagonalize Yd. If None, it is set to the identity. (Only used in 'derivative_above' and 'massbasis_ew' bases)
 
         VeL : np.ndarray, optional
-            Unitary rotation of the left-handed leptons to diagonalize Ye. If None, it is set to the identity.
+            Unitary rotation of the left-handed leptons to diagonalize Ye. If None, it is set to the identity. (Only used in 'derivative_above' and 'massbasis_ew' bases)
 
         VeR : np.ndarray, optional
-            Unitary rotation of the right-handed leptons to diagonalize Ye. If None, it is set to the identity.
-            
+            Unitary rotation of the right-handed leptons to diagonalize Ye. If None, it is set to the identity. (Only used in 'derivative_above' and 'massbasis_ew' bases)
+
         Raises
         ------
         ValueError

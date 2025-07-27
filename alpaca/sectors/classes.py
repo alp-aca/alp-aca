@@ -265,4 +265,5 @@ def initialize_sectors(sector_dir: str|None = None) -> dict[str, Sector]:
     return sectors
 
 default_sectors = initialize_sectors()
+'''Dictionary of the pre-defined sectors in ALPaca.'''
 default_sectors['all'] = combine_sectors(list(default_sectors.values()), name='all', tex='Total', description='All sectors combined')

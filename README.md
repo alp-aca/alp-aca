@@ -1,6 +1,10 @@
 # ALPaca
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16447037.svg)](https://doi.org/10.5281/zenodo.16447037)
+
 Welcome to the ALP Automated Computed Algorithm (ALPaca)!
+
+![ALPaca logo](docs/_static/logo.png)
 
 ALPaca is an open-source Python library for the phenomenology of Axion-Like Particles (ALPs) with masses in the ranges of $m_a \sim 0.01 - 10\,\mathrm{GeV}$, mainly in processes involving mesons.
 
@@ -20,21 +24,55 @@ ALPaca integrates the full analysis with an easy-to-use syntax:
 
 ## The ALPaca team
 
-* **Jorge Alda** (@Jorge-Alda): Università degli Studi di Padova & INFN Sezione di Padova & CAPA Zaragoza.
-* **Marta Fuentes Zamoro** (@mfzaso): Universidad Autónoma de Madrid & IFT Madrid.
+* **Jorge Alda**: Università degli Studi di Padova & INFN Sezione di Padova & CAPA Zaragoza.
+* **Marta Fuentes Zamoro**: Universidad Autónoma de Madrid & IFT Madrid.
 * **Luca Merlo**: Universidad Autónoma de Madrid & IFT Madrid.
-* **Xavier Ponce Díaz** (@xavipondi): University of Basel.
+* **Xavier Ponce Díaz**: University of Basel.
 * **Stefano Rigolin**: Università degli Studi di Padova & INFN Sezione di Padova.
 
 ## ALPaca in action
 
-In [this repositoy](https://github.com/alp-aca/example) you can find examples, tutorials and applications of ALPaca.
+In [this repositoy](https://github.com/alp-aca/examples) you can find examples, tutorials and applications of ALPaca.
 
 ALPaca has been used in the following publications:
 
 * J. Alda, M. Fuentes Zamoro, L. Merlo, X. Ponce Díaz, S. Rigolin: *Comprehensive ALP searches in Meson Decays*.
 
-If you have used ALPaca in your publication and want to be featured in this list, please [contact us](https://github.com/alp-aca/alp-aca/issues/new/choose).
+If you have used ALPaca in your publication and want to be featured in this list, please [contact us](https://github.com/alp-aca/alp-aca/issues/new?template=publication-using-alpaca.md).
+
+## Installation
+
+ALPaca can be installed with `pip`:
+
+```bash
+pip install alpaca-ALPs
+```
+
+It is *strongly recommended* to install ALPaca inside a virtual environment (venv), in order to avoid clashes with conflicting versions of the dependencies. In order to create a venv, execute the following command
+
+```bash
+python3 -m venv pathToVenv
+```
+
+where `pathToVenv` is the location where the files of the venv will be stored. In order to activate the venv, for Linux or MacOS using `bash` or `zsh`
+
+```bash
+source pathToVenv/bin/activate
+```
+
+For Windows using ```cmd.exe```
+
+```bat
+C:\> pathToVenv\Scripts\Activate.bat
+```
+
+And for Windows using ```PowerShell```
+
+```powershell
+PS C:\> path_to_venv\Scripts\Activate.ps1
+```
+
+Once the venv is activated, ALPaca can be normally installed and used.
 
 ## Citing ALPaca
 
@@ -42,9 +80,28 @@ If you use ALPaca, please cite
 
 ```bibtex
 @article{ALPaca:2025Manual,
-    author = "Alda, J. and Fuentes Zamoro, M., and Merlo, L., and Ponce Diaz, X., and Rigolin, S.",
+    author = {Alda, Jorge and
+                  Fuentes Zamoro, Marta and
+                  Merlo, Luca and
+                  Rigolin, Stefano and
+                  Ponce Díaz, Xavier},
     title = "ALPaca: the ALP Automatic Computing Algorithm",
     journal = "In preparation."
+}
+
+@software{alda_2025_16447037,
+  author       = {Alda, Jorge and
+                  Fuentes Zamoro, Marta and
+                  Merlo, Luca and
+                  Rigolin, Stefano and
+                  Ponce Díaz, Xavier},
+  title        = {ALPaca v1.0},
+  month        = jul,
+  year         = 2025,
+  publisher    = {Zenodo},
+  version      = {v1.0.0-alpha.1},
+  doi          = {10.5281/zenodo.16447037},
+  url          = {https://doi.org/10.5281/zenodo.16447037},
 }
 ```
 
