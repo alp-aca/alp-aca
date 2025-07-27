@@ -17,6 +17,7 @@ classifiers = [
 
 [project.urls]
 repository = "https://github.com/alp-aca/alp-aca"
+Documentation = "https://alpaca-alps.readthedocs.io/latest/"
 "Examples" = "https://github.com/alp-aca/examples"
 "DOI" = "https://doi.org/10.5281/zenodo.16447036"
 

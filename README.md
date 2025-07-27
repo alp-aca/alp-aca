@@ -105,6 +105,12 @@ If you use ALPaca, please cite
 }
 ```
 
+## Documentation
+
+The ALPaca manual will be published in arXiv very soon!
+
+You can also check the [automatically-generated documentation](https://alpaca-alps.readthedocs.io/latest/).
+
 ## Feedback
 
 If you encounter bugs or want to propose a new feature, you can contact us using [Gihub issues](https://github.com/alp-aca/alp-aca/issues/new/choose).
