@@ -22,10 +22,14 @@ imagesize==1.4.1
     # via sphinx
 jinja2==3.1.6
     # via sphinx
+lazy-loader==0.4
+    # via -r requirements.in
 markupsafe==3.0.2
     # via jinja2
 packaging==25.0
-    # via sphinx
+    # via
+    #   lazy-loader
+    #   sphinx
 pygments==2.19.2
     # via sphinx
 requests==2.32.4
