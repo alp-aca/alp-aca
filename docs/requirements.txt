@@ -8,7 +8,7 @@ alabaster==1.0.0
     # via sphinx
 appdirs==1.4.4
     # via parton
-attrs==25.3.0
+attrs==25.1.0
     # via particle
 babel==2.17.0
     # via sphinx
@@ -20,7 +20,7 @@ ckmutil==1.2.0
     # via
     #   flavio
     #   wilson
-contourpy==1.3.3
+contourpy==1.3.1
     # via matplotlib
 cycler==0.12.1
     # via matplotlib
@@ -32,11 +32,11 @@ docutils==0.21.2
     #   sphinx-rtd-theme
 flavio==2.6.2
     # via -r requirements.in
-fonttools==4.59.0
+fonttools==4.56.0
     # via matplotlib
-gvar==13.1.7
+gvar==13.1.5
     # via vegas
-hepunits==2.3.6
+hepunits==2.3.5
     # via particle
 idna==3.10
     # via requests
@@ -54,7 +54,7 @@ matplotlib==3.10.3
     # via -r requirements.in
 mpmath==1.3.0
     # via sympy
-numpy==2.3.2
+numpy==2.2.3
     # via
     #   ckmutil
     #   contourpy
@@ -72,25 +72,25 @@ packaging==25.0
     #   lazy-loader
     #   matplotlib
     #   sphinx
-pandas==2.3.1
+pandas==2.2.3
     # via wilson
-particle==0.25.4
+particle==0.25.2
     # via flavio
-parton==0.2.2
+parton==0.2.1
     # via flavio
-pillow==11.3.0
+pillow==11.1.0
     # via matplotlib
 pygments==2.19.2
     # via sphinx
 pylha==0.4
     # via wilson
-pyparsing==3.2.3
+pyparsing==3.2.1
     # via matplotlib
 python-dateutil==2.9.0.post0
     # via
     #   matplotlib
     #   pandas
-pytz==2025.2
+pytz==2025.1
     # via pandas
 pyyaml==6.0.2
     # via
@@ -106,7 +106,7 @@ roman-numerals-py==3.1.0
     # via sphinx
 rundec==0.6
     # via wilson
-scipy==1.16.1
+scipy==1.15.2
     # via
     #   ckmutil
     #   flavio
@@ -140,7 +140,7 @@ sphinxcontrib-serializinghtml==2.0.0
     # via sphinx
 sympy==1.13.3
     # via -r requirements.in
-tzdata==2025.2
+tzdata==2025.1
     # via pandas
 urllib3==2.5.0
     # via requests
@@ -148,7 +148,7 @@ vegas==6.1.1
     # via -r requirements.in
 voluptuous==0.15.2
     # via wilson
-wilson==2.5.2
+wilson==2.4
     # via flavio
 
 # The following packages are considered to be unsafe in a requirements file:
