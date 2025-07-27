@@ -8,6 +8,22 @@ import numpy as np
 from .palettes import trafficlights
 from ..statistics.chisquared import ChiSquared, combine_chi2
 from ..decays.decays import to_tex
+from ..biblio import citations
+
+ref_matplotlib = r'''@Article{Hunter:2007,
+  Author    = {Hunter, J. D.},
+  Title     = {Matplotlib: A 2D graphics environment},
+  Journal   = {Computing in Science \& Engineering},
+  Volume    = {9},
+  Number    = {3},
+  Pages     = {90--95},
+  abstract  = {Matplotlib is a 2D graphics package used for Python for
+  application development, interactive scripting, and publication-quality
+  image generation across user interfaces and operating systems.},
+  publisher = {IEEE COMPUTER SOC},
+  doi       = {10.1109/MCSE.2007.55},
+  year      = 2007
+}'''
 
 def exclusionplot(x: Container[float], y: Container[float], chi2: list[ChiSquared] | ChiSquared, xlabel: str, ylabel: str, title: str | None = None, ax: Axes | None = None, global_chi2: ChiSquared | bool = True) -> Axes:
     """
@@ -34,6 +50,7 @@ def exclusionplot(x: Container[float], y: Container[float], chi2: list[ChiSquare
         If set to False, no global significance will be plotted.
 
     """
+    citations.register_bibtex('matplotlib', ref_matplotlib)
     cmap_trafficlights = ListedColormap(trafficlights+['#000000'])
     if ax is None:
         fig = plt.figure()
@@ -125,6 +142,7 @@ def alp_channels_plot(x: Container[float], channels: dict[str, Container[float]]
         The matplotlib Axes object to plot on (default is None, which creates a new figure).
 
     """
+    citations.register_bibtex('matplotlib', ref_matplotlib)
     if ax is None:
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)

@@ -8,6 +8,31 @@ class Citations:
     def __init__(self):
         self.citations = set()
         self.dict_citations = {}
+        bibtex_manual = r"""@article{ALPaca:2025Manual,
+    author = {Alda, Jorge and
+                  Fuentes Zamoro, Marta and
+                  Merlo, Luca and
+                  Rigolin, Stefano and
+                  Ponce Díaz, Xavier},
+    title = "ALPaca: the ALP Automatic Computing Algorithm",
+    journal = "In preparation."
+}
+
+@software{alda_2025_16447037,
+    author       = {Alda, Jorge and
+                    Fuentes Zamoro, Marta and
+                    Merlo, Luca and
+                    Rigolin, Stefano and
+                    Ponce Díaz, Xavier},
+    title        = {ALPaca v1.0},
+    month        = jul,
+    year         = 2025,
+    publisher    = {Zenodo},
+    version      = {v1.0.0-alpha.1},
+    doi          = {10.5281/zenodo.16447037},
+    url          = {https://doi.org/10.5281/zenodo.16447037},
+}"""
+        self.dict_citations['ALPaca'] = bibtex_manual
 
     def register_inspire(self, inspires_id: str):
         self.citations |= {inspires_id}
