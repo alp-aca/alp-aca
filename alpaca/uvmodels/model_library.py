@@ -11,7 +11,7 @@ from ..biblio.biblio import citations
 import sympy as sp
 
 
-couplings_latex = {'cG': r'c_G', 'cB': 'c_B', 'cW': 'c_W', 'cqL': r'c_{q_L}', 'cuR': r'c_{u_R}', 'cdR': r'c_{d_R}', 'clL': r'c_{\ell_L}', 'ceR': r'c_{e_R}'}
+couplings_latex = {'cG': r'c_G', 'cB': 'c_B', 'cW': 'c_W', 'cqL': r'c_q', 'cuR': r'c_u', 'cdR': r'c_d', 'clL': r'c_\ell', 'ceR': r'c_e'}
 class ModelBase:
     """
     Base class representing a UV model with couplings to ALPs.
@@ -175,6 +175,25 @@ class ModelBase:
             raise ZeroDivisionError('cG = 0')
         cgamma = self.couplings['cB'] + self.couplings['cW']
         return sp.Rational(sp.simplify(cgamma/self.couplings['cG'])).limit_denominator()
+    
+    def model_parmeters(self) -> list[sp.Expr]:
+        symbols = set()
+        for value in self.couplings.values():
+            symbols.update(value.free_symbols)
+        return list(symbols)
+
+    def _repr_markdown_(self):
+        """Return a string representation of the model in Markdown format."""
+        self.initialize()
+        md = f"### UV-complete model\n\n**Name:** {self.model_name}\n\n**Model class:** {str(self.__class__).split('.')[-1][:-2]}\n\n"
+        if len(self.model_parmeters()) > 0:
+            md += "<details><summary><b>Parameters:</b></summary>\n\n"
+            for p in self.model_parmeters():
+                md += f"- ${sp.latex(p)}$\n"
+            md += "\n\n</details>"
+        md += "<details><summary><b>Couplings:</b></summary>\n\n" + self.couplings_latex(eqnumber=False) + "\n\n</details>"
+
+        return md
 
 class PQChargedModel(ModelBase):
     """A class to define a model given the PQ charges of the SM fermions.
@@ -216,6 +235,14 @@ class PQChargedModel(ModelBase):
         ))
     def initialize(self):
         citations.register_inspire('DiLuzio:2020wdo')
+
+    def _repr_markdown_(self):
+        md = super()._repr_markdown_()
+        md += "<details><summary><b>PQ charges:</b></summary>\n\n"
+        for f, c in self.charges.items():
+            md += f"- $\\mathcal{{X}}{couplings_latex['c'+f][1:]} = {sp.latex(c)}$\n"
+        md += "\n\n</details>"
+        return md
 
 
 class HeavyFermion:
@@ -260,15 +287,20 @@ class HeavyFermion:
 
         j = sp.Rational(int(SU2_rep)-1, 2)
         if isinstance(SU3_rep, (list, tuple)):
-            label_su3 = SU3_rep
+            self.label_su3 = SU3_rep
         else:
-            label_su3 = su3.dynkinlabels_from_name(SU3_rep)
-        self.color_dim = su3.dim_from_dynkinlabels(*label_su3)
+            self.label_su3 = su3.dynkinlabels_from_name(SU3_rep)
+        self.color_dim = su3.dim_from_dynkinlabels(*self.label_su3)
         self.weak_isospin_dim = 2*j + 1
-        self.dynkin_index_color = su3.index_from_dynkinlabels(*label_su3)
+        self.dynkin_index_color = su3.index_from_dynkinlabels(*self.label_su3)
         self.dynkin_index_weak = sp.Rational(1,3) * (j*(j+1)*(2*j+1))
         self.hypercharge = Y_hyper
         self.PQ = PQ
+
+    def _repr_markdown_(self):
+        """Return a string representation of the heavy fermion in Markdown format."""
+        md = '(' + su3.latex_from_dynkinlabels(*self.label_su3) + ', $\\mathbf{' + str(self.weak_isospin_dim) + f'}}, {self.hypercharge}, {self.PQ}$)'
+        return md
 
 class KSVZ_model(ModelBase):
     """A class to define the KSVZ-like models given the new heavy fermions."""
@@ -283,11 +315,21 @@ class KSVZ_model(ModelBase):
             A list with the heavy fermions of the model.
         """
         super().__init__(model_name)
+        self.fermions = fermions
         self.couplings['cG']=-sum(f.PQ * f.weak_isospin_dim * f.dynkin_index_color for f in fermions)
         self.couplings['cB']=-sum(f.PQ * f.color_dim * f.weak_isospin_dim * f.hypercharge**2 for f in fermions)
         self.couplings['cW']=-sum(f.PQ * f.dynkin_index_weak * f.color_dim for f in fermions)
     def initialize(self):
         citations.register_inspire('Quevillon:2019zrd')
+
+    def _repr_markdown_(self):
+        """Return a string representation of the KSVZ-like model in Markdown format."""
+        md = super()._repr_markdown_()
+        md += "<details><summary><b>Heavy fermions:</b></summary>\n\n"
+        for f in self.fermions:
+            md += f"- {f._repr_markdown_()}\n"
+        md += "\n\n</details>"
+        return md
 
 eps_flaxion = sp.symbols(r'\epsilon')
 vev = sp.symbols(r'v')
@@ -351,6 +393,20 @@ class Flaxion(PQChargedModel):
         return a
     def symbolic_ALPcouplings(self, scale: float, ew_scale: float = 100, VuL: np.ndarray | None = None, VdL: np.ndarray | None = None, VuR: np.ndarray | None = None, VdR: np.ndarray | None = None, VeL: np.ndarray | None = None, VeR: np.ndarray | None = None) -> ALPcouplings:
         raise NotImplementedError("The symbolic ALP couplings for the Flaxion model are not implemented. Use get_couplings() instead to get numerical values.")
+    
+    def model_parmeters(self) -> list[sp.Expr]:
+        symbols = super().model_parmeters()
+        symbols += [eps_flaxion,]
+        return symbols
+
+    def _repr_markdown_(self):
+        md = super()._repr_markdown_()
+        md += "<details><summary><b>Yukawa matrices:</b></summary>\n\n"
+        md += f"- $Y_u \\sim {sp.latex(self.yukawas_symbolic('u'))}$\n"
+        md += f"- $Y_d \\sim {sp.latex(self.yukawas_symbolic('d'))}$\n"
+        md += f"- $Y_e \\sim {sp.latex(self.yukawas_symbolic('e'))}$\n"
+        md += "\n\n</details>"
+        return md
 
 # Benchmark Models
 

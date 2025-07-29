@@ -52,3 +52,33 @@ def dynkinlabels_from_name(name: str) -> tuple[int, int]:
     if primes > len(reprs)-1:
         raise KeyError(f"The representation {name} of the group SU(3) does not exist.")
     return reprs[primes]
+
+def name_from_dynkinlabels(l1: int, l2: int) -> str:
+    if l2 > l1:
+        return name_from_dynkinlabels(l2, l1) + "_bar"
+    dim = dim_from_dynkinlabels(l1, l2)
+    reprs = dynkinlabels_from_dim(dim)
+    reprs = [repr for repr in reprs if repr[0] >= repr[1]]
+    reprs = sorted(reprs, key=lambda x: x[0])
+    index = reprs.index((l1, l2))
+    return str(dim) + "'" * index
+
+def latex_from_dynkinlabels(l1: int, l2: int) -> str:
+    """Returns the LaTeX representation of the SU(3) representation with the given Dynkin labels."""
+    name = name_from_dynkinlabels(l1, l2)
+    if name.endswith('_bar'):
+        name = name[:-4]
+        bar = True
+    else:
+        bar = False
+    primes = name.count("'")
+    name = name.replace("'", "")
+    if bar:
+        num = f"$\\overline{{\\mathbf{{{name}}}}}"
+    else:
+        num = f"$\\mathbf{{{name}}}"
+    if primes > 0:
+        num += f"^{{{'\\prime' * primes}}}$"
+    else:
+        num += "$"
+    return num
