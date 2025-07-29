@@ -8,7 +8,7 @@ class Citations:
     def __init__(self):
         self.citations = set()
         self.dict_citations = {}
-        bibtex_manual = r"""@article{ALPaca:2025Manual,
+        self.bibtex_manual = r"""@article{ALPaca:2025Manual,
     author = {Alda, Jorge and
                   Fuentes Zamoro, Marta and
                   Merlo, Luca and
@@ -32,7 +32,7 @@ class Citations:
     doi          = {10.5281/zenodo.16447037},
     url          = {https://doi.org/10.5281/zenodo.16447037},
 }"""
-        self.dict_citations['ALPaca'] = bibtex_manual
+        self.dict_citations['ALPaca'] = self.bibtex_manual
 
     def register_inspire(self, inspires_id: str):
         self.citations |= {inspires_id}
@@ -66,10 +66,17 @@ class Citations:
             object is passed, the bibtex will be written to it. If a string is
             passed, the bibtex will be written to a file with the given name.
         '''
+        if len(list(self.citations)) == 0:
+            if isinstance(filepath, TextIOBase):
+                for v in self.dict_citations.values():
+                    filepath.write('\n\n' + v)
+            else:
+                with open(filepath, 'wb') as f:
+                    for v in self.dict_citations.values():
+                        f.write(str.encode('\n\n' + v))
+            return
         with tempfile.NamedTemporaryFile('w+t', suffix='.tex') as tf:
             tf.write(r'\cite{' + ','.join(citations.inspires_ids()) + r'}')
-            tf.seek(0)
-            print(tf.read())
             tf.seek(0)
             r = requests.post('https://inspirehep.net/api/bibliography-generator?format=bibtex', files={'file': tf})
         r.raise_for_status()
@@ -96,6 +103,7 @@ def _citations_context(merge: bool = True):
     saved_dict_citations = citations.dict_citations.copy()
     citations.citations.clear()
     citations.dict_citations.clear()
+    citations.dict_citations['ALPaca'] = citations.bibtex_manual
     yield
     if merge:
         citations.citations |= saved_citations
