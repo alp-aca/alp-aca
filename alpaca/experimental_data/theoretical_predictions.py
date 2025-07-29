@@ -1,7 +1,10 @@
 #File with all possible theoretical predictions
 from ..biblio.biblio import citations
 from ..decays.decays import parse
-import flavio
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    import flavio
 from functools import cache
 import numpy as np
 from ..constants import hbar_GeVps

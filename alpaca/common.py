@@ -1,9 +1,11 @@
 import numpy as np
-import flavio
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    import flavio
 from .constants import pars
 from .biblio.biblio import citations
 from scipy.integrate import quad
-import warnings
 from functools import cache
 
 def kallen(a, b, c):

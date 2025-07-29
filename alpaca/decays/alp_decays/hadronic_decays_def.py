@@ -1,5 +1,8 @@
 import numpy as np
-import flavio
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    import flavio
 import vegas as vegas
 import functools
 from . import threebody_decay

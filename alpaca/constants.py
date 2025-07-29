@@ -2,6 +2,7 @@ import particle.literals as particles
 import numpy as np
 from .biblio.biblio import citations, Constant
 from .classes import LazyFloat
+import warnings
 
 import operator
 
@@ -36,7 +37,9 @@ class PreInitializedDict:
         self._wrapped[item] = value
 
 def getpars():
-    import flavio
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        import flavio
     citations.register_inspire('Straub:2018kue')
     return flavio.default_parameters.get_central_all()
 
@@ -53,21 +56,27 @@ vev = LazyFloat(lambda: (2**0.5*GF)**(-0.5))
 yuk_t = LazyFloat(lambda: mt*2**0.5/vev)
 
 def getC10():
-    import flavio
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        import flavio
     citations.register_inspire('Straub:201')
     return flavio.physics.bdecays.wilsoncoefficients.wcsm_nf5(4.18)[9]
 
 C10 = LazyFloat(getC10)
 
 def getC7():
-    import flavio
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        import flavio
     citations.register_inspire('Straub:201')
     return flavio.physics.bdecays.wilsoncoefficients.wcsm_nf5(4.18)[6]
 
 C7 = LazyFloat(getC7)
 
 def getC10sd():
-    import flavio
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        import flavio
     citations.register_inspire('Straub:201')
     citations.register_inspire('Bobeth:2013uxa')
     citations.register_inspire('Gorbahn:2006bm')
