@@ -36,7 +36,7 @@ In [this repositoy](https://github.com/alp-aca/examples) you can find examples, 
 
 ALPaca has been used in the following publications:
 
-* J. Alda, M. Fuentes Zamoro, L. Merlo, X. Ponce Díaz, S. Rigolin: *Comprehensive ALP searches in Meson Decays*.
+* J. Alda, M. Fuentes Zamoro, L. Merlo, X. Ponce Díaz, S. Rigolin: *Comprehensive ALP searches in Meson Decays*. [arXiv:2507.19578](https://arxiv.org/abs/2507.19578)
 
 If you have used ALPaca in your publication and want to be featured in this list, please [contact us](https://github.com/alp-aca/alp-aca/issues/new?template=publication-using-alpaca.md).
 
