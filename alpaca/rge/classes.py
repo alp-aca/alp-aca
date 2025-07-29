@@ -12,9 +12,8 @@ import sympy as sp
 from os import PathLike
 from io import TextIOBase
 import wilson
-import ckmutil
 from cmath import phase
-from ..common import svd
+from ..common import svd, diagonalise_yukawas
 
 numeric = (int, float, complex, Expr)
 matricial = (np.ndarray, np.matrix, Matrix, list)
@@ -340,9 +339,11 @@ class ALPcouplings:
             smpars = runSM(self.scale)
             s2w = smpars['s2w']
             c2w = 1-s2w
-            UuL, mu, UuR = svd(self.yu)
-            UdL, md, UdR = svd(self.yd)
-            UeL, me, UeR = svd(self.ye)
+            
+            d_y = diagonalise_yukawas(self.yu, self.yd, self.ye)
+            UuL, mu, UuR = d_y['u']
+            UdL, md, UdR = d_y['d']
+            UeL, me, UeR = d_y['e']
 
             cgamma = self.values['cW'] + self.values['cB']
             cgammaZ = c2w * self.values['cW'] - s2w * self.values['cB']
@@ -364,9 +365,10 @@ class ALPcouplings:
             return a
         
         if self.basis == 'massbasis_ew' and basis == 'derivative_above':
-            UuL, mu, UuR = svd(self.yu)
-            UdL, md, UdR = svd(self.yd)
-            UeL, me, UeR = svd(self.ye)
+            d_y = diagonalise_yukawas(self.yu, self.yd, self.ye)
+            UuL, mu, UuR = d_y['u']
+            UdL, md, UdR = d_y['d']
+            UeL, me, UeR = d_y['e']
             a = ALPcouplings({'cG': self.values['cG'], 'cB': self.values['cgamma'] - self.values['cW'], 'cW': self.values['cW'],
                                  'cqL': UuL @ self.values['cuL'] @ np.matrix(UuL).H/2 + UdL @ self.values['cdL'] @ np.matrix(UdL).H/2,
                                  'cuR': UuR @ self.values['cuR'] @ np.matrix(UuR),
@@ -672,14 +674,10 @@ class ALPcouplings:
         if self.scale < self.ew_scale:
             raise ValueError("The running of the CKM matrix is only computed above the EW scale")
         wSM = wilson.classes.SMEFT(wilson.wcxf.WC('SMEFT', 'Warsaw', self.scale, {})).C_in
-        UuL, mu, UuR = svd(self.yu)
-        UdL, md, UdR = svd(self.yd)
-        K = UuL.conj().T @ UdL
-        Vub = abs(K[0,2])
-        Vcb = abs(K[1,2])
-        Vus = abs(K[0,1])
-        gamma = phase(-K[0,0]*K[0,2].conj()/(K[1,0]*K[1,2].conj()))
-        return ckmutil.ckm.ckm_tree(Vus, Vub, Vcb, gamma, 2)
+        d_y = diagonalise_yukawas(self.yu, self.yd, self.ye)
+        UuL, mu, UuR = d_y['u']
+        UdL, md, UdR = d_y['d']
+        return UuL.conj().T @ UdL
     
     def get_mup(self):
         if self.scale < self.ew_scale:
@@ -924,15 +922,11 @@ def _yukawa_matrices(
     VeR: tuple[complex,...],
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     wSM = wilson.classes.SMEFT(wilson.wcxf.WC('SMEFT', 'Warsaw', scale, {})).C_in
-    UuL, mu, UuR = svd(wSM['Gu'])
-    UdL, md, UdR = svd(wSM['Gd'])
-    UeL, me, UeR = svd(wSM['Ge'])
-    K = UuL.conj().T @ UdL
-    Vub = abs(K[0,2])
-    Vcb = abs(K[1,2])
-    Vus = abs(K[0,1])
-    gamma = phase(-K[0,0]*K[0,2].conj()/(K[1,0]*K[1,2].conj()))
-    Vckm = ckmutil.ckm.ckm_tree(Vus, Vub, Vcb, gamma)
+    d_y = diagonalise_yukawas(wSM['Gu'], wSM['Gd'], wSM['Ge'])
+    UuL, mu, UuR = d_y['u']
+    UdL, md, UdR = d_y['d']
+    UeL, me, UeR = d_y['e']
+    Vckm = UuL.conj().T @ UdL
     if VdL is not None:
         VuL_arr = np.array(VdL).reshape(3, 3) @ Vckm
         VdL_arr = np.eye(3, dtype=complex)

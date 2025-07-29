@@ -116,5 +116,34 @@ def svd(A):
     u = u @ pmatrix
     s = s[[2,1,0]]
     vh = pmatrix @ vh
-    t = np.diag(vh)
-    return u @ np.diag(t), s, np.diag(1/t) @ vh
+    return u, s, vh
+
+def diagonalise_yukawas(yu, yd, ye):
+    lu, mu, ru = svd(yu)
+    ld, md, rd = svd(yd)
+    le, me, re = svd(ye)
+    ckm_0 = lu.conj().T @ ld
+    J = np.imag(ckm_0[0,1] * ckm_0[1,2] * np.conj(ckm_0[0,2] * ckm_0[1,1]) )
+    th_12 = np.arctan(np.abs(ckm_0[0,1] / ckm_0[0,0]))
+    th_13 = np.arcsin(np.abs(ckm_0[0,2]))
+    th_23 = np.arctan(np.abs(ckm_0[1,2] / ckm_0[2,2]))
+    delta = np.arcsin(J/(np.cos(th_12) * np.cos(th_13)**2 * np.cos(th_23) * np.sin(th_12) * np.sin(th_13) * np.sin(th_23)))
+    phase_d_1 = ckm_0[0,0] / np.abs(ckm_0[0,0])
+    phase_d_2 = ckm_0[0,1] / np.abs(ckm_0[0,1])
+    phase_d_3 = ckm_0[0,2] / np.abs(ckm_0[0,2]) * np.exp(1j * delta)
+    phase_u_1 = 1.0
+    phase_u_2 = phase_d_3 * np.abs(ckm_0[1,2])/ckm_0[1,2]
+    phase_u_3 = phase_d_3 * np.abs(ckm_0[2,2])/ckm_0[2,2]
+    rephasing_u = np.diag([phase_u_1, phase_u_2, phase_u_3])
+    rephasing_u_h = np.conj(rephasing_u)
+    rephasing_d = np.diag([phase_d_1, phase_d_2, phase_d_3])
+    rephasing_d_h = np.conj(rephasing_d)
+    lu_p = lu @ rephasing_u_h
+    ld_p = ld @ rephasing_d_h
+    ru_p = ru @ rephasing_u_h
+    rd_p = rd @ rephasing_d_h
+
+    return {'u': (lu_p, mu, ru_p.conj().T),
+            'd': (ld_p, md, rd_p.conj().T),
+            'e': (le, me, re.conj().T),
+            }

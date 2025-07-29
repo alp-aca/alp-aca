@@ -4,7 +4,7 @@ import numpy as np
 from cmath import phase
 from ..biblio.biblio import citations
 from functools import lru_cache
-from ..common import svd
+from ..common import svd, diagonalise_yukawas
 
 def runSM(scale: float) -> dict:
     """SM parameters at an energy scale
@@ -27,14 +27,10 @@ def _runSM(scale):
     citations.register_inspire('Straub:2018kue') # ckmutil is inside flavio's repo
     wSM = wilson.classes.SMEFT(wilson.wcxf.WC('SMEFT', 'Warsaw', scale, {})).C_in # For the moment we reuse wilson's code for the SM case, i.e, with all Wilson coefficients set to zero. Maybe at some point we should implement our own version.
 
-    UuL, mu, UuR = svd(wSM['Gu'])
-    UdL, md, UdR = svd(wSM['Gd'])
-    K = UuL.conj().T @ UdL
-    Vub = abs(K[0,2])
-    Vcb = abs(K[1,2])
-    Vus = abs(K[0,1])
-    gamma = phase(-K[0,0]*K[0,2].conj()/(K[1,0]*K[1,2].conj()))
-    Vckm = ckmutil.ckm.ckm_tree(Vus, Vub, Vcb, gamma)
+    d_y = diagonalise_yukawas(wSM['Gu'], wSM['Gd'], wSM['Ge'])
+    UuL, mu, UuR = d_y['u']
+    UdL, md, UdR = d_y['d']
+    Vckm = UuL.conj().T @ UdL
 
     return {
         'yu': np.matrix(UuL).H @ np.matrix(wSM['Gu']),
