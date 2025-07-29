@@ -3,6 +3,7 @@ import tempfile
 from contextlib import contextmanager
 from os import PathLike
 from io import TextIOBase
+from pathlib import Path
 
 class Citations:
     def __init__(self):
@@ -133,7 +134,7 @@ def citations_context(merge: bool = True):
 
 def citation_report(inspire_ids: dict, bibtex: dict, filename: str):
     """Generate a citation report for the measurements from a dict of InSpire ids."""
-    with open(f'{filename}.tex', 'wt') as ftex:
+    with open(Path(filename).with_suffix('.tex'), 'wt') as ftex:
         ftex.write('\\documentclass{article}\n\\usepackage{amsmath,amsfonts,amssymb}\n\\begin{document}\n\\begin{itemize}\n')
         for key, id in inspire_ids.items():
             if isinstance(id, list):
@@ -142,15 +143,16 @@ def citation_report(inspire_ids: dict, bibtex: dict, filename: str):
                 id_str = id
             ftex.write(f'\\item {key}: \\cite{{{id_str}}}\n')
         ftex.write('\\end{itemize}\n')
-        ftex.write(f'\\bibliographystyle{{plain}}\n\\bibliography{{{filename}}}\n')
+        bibname = Path(filename).stem
+        ftex.write(f'\\bibliographystyle{{plain}}\n\\bibliography{{{bibname}}}\n')
         ftex.write('\\end{document}\n')
 
-    with open(f'{filename}.tex', 'rt') as ftex:
+    with open(Path(filename).with_suffix('.tex'), 'rt') as ftex:
         r = requests.post('https://inspirehep.net/api/bibliography-generator?format=bibtex', files={'file': ftex})
     r.raise_for_status()
     r2 = requests.get(r.json()['data']['download_url'], stream=True)
     r2.raise_for_status()
-    with open(f'{filename}.bib', 'wb') as f:
+    with open(Path(filename).with_suffix('.bib'), 'wb') as f:
         for chunck in r2.iter_content(chunk_size=16*1024):
             f.write(chunck)
         for v in bibtex.values():
