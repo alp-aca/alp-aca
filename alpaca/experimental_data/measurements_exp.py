@@ -120,6 +120,18 @@ na62_Ktopiinv = MeasurementDisplacedVertexBound(
     decay_type = 'invisible'
 )
 
+na62_Ktopiinv_2025 = MeasurementDisplacedVertexBound(
+    'NA62:2025upx',
+    os.path.join(current_dir, invisible, 'na62_kpiInv_2025.npy'),
+    decay_type = 'invisible'
+)
+
+na62_Ktopipi0 = MeasurementDisplacedVertexBound(
+    'NA62:2020pwi',
+    os.path.join(current_dir, invisible, 'na62_kpipi0.npy'),
+    decay_type = 'invisible'
+)
+
 e949_Ktopiinv = MeasurementDisplacedVertexBound(
     'BNL-E949:2009dza',
     os.path.join(current_dir, invisible, 'e949_kpiInv.npy'),
@@ -441,15 +453,15 @@ besIII_D0topi0nunu = MeasurementConstantBound(
 #NA62  K+->pi+ gamma gamma
     #Experiment: NA62
     #arXiv: 1402.4334
-def na62_Ktopigammagamma(x):
-    citations.register_inspire('NA62:2014ybm')
-    q2min = [0.220] #Digamma momentum
-    q2max = [0.354] #Digamma momentum
-    value = [9.65e-7]
-    sigmal = [0.63e-7]
-    sigmar = sigmal
-    values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmar)
-    return values, sigmals, sigmars
+# def na62_Ktopigammagamma(x):
+#     citations.register_inspire('NA62:2014ybm')
+#     q2min = [0.220] #Digamma momentum
+#     q2max = [0.354] #Digamma momentum
+#     value = [9.65e-7]
+#     sigmal = [0.63e-7]
+#     sigmar = sigmal
+#     values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmal, sigmar)
+#     return values, sigmals, sigmars
 
 #E949  K+->pi+ gamma gamma
     #Experiment: E949
@@ -1220,6 +1232,18 @@ belle_B0toK0stautau = MeasurementConstantBound('Belle:2021ecr', 'prompt', 3.1e-3
 
 #belle_Y1S_tautau = MeasurementInterpolatedBound('Belle:2021rcl', os.path.join(current_dir, visible, 'Belle_BR_tautau_binned.txt'), 'prompt', conf_level=0.9, min_ma=2*mtau, lab_boost=0.42, mass_parent=mUpsilon1S, mass_sibling=0, rmin=100)
 babar_Y3S_tautau = MeasurementInterpolatedBound('BaBar:2009oxm', os.path.join(current_dir, visible, 'babar_Y3S_tautau.txt'), 'prompt', conf_level=0.9, lab_boost=0.469/(1-0.469**2)**0.5, mass_parent=mUpsilon3S, mass_sibling=0, rmin=10)
+
+na62_Ktopimumu = MeasurementDisplacedVertexBound(
+    ['NA62:2025upx', 'NA62:2022qes'],
+    os.path.join(current_dir, visible, 'na62_kpimumu.npy'),
+    decay_type = 'visible'
+)
+
+na62_Ktopigammagamma = MeasurementDisplacedVertexBound(
+    ['NA62:2025upx', 'NA62:2023olg'],
+    os.path.join(current_dir, visible, 'na62_kpigammagamma.npy'),
+    decay_type = 'visible'
+)
 
 na62na48_kpigammagamma = MeasurementBinned(
     '',
@@ -2154,13 +2178,16 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         return {'E653': e653_DstoKstmue}
     #Initial state K+
     elif initial == ['K+'] and final == sorted(['pion+', 'alp']):
-        return {'NA62': na62_Ktopiinv, 'E949': e949_Ktopiinv, 'NA62(2022)': na62_Ktopiinv22}
+        return {'E949': e949_Ktopiinv,
+                'NA62': na62_Ktopiinv_2025,
+                'NA62 (pi0)': na62_Ktopipi0}
     elif initial == ['K+'] and final == sorted(['pion+', 'electron', 'muon']):
         return {'NA62': na62_Kpluspimue}
-    #elif initial == ['K+'] and final == sorted(['pion+', 'photon', 'photon']):
-    #    return {'NA62+NA48/2': na62na48_kpigammagamma}
+    elif initial == ['K+'] and final == sorted(['pion+', 'photon', 'photon']):
+        return {'NA62': na62_Ktopigammagamma}
     elif initial == ['K+'] and final == sorted(['muon', 'muon', 'pion+']):
-        return {'NA48/2': na482_Kpimumu}
+        return {'NA48/2': na482_Kpimumu,
+                'NA62': na62_Ktopimumu,}
     elif initial == ['K+'] and final == sorted(['electron', 'electron', 'pion+']):
         return {'MicroBooNE': microboone_Kpiee}
     elif initial == ['K+'] and final == sorted(['photon', 'photon', 'pion+']):
