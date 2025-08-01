@@ -12,7 +12,6 @@ import sympy as sp
 from os import PathLike
 from io import TextIOBase
 import wilson
-from cmath import phase
 from ..common import svd, diagonalise_yukawas
 
 numeric = (int, float, complex, Expr)
@@ -159,6 +158,8 @@ class ALPcouplings:
                      raise TypeError(f'The coupling {c} must be of a numeric type, {type(values[c])} given')
             self.values = {c: values[c] for c in ['cG', 'cB', 'cW', 'cqL', 'cuR', 'cdR', 'clL', 'ceR']}
         elif basis == 'massbasis_ew' or basis == 'sp_massbasis_ew':
+            if scale != ew_scale:
+                raise ValueError(f'The scale must be equal to the electroweak scale ({ew_scale} GeV) for the {basis} basis')
             self.scale = scale
             self.basis = basis
             unknown_keys = set(values.keys()) - {'cG', 'cgamma', 'cgammaZ', 'cW', 'cZ', 'cG', 'cuL', 'cuR', 'cdL', 'cdR', 'ceL', 'cnuL', 'ceR'}
@@ -359,23 +360,6 @@ class ALPcouplings:
                 'ceR': np.matrix(UeR).H @ self.values['ceR'] @ UeR,
                 'cgamma': cgamma, 'cW': self.values['cW'], 'cgammaZ': cgammaZ, 'cZ': cZ, 'cG': self.values['cG']
                 }, scale=self.scale, basis='massbasis_ew', ew_scale=self.ew_scale)
-            a.yu = self.yu
-            a.yd = self.yd
-            a.ye = self.ye
-            return a
-        
-        if self.basis == 'massbasis_ew' and basis == 'derivative_above':
-            d_y = diagonalise_yukawas(self.yu, self.yd, self.ye)
-            UuL, mu, UuR = d_y['u']
-            UdL, md, UdR = d_y['d']
-            UeL, me, UeR = d_y['e']
-            a = ALPcouplings({'cG': self.values['cG'], 'cB': self.values['cgamma'] - self.values['cW'], 'cW': self.values['cW'],
-                                 'cqL': UuL @ self.values['cuL'] @ np.matrix(UuL).H/2 + UdL @ self.values['cdL'] @ np.matrix(UdL).H/2,
-                                 'cuR': UuR @ self.values['cuR'] @ np.matrix(UuR),
-                                 'cdR': UdR @ self.values['cdL'] @ np.matrix(UdR),
-                                 'clL': UeL @ self.values['ceL'] @ np.matrix(UeL).H/2 + self.values['cnuL'],
-                                 'ceR': UeR @ self.values['ceR'] @ np.matrix(UeR),
-                                 }, scale=self.scale, basis='derivative_above', ew_scale=self.ew_scale)
             a.yu = self.yu
             a.yd = self.yd
             a.ye = self.ye
