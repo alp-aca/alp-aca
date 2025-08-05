@@ -1236,13 +1236,13 @@ babar_Y3S_tautau = MeasurementInterpolatedBound('BaBar:2009oxm', os.path.join(cu
 na62_Ktopimumu = MeasurementDisplacedVertexBound(
     ['NA62:2025upx', 'NA62:2022qes'],
     os.path.join(current_dir, visible, 'na62_kpimumu.npy'),
-    decay_type = 'visible'
+    decay_type = 'displaced'
 )
 
 na62_Ktopigammagamma = MeasurementDisplacedVertexBound(
     ['NA62:2025upx', 'NA62:2023olg'],
     os.path.join(current_dir, visible, 'na62_kpigammagamma.npy'),
-    decay_type = 'visible'
+    decay_type = 'displaced'
 )
 
 na62na48_kpigammagamma = MeasurementBinned(
