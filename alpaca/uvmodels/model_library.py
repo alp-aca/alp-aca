@@ -176,7 +176,7 @@ class ModelBase:
         cgamma = self.couplings['cB'] + self.couplings['cW']
         return sp.Rational(sp.simplify(cgamma/self.couplings['cG'])).limit_denominator()
     
-    def model_parmeters(self) -> list[sp.Expr]:
+    def model_parameters(self) -> list[sp.Expr]:
         symbols = set()
         for value in self.couplings.values():
             symbols.update(value.free_symbols)
@@ -186,9 +186,9 @@ class ModelBase:
         """Return a string representation of the model in Markdown format."""
         self.initialize()
         md = f"### UV-complete model\n\n**Name:** {self.model_name}\n\n**Model class:** {str(self.__class__).split('.')[-1][:-2]}\n\n"
-        if len(self.model_parmeters()) > 0:
+        if len(self.model_parameters()) > 0:
             md += "<details><summary><b>Parameters:</b></summary>\n\n"
-            for p in self.model_parmeters():
+            for p in self.model_parameters():
                 md += f"- ${sp.latex(p)}$\n"
             md += "\n\n</details>"
         md += "<details><summary><b>Couplings:</b></summary>\n\n" + self.couplings_latex(eqnumber=False) + "\n\n</details>"
@@ -394,8 +394,8 @@ class Flaxion(PQChargedModel):
     def symbolic_ALPcouplings(self, scale: float, ew_scale: float = 100, VuL: np.ndarray | None = None, VdL: np.ndarray | None = None, VuR: np.ndarray | None = None, VdR: np.ndarray | None = None, VeL: np.ndarray | None = None, VeR: np.ndarray | None = None) -> ALPcouplings:
         raise NotImplementedError("The symbolic ALP couplings for the Flaxion model are not implemented. Use get_couplings() instead to get numerical values.")
     
-    def model_parmeters(self) -> list[sp.Expr]:
-        symbols = super().model_parmeters()
+    def model_parameters(self) -> list[sp.Expr]:
+        symbols = super().model_parameters()
         symbols += [eps_flaxion,]
         return symbols
 

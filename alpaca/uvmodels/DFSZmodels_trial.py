@@ -1,81 +1,86 @@
-from ..constants import GF, mW, mu, mc, mt
-class DFSZSpecificModel(ModelBase):
+from alpaca.rge import ALPcouplings
+from ..constants import mW, mu, mc, mt
+from .model_library import PQChargedModel, couplings_latex, beta
+from ..biblio import citations
+from ..rge.matching import match_FCNC_d
+from ..rge.runSM import runSM
+import sympy as sp
+import numpy as np
+
+
+def X1(mq, mH):
+    mHc = float(mH['mH+'])
+    aux = 2 + (mHc**2)/(mHc**2-mq**2) - 3*mW**2/(mq**2-mW**2)
+    aux += 3*mW**4*(mHc**2+mW**2-2*mq**2)/((mHc**2-mW**2)*(mq**2-mW**2)**2)*np.log(mq**2/mW**2)
+    aux += mHc**2/(mHc**2-mq**2)*(mHc**2/(mHc**2-mq**2)-6*mW**2/(mHc**2-mW**2))*np.log(mq**2/mHc**2)
+    return aux
+
+def X2(mq, mH):
+    mHc = float(mH['mH+'])
+    aux = -2*mq**2/(mHc**2-mq**2)*(1+mHc**2/(mHc**2-mq**2)*np.log(mq**2/mHc**2))
+    return aux
+
+
+class DFSZSpecificModel(PQChargedModel):
     """A class to define a model of the type DFSZ given the PQ charges of the SM fermions.
 
     """
-    def X1(mq, mHc, mW):
-        aux = 2 + (mHc**2)/(mHc**2-mq**2) - 3*mW**2/(mq**2-mW**2) +\
-        3*mW**4*(mHc**2+mW**2-2*mq**2)/((mHc**2-mW**2)(mq**2-mW**2)**2)*np.log(mq**2/mW**2) +\
-        mHc**2/(mHc**2-mq**2)*(mHc**2/(mHc**2-mq**2)-6*mW**2/(mHc**2-mW**2))*np.log(mq**2/mHc**2)
-        return aux
     
-    def X2(mq, mHc):
-        aux = -2*mq**2/(mHc**2-mq**2)*(1+mHc**2/(mHc**2-mq**2)*np.log(mq**2/mHc**2))
-        return aux
-    
-    def __init__(self, model_name: str, charges: dict[str, sp.Expr], masses: dict[str, sp.Expr], vevs: dict[str, sp.Expr]):
+    def __init__(self, model_name: str, masses: dict[str, sp.Expr]):
         """Initialize the model with the given name and PQ charges.
 
         Arguments
         ---------
         model_name : str
             The name of the model.
-        charges : dict[str, sp.Expr]
-            A dictionary with the PQ charges of the SM fermions. The keys are the names of the fermions in the unbroken phase: 'cqL', 'cuR', 'cdR', 'clL', 'ceR'.
         masses : dict[str, sp.Expr]
             Mass of the charged Higgses in 2HDM. The keys are the names of Higgses.
-        vevs : dict[str, sp.Expr]
-            Vevs of the charged Higgses in 2HDM. The keys are the names of the 2 Higgs doublets.
-
-        Raises
-        ------
-        NotImplementedError
-            If nonuniversal is True.
         """
-        super().__init__(model_name)
+        charges = {'uR' : 2*sp.sin(beta)**2, 'eR':2*sp.cos(beta)**2, 'dR': 2*sp.cos(beta)**2, 'qL': 0, 'lL': 0}
+        super().__init__(model_name, charges)
         masses = {f: 0 for f in ['mH+']} | masses # initialize to zero all missing masses
         self.masses = {key: sp.sympify(value) for key, value in masses.items()}  # Convert all values to sympy objects
-        
-        masses_np = {key: np.broadcast_to(value, 1) for key, value in masses.items()}  # Convert all values to numpy arrays
-
-        vevs = {f: 0 for f in ['vu', 'vd']} | vevs # initialize to zero all missing vevs
-        self.vevs = {key: sp.sympify(value) for key, value in vevs.items()}  # Convert all values to sympy objects
-        
-        vevs_np = {key: np.broadcast_to(value, 1) for key, value in vevs.items()}  # Convert all values to numpy arrays
-
-        charges = {f: 0 for f in ['lL', 'eR', 'qL', 'uR', 'dR']} | charges # initialize to zero all missing charges
-        self.charges = {key: sp.sympify(value) for key, value in charges.items()}  # Convert all values to sympy objects
-        
-        charges_np = {key: np.broadcast_to(value, 3) for key, value in charges.items()}  # Convert all values to numpy arrays
-        for f in ['qL', 'uR', 'dR', 'lL', 'eR']:
-            if np.array(self.charges[f]).shape == ():
-                self.couplings[f'c{f}'] = -self.charges[f]
-            else:
-                self.couplings[f'c{f}'] = - sp.diag(charges_np[f].tolist(), unpack=True)
-        
-        mquark = [mu, mc, mt]
-        self.couplings['cuR'][1, 2] = self.couplings['cuR'][1, 2] + \
-            - GF/(16*np.pi**2)*(vevs_np['vd']/np.sqrt(vevs_np['vd']**2 + vevs_np['vu']))**2 *1/3*(np.sum([np.conjugate(VCKM[i,0])*VCKM[i,1]*mquark[i]*(X1(mquark[i], masses_np, mW)+X2(mquark[i], masses_np) * (vevs_np['vd']/vevs_np['vu'])**2) for i in range(len(mquark))]))
-
-        self.couplings['cG'] = -sp.Rational(1,2) * sp.simplify(np.sum(
-            2 * charges_np['qL'] - charges_np['dR'] - charges_np['uR']
-        ))
-        self.couplings['cW'] = -sp.Rational(1,2) * sp.simplify(np.sum(
-            3 * charges_np['qL'] + charges_np['lL']
-        ))
-        self.couplings['cB'] = -sp.Rational(1,6) * sp.simplify(np.sum(
-            charges_np['qL'] - 8 * charges_np['uR'] - 2 * charges_np['dR'] + 3 * charges_np['lL'] - 6 * charges_np['eR']
-        ))
-
+    
 
     def initialize(self):
         citations.register_inspire('DiLuzio:2020wdo')
         citations.register_inspire('Alonso-Alvarez:2021ett')
-    
+
+    def get_couplings(self,
+                      substitutions: dict[sp.Expr, float | complex],
+                      scale: float,
+                      ew_scale: float = 100.0,
+                      VuL: np.ndarray| None = None,
+                      VdL: np.ndarray| None = None,
+                      VuR: np.ndarray| None = None,
+                      VdR: np.ndarray| None = None,
+                      VeL: np.ndarray| None = None,
+                      VeR: np.ndarray| None = None,
+                      **kwargs
+                      ) -> ALPcouplings:
+        c1 = super().get_couplings(substitutions, scale, ew_scale, VuL, VdL, VuR, VdR, VeL, VeR)
+        c2 = c1.match_run(c1.ew_scale, 'massbasis_ew', **kwargs)
+        c3 = c2.match_run(c1.ew_scale*(1-1e-8), 'RL_below')
+        c3['cdL'] -= match_FCNC_d(c2, two_loops=True)
+
+        parsSM = runSM(c1.ew_scale)
+        GF = parsSM['GF']
+        VCKM = np.matrix(parsSM['CKM'])
+        beta_val = substitutions[beta]
+
+        mquark = [mu, mc, mt]
+        for d1 in range(3):
+            for d2 in range(3):
+                if d1 == d2:
+                    continue
+                c3['cdL'][d1,d2] += GF/(16*np.pi**2) * np.cos(beta_val)**2/3*(np.sum([np.conjugate(VCKM[i,d1])*VCKM[i,d2]*mquark[i]**2*(X1(mquark[i], self.masses)+X2(mquark[i], self.masses)/np.tan(beta_val)**2) for i in range(3)]))
+        return c3
+
     def _repr_markdown_(self):
+        latex_higgses = {'mH+': r'H^\pm'}
         md = super()._repr_markdown_()
-        md += "<details><summary><b>PQ charges:</b></summary>\n\n"
-        for f, c in self.charges.items():
-            md += f"- $\\mathcal{{X}}{couplings_latex['c'+f][1:]} = {sp.latex(c)}$\n"
+        md += "<details><summary><b>Masses:</b></summary>\n\n"
+        for f, m in self.masses.items():
+            md += f"- $m_{{{latex_higgses[f]}}} = {sp.latex(m)}$ GeV\n"
         md += "\n\n</details>"
         return md
