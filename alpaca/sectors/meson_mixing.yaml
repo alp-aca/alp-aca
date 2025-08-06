@@ -7,4 +7,6 @@ observables:
 - 'phi12_D0'
 - 'delta_mBs'
 - 'delta_mB0'
+- 'ASL_B0'
+- 'ASL_Bs'
 tex: '$M^0 \to \bar{M}^0$'
