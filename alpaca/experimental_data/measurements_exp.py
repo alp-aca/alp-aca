@@ -1447,6 +1447,25 @@ hflav_phi12D0 = MeasurementConstant(
     max_ma=np.inf
 )
 
+hflav_ASL_B0 = MeasurementConstant(
+    'HeavyFlavorAveragingGroupHFLAV:2024ctg',
+    'flat',
+    -0.0021,
+    0.0017,
+    0.0017,
+    max_ma=np.inf
+)
+
+
+hflav_ASL_Bs = MeasurementConstant(
+    'HeavyFlavorAveragingGroupHFLAV:2024ctg',
+    'flat',
+    -0.0006,
+    0.0028,
+    0.0028,
+    max_ma=np.inf
+)
+
 belleII_deltaMd = MeasurementConstant(
     'Belle-II:2023bps',
     'flat',
@@ -1950,6 +1969,10 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         return {'Belle II': belleII_deltaMd}
     elif process == 'delta_mBs':
         return {'LHCb': lhcb_deltaMs}
+    elif process == 'ASL_B0':
+        return {'HFLAV': hflav_ASL_B0}
+    elif process == 'ASL_Bs':
+        return {'HFLAV': hflav_ASL_Bs}
     elif process in ['B+', 'B-']:
         return {'PDG': dw_Bplus}
     elif process in ['B0', 'Bd0']:

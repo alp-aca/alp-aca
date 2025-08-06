@@ -83,7 +83,11 @@ def get_th_uncert(process: str | tuple, N: int = 50) -> float:
     elif process == 'x_D0':
         return flavio.sm_uncertainty('x_D', N=N)
     elif process == 'phi12_D0':
-        return 0 
+        return 0
+    elif process == 'ASL_B0':
+        return flavio.sm_uncertainty('a_fs_d', N=N)
+    elif process == 'ASL_Bs':
+        return flavio.sm_uncertainty('a_fs_s', N=N)
     elif process in ['B+', 'B-', 'B0', 'Bd0', 'D+', 'D-', 'D0', 'Ds+', 'Ds-', 'K+', 'K-', 'KL', 'KS', 'K0L', 'K0S']:
         return 0
     if isinstance(process, str):

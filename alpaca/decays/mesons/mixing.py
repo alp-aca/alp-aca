@@ -2,7 +2,7 @@ import numpy as np
 from ...biblio.biblio import citations
 from ...common import alpha_s, pars
 from ...rge.classes import ALPcouplings
-from flavio.physics.mesonmixing.amplitude import M12_d_SM, M12_u_SM, G12_u_SM
+from flavio.physics.mesonmixing.amplitude import M12_d_SM, M12_u_SM, G12_u_SM, G12_d_SM
 
 tex_codes = {
     'delta_mK0': r'\Delta m_{K^0}',
@@ -11,6 +11,8 @@ tex_codes = {
     'phi12_D0': r'\phi_{12,D^0}',
     'delta_mB0': r'\Delta m_{B^0}',
     'delta_mBs': r'\Delta m_{B_s^0}',
+    'ASL_B0': r'\mathcal{A}_\mathrm{SL}(B^0)',
+    'ASL_Bs': r'\mathcal{A}_\mathrm{SL}(B_s^0)',
 }
 
 def eta(meson) -> np.ndarray:
@@ -183,6 +185,20 @@ def delta_mBs(couplings: ALPcouplings, ma, fa, **kwargs) -> float:
     from ...constants import mBs, hbar_GeVps
     return np.abs(effhamiltonian('Bs', couplings, ma, fa, **kwargs)/mBs/hbar_GeVps)
 
+def ASL_Bd(couplings: ALPcouplings, ma, fa, **kwargs) -> float:
+    from ...constants import mB0
+    heff = effhamiltonian('B0', couplings, ma, fa, **kwargs)
+    gamma12 = G12_d_SM(pars, 'B0')
+    phi12 = np.angle(-heff/(2*mB0*gamma12))
+    return 2 * mB0 * np.abs(gamma12/heff) * np.sin(phi12)
+
+def ASL_Bs(couplings: ALPcouplings, ma, fa, **kwargs) -> float:
+    from ...constants import mBs
+    heff = effhamiltonian('Bs', couplings, ma, fa, **kwargs)
+    gamma12 = G12_d_SM(pars, 'Bs')
+    phi12 = np.angle(-heff/(2*mBs*gamma12))
+    return 2 * mBs * np.abs(gamma12/heff) * np.sin(phi12)
+
 mixing_observables = {
     'delta_mK0': delta_mK0,
     'epsK': epsK,
@@ -190,6 +206,8 @@ mixing_observables = {
     'phi12_D0': phi12_D0,
     'delta_mB0': delta_mB0,
     'delta_mBs': delta_mBs,
+    'ASL_B0': ASL_Bd,
+    'ASL_Bs': ASL_Bs,
 }
 
 def meson_mixing(obs: str, ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
