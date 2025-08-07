@@ -370,6 +370,10 @@ class MeasurementDisplacedVertexBound(MeasurementBase):
         self.initiate()
         return sigma(self.conf_level, self.get_central(ma, ctau))
     
+    def get_values(self, ma: float, ctau: float) -> float:
+        self.initiate()
+        return self.get_central(ma, ctau), self.get_sigma_left(ma, ctau), self.get_sigma_right(ma, ctau)
+    
     def decay_probability(self, ctau, ma, theta = None, br_dark = 0):
         self.initiate()
         tau = np.atleast_1d(ctau)*1e7/c_nm_per_ps
