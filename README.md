@@ -1,6 +1,6 @@
 # ALPaca
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16447037.svg)](https://doi.org/10.5281/zenodo.16447037)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16447037.svg)](https://doi.org/10.5281/zenodo.16447037) [![arxiv](https://img.shields.io/badge/arXiv-2508.08354_[hep--ph]-B31B1B.svg?style=flat&logo=arxiv&logoColor=B31B1B)](https://arxiv.org/abs/2508.08354)
 
 Welcome to the ALP Automated Computed Algorithm (ALPaca)!
 
@@ -45,7 +45,7 @@ If you have used ALPaca in your publication and want to be featured in this list
 ALPaca can be installed with `pip`:
 
 ```bash
-pip install alpaca-ALPs
+pip3 install alpaca-ALPs
 ```
 
 It is *strongly recommended* to install ALPaca inside a virtual environment (venv), in order to avoid clashes with conflicting versions of the dependencies. In order to create a venv, execute the following command
@@ -79,14 +79,15 @@ Once the venv is activated, ALPaca can be normally installed and used.
 If you use ALPaca, please cite
 
 ```bibtex
-@article{ALPaca:2025Manual,
-    author = {Alda, Jorge and
-                  Fuentes Zamoro, Marta and
-                  Merlo, Luca and
-                  Rigolin, Stefano and
-                  Ponce Díaz, Xavier},
-    title = "ALPaca: the ALP Automatic Computing Algorithm",
-    journal = "In preparation."
+@article{Alda:2025nsz,
+    author = "Alda, Jorge and Fuentes Zamoro, Marta and Merlo, Luca and Ponce D{\'\i}az, Xavier and Rigolin, Stefano",
+    title = "{ALPaca: The ALP Automatic Computing Algorithm}",
+    eprint = "2508.08354",
+    archivePrefix = "arXiv",
+    primaryClass = "hep-ph",
+    reportNumber = "IFT-UAM/CSIC-25-82",
+    month = "8",
+    year = "2025"
 }
 
 @software{alda_2025_16447037,
@@ -107,7 +108,7 @@ If you use ALPaca, please cite
 
 ## Documentation
 
-The ALPaca manual will be published in arXiv very soon!
+The ALPaca manual is available on [arXiv](https://arxiv.org/abs/2508.08354).
 
 You can also check the [automatically-generated documentation](https://alpaca-alps.readthedocs.io/latest/).
 

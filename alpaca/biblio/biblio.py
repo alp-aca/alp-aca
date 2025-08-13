@@ -8,17 +8,9 @@ from pathlib import Path
 class Citations:
     def __init__(self):
         self.citations = set()
+        self.citations.add('Alda:2025nsz')
         self.dict_citations = {}
-        self.bibtex_manual = r"""@article{ALPaca:2025Manual,
-    author = {Alda, Jorge and
-                  Fuentes Zamoro, Marta and
-                  Merlo, Luca and
-                  Rigolin, Stefano and
-                  Ponce Díaz, Xavier},
-    title = "ALPaca: the ALP Automatic Computing Algorithm",
-    journal = "In preparation."
-}
-
+        self.bibtex_manual = r"""
 @software{alda_2025_16447037,
     author       = {Alda, Jorge and
                     Fuentes Zamoro, Marta and

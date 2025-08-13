@@ -4,7 +4,7 @@ authors = [{name = "Jorge Alda", email = "jorge.alda@pd.infn.it"}, {name = "Mart
 description = "The ALP Automatic Computing Algorithm"
 license = "MIT"
 readme = "README.md"
-version = "0.1.0"
+version = "1.0.0"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
@@ -20,6 +20,7 @@ repository = "https://github.com/alp-aca/alp-aca"
 Documentation = "https://alpaca-alps.readthedocs.io/latest/"
 "Examples" = "https://github.com/alp-aca/examples"
 "DOI" = "https://doi.org/10.5281/zenodo.16447036"
+"Manual" = "https://arxiv.org/abs/2508.08354"
 
 [tool.poetry]
 packages = [{ include = "alpaca" }]

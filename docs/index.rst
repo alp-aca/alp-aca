@@ -50,13 +50,15 @@ ALPaca in action
 The source code of ALPaca is available in
 `this repository <https://github.com/alp-aca/alp-aca>`__ (`doi:10.5281/zenodo.16447037 <https://doi.org/10.5281/zenodo.16447037>`__).
 
+The ALPaca manual is available on `arXiv:2508.08354 [hep-ph] <https://arxiv.org/abs/2508.08354>`__.
+
 In `this repository <https://github.com/alp-aca/examples>`__ you can find
 examples, tutorials and applications of ALPaca.
 
 ALPaca has been used in the following publications:
 
 - J. Alda, M. Fuentes Zamoro, L. Merlo, X. Ponce Díaz, S. Rigolin:
-  *Comprehensive ALP searches in Meson Decays*.
+  *Comprehensive ALP searches in Meson Decays* `arXiv:2507.19578 [hep-ph] <https://arxiv.org/abs/2507.19578>`__.
 
 If you have used ALPaca in your publication and want to be featured in
 this list, please `contact
@@ -69,7 +71,7 @@ ALPaca can be installed with ``pip``:
 
 .. code:: bash
 
-   pip install alpaca-ALPs
+   pip3 install alpaca-ALPs
 
 It is *strongly recommended* to install ALPaca inside a virtual
 environment (venv), in order to avoid clashes with conflicting versions
@@ -109,14 +111,15 @@ If you use ALPaca, please cite
 
 .. code:: bibtex
 
-   @article{ALPaca:2025Manual,
-       author = {Alda, Jorge and
-                     Fuentes Zamoro, Marta and
-                     Merlo, Luca and
-                     Rigolin, Stefano and
-                     Ponce Díaz, Xavier},
-       title = "ALPaca: the ALP Automatic Computing Algorithm",
-       journal = "In preparation."
+   @article{Alda:2025nsz,
+      author = "Alda, Jorge and Fuentes Zamoro, Marta and Merlo, Luca and Ponce D{\'\i}az, Xavier and Rigolin, Stefano",
+      title = "{ALPaca: The ALP Automatic Computing Algorithm}",
+      eprint = "2508.08354",
+      archivePrefix = "arXiv",
+      primaryClass = "hep-ph",
+      reportNumber = "IFT-UAM/CSIC-25-82",
+      month = "8",
+      year = "2025"
    }
 
    @software{alda_2025_16447037,
