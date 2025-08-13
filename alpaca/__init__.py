@@ -43,3 +43,29 @@ alp_channels_branching_ratios
 import lazy_loader as lazy
 
 __getattr__, __dir__, __all__ = lazy.attach_stub(__name__, __file__)
+
+__version__ = "1.0.0"
+
+class info:
+    def __repr__(self):
+        out = "\nALPaca: ALP Automatic Computing Algorithm\n"
+        out += "=========================================\n"
+        out += f"Version: {__version__}\n\n"
+        out += "Authors:\n"
+        out += "\t- Jorge Alda (U. Padova & INFN Padova & CAPA Zaragoza)\n"
+        out += "\t- Marta Fuentes Zamoro (U. Autónoma de Madrid & IFT Madrid)\n"
+        out += "\t- Luca Merlo (U. Autónoma de Madrid & IFT Madrid)\n"
+        out += "\t- Xavier Ponce Díaz (U. Basel)\n"
+        out += "\t- Stefano Rigolin (U. Padova & INFN Padova)\n"
+        out += "Homepage: https://github.com/alp-aca/alp-aca\n"
+        out += "Documentation: https://alpaca-alps.readthedocs.io/latest/\n"
+        out += "Please cite arXiv:2508.08354 https://arxiv.org/abs/2508.08354"
+        return out
+    def _repr_markdown_(self):
+        import os
+        import pathlib
+        current_dir = os.path.dirname(__file__)
+        readme_path = pathlib.Path(current_dir).parent / "README.md"
+        with open(readme_path, "r") as f:
+            readme_content = f.read()
+        return readme_content

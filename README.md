@@ -1,10 +1,11 @@
 # ALPaca
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16447037.svg)](https://doi.org/10.5281/zenodo.16447037) [![arxiv](https://img.shields.io/badge/arXiv-2508.08354_[hep--ph]-B31B1B.svg?style=flat&logo=arxiv&logoColor=B31B1B)](https://arxiv.org/abs/2508.08354)
+[![Version](https://img.shields.io/badge/version-1.0.0-teal?logo=GitHub)](https://github.com/alp-aca/alp-aca/tree/v1.0.0)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16447036.svg)](https://doi.org/10.5281/zenodo.16447036) [![arxiv](https://img.shields.io/badge/arXiv-2508.08354_[hep--ph]-B31B1B.svg?style=flat&logo=arxiv&logoColor=B31B1B)](https://arxiv.org/abs/2508.08354)
 
 Welcome to the ALP Automated Computed Algorithm (ALPaca)!
 
-![ALPaca logo](docs/_static/logo.png)
+![ALPaca logo](https://raw.githubusercontent.com/alp-aca/alp-aca/main/docs/_static/logo.png)
 
 ALPaca is an open-source Python library for the phenomenology of Axion-Like Particles (ALPs) with masses in the ranges of $m_a \sim 0.01 - 10\,\mathrm{GeV}$, mainly in processes involving mesons.
 
@@ -90,7 +91,7 @@ If you use ALPaca, please cite
     year = "2025"
 }
 
-@software{alda_2025_16447037,
+@software{alda_2025_16447036,
   author       = {Alda, Jorge and
                   Fuentes Zamoro, Marta and
                   Merlo, Luca and
@@ -100,9 +101,9 @@ If you use ALPaca, please cite
   month        = jul,
   year         = 2025,
   publisher    = {Zenodo},
-  version      = {v1.0.0-alpha.1},
-  doi          = {10.5281/zenodo.16447037},
-  url          = {https://doi.org/10.5281/zenodo.16447037},
+  version      = {v1.0.0},
+  doi          = {10.5281/zenodo.16447036},
+  url          = {https://doi.org/10.5281/zenodo.16447036},
 }
 ```
 
