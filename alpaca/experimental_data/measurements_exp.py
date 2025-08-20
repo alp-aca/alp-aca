@@ -367,13 +367,23 @@ belle_Bchargedtorhochargednunu = MeasurementConstantBound(
     lab_boost=0.28
 )
 
-belle_Bchargedtopichargednunu = MeasurementConstantBound(
-    inspire_id='Belle:2017oht',
+#belle_Bchargedtopichargednunu = MeasurementConstantBound(
+#    inspire_id='Belle:2017oht',
+#    decay_type='invisible',
+#    bound=1.4e-5,
+#    conf_level=0.9,
+#    mass_parent=mB,
+#    rmax=rmax_belle
+#)
+
+babar_Bchargedtopichargednunu = MeasurementConstantBound(
+    inspire_id='MartinCamalich:2020dfe',
     decay_type='invisible',
-    bound=1.4e-5,
+    bound=2.3e-5,
     conf_level=0.9,
     mass_parent=mB,
-    rmax=rmax_belle
+    rmax=50, 
+    lab_boost=0.469/(1-0.469**2)**0.5
 )
 
 belle_B0toK0nunu = MeasurementConstantBound(
@@ -405,14 +415,34 @@ belle_B0topi0nunu = MeasurementConstantBound(
     lab_boost=0.28
 )
 
-belle_B0torho0nunu = MeasurementConstantBound(
-    inspire_id='Belle:2017oht',
-    decay_type='invisible',
-    bound=4e-5,
-    conf_level=0.9,
+#belle_B0torho0nunu = MeasurementConstantBound(
+#    inspire_id='Belle:2017oht',
+#    decay_type='invisible',
+#    bound=4e-5,
+#    conf_level=0.9,
+#    mass_parent=mB0,
+#   rmax=rmax_belle,
+#    lab_boost=0.28
+#)
+
+aleph_B0torho0nunu = MeasurementInterpolatedBound(
+    'Alonso-Alvarez:2023mgc',
+    os.path.join(current_dir, invisible, 'aleph_Brhonunu.txt'),
+    'invisible',
+    #rmax = 16.5,
     mass_parent=mB0,
-    rmax=rmax_belle,
-    lab_boost=0.28
+    mass_sibling=mrho,
+    lab_boost=0.0
+)
+
+aleph_Bptorhopnunu = MeasurementInterpolatedBound(
+    'Alonso-Alvarez:2023mgc',
+    os.path.join(current_dir, invisible, 'aleph_Brhonunu.txt'),
+    'invisible',
+    #rmax = 16.5,
+    mass_parent=mB,
+    mass_sibling=mrho,
+    lab_boost=0.0
 )
 
 delphi_Bstophinunu = MeasurementConstantBound(
@@ -430,21 +460,30 @@ delphi_Bstophinunu = MeasurementConstantBound(
     #arXiv: 2112.14236
     #@ 90% confidence level
     #Branching ratio
-besIII_D0topi0nunu = MeasurementConstantBound(
-    inspire_id='BESIII:2021slf',
-    decay_type='invisible',
-    bound=2.1e-4,
-    conf_level=0.9,
-    mass_parent=mD0,
-    mass_sibling=mpi0,
-    rmax=rmax_besIII
-)
+#besIII_D0topi0nunu = MeasurementConstantBound(
+#    inspire_id='BESIII:2021slf',
+#    decay_type='invisible',
+#    bound=2.1e-4,
+#    conf_level=0.9,
+#    mass_parent=mD0,
+#    mass_sibling=mpi0,
+#    rmax=rmax_besIII
+#)
 
-#BelleII e+e- -> gamma a
-    #Experiment: BelleII
-    #arXiv: 2007.13071
-    #@95% confidence level
-    #Cross section (pb)
+#CLEO D+->pi+ nu nu 2008 
+    #Experiment: CLEO (recast)
+    #arXiv: 2002.04623
+    #@ 90% confidence level
+    #Branching ratio
+cleo_Dptopipnunu = MeasurementConstantBound(
+    inspire_id='MartinCamalich:2020dfe',
+    decay_type='invisible',
+    bound=8.0e-6,
+    conf_level=0.9,
+    mass_parent=mDplus,
+    mass_sibling=mpi_pm,
+    #rmin=4.7
+)
 
 #################################### VISIBLE SEARCHES ####################################
 
@@ -2006,9 +2045,11 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     elif initial == ['B+'] and final == sorted(['K*+', 'alp']):
         return {'BaBar': babar_btokstarnunu_lightmediator}
     elif initial == ['B+'] and final == sorted(['pion+', 'alp']):
-        return {'Belle': belle_Bchargedtopichargednunu}
+        #return {'Belle': belle_Bchargedtopichargednunu}
+        return {'BaBar': babar_Bchargedtopichargednunu}
     elif initial == ['B+'] and final == sorted(['rho+', 'alp']):
-        return {'Belle': belle_Bchargedtorhochargednunu}
+        return {'ALEPH': aleph_Bptorhopnunu}
+        #return {'Belle': belle_Bchargedtorhochargednunu}
     elif initial == ['B+'] and final == sorted(['pion+', 'electron', 'electron']):
         return {'BaBar': babar_bptopiee, 'Belle': belle_bptopiee}
     elif initial == ['B+'] and final == sorted(['pion+', 'muon', 'muon']):
@@ -2055,7 +2096,8 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     elif initial == ['B0'] and final == sorted(['K0', 'alp']):
         return {'Belle': belle_B0toK0nunu}
     elif initial == ['B0'] and final == sorted(['rho0', 'alp']):
-        return {'Belle': belle_B0torho0nunu}
+        return {'ALEPH': aleph_B0torho0nunu}
+        #return {'Belle': belle_B0torho0nunu}
     elif initial == ['B0'] and final == sorted(['pion0', 'electron', 'electron']):
         return {'BaBar': babar_b0topiee, 'Belle': belle_b0topiee}
     elif initial == ['B0'] and final == sorted(['pion0', 'muon', 'muon']):
@@ -2149,8 +2191,8 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         else:
             return {'Belle II': belleII_Upsilon4S_gammatautau}
     #initial state D0
-    elif initial == ['D0'] and final == sorted(['pion0', 'alp']):
-        return {'BESIII': besIII_D0topi0nunu}
+    #elif initial == ['D0'] and final == sorted(['pion0', 'alp']):
+    #    return {'BESIII': besIII_D0topi0nunu}
     elif initial == ['D0'] and final == sorted(['pion0', 'electron', 'electron']):
         return {'BESIII': besIII_D0topi0ee}
     elif initial == ['D0'] and final == sorted(['pion0', 'muon', 'muon']):
@@ -2179,6 +2221,8 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     elif initial == ['D0'] and final == sorted(['rho0', 'muon', 'electron']):
         return {'BaBar': babar_D0rhomue}
     #Initial state D+
+    elif initial == ['D+'] and final == sorted(['pion+', 'alp']):
+        return {'CLEO': cleo_Dptopipnunu}
     elif initial == ['D+'] and final == sorted(['pion+', 'electron', 'electron']):
         return {'LHCb': lhcb_Dptopipee}
     elif initial == ['D+'] and final == sorted(['pion+', 'muon', 'muon']):
