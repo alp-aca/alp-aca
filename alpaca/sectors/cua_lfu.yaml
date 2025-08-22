@@ -1,7 +1,6 @@
 name: cua_lfu
 description: 'LFU $c\to u a$ observables'
 observables:
-- D0 -> pi0 a
 - D0 -> pi0 e e
 - D0 -> eta e e
 - D0 -> rho0 e e
