@@ -429,20 +429,20 @@ aleph_B0torho0nunu = MeasurementInterpolatedBound(
     'Alonso-Alvarez:2023mgc',
     os.path.join(current_dir, invisible, 'aleph_Brhonunu.txt'),
     'invisible',
-    #rmax = 16.5,
+    rmax = 170,
     mass_parent=mB0,
     mass_sibling=mrho,
-    lab_boost=0.0
+    lab_boost=6.1
 )
 
 aleph_Bptorhopnunu = MeasurementInterpolatedBound(
     'Alonso-Alvarez:2023mgc',
     os.path.join(current_dir, invisible, 'aleph_Brhonunu.txt'),
     'invisible',
-    #rmax = 16.5,
+    rmax = 170,
     mass_parent=mB,
     mass_sibling=mrho,
-    lab_boost=0.0
+    lab_boost=6.1
 )
 
 delphi_Bstophinunu = MeasurementConstantBound(
@@ -482,7 +482,7 @@ cleo_Dptopipnunu = MeasurementConstantBound(
     conf_level=0.9,
     mass_parent=mDplus,
     mass_sibling=mpi_pm,
-    #rmin=4.7
+    rmax=95
 )
 
 #################################### VISIBLE SEARCHES ####################################
