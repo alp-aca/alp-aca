@@ -406,13 +406,13 @@ belle_B0toK0starnunu = MeasurementConstantBound(
 )
 
 belle_B0topi0nunu = MeasurementConstantBound(
-    inspire_id='Belle:2017oht',
+    inspire_id='MartinCamalich:2020dfe',
     decay_type='invisible',
-    bound=9e-6,
+    bound=2.3e-5,
     conf_level=0.9,
-    mass_parent=mB0,
-    rmax=rmax_belle,
-    lab_boost=0.28
+    mass_parent=mB,
+    rmax=50, 
+    lab_boost=0.469/(1-0.469**2)**0.5
 )
 
 #belle_B0torho0nunu = MeasurementConstantBound(
