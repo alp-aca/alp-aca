@@ -1284,6 +1284,107 @@ na62_Ktopigammagamma = MeasurementDisplacedVertexBound(
     decay_type = 'displaced'
 )
 
+lhcbdownstream_Kstopimumu = MeasurementDisplacedVertexBound(
+    'Gorkavenko:2023nbk',
+    os.path.join(current_dir, visible, 'lhcbdownstream_KS_mumu_D.npy'),
+    decay_type = 'displaced'
+)
+
+lhcbdownstream_Kstopiee = MeasurementDisplacedVertexBound(
+    'Gorkavenko:2023nbk',
+    os.path.join(current_dir, visible, 'lhcbdownstream_KS_ee_D.npy'),
+    decay_type = 'displaced'
+)
+
+lhcbdownstream_B0toKstmumu = MeasurementDisplacedVertexBound(
+    'Gorkavenko:2023nbk',
+    os.path.join(current_dir, visible, 'lhcbdownstream_B0_mumu_D.npy'),
+    decay_type = 'displaced'
+)
+
+lhcbdownstream_BplustoKmumu = MeasurementDisplacedVertexBound(
+    'Gorkavenko:2023nbk',
+    os.path.join(current_dir, visible, 'lhcbdownstream_Bplus_mumu_D.npy'),
+    decay_type = 'displaced'
+)
+
+lhcbdownstream_B0toKstee = MeasurementDisplacedVertexBound(
+    'Gorkavenko:2023nbk',
+    os.path.join(current_dir, visible, 'lhcbdownstream_B0_ee_D.npy'),
+    decay_type = 'displaced'
+)
+
+lhcbdownstream_BplustoKee = MeasurementDisplacedVertexBound(
+    'Gorkavenko:2023nbk',
+    os.path.join(current_dir, visible, 'lhcbdownstream_Bplus_ee_D.npy'),
+    decay_type = 'displaced'
+)
+
+lhcbdownstream_BplustoK3pi = MeasurementDisplacedVertexBound(
+    'Gorkavenko:2023nbk',
+    os.path.join(current_dir, visible, 'lhcbdownstream_Bplus_3pi_D.npy'),
+    decay_type = 'displaced'
+)
+
+lhcbdownstream_B0toKst3pi = MeasurementDisplacedVertexBound(
+    'Gorkavenko:2023nbk',
+    os.path.join(current_dir, visible, 'lhcbdownstream_B0_3pi_D.npy'),
+    decay_type = 'displaced'
+)
+
+lhcbdownstream_BplustoKgammapipi = MeasurementDisplacedVertexBound(
+    'Gorkavenko:2023nbk',
+    os.path.join(current_dir, visible, 'lhcbdownstream_Bplus_gammapipi_D.npy'),
+    decay_type = 'displaced'
+)
+
+lhcbdownstream_B0toKstgammapipi = MeasurementDisplacedVertexBound(
+    'Gorkavenko:2023nbk',
+    os.path.join(current_dir, visible, 'lhcbdownstream_B0_gammapipi_D.npy'),
+    decay_type = 'displaced'
+)
+
+lhcbdownstream_DstoKmumu = MeasurementDisplacedVertexBound(
+    'Gorkavenko:2023nbk',
+    os.path.join(current_dir, visible, 'lhcbdownstream_Ds_mumu_D.npy'),
+    decay_type = 'displaced'
+)
+
+lhcbdownstreamT_Kstopimumu = MeasurementDisplacedVertexBound(
+    'Gorkavenko:2023nbk',
+    os.path.join(current_dir, visible, 'lhcbdownstream_KS_mumu_T.npy'),
+    decay_type = 'displaced'
+)
+
+lhcbdownstreamT_Kstopiee = MeasurementDisplacedVertexBound(
+    'Gorkavenko:2023nbk',
+    os.path.join(current_dir, visible, 'lhcbdownstream_KS_ee_T.npy'),
+    decay_type = 'displaced'
+)
+
+lhcbdownstreamT_B0toKstmumu = MeasurementDisplacedVertexBound(
+    'Gorkavenko:2023nbk',
+    os.path.join(current_dir, visible, 'lhcbdownstream_B0_mumu_T.npy'),
+    decay_type = 'displaced'
+)
+
+lhcbdownstreamT_BplustoKmumu = MeasurementDisplacedVertexBound(
+    'Gorkavenko:2023nbk',
+    os.path.join(current_dir, visible, 'lhcbdownstream_Bplus_mumu_T.npy'),
+    decay_type = 'displaced'
+)
+lhcbdownstreamT_B0toKstee = MeasurementDisplacedVertexBound(
+    'Gorkavenko:2023nbk',
+    os.path.join(current_dir, visible, 'lhcbdownstream_B0_ee_T.npy'),
+    decay_type = 'displaced'
+)
+
+lhcbdownstreamT_BplustoKee = MeasurementDisplacedVertexBound(
+    'Gorkavenko:2023nbk',
+    os.path.join(current_dir, visible, 'lhcbdownstream_Bplus_ee_T.npy'),
+    decay_type = 'displaced'
+)
+
 na62na48_kpigammagamma = MeasurementBinned(
     '',
     os.path.join(current_dir, visible, 'na62na48_Kplus_piphotons'),
@@ -2059,12 +2160,15 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     elif initial == ['B+'] and final == sorted(['pion+', 'muon', 'tau']):
         return {'BaBar': babar_Bpluspitaumu}
     elif initial == ['B+'] and final == sorted(['K+', 'electron', 'electron']):
-        return {'Belle II': belleII_bkee_displvertex}
+        if exclude_projections:
+            return {'Belle II': belleII_bkee_displvertex}
+        else:
+            return {'Belle II': belleII_bkee_displvertex, 'LHCb downstream': lhcbdownstream_BplustoKee, 'LHCb downstream (T)': lhcbdownstreamT_BplustoKee}
     elif initial == ['B+'] and final == sorted(['K+', 'muon', 'muon']):
         if exclude_projections:
             return {'LHCb': lhcb_bkmumu_displvertex, 'Belle II': belleII_bkmumu_displvertex, 'CHARM': charm_bkmumu_displvertex}
         else:
-            return {'LHCb': lhcb_bkmumu_displvertex, 'Belle II': belleII_bkmumu_displvertex, 'CHARM': charm_bkmumu_displvertex, 'NA62': na62proj_bkmumu_displvertex, 'SHiP': shipproj_bkmumu_displvertex}  
+            return {'LHCb': lhcb_bkmumu_displvertex, 'Belle II': belleII_bkmumu_displvertex, 'CHARM': charm_bkmumu_displvertex, 'NA62': na62proj_bkmumu_displvertex, 'SHiP': shipproj_bkmumu_displvertex, 'LHCb downstream': lhcbdownstream_BplustoKmumu, 'LHCb downstream (T)': lhcbdownstreamT_BplustoKmumu}
     elif initial == ['B+'] and final == sorted(['K+', 'tau', 'tau']):
         if exclude_projections:
             return {'BaBar': babar_bktautau}
@@ -2073,9 +2177,15 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     elif initial == ['B+'] and final == sorted(['K+', 'photon', 'photon']):
         return {'BaBar': babar_bkphotons_displvertex}
     elif initial == ['B+'] and final == sorted(['K+', 'pion+', 'pion-', 'pion0']):
-        return {'Belle': belle_bpKomega3pi}
+        if exclude_projections:
+            return {'Belle': belle_bpKomega3pi}
+        else:
+            return {'Belle': belle_bpKomega3pi, 'LHCb downstream': lhcbdownstream_BplustoK3pi}
     elif initial == ['B+'] and final == sorted(['K+', 'eta', 'pion+', 'pion-']):
         return {'BaBar': babar_BKetapipi}
+    elif initial == ['B+'] and final == sorted(['K+', 'photon', 'pion+', 'pion-']):
+        if not exclude_projections:
+            return {'LHCb downstream': lhcbdownstream_BplustoKgammapipi}
     elif initial == ['B+'] and final == sorted(['K+', 'muon', 'tau']):
         if exclude_projections:
             return {'BaBar': babar_BplusKtaumu}
@@ -2103,9 +2213,15 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     elif initial == ['B0'] and final == sorted(['pion0', 'muon', 'muon']):
         return {'BaBar': babar_b0topimumu, 'Belle': belle_b0topimumu}
     elif initial == ['B0'] and final == sorted(['K*0', 'electron', 'electron']):
-        return {'Belle II': belleII_bks0ee_displvertex}
+        if exclude_projections:
+            return {'Belle II': belleII_bks0ee_displvertex}
+        else:
+            return {'Belle II': belleII_bks0ee_displvertex, 'LHCb downstream': lhcbdownstream_B0toKstee, 'LHCb downstream (T)': lhcbdownstreamT_B0toKstee}
     elif initial == ['B0'] and final == sorted(['K*0', 'muon', 'muon']):
-        return {'LHCb': lhcb_bks0mumu_displvertex, 'Belle II': belleII_bks0mumu_displvertex}
+        if exclude_projections:
+            return {'LHCb': lhcb_bks0mumu_displvertex, 'Belle II': belleII_bks0mumu_displvertex}
+        else:
+            return {'LHCb': lhcb_bks0mumu_displvertex, 'Belle II': belleII_bks0mumu_displvertex, 'LHCb downstream': lhcbdownstream_B0toKstmumu, 'LHCb downstream (T)': lhcbdownstreamT_B0toKstmumu}
     elif initial == ['B0'] and final == sorted(['K*0', 'tau', 'tau']):
         if exclude_projections:
             return {'Belle': belle_B0toK0stautau}
@@ -2113,6 +2229,12 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
             return {'Belle': belle_B0toK0stautau, 'Belle II 50ab-1': belleII_B0Kstautau}
     elif initial == ['B0'] and final == sorted(['K0', 'pion+', 'pion-', 'pion0']):
         return {'Belle': belle_b0Komega3pi}
+    elif initial == ['B0'] and final == sorted(['K*0', 'pion+', 'pion-', 'pion0']):
+        if not exclude_projections:
+            return {'LHCb downstream': lhcbdownstream_B0toKst3pi}
+    elif initial == ['B0'] and final == sorted(['K*0', 'photon', 'pion+', 'pion-']):
+        if not exclude_projections:
+            return {'LHCb downstream': lhcbdownstream_B0toKstgammapipi}
     elif initial == ['B0'] and final == ['electron', 'electron']:
         return {'LHCb': lhcb_B0toee}
     elif initial == ['B0'] and final == ['muon', 'muon']:
@@ -2238,7 +2360,10 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
     elif initial == ['Ds+'] and final == sorted(['K+', 'electron', 'electron']):
         return {'LHCb': lhcb_DstoKpee}
     elif initial == ['Ds+'] and final == sorted(['K+', 'muon', 'muon']):
-        return {'LHCb': lhcb_DstoKpmumu}
+        if exclude_projections:
+            return {'LHCb': lhcb_DstoKpmumu}
+        else:
+            return {'LHCb': lhcb_DstoKpmumu, 'LHCb downstream': lhcbdownstream_DstoKmumu}
     elif initial == ['Ds+'] and final == sorted(['K+', 'muon', 'electron']):
         return {'LHCb': lhcb_DstoKmue}
     elif initial == ['Ds+'] and final == sorted(['K*+', 'muon', 'electron']):
@@ -2275,6 +2400,16 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         return {'LHCb': lhcb_KStomumu}
     elif initial == ['KS'] and final == sorted(['photon', 'photon']):
         return {'NA48': na48_KStogammagamma, 'KLOE': kloe_KStogammagamma}
+    elif initial == ['KS'] and final == sorted(['pion0', 'muon', 'muon']):
+        if not exclude_projections:
+            return {'LHCb downstream': lhcbdownstream_Kstopimumu,
+                    'LHCb downstream (T)': lhcbdownstreamT_Kstopimumu
+                    }
+    elif initial == ['KS'] and final == sorted(['pion0', 'electron', 'electron']):
+        if not exclude_projections:
+            return {'LHCb downstream': lhcbdownstream_Kstopiee,
+                    'LHCb downstream (T)': lhcbdownstreamT_Kstopiee
+                    }
     #Lepton LFV decays
     elif initial == ['tau'] and final == sorted(['electron', 'alp']):
         return {'Belle II': belleII_taueinv}
