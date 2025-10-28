@@ -23,4 +23,5 @@ from . import(
     plotting as plotting,
     biblio as biblio,
     sectors as sectors,
+    scan as scan,
 )
