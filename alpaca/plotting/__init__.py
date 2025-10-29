@@ -2,7 +2,7 @@ from .engines import check_plotting_engines
 
 __all__ = ['check_plotting_engines', 'palettes']
 
-available_engines = [engine for engine in check_plotting_engines() if engine]
+available_engines = [engine for engine, av in check_plotting_engines().items() if av]
 if 'matplotlib' in available_engines:
     from . import mpl
     __all__.append('mpl')
