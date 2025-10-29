@@ -4,6 +4,8 @@ from ..rge import ALPcouplings
 from ..uvmodels import ModelBase
 from ..sectors import Sector
 from ..statistics import ChiSquaredList, get_chi2
+from ..decays.decays import decay_width, branching_ratio, cross_section, alp_channels_decay_widths, alp_channels_branching_ratios
+from ..decays.mesons.mixing import meson_mixing
 
 try:
     import tqdm
@@ -46,7 +48,7 @@ class Scan:
                  fa: float | Axis = 1e3,
                  lambda_scale : float | Axis | None = None,
                  mu_scale : float | Axis | None = None,
-                 brdark: float | Axis | None = None,
+                 brdark: float | Axis = 0.0,
                  model_pars: dict = {}):
         self.couplings = None
         self.model = model
@@ -86,6 +88,8 @@ class Scan:
             for par in model.model_parameters():
                 if par not in model_pars:
                     raise ValueError(f"Model parameter '{par}' must be provided in model_pars.")
+                if lambda_scale is None:
+                    raise ValueError("lambda_scale must be provided for ModelBase objects.")
         else:
             if lambda_scale is not None:
                 raise ValueError("lambda_scale is not a valid parameter for ALPcouplings object.")
@@ -215,7 +219,7 @@ class Scan:
                 self.couplings, _ = np.meshgrid(x_couplings, np.zeros(self.y_dim))
                 return self.couplings
             
-    def get_chi2(self, transitions: list[Sector | str | tuple] | Sector | str | tuple, exclude_projections: bool=True, **kwargs) -> ChiSquaredList:
+    def _prepare_scan_params(self):
         if isinstance(self.args['ma'], Axis):
             if self.args['ma'].axis in ['x', 'x_func', 'x_dep']:
                 ma = np.meshgrid(self.args['ma'].values, np.zeros(self.y_dim))[0]
@@ -237,5 +241,32 @@ class Scan:
                 br_dark = np.meshgrid(np.zeros(self.x_dim), self.args['br_dark'].values)[1]
         else:
             br_dark = self.args['br_dark']
+        return ma, fa, br_dark
 
+    def get_chi2(self, transitions: list[Sector | str | tuple] | Sector | str | tuple, exclude_projections: bool=True, **kwargs) -> ChiSquaredList:
+        ma, fa, br_dark = self._prepare_scan_params()
         return get_chi2(transitions, ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, exclude_projections=exclude_projections, **kwargs)
+    
+    def decay_width(self, transition: str, **kwargs):
+        ma, fa, br_dark = self._prepare_scan_params()
+        return decay_width(transition, ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, **kwargs)
+    
+    def branching_ratio(self, transition: str, **kwargs):
+        ma, fa, br_dark = self._prepare_scan_params()
+        return branching_ratio(transition, ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, **kwargs)
+    
+    def cross_section(self, transition: str, s: float, **kwargs):
+        ma, fa, br_dark = self._prepare_scan_params()
+        return cross_section(transition, ma, self.compute_grid(**kwargs), fa=fa, br_dark=br_dark, s=s, **kwargs)
+    
+    def alp_channels_decay_widths(self, **kwargs):
+        ma, fa, br_dark = self._prepare_scan_params()
+        return alp_channels_decay_widths(ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, **kwargs)
+    
+    def alp_channels_branching_ratios(self, **kwargs):
+        ma, fa, br_dark = self._prepare_scan_params()
+        return alp_channels_branching_ratios(ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, **kwargs)
+    
+    def meson_mixing(self, obs: str, **kwargs):
+        ma, fa, br_dark = self._prepare_scan_params()
+        return meson_mixing(obs, ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, **kwargs)
