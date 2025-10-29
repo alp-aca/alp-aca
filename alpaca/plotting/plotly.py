@@ -6,6 +6,9 @@ from ..statistics import ChiSquared, combine_chi2
 from typing import Container
 import distinctipy
 import numpy as np
+import jinja2
+import os
+from .. import __version__
 
 def prepare_nb():
     from IPython.display import display, HTML
@@ -113,3 +116,17 @@ def exclusionplot(x: Container[float], y: Container[float], chi2: list[ChiSquare
     fig.update_xaxes(showspikes=True)
     fig.update_yaxes(showspikes=True)
     return fig
+
+def save_html(fig: go.Figure, filename: str, title: str, template: str = 'basic'):
+    template_file = os.path.join(os.path.dirname(__file__), 'html_templates', f'{template}.html')
+    with open(filename, 'w') as f_out:
+        with open(template_file, 'r') as f_template:
+            template_content = f_template.read()
+        jinja_template = jinja2.Template(template_content)
+        fig_html = plotly.io.to_html(fig, full_html=False, include_plotlyjs='cdn', include_mathjax='cdn', default_width="80%", div_id ="plotly-figure", default_height="800px")
+        rendered_html = jinja_template.render(
+            title=title,
+            fig=fig_html,
+            version=__version__
+        )
+        f_out.write(rendered_html)

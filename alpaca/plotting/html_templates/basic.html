@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <script src="https://kit.fontawesome.com/4b8d2fb3c6.js" crossorigin="anonymous"></script>
+    <script id="MathJax-script", async src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <style>
+        * {
+  box-sizing: border-box;
+}
+
+body {
+    padding-bottom: 50px;
+    margin: 0;
+}
+
+h1 {
+    font-size: 40px;
+    background-color: teal;
+    color: white;
+    padding: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    font-family: Helvetica;
+    z-index: 1000;
+    margin-top: 0;
+}
+
+p {
+    font-size: 20px;
+    line-height: 1.6;
+    font-family: Garamond;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+.plotly-figure {
+    margin-top: 100px;
+    text-align: center;
+}
+
+a.whitelink:link, a.whitelink:visited, a.whitelink:hover, a.whitelink:active {
+    color: white;
+    text-decoration: none;
+}
+
+.alpaca {
+    width: 100%;
+    height: 20px;
+    font-size: 16px;
+    font-family: Garamond;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    margin-bottom: 0px;
+    background-color: teal;
+    color: white;
+    text-align: center;
+}
+    </style>
+</head>
+<body>
+    <h1>{{ title }}</h1>
+
+    {{ fig }}
+
+<div class="alpaca">Created with ALP-aca v{{ version }}
+    <a href="https://arxiv.org/abs/2508.08354" class="whitelink"><i class="fa-solid fa-book-open"></i></a>
+    <a href="https://github.com/alp-aca/alp-aca" class="whitelink"><i class="fa-brands fa-github"></i></a>
+</div>
+</body>
+</html>
