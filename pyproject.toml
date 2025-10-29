@@ -26,22 +26,34 @@ Documentation = "https://alpaca-alps.readthedocs.io/latest/"
 packages = [{ include = "alpaca" }]
 
 [tool.poetry.dependencies]
-python = ">=3.10, <3.14"
+python = ">=3.11, <3.14"
+contourpy = ">=1.3.3"
 flavio = "^2.6.1"
 vegas = "^6.1.1"
 requests = "^2.32.3"
 sympy = "1.13.3"
 lazy-loader = "^0.4"
-distinctipy = "^1.3.4"
 
-[tool.poetry.group.tutorial]
+[tool.poetry.extras]
+matplotlib = ["matplotlib", "distinctipy"]
+plotly = ["plotly", "notebook", "anywidget", "jinja2", "distinctipy"]
+
+[tool.poetry.group.matplotlib]
 optional = true
 
-[tool.poetry.group.tutorial.dependencies]
-ipykernel = "^6.29.5"
-metakernel = "^0.30.2"
-matplotlib = "^3.10.0"
-bokeh = "^3.6.2"
+[tool.poetry.group.matplotlib.dependencies]
+matplotlib = "^3.10.7"
+distinctipy = "^1.3.4"
+
+[tool.poetry.group.plotly]
+optional = true
+
+[tool.poetry.group.plotly.dependencies]
+plotly = "^6.3.1"
+notebook = ">=7.0"
+anywidget = ">=0.9.13"
+jinja2 = "^3.1.6"
+distinctipy = "^1.3.4"
 
 [build-system]
 requires = ["poetry-core"]
