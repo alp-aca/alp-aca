@@ -14,6 +14,10 @@ plotting
     Contains functions to handle plotting.
 citations
     Contains functions to handle bibliographical references.
+scan
+    Contains functions to handle parameter space scans.
+benchmarks
+    Contains the benchmarks defined in 1901.09966 [hep-ex] for ALPs.
 
 Classes
 -------

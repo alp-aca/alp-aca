@@ -25,4 +25,5 @@ from . import(
     sectors as sectors,
     scan as scan,
     plotting as plotting,
+    benchmarks as benchmarks,
 )
