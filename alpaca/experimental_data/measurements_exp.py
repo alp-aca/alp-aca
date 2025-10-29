@@ -233,7 +233,9 @@ def babar_b0tokstar0nunu(x):
     values, sigmals, sigmars = bin_selection(x, q2min, q2max, value, sigmap, sigmap)
     return values, sigmals, sigmars
 
-belleII_bptoknunu_lightmediator = MeasurementInterpolated(['Altmannshofer:2023hkn', 'Belle-II:2023esi'], os.path.join(current_dir, invisible, 'BelleII_BtoK_bestfit.txt'), 'invisible', rmax=100, lab_boost=0.28, mass_parent=mB, mass_sibling=mK)
+#belleII_bptoknunu_lightmediator = MeasurementInterpolated(['Altmannshofer:2023hkn', 'Belle-II:2023esi'], os.path.join(current_dir, invisible, 'BelleII_BtoK_bestfit.txt'), 'invisible', rmax=100, lab_boost=0.28, mass_parent=mB, mass_sibling=mK)
+
+belleII_bptoknunu_lightmediator = MeasurementInterpolated(['Abumusabh:2025zsr', 'Belle-II:2023esi'], os.path.join(current_dir, invisible, 'BelleII_BtoKinv.txt'), 'invisible', rmax=100, lab_boost=0.28, mass_parent=mB, mass_sibling=mK)
 
 babar_btoknunu_lightmediator = MeasurementInterpolated(['Altmannshofer:2023hkn', 'BaBar:2013npw'], os.path.join(current_dir, invisible, 'Babar_BtoK_bestfit.txt'), 'invisible', rmax=50, lab_boost=0.469/(1-0.469**2)**0.5, mass_parent=mB, mass_sibling=mK)
 
