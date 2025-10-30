@@ -9,6 +9,7 @@ import numpy as np
 import jinja2
 import os
 from .. import __version__
+from ..scan import Axis
 
 def prepare_nb():
     from IPython.display import display, HTML
@@ -18,7 +19,7 @@ def prepare_nb():
         '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_SVG"></script>'
     ))
 
-def exclusionplot(x: Container[float], y: Container[float], chi2: list[ChiSquared] | ChiSquared, xlabel: str, ylabel: str, title: str | None = None, fig: go.Figure | None = None, global_chi2: ChiSquared | bool = True, xvar: str = 'x', yvar: str = 'y', xunits: str = '', yunits: str = '') -> go.Figure:
+def exclusionplot(x: Container[float] | Axis, y: Container[float] | Axis, chi2: list[ChiSquared] | ChiSquared, xlabel: str | None = None, ylabel: str | None = None, title: str | None = None, fig: go.Figure | None = None, global_chi2: ChiSquared | bool = True, xvar: str = 'x', yvar: str = 'y', xunits: str = '', yunits: str = '') -> go.Figure:
     if isinstance(chi2, ChiSquared):
         if global_chi2 is True:
             global_chi2 = chi2
@@ -31,11 +32,24 @@ def exclusionplot(x: Container[float], y: Container[float], chi2: list[ChiSquare
     if fig is None:
         fig = go.Figure()
 
+    if isinstance(x, Axis):
+        x_values = x.values
+    else:
+        x_values = np.array(x)
+        if len(x_values.shape) == 2:
+            x_values = x_values[0, :]
+    if isinstance(y, Axis):
+        y_values = y.values
+    else:
+        y_values = np.array(y)
+        if len(y_values.shape) == 2:
+            y_values = y_values[:, 0]
+
     if isinstance(global_chi2, ChiSquared):
         fig.add_trace(
             go.Heatmap(
-                x = x,
-                y = y,
+                x = x_values,
+                y = y_values,
                 z = global_chi2.significance(),
                 connectgaps=True,
                 name = global_chi2.sector.tex,
@@ -65,7 +79,7 @@ def exclusionplot(x: Container[float], y: Container[float], chi2: list[ChiSquare
     palette = distinctipy.get_colors(len(chi2_contours)- (len(colors_used)-6), exclude_colors=[hex2rgb(c) for c in colors_used], pastel_factor=0.7)
     i_color = 0
     for c in chi2_contours:
-        x_c, y_c = c.contour(x, y)
+        x_c, y_c = c.contour(x_values, y_values)
         if c.sector.color is not None:
             color = c.sector.color
         else:
@@ -98,8 +112,16 @@ def exclusionplot(x: Container[float], y: Container[float], chi2: list[ChiSquare
             )
         )
 
-    fig.update_xaxes(title_text=xlabel, type='log', range=[np.log10(np.min(x)), np.log10(np.max(x))], exponentformat='power')
-    fig.update_yaxes(title_text=ylabel, type='log', range=[np.log10(np.min(y)), np.log10(np.max(y))], exponentformat='power')
+    fig.update_xaxes(type='log', range=[np.log10(np.min(x_values)), np.log10(np.max(x_values))], exponentformat='power')
+    fig.update_yaxes(type='log', range=[np.log10(np.min(y_values)), np.log10(np.max(y_values))], exponentformat='power')
+    if xlabel is not None:
+        fig.update_xaxes(title_text=xlabel)
+    elif isinstance(x, Axis):
+        fig.update_xaxes(title_text=x.tex)
+    if ylabel is not None:
+        fig.update_yaxes(title_text=ylabel)
+    elif isinstance(y, Axis):
+        fig.update_yaxes(title_text=y.tex)
 
     fig.update_layout(
         legend = dict(
