@@ -10,6 +10,17 @@ import jinja2
 import os
 from .. import __version__
 from ..scan import Axis
+from ..biblio import citations
+
+ref_plotly = '''@software{Kruchten_An_interactive_open-source_2025,
+author = {Kruchten, Nicolas and Seier, Andrew and Parmer, Chris},
+doi = {10.5281/zenodo.14503524},
+month = oct,
+title = {{An interactive, open-source, and browser-based graphing library for Python}},
+url = {https://github.com/plotly/plotly.py},
+version = {6.3.1},
+year = {2025}
+}'''
 
 def prepare_nb():
     from IPython.display import display, HTML
@@ -20,6 +31,7 @@ def prepare_nb():
     ))
 
 def exclusionplot(x: Container[float] | Axis, y: Container[float] | Axis, chi2: list[ChiSquared] | ChiSquared, xlabel: str | None = None, ylabel: str | None = None, title: str | None = None, fig: go.Figure | None = None, global_chi2: ChiSquared | bool = True, xvar: str = 'x', yvar: str = 'y', xunits: str = '', yunits: str = '') -> go.Figure:
+    citations.register_bibtex('plotly', ref_plotly)
     if isinstance(chi2, ChiSquared):
         if global_chi2 is True:
             global_chi2 = chi2
