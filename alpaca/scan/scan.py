@@ -2,6 +2,7 @@ import numpy as np
 from typing import Callable, Sequence
 from ..rge import ALPcouplings
 from ..uvmodels import ModelBase
+from ..benchmarks import Benchmark
 from ..sectors import Sector
 from ..statistics import ChiSquaredList, get_chi2
 from ..decays.decays import decay_width, branching_ratio, cross_section, alp_channels_decay_widths, alp_channels_branching_ratios
@@ -43,7 +44,7 @@ class Axis:
 
 class Scan:
     def __init__(self,
-                 model: ALPcouplings | ModelBase,
+                 model: ALPcouplings | ModelBase | Benchmark,
                  ma: float | Axis = 1.0,
                  fa: float | Axis = 1e3,
                  lambda_scale : float | Axis | None = None,
@@ -92,7 +93,7 @@ class Scan:
                     raise ValueError("lambda_scale must be provided for ModelBase objects.")
         else:
             if lambda_scale is not None:
-                raise ValueError("lambda_scale is not a valid parameter for ALPcouplings object.")
+                raise ValueError("lambda_scale is not a valid parameter for ALPcouplings or Benchmark objects.")
             
     def compute_grid(self, verbose = True, **kwargs):
         if self.couplings is not None:
@@ -218,6 +219,89 @@ class Scan:
                     x_couplings.append(c2)
                 self.couplings, _ = np.meshgrid(x_couplings, np.zeros(self.y_dim))
                 return self.couplings
+        elif isinstance(self.model, Benchmark):
+            grid_pars = ['mu_scale'] + [self.model.model_parameter]
+            pars_x = []
+            pars_y = []
+            for par in grid_pars:
+                if isinstance(self.args[par], Axis):
+                    if self.args[par].axis in ['x', 'x_func', 'x_dep']:
+                        pars_x.append(par)
+                    elif self.args[par].axis in ['y', 'y_func', 'y_dep']:
+                        pars_y.append(par)
+            if len(pars_x) == 0 and len(pars_y) == 0:
+                model_args = self.args[self.model.model_parameter]
+                c1 = self.model(model_args, 1000)
+                if self.args['mu_scale'] is not None:
+                    if self.args['mu_scale'] < c1.ew_scale:
+                        basis = 'VA_below'
+                    else:
+                        basis = 'derivative_above'
+                    c2 = c1.match_run(self.args['mu_scale'], basis, **kwargs)
+                else:
+                    c2 = c1
+                self.couplings = np.full((self.x_dim, self.y_dim), c2)
+                return self.couplings
+            if len(pars_x) == 0:
+                y_couplings = []
+                for i in my_range(self.y_dim, verbose):
+                    model_args = self.args[self.model.model_parameter].values[i] if self.model.model_parameter in pars_y else self.args[self.model.model_parameter]
+                    c1 = self.model(model_args, 1000)
+                    mu_val = self.args['mu_scale'].values[i] if 'mu_scale' in pars_y else self.args['mu_scale']
+                    if mu_val is not None:
+                        if mu_val < c1.ew_scale:
+                            basis = 'VA_below'
+                        else:
+                            basis = 'derivative_above'
+                        c2 = c1.match_run(mu_val, basis, **kwargs)
+                    else:
+                        c2 = c1
+                    y_couplings.append(c2)
+                _, self.couplings = np.meshgrid(np.zeros(self.x_dim), y_couplings)
+                return self.couplings
+            if len(pars_y) == 0:
+                x_couplings = []
+                for i in my_range(self.x_dim, verbose):
+                    model_args = self.args[self.model.model_parameter].values[i] if self.model.model_parameter in pars_x else self.args[self.model.model_parameter]
+                    c1 = self.model(model_args, 1000)
+                    mu_val = self.args['mu_scale'].values[i] if 'mu_scale' in pars_x else self.args['mu_scale']
+                    if mu_val is not None:
+                        if mu_val < c1.ew_scale:
+                            basis = 'VA_below'
+                        else:
+                            basis = 'derivative_above'
+                        c2 = c1.match_run(mu_val, basis, **kwargs)
+                    else:
+                        c2 = c1
+                    x_couplings.append(c2)
+                self.couplings, _ = np.meshgrid(x_couplings, np.zeros(self.y_dim))
+                return self.couplings
+            grids = {}
+            for par in grid_pars:
+                if par in pars_x:
+                    grids[par] = np.meshgrid(self.args[par].values, np.zeros(self.y_dim))[0]
+                elif par in pars_y:
+                    grids[par] = np.meshgrid(np.zeros(self.x_dim), self.args[par].values)[1]
+                else:
+                    grids[par] = np.full((self.y_dim, self.x_dim), self.args[par])
+            self.couplings = np.empty((self.y_dim, self.x_dim), dtype=object)
+            for n in my_range(self.x_dim * self.y_dim, verbose):
+                ix = n // self.y_dim
+                iy = n % self.y_dim
+                model_args = grids[self.model.model_parameter][iy, ix]
+                c1 = self.model(model_args, 1000)
+                mu_val = grids['mu_scale'][iy, ix]
+                if mu_val is not None:
+                    if mu_val < c1.ew_scale:
+                        basis = 'VA_below'
+                    else:
+                        basis = 'derivative_above'
+                    c2 = c1.match_run(mu_val, basis, **kwargs)
+                else:
+                    c2 = c1
+                self.couplings[iy, ix] = c2
+            return self.couplings
+
             
     def _prepare_scan_params(self):
         if isinstance(self.args['ma'], Axis):
@@ -227,13 +311,16 @@ class Scan:
                 ma = np.meshgrid(np.zeros(self.x_dim), self.args['ma'].values)[1]
         else:
             ma = self.args['ma']
-        if isinstance(self.args['fa'], Axis):
-            if self.args['fa'].axis in ['x', 'x_func', 'x_dep']:
-                fa = np.meshgrid(self.args['fa'].values, np.zeros(self.y_dim))[0]
-            elif self.args['fa'].axis in ['y', 'y_func', 'y_dep']:
-                fa = np.meshgrid(np.zeros(self.x_dim), self.args['fa'].values)[1]
+        if isinstance(self.model, Benchmark):
+            fa = 1000
         else:
-            fa = self.args['fa']
+            if isinstance(self.args['fa'], Axis):
+                if self.args['fa'].axis in ['x', 'x_func', 'x_dep']:
+                    fa = np.meshgrid(self.args['fa'].values, np.zeros(self.y_dim))[0]
+                elif self.args['fa'].axis in ['y', 'y_func', 'y_dep']:
+                    fa = np.meshgrid(np.zeros(self.x_dim), self.args['fa'].values)[1]
+            else:
+                fa = self.args['fa']
         if isinstance(self.args['br_dark'], Axis):
             if self.args['br_dark'].axis in ['x', 'x_func', 'x_dep']:
                 br_dark = np.meshgrid(self.args['br_dark'].values, np.zeros(self.y_dim))[0]
