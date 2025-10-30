@@ -9,6 +9,7 @@ from .palettes import trafficlights
 from ..statistics.chisquared import ChiSquared, combine_chi2
 from ..decays.decays import to_tex
 from ..biblio import citations
+from ..scan import Axis
 
 ref_matplotlib = r'''@Article{Hunter:2007,
   Author    = {Hunter, J. D.},
@@ -25,21 +26,21 @@ ref_matplotlib = r'''@Article{Hunter:2007,
   year      = 2007
 }'''
 
-def exclusionplot(x: Container[float], y: Container[float], chi2: list[ChiSquared] | ChiSquared, xlabel: str, ylabel: str, title: str | None = None, ax: Axes | None = None, global_chi2: ChiSquared | bool = True) -> Axes:
+def exclusionplot(x: Container[float] | Axis, y: Container[float] | Axis, chi2: list[ChiSquared] | ChiSquared, xlabel: str | None = None, ylabel: str | None = None, title: str | None = None, ax: Axes | None = None, global_chi2: ChiSquared | bool = True) -> Axes:
     """
     Create an exclusion plot.
 
     Parameters
     ----------
-    x : Container[float]
+    x : Container[float] | Axis
         The x-coordinates of the data points.
-    y : Container[float]
+    y : Container[float] | Axis
         The y-coordinates of the data points.
     chi2 : list[ChiSquared] | ChiSquared
         The ChiSquared object(s) representing the exclusion regions. If a single ChiSquared object is provided, it will be treated as the global exclusion significance.
-    xlabel : str
+    xlabel : str | None, optional
         The label for the x-axis.
-    ylabel : str
+    ylabel : str | None, optional
         The label for the y-axis.
     title : str | None, optional
         The title of the plot (default is None).
@@ -66,8 +67,16 @@ def exclusionplot(x: Container[float], y: Container[float], chi2: list[ChiSquare
             chi2 = [chi2]
     elif global_chi2 is True:
         global_chi2 = combine_chi2(chi2, 'Global', 'Global', 'Global')
+    if isinstance(x, Axis):
+        x0 = x.values
+    else:
+        x0 = x
+    if isinstance(y, Axis):
+        y0 = y.values
+    else:
+        y0 = y
     if isinstance(global_chi2, ChiSquared):
-        pl = ax.contourf(x,y, global_chi2.significance(), levels=list(np.linspace(0, 5, 150)), cmap=cmap_trafficlights, vmax=5, extend='max', zorder=-20)
+        pl = ax.contourf(x0,y0, global_chi2.significance(), levels=list(np.linspace(0, 5, 150)), cmap=cmap_trafficlights, vmax=5, extend='max', zorder=-20)
     
     colors_used = ['#ffffff', '#bfff86', '#fffd66', '#f06060', '#68292a', '#000000']
     chi2_contours = []
@@ -99,7 +108,7 @@ def exclusionplot(x: Container[float], y: Container[float], chi2: list[ChiSquare
             lw = c.sector.lw
         else:
             lw = 1.0
-        ax.contour(x, y, mask, levels=[2], colors = color, linestyles=ls, linewidths=lw)
+        ax.contour(x0, y0, mask, levels=[2], colors = color, linestyles=ls, linewidths=lw)
         legend_elements.append(plt.Line2D([0], [0], color=color, ls=ls, label=c.sector.tex, lw=lw))
     ax.set_xscale('log')
     ax.set_yscale('log')
@@ -107,8 +116,14 @@ def exclusionplot(x: Container[float], y: Container[float], chi2: list[ChiSquare
         cb = fig.colorbar(pl, extend='max')
         cb.set_label(r'Exclusion significance [$\sigma$]')
         cb.set_ticks([0, 1, 2, 3, 4, 5])
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
+    if xlabel is not None:
+        ax.set_xlabel(xlabel)
+    elif isinstance(x, Axis):
+        ax.set_xlabel(x.tex)
+    if ylabel is not None:
+        ax.set_ylabel(ylabel)
+    elif isinstance(y, Axis):
+        ax.set_ylabel(y.tex)
     if title is not None:
         ax.set_title(title, fontsize=12)
     if len(legend_elements) > 0:
@@ -118,24 +133,22 @@ def exclusionplot(x: Container[float], y: Container[float], chi2: list[ChiSquare
     ax.set_rasterization_zorder(-10)
     return ax
 
-def alp_channels_plot(x: Container[float], channels: dict[str, Container[float]], xlabel: str, ylabel: str, ymin: float | None = None, title: str | None = None, ax: Axes | None = None) -> Axes:
+def alp_channels_plot(x: Container[float] | Axis, channels: dict[str, Container[float]], xlabel: str | None = None, ylabel: str | None = None, ymin: float | None = None, title: str | None = None, ax: Axes | None = None) -> Axes:
     """
     Create a plot for ALP decay channels.
 
     Parameters
     ----------
-    x : Container[float]
+    x : Container[float] | Axis
         The x-coordinates of the data points.
     channels : dict[str, Container[float]]
         A dictionary where keys are channel names and values are the corresponding y-coordinates.
-    xlabel : str
+    xlabel : str | None, optional
         The label for the x-axis.
-    ylabel : str
+    ylabel : str | None, optional
         The label for the y-axis.
     ymin : float
         The minimum value for the y-axis.
-    ymax : float
-        The maximum value for the y-axis.
     title : str | None, optional
         The title of the plot (default is None).
     ax : plt.Axes | None, optional
@@ -154,12 +167,20 @@ def alp_channels_plot(x: Container[float], channels: dict[str, Container[float]]
     else:
         ncols = sum(1 for channel in channels if np.max(channels[channel]) > ymin)
     palette = distinctipy.get_colors(ncols, pastel_factor=0.7)
+    if isinstance(x, Axis):
+        x_vals = x.values
+    else:
+        x_vals = x
     for channel, y in channels.items():
         if (ymin is None) or (np.max(y) > ymin):
-            ax.loglog(x, y, label=to_tex(channel), color=palette.pop(0))
-    
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
+            ax.loglog(x_vals, y, label=to_tex(channel), color=palette.pop(0))
+
+    if xlabel is not None:
+        ax.set_xlabel(xlabel)
+    elif isinstance(x, Axis):
+        ax.set_xlabel(x.tex)
+    if ylabel is not None:
+        ax.set_ylabel(ylabel)
     if ymin is not None:
         ax.set_ylim(bottom=ymin)
     if title is not None:
