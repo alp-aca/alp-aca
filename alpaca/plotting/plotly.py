@@ -57,6 +57,15 @@ def exclusionplot(x: Container[float] | Axis, y: Container[float] | Axis, chi2: 
         if len(y_values.shape) == 2:
             y_values = y_values[:, 0]
 
+    if xvar is None and isinstance(x, Axis):
+        xvar = x.name
+    if yvar is None and isinstance(y, Axis):
+        yvar = y.name
+    if xunits is None and isinstance(x, Axis):
+        xunits = x.units
+    if yunits is None and isinstance(y, Axis):
+        yunits = y.units
+
     if isinstance(global_chi2, ChiSquared):
         fig.add_trace(
             go.Heatmap(
