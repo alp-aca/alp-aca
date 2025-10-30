@@ -9,6 +9,7 @@ import numpy as np
 import jinja2
 import os
 from .. import __version__
+from ..decays.decays import to_tex
 from ..scan import Axis
 from ..biblio import citations
 
@@ -30,7 +31,19 @@ def prepare_nb():
         '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_SVG"></script>'
     ))
 
-def exclusionplot(x: Container[float] | Axis, y: Container[float] | Axis, chi2: list[ChiSquared] | ChiSquared, xlabel: str | None = None, ylabel: str | None = None, title: str | None = None, fig: go.Figure | None = None, global_chi2: ChiSquared | bool = True, xvar: str = 'x', yvar: str = 'y', xunits: str = '', yunits: str = '') -> go.Figure:
+def exclusionplot(
+        x: Container[float] | Axis,
+        y: Container[float] | Axis,
+        chi2: list[ChiSquared] | ChiSquared,
+        xlabel: str | None = None,
+        ylabel: str | None = None,
+        title: str | None = None,
+        fig: go.Figure | None = None,
+        global_chi2: ChiSquared | bool = True,
+        xvar: str | None = None,
+        yvar: str | None = None,
+        xunits: str | None = None,
+        yunits: str | None = None) -> go.Figure:
     citations.register_bibtex('plotly', ref_plotly)
     if isinstance(chi2, ChiSquared):
         if global_chi2 is True:
@@ -57,14 +70,26 @@ def exclusionplot(x: Container[float] | Axis, y: Container[float] | Axis, chi2: 
         if len(y_values.shape) == 2:
             y_values = y_values[:, 0]
 
-    if xvar is None and isinstance(x, Axis):
-        xvar = x.name
-    if yvar is None and isinstance(y, Axis):
-        yvar = y.name
-    if xunits is None and isinstance(x, Axis):
-        xunits = x.units
-    if yunits is None and isinstance(y, Axis):
-        yunits = y.units
+    if xvar is None:
+        if isinstance(x, Axis):
+            xvar = x.name
+        else:
+            xvar = 'x'
+    if yvar is None:
+        if isinstance(y, Axis):
+            yvar = y.name
+        else:
+            yvar = 'y'
+    if xunits is None:
+        if isinstance(x, Axis):
+            xunits = x.units
+        else:
+            xunits = ''
+    if yunits is None:
+        if isinstance(y, Axis):
+            yunits = y.units
+        else:
+            yunits = ''
 
     if isinstance(global_chi2, ChiSquared):
         fig.add_trace(
@@ -158,6 +183,100 @@ def exclusionplot(x: Container[float] | Axis, y: Container[float] | Axis, chi2: 
 
     fig.update_xaxes(showspikes=True)
     fig.update_yaxes(showspikes=True)
+    return fig
+
+def alp_channels_plot(
+        x: Container[float] | Axis,
+        channels: dict[str, Container[float]],
+        xlabel: str | None = None,
+        ylabel: str | None = None,
+        ymin: float | None = None,
+        title: str | None = None,
+        fig: go.Figure | None = None,
+        xvar: str | None = None,
+        yvar: str = 'y',
+        xunits: str | None = None,
+        yunits: str = ''
+) -> go.Figure:
+    """
+    Create a plot for ALP decay channels.
+
+    Parameters
+    ----------
+    x : Container[float] | Axis
+        The x-coordinates of the data points.
+    channels : dict[str, Container[float]]
+        A dictionary where keys are channel names and values are the corresponding y-coordinates.
+    xlabel : str | None, optional
+        The label for the x-axis.
+    ylabel : str | None, optional
+        The label for the y-axis.
+    ymin : float
+        The minimum value for the y-axis.
+    title : str | None, optional
+        The title of the plot (default is None).
+    fig : go.Figure | None, optional
+        The Plotly Figure object to plot on (default is None, which creates a new figure).
+
+    """
+    citations.register_bibtex('plotly', ref_plotly)
+    if fig is None:
+        fig = go.Figure()
+    
+    if ymin is None:
+        ncols = len(channels)
+    else:
+        ncols = sum(1 for channel in channels if np.max(channels[channel]) > ymin)
+    palette = distinctipy.get_colors(ncols, pastel_factor=0.7)
+    if isinstance(x, Axis):
+        x_vals = x.values
+    else:
+        x_vals = x
+    if xvar is None:
+        if isinstance(x, Axis):
+            xvar = x.name
+        else:
+            xvar = 'x'
+    for channel, y in channels.items():
+        if (ymin is None) or (np.max(y) > ymin):
+            fig.add_trace(
+                go.Scatter(
+                    x = x_vals,
+                    y = y,
+                    mode = 'lines',
+                    name = to_tex(channel),
+                    line = {'color': palette.pop(0)},
+                    showlegend=True,
+                    meta = {'name': channel},
+                    hovertemplate = f'<b>%{{meta.name}}</b><br>{xvar} = %{{x}} {xunits}<br>{yvar} = %{{y}} {yunits}<extra></extra>',
+                )
+            )
+
+    if xlabel is not None:
+        fig.update_xaxes(title_text=xlabel)
+    elif isinstance(x, Axis):
+        fig.update_xaxes(title_text=x.tex)
+    if ylabel is not None:
+        fig.update_yaxes(title_text=ylabel)
+    if ymin is not None:
+        fig.update_yaxes(range=[ymin, None])
+    if title is not None:
+        fig.update_layout(title={'text': title})
+    
+    fig.update_layout(
+        legend = dict(
+            orientation = 'v',
+            yanchor = 'top',
+            xanchor = 'right',
+            x = 1.2,
+        ),
+        title = {'text': title, 'automargin': False, 'pad': {'t': -50, 'b': -50}, 'yanchor': 'top'} if title is not None else None,
+        margin = {'autoexpand': True, 'pad': 0.8, 'b': 150, 't': 60, 'r': 200, 'l': 10},
+        autosize = True,
+    )
+    
+    fig.update_xaxes(showspikes=True, type='log', range=[np.log10(np.min(x_vals)), np.log10(np.max(x_vals))], exponentformat='power')
+    fig.update_yaxes(showspikes=True, type='log', exponentformat='power')
     return fig
 
 def save_html(fig: go.Figure, filename: str, title: str, template: str = 'basic'):
