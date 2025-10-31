@@ -48,7 +48,7 @@ import lazy_loader as lazy
 
 __getattr__, __dir__, __all__ = lazy.attach_stub(__name__, __file__)
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 class info:
     def __repr__(self):
