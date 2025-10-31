@@ -1,3 +1,25 @@
+'''
+alpaca.plotting.plotly
+=======================
+
+This module contains functions to handle interactive plotting with Plotly.
+
+Functions
+---------
+
+prepare_nb
+    Prepare the Jupyter Notebook environment for Plotly plotting.
+
+exclusionplot
+    Create an exclusion plot.
+
+alp_channels_plot
+    Create a plot for ALP decay channels.
+
+save_html
+    Save a Plotly figure as an HTML file using a template.
+'''
+
 import plotly.graph_objects as go
 import plotly
 
@@ -24,6 +46,9 @@ year = {2025}
 }'''
 
 def prepare_nb():
+    """
+    Prepare the Jupyter Notebook environment for Plotly plotting.
+    """
     from IPython.display import display, HTML
 
     plotly.offline.init_notebook_mode()
@@ -32,8 +57,8 @@ def prepare_nb():
     ))
 
 def exclusionplot(
-        x: Container[float] | Axis,
-        y: Container[float] | Axis,
+        x: np.typing.ArrayLike | Axis,
+        y: np.typing.ArrayLike | Axis,
         chi2: list[ChiSquared] | ChiSquared,
         xlabel: str | None = None,
         ylabel: str | None = None,
@@ -44,6 +69,38 @@ def exclusionplot(
         yvar: str | None = None,
         xunits: str | None = None,
         yunits: str | None = None) -> go.Figure:
+    """
+    Create an exclusion plot.
+
+    Parameters
+    ----------
+    x : np.typing.ArrayLike | Axis
+        The x-coordinates of the data points.
+    y : np.typing.ArrayLike | Axis
+        The y-coordinates of the data points.
+    chi2 : list[ChiSquared] | ChiSquared
+        The ChiSquared object(s) representing the exclusion regions. If a single ChiSquared object is provided, it will be treated as the global exclusion significance.
+    xlabel : str | None, optional
+        The label for the x-axis.
+    ylabel : str | None, optional
+        The label for the y-axis.
+    title : str | None, optional
+        The title of the plot (default is None).
+    fig : go.Figure | None, optional
+        The Plotly Figure object to plot on (default is None, which creates a new figure).
+    global_chi2 : ChiSquared | bool, optional
+        A ChiSquared object representing the global exclusion significance (default is True, which uses the combined chi squared).
+        If set to False, no global significance will be plotted.
+    xvar : str | None, optional
+        The variable name for the x-axis when hovering over the plot (default is None, which uses the Axis name if available). Formatting with HTML is supported.
+    yvar : str | None, optional
+        The variable name for the y-axis when hovering over the plot (default is None, which uses the Axis name if available). Formatting with HTML is supported.
+    xunits : str | None, optional
+        The units for the x-axis when hovering over the plot (default is None, which uses the Axis units if available). Formatting with HTML is supported.
+    yunits : str | None, optional
+        The units for the y-axis when hovering over the plot (default is None, which uses the Axis units if available). Formatting with HTML is supported.
+
+    """
     citations.register_bibtex('plotly', ref_plotly)
     if isinstance(chi2, ChiSquared):
         if global_chi2 is True:
@@ -186,8 +243,8 @@ def exclusionplot(
     return fig
 
 def alp_channels_plot(
-        x: Container[float] | Axis,
-        channels: dict[str, Container[float]],
+        x: np.typing.ArrayLike | Axis,
+        channels: dict[str, np.typing.ArrayLike],
         xlabel: str | None = None,
         ylabel: str | None = None,
         ymin: float | None = None,
@@ -203,9 +260,9 @@ def alp_channels_plot(
 
     Parameters
     ----------
-    x : Container[float] | Axis
+    x : np.typing.ArrayLike | Axis
         The x-coordinates of the data points.
-    channels : dict[str, Container[float]]
+    channels : dict[str, np.typing.ArrayLike]
         A dictionary where keys are channel names and values are the corresponding y-coordinates.
     xlabel : str | None, optional
         The label for the x-axis.
@@ -280,6 +337,20 @@ def alp_channels_plot(
     return fig
 
 def save_html(fig: go.Figure, filename: str, title: str, template: str = 'basic'):
+    """
+    Save a Plotly figure as an HTML file using a template.
+
+    Parameters
+    ----------
+    fig : go.Figure
+        The Plotly Figure object to be saved.
+    filename : str
+        The path to the output HTML file.
+    title : str
+        The title of the HTML page.
+    template : str, optional
+        The name of the HTML template to use (default is 'basic').
+    """
     template_file = os.path.join(os.path.dirname(__file__), 'html_templates', f'{template}.html')
     with open(filename, 'w') as f_out:
         with open(template_file, 'r') as f_template:

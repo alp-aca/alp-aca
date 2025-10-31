@@ -25,7 +25,23 @@ def my_range(ntot, verbose=False):
     
 
 class Axis:
-    def __init__(self, values: Callable | Sequence | np.ndarray, axis: str, tex: str, name: str = '', units: str = ''):
+    '''
+    Class to define an axis in a parameter space scan.
+
+    Parameters
+    ----------
+    values : Callable | np.typing.ArrayLike
+        The values of the axis. If axis is 'x_func' or 'y_func', this should be a callable function.
+    axis : str
+        The axis type. For main axes either `x` or `y`. For functional axes, either `x_func` or `y_func`. For dependent axes, either `x_dep` or `y_dep`.
+    tex : str
+        The LaTeX representation of the axis.
+    name : str, optional
+        The name of the axis, by default ''.
+    units : str, optional
+        The units of the axis, by default ''.
+    '''
+    def __init__(self, values: Callable | np.typing.ArrayLike, axis: str, tex: str, name: str = '', units: str = ''):
         if axis in ['x', 'y', 'x_func', 'y_func', 'x_dep', 'y_dep']:
             self.axis = axis
         else:
@@ -43,6 +59,53 @@ class Axis:
     
 
 class Scan:
+    '''
+    Class to perform parameter space scans.
+
+    Parameters
+    ----------
+    model : ALPcouplings | ModelBase | Benchmark
+        The ALP model to use in the scan. Can be an ALPcouplings object, a ModelBase object, or a Benchmark object.
+    ma : float | Axis, optional
+        The ALP mass or Axis for the x-axis, by default 1.0 GeV.
+    fa : float | Axis, optional
+        The ALP decay constant or Axis for the y-axis, by default 1e3 GeV.
+    lambda_scale : float | Axis | None, optional
+        The UV scale or Axis where the ALP couplings are defined, by default None. Must be provided only for ModelBase objects.
+    mu_scale : float | Axis | None, optional
+        The scale or Axis where the ALP couplings are evaluated, by default None (i.e. no running).
+    brdark : float | Axis, optional
+        The branching ratio of the ALP into dark sector particles, by default 0.0.
+    model_pars : dict, optional
+        A dictionary of model parameters for ModelBase and Benchmark objects.
+
+    Methods
+    -------
+    compute_grid(verbose: bool = False, **kwargs) -> np.ndarray
+        Computes the grid of ALPcouplings over the scan parameter space. 
+
+    get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, exclude_projections: bool=True, **kwargs) -> ChiSquaredList
+        Computes the chi-squared values over the scan parameter space for the given transitions.
+
+    decay_width(transition: str, **kwargs)
+        Computes the decay width for the given transition over the scan parameter space.
+
+    branching_ratio(transition: str, **kwargs)
+        Computes the branching ratio for the given transition over the scan parameter space.
+
+    cross_section(transition: str, s: float, **kwargs)
+        Computes the cross section for the given transition over the scan parameter space.
+
+    alp_channels_decay_widths(**kwargs)
+        Computes the decay widths for all ALP channels over the scan parameter space.
+
+    alp_channels_branching_ratios(**kwargs)
+        Computes the branching ratios for all ALP channels over the scan parameter space.
+
+    meson_mixing(obs: str, **kwargs)
+        Computes the meson mixing observable over the scan parameter space.
+
+    '''
     def __init__(self,
                  model: ALPcouplings | ModelBase | Benchmark,
                  ma: float | Axis = 1.0,
@@ -94,8 +157,23 @@ class Scan:
         else:
             if lambda_scale is not None:
                 raise ValueError("lambda_scale is not a valid parameter for ALPcouplings or Benchmark objects.")
-            
-    def compute_grid(self, verbose = True, **kwargs):
+
+    def compute_grid(self, verbose: bool = False, **kwargs) -> np.typing.NDArray:
+        '''
+        Computes the grid of ALPcouplings over the scan parameter space.
+
+        Parameters
+        ----------
+        verbose : bool, optional
+            Whether to display a progress bar, by default False.
+        **kwargs
+            Additional keyword arguments to pass to the matching and running methods.
+
+        Returns
+        -------
+        np.ndarray
+            The computed grid of ALPcouplings.
+        '''
         if self.couplings is not None:
             return self.couplings
         if isinstance(self.model, ModelBase):
@@ -331,29 +409,140 @@ class Scan:
         return ma, fa, br_dark
 
     def get_chi2(self, transitions: list[Sector | str | tuple] | Sector | str | tuple, exclude_projections: bool=True, **kwargs) -> ChiSquaredList:
+        """Calculate the chi-squared values for a set of transitions.
+
+    Parameters
+    ----------
+    transitions (list[str])
+        List of transition identifiers.
+
+    exclude_projections (bool, optional):
+        Whether to exclude projections from measurements. Default is True.
+        
+    **kwargs:
+        Additional keyword arguments passed to the matching and running routines.
+
+    Returns
+    -------
+    chi2_dict : ChiSquaredList
+        Chi-squared values for each transition over the scan parameter space.
+    """
         ma, fa, br_dark = self._prepare_scan_params()
         return get_chi2(transitions, ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, exclude_projections=exclude_projections, **kwargs)
     
-    def decay_width(self, transition: str, **kwargs):
+    def decay_width(self, transition: str, **kwargs) -> np.typing.NDArray:
+        """ Calculate the decay width for a given transition.
+
+        Parameters
+        ----------
+        transition (str) :
+            The particle transition in the form 'initial -> final'.
+        **kwargs:
+            Additional parameters for the decay width calculation.
+
+        Returns
+        -------
+        Gamma (np.ndarray) :
+            The decay width for the specified transition, in GeV.
+
+        Raises
+        ------
+            NotImplementedError: If the decay process is unknown.
+        """
         ma, fa, br_dark = self._prepare_scan_params()
         return decay_width(transition, ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, **kwargs)
     
-    def branching_ratio(self, transition: str, **kwargs):
+    def branching_ratio(self, transition: str, **kwargs) -> np.typing.NDArray:
+        """ Calculate the branching ratio for a given transition.
+
+        Parameters
+        ----------
+        transition (str) :
+            The particle transition in the form 'initial -> final'.
+        **kwargs:
+            Additional parameters for the branching ratio calculation.
+
+        Returns
+        -------
+        BR (np.ndarray) :
+            The branching ratio for the specified transition.
+
+        Raises
+        ------
+            NotImplementedError: If the decay process is unknown.
+        """
         ma, fa, br_dark = self._prepare_scan_params()
         return branching_ratio(transition, ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, **kwargs)
-    
-    def cross_section(self, transition: str, s: float, **kwargs):
+
+    def cross_section(self, transition: str, s: float, **kwargs) -> np.typing.NDArray:
+        """Calculate the cross section for a given transition process involving an ALP
+
+        Parameters
+        ----------
+        transition (str) :
+            The transition process in the form 'initial -> final'.
+        s (float) :
+            The Mandelstam variable s, representing the square of the center-of-mass energy, in Gev^2.
+        **kwargs:
+            Additional keyword arguments for specific cross section calculations.
+
+        Returns
+        -------
+        sigma (np.ndarray) :
+            The calculated cross section for the given transition process.
+
+        Raises
+        ------
+        NotImplementedError: If the transition process is not recognized or implemented.
+        """
         ma, fa, br_dark = self._prepare_scan_params()
         return cross_section(transition, ma, self.compute_grid(**kwargs), fa=fa, br_dark=br_dark, s=s, **kwargs)
     
     def alp_channels_decay_widths(self, **kwargs):
+        """Calculate the decay widths for all ALP decay channels.
+
+        Parameters
+        ----------
+        **kwargs:
+            Additional parameters for the decay width calculation.
+
+        Returns
+        -------
+        dict[str, float] :
+            A dictionary with decay channels as keys and their corresponding widths as values.
+        """
         ma, fa, br_dark = self._prepare_scan_params()
         return alp_channels_decay_widths(ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, **kwargs)
     
     def alp_channels_branching_ratios(self, **kwargs):
+        """Calculate the branching ratios for all ALP decay channels.
+
+        Parameters
+        ----------
+        **kwargs:
+            Additional parameters for the branching ratio calculation.
+
+        Returns
+        -------
+        dict[str, float] :
+            A dictionary with decay channels as keys and their corresponding branching ratios as values.
+        """
         ma, fa, br_dark = self._prepare_scan_params()
         return alp_channels_branching_ratios(ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, **kwargs)
     
     def meson_mixing(self, obs: str, **kwargs):
+        '''Obtains the value of a meson mixing observable.
+
+        Parameters
+        ----------
+        obs : str
+            The observable to calculate. The available options are:
+            - 'delta_mK0': The mass difference of the K0 meson, in ps^{-1}.
+            - 'epsK': The epsilon parameter of the K0 meson.
+            - 'x_D0': Normalized mass difference in D0 mixing.
+            - 'phi12_D0': D0 mixing phase, in rad.
+            - 'delta_mB0': The mass difference of the B0 meson, in ps^{-1}.
+            - 'delta_mBs': The mass difference of the Bs meson, in ps^{-1}.
+        '''
         ma, fa, br_dark = self._prepare_scan_params()
         return meson_mixing(obs, ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, **kwargs)

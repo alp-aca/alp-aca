@@ -1,3 +1,19 @@
+'''
+alpaca.plotting.mpl
+======================
+
+This module contains functions to handle plotting with Matplotlib.
+
+Functions
+---------
+
+exclusionplot
+    Create an exclusion plot.
+
+alp_channels_plot
+    Create a plot for ALP decay channels.
+'''
+
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from matplotlib.axes import Axes
