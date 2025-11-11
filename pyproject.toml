@@ -33,6 +33,7 @@ vegas = "^6.1.1"
 requests = "^2.32.3"
 sympy = "1.13.3"
 lazy-loader = "^0.4"
+appdirs = "^1.4.4"
 
 [tool.poetry.extras]
 matplotlib = ["matplotlib", "distinctipy"]
