@@ -24,6 +24,10 @@ limits_neutrons_proj :
     AxionLimits object for projected neutron coupling limits.
 limits_tops :
     AxionLimits object for top quark coupling limits.
+limits_gluons :
+    AxionLimits object for gluon coupling limits.
+limits_gluons_proj :
+    AxionLimits object for projected gluon coupling limits.
 """
 
 import lazy_loader as lazy

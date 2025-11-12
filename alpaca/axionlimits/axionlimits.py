@@ -75,4 +75,5 @@ limits_protons_proj = AxionLimits('limit_data/AxionProton/Projections', 'proton_
 limits_neutrons = AxionLimits('limit_data/AxionNeutron', 'neutron')
 limits_neutrons_proj = AxionLimits('limit_data/AxionNeutron/Projections', 'neutron_proj')
 limits_tops = AxionLimits('limit_data/AxionTop', 'top')
-
+limits_gluons = AxionLimits('limit_data/fa', 'gluon')
+limits_gluons_proj = AxionLimits('limit_data/fa/Projections', 'gluon_proj')

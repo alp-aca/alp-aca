@@ -8,4 +8,6 @@ from .axionlimits import (
     limits_neutrons as limits_neutrons,
     limits_neutrons_proj as limits_neutrons_proj,
     limits_tops as limits_tops,
+    limits_gluons as limits_gluons,
+    limits_gluons_proj as limits_gluons_proj,
 )
