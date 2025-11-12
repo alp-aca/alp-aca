@@ -2,6 +2,7 @@ from appdirs import AppDirs
 import os
 import requests
 from .. import __version__
+import pandas as pd
 
 class AxionLimits:
     def __init__(self, github_path: str, local_path: str):
@@ -55,6 +56,14 @@ class AxionLimits:
                 else:
                     info[f[:-4]] = infolines[0] if infolines else ''
         return info
+
+    def __getitem__(self, key):
+        file_path = os.path.join(self.base_path, f'{key}.txt')
+        if not os.path.isfile(file_path):
+            raise KeyError(f"No data file found for key '{key}' in {self.base_path}.")
+        data = pd.read_csv(file_path, comment='#', sep=r'\s+', names=['ma', 'gaX'])
+        data['ma'] *= 1e-9
+        return data
 
 
 limits_electrons = AxionLimits('limit_data/AxionElectron', 'electron')
