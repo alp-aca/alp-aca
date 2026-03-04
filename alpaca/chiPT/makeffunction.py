@@ -5,6 +5,7 @@ import pandas as pd
 from scipy import interpolate
 import pickle
 import os
+import numpy as np
 
 path = os.path.dirname(__file__)
 
@@ -13,8 +14,7 @@ dataAloni = pd.read_csv(os.path.join(path, 'ffunction_Aloni.csv'))
 # The file ffunction_Aloni.csv contains a digitized version of Fig. 2,
 # but it is a bit noisy...
 
-spl = interpolate.BSpline(*interpolate.splrep(dataAloni['ma_GeV'], dataAloni['F'], s=2))
+t, c, k = interpolate.splrep(dataAloni['ma_GeV'], dataAloni['F'], s=2)
 # splrep makes a smooth interpolation, that doesn't pass through all the data points. The parameter s controls the smoothness
 
-with open(os.path.join(path, 'ffunction.pickle'), 'wb') as f:
-    pickle.dump(spl, f)
+np.savez(os.path.join(path, 'ffunction.npz'), t=t, c=c, k=[k])

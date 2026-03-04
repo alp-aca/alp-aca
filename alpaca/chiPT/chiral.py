@@ -5,7 +5,7 @@ from ..common import alpha_s
 from . import u3reprs
 from ..biblio.biblio import citations
 from functools import lru_cache
-import pickle
+from scipy import interpolate
 import os
 
 
@@ -115,8 +115,12 @@ class _ffunction:
 
     def initialize(self):
         path = os.path.dirname(__file__)
-        with open(os.path.join(path, 'ffunction.pickle'), 'rb') as f:
-            self.ffunction_interp = pickle.load(f)
+        data_loaded = np.load(os.path.join(path, 'ffunction.npz'))
+        t = np.array(data_loaded['t'])   # np.array() ensures exact ndarray, not memmap
+        c = np.array(data_loaded['c'])
+        k = int(data_loaded['k'][0])
+
+        self.ffunction_interp = interpolate.BSpline(t, c, k)
         self.initialized = True
 
     def __call__(self, ma):
