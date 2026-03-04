@@ -1,9 +1,12 @@
 from ..rge import ALPcouplings
 from ..common import B0disc_equalmass, ckm_xi
 from ..constants import GF, mu, md, ms, mc, mb, me, mmu, mtau, s2w, mW, mZ
+from ..constants import Deltau_U3, Deltad_U3, Deltas_U3
 import numpy as np
 from ..common import g_photonloop, alpha_em, alpha_s, B3
 from ..biblio.biblio import citations
+from ..chiPT.pseudoscalar_diag import mixing_shift
+from ..chiPT.u3reprs import baryons
 
 def effcoupling_ff(ma, couplings: ALPcouplings, fermion, **kwargs):
     mass = {'e': me, 'mu': mmu, 'tau': mtau, 'c': mc, 'b': mb}[fermion]
@@ -90,3 +93,22 @@ def offshellphoton(couplings: ALPcouplings, ma: float, s: float) -> complex:
     for i, mdq in enumerate([md, ms, mb]):
         ceff += 3 * (-1/3)**2 * couplings['cdA'][i,i] * B3(4*mdq**2/ma**2, 4*mdq**2/s)
     return ceff
+
+def effcoupling_baryons_A(couplings: ALPcouplings, ma: float, b1: str, b2: str, **kwargs):
+    couplings = couplings.match_run(ma, 'VA_below', **kwargs)
+    DB = (Deltau_U3 - 2*Deltad_U3 + Deltas_U3)/2
+    FB = (Deltau_U3 - Deltas_U3)/2
+    SB = Deltad_U3
+    lambda1 = baryons[b1].T
+    lambda2 = baryons[b2]
+    mix_shift = mixing_shift(couplings, ma)
+    return DB * np.trace(mix_shift @ lambda1 @ lambda2 + mix_shift @ lambda2 @ lambda1) - FB * np.trace(mix_shift @ lambda1 @ lambda2 - mix_shift @ lambda2 @ lambda1) + SB * np.trace(mix_shift) *np.trace(lambda1 @ lambda2)
+
+def effcoupling_baryons_V(couplings: ALPcouplings, ma: float, b1: str, b2: str, **kwargs):
+    couplings = couplings.match_run(ma, 'VA_below', **kwargs)
+    cuV = couplings['cuV']
+    cdV = couplings['cdV']
+    cqV = np.array([[cuV[0,0], 0, 0], [0, cdV[0,0], cdV[0,1]], [0, cdV[1,0], cdV[1,1]]])/2
+    lambda1 = baryons[b1].T
+    lambda2 = baryons[b2]
+    return - np.trace(cqV @ lambda1 @ lambda2 - cqV @ lambda2 @ lambda1)

@@ -254,3 +254,8 @@ O2_D0 = Constant(-0.1561, 'Bazavov:2017weg') #GeV^4
 O3_D0 = Constant(0.0464, 'Bazavov:2017weg') #GeV^4
 O4_D0 = Constant(0.2747, 'Bazavov:2017weg') #GeV^4
 O5_D0 = Constant(0.1035, 'Bazavov:2017weg') #GeV^4
+
+# Baryon ChiPT constants
+Deltau_U3 = Constant(0.832, 'Alexandrou:2024ozj')
+Deltad_U3 = Constant(-0.417, 'Alexandrou:2024ozj')
+Deltas_U3 = Constant(-0.037, 'Alexandrou:2024ozj')
