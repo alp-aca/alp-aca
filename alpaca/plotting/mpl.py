@@ -17,6 +17,7 @@ alp_channels_plot
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from matplotlib.axes import Axes
+import matplotlib.image as mpimg
 import distinctipy
 from collections.abc import Container
 plt.rcParams.update({'font.size': 12, 'text.usetex': True, 'font.family': 'serif', 'font.serif': 'Computer Modern Roman'})
@@ -26,6 +27,7 @@ from ..statistics.chisquared import ChiSquared, combine_chi2
 from ..decays.decays import to_tex
 from ..biblio import citations
 from ..scan import Axis
+import os
 
 ref_matplotlib = r'''@Article{Hunter:2007,
   Author    = {Hunter, J. D.},
@@ -42,7 +44,124 @@ ref_matplotlib = r'''@Article{Hunter:2007,
   year      = 2007
 }'''
 
-def exclusionplot(x: Container[float] | Axis, y: Container[float] | Axis, chi2: list[ChiSquared] | ChiSquared, xlabel: str | None = None, ylabel: str | None = None, title: str | None = None, ax: Axes | None = None, global_chi2: ChiSquared | bool = True) -> Axes:
+def add_logo_avoiding_legend(fig, ax, logo_path, logo_size=0.15, margin=0.02, alpha=0.8, position=0):
+    """
+    Add a logo inside the axes, automatically avoiding the legend.
+    
+    Parameters:
+    -----------
+    fig : matplotlib.figure.Figure
+        The figure object
+    ax : matplotlib.axes.Axes
+        The axes object
+    logo_path : str
+        Path to the logo image file
+    logo_size : float
+        Size of the logo as fraction of axes size (default: 0.15)
+    margin : float
+        Margin from axes edges (default: 0.02)
+    """
+    
+    # Load the logo
+    logo = mpimg.imread(logo_path)
+    
+    # Calculate logo dimensions maintaining aspect ratio
+    logo_height, logo_width = logo.shape[:2]
+    aspect_ratio = logo_width / logo_height
+    logo_width_axes = logo_size * aspect_ratio
+    logo_height_axes = logo_size
+    
+    # Get legend position if it exists
+    legend = ax.get_legend()
+    
+    # Define potential positions (x, y in axes coordinates)
+    candidate_positions: dict[str, tuple[float, float]] = {
+        'upper right': (1 - margin - logo_width_axes, 1 - margin - logo_height_axes),
+        'upper left': (margin, 1 - margin - logo_height_axes),
+        'lower right': (1 - margin - logo_width_axes, margin),
+        'lower left': (margin, margin),
+    }
+
+    positions_num = {
+        0: 'best',
+        1: 'upper right',
+        2: 'upper left',
+        3: 'lower left',
+        4: 'lower right'
+    }
+    
+    if isinstance(position, int) and position in positions_num.keys():
+        position = positions_num[position]
+    elif not position in positions_num.values():
+        raise ValueError(f"Unkown option for logo placement {position}")
+
+    if position in candidate_positions.keys():
+        logo_x, logo_y = candidate_positions[position]
+    elif legend is not None:
+        # Force drawing to get accurate legend position
+        fig.canvas.draw()
+        
+        # Get legend bounding box in axes coordinates
+        legend_bbox = legend.get_window_extent(fig.canvas.get_renderer())
+        legend_bbox_axes = legend_bbox.transformed(ax.transAxes.inverted())
+        
+        # Find the position with maximum distance from legend
+        best_position = None
+        max_distance = -1
+        
+        for logo_x, logo_y in candidate_positions.values():
+            # Calculate logo center
+            logo_center_x = logo_x + logo_width_axes / 2
+            logo_center_y = logo_y + logo_height_axes / 2
+            
+            # Calculate legend center
+            legend_center_x = (legend_bbox_axes.x0 + legend_bbox_axes.x1) / 2
+            legend_center_y = (legend_bbox_axes.y0 + legend_bbox_axes.y1) / 2
+            
+            # Calculate distance between centers
+            distance = np.sqrt((logo_center_x - legend_center_x)**2 + 
+                             (logo_center_y - legend_center_y)**2)
+            
+            # Check if logo would overlap with legend
+            logo_bbox_x0, logo_bbox_x1 = logo_x, logo_x + logo_width_axes
+            logo_bbox_y0, logo_bbox_y1 = logo_y, logo_y + logo_height_axes
+            
+            overlaps = not (logo_bbox_x1 < legend_bbox_axes.x0 or 
+                          logo_bbox_x0 > legend_bbox_axes.x1 or
+                          logo_bbox_y1 < legend_bbox_axes.y0 or 
+                          logo_bbox_y0 > legend_bbox_axes.y1)
+            
+            # Prefer positions that don't overlap and have maximum distance
+            if not overlaps and distance > max_distance:
+                max_distance = distance
+                best_position = (logo_x, logo_y)
+            elif best_position is None:  # All positions overlap, choose farthest
+                if distance > max_distance:
+                    max_distance = distance
+                    best_position = (logo_x, logo_y)
+        
+        logo_x, logo_y = best_position
+    else:
+        # No legend, default to upper right
+        logo_x = 1 - margin - logo_width_axes
+        logo_y = 1 - margin - logo_height_axes
+    
+    # Add logo using inset axes
+    logo_ax = ax.inset_axes([logo_x, logo_y, logo_width_axes, logo_height_axes],
+                            transform=ax.transAxes, zorder=-10)
+    
+    # Disable clipping to prevent cropping
+    logo_ax.set_clip_on(False)
+    
+    # Display the image
+    im = logo_ax.imshow(logo, alpha=alpha)
+    im.set_clip_on(False)
+    
+    logo_ax.axis('off')
+    
+    return logo_ax
+
+def exclusionplot(x: Container[float] | Axis, y: Container[float] | Axis, chi2: list[ChiSquared] | ChiSquared, xlabel: str | None = None, ylabel: str | None = None, title: str | None = None, ax: Axes | None = None, global_chi2: ChiSquared | bool = True, logo_position = 0) -> Axes:
     """
     Create an exclusion plot.
 
@@ -146,10 +265,15 @@ def exclusionplot(x: Container[float] | Axis, y: Container[float] | Axis, chi2: 
         ax.legend(handles = legend_elements, loc='center left', bbox_to_anchor=(1, 0.5), borderaxespad=9, fontsize=8)
     plt.tight_layout()
 
+    if logo_position is not None:
+        current_dir = os.path.dirname(__file__)
+        logo_path = os.path.join(current_dir, 'logo.png')
+        ax = add_logo_avoiding_legend(fig, ax, logo_path, 0.07, position=logo_position)
+
     ax.set_rasterization_zorder(-10)
     return ax
 
-def alp_channels_plot(x: Container[float] | Axis, channels: dict[str, Container[float]], xlabel: str | None = None, ylabel: str | None = None, ymin: float | None = None, title: str | None = None, ax: Axes | None = None) -> Axes:
+def alp_channels_plot(x: Container[float] | Axis, channels: dict[str, Container[float]], xlabel: str | None = None, ylabel: str | None = None, ymin: float | None = None, title: str | None = None, ax: Axes | None = None, logo_position = 0) -> Axes:
     """
     Create a plot for ALP decay channels.
 
@@ -204,5 +328,11 @@ def alp_channels_plot(x: Container[float] | Axis, channels: dict[str, Container[
     
     ax.legend(loc='center left', bbox_to_anchor=(1, 0.5), borderaxespad=2, fontsize=8)
     plt.tight_layout()
+
+
+    if logo_position is not None:
+        current_dir = os.path.dirname(__file__)
+        logo_path = os.path.join(current_dir, 'logo.png')
+        ax = add_logo_avoiding_legend(fig, ax, logo_path, 0.07, position=logo_position)
     
     return ax
