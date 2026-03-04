@@ -86,6 +86,18 @@ particle_aliases = {
     'invisible': 'invisible',
     'inv': 'invisible',
     'dark': 'dark',
+    'p': 'proton',
+    'proton': 'proton',
+    'n': 'neutron',
+    'neutron': 'neutron',
+    'Sigma0': 'Sigma0',
+    'Sigma+': 'Sigma+',
+    'Sigma-': 'Sigma-',
+    'Lambda': 'Lambda',
+    'Xi0': 'Xi0',
+    'cascade0': 'Xi0',
+    'Xi-': 'Xi-',
+    'cascade-': 'Xi-',
 }
 
 tex_codes = {
@@ -137,4 +149,12 @@ tex_codes = {
     'invisible': r'\mathrm{inv.}',
     'dark': r'\mathrm{dark}',
     'hadrons': r'\mathrm{hadrons}',
+    'proton': 'p',
+    'neutron': 'n',
+    'Sigma0': r'\Sigma^0',
+    'Sigma+': r'\Sigma^+',
+    'Sigma-': r'\Sigma^-',
+    'Lambda': r'\Lambda',
+    'Xi0': r'\Xi^0',
+    'Xi-': r'\Xi^-',
 }
