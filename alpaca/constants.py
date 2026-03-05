@@ -161,6 +161,12 @@ GammaDplus = Constant(particles.D_plus.width/1000, 'particle')
 GammaDs = Constant(particles.D_s_plus.width/1000, 'particle')
 Gammatau = Constant(particles.tau_minus.width/1000, 'particle')
 Gammamu = Constant(particles.mu_minus.width/1000, 'particle')
+GammaSigma0 = Constant(particles.Sigma_0.width/1000, 'particle')
+GammaSigma_plus = Constant(particles.Sigma_plus.width/1000, 'particle')
+GammaSigma_minus = Constant(particles.Sigma_minus.width/1000, 'particle')
+GammaLambda = Constant(particles.Lambda.width/1000, 'particle')
+GammaXi0 = Constant(particles.Xi_0.width/1000, 'particle')
+GammaXi_minus = Constant(particles.Xi_minus.width/1000, 'particle')
 
 # Mixing angle
 theta_eta_etap = Constant(-14.1/180*np.pi, 'Christ:2010dd')

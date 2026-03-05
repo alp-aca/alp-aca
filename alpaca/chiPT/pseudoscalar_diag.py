@@ -1,6 +1,7 @@
 import numpy as np
 import gvar
 from ..rge import ALPcouplings
+import os
 
 def det3(M):
     return M[0,0] * (M[1,1] * M[2,2] - M[1,2] * M[2,1]) - M[0,1] * (M[1,0] * M[2,2] - M[1,2]*M[2,0]) + M[0,2]*(M[1,0]*M[2,1] - M[1,1]*M[2,0])
@@ -87,7 +88,8 @@ class FitResults:
         if self.initialized:
             return
         self.initialized = True
-        fit_res = gvar.load('mesonfit.pickle')
+        current_path = os.path.dirname(__file__)
+        fit_res = gvar.load(os.path.join(current_path, 'mesonfit.pickle'))
 
         mneutr, R = mass_sol(**fit_res)
         lam_pi3 = np.diag([1, -1, 0])

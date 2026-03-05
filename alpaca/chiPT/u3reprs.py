@@ -46,3 +46,4 @@ Sigma_minus = np.array([[0,0,0],[1,0,0],[0,0,0]])
 Lambda0 = np.diag([1,1,-2])/np.sqrt(6)
 Xi0 = np.array([[0,0,0],[0,0,0],[0,1,0]])
 Xi_minus = np.array([[0,0,0],[0,0,0],[1,0,0]])
+baryons = {'proton': proton, 'neutron': neutron, 'Sigma0': Sigma0, 'Sigma+': Sigma_plus, 'Sigma-': Sigma_minus, 'Lambda': Lambda0, 'Xi0': Xi0, 'Xi-': Xi_minus}

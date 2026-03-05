@@ -6,6 +6,7 @@ from .mesons.decays import meson_to_alp, meson_nwa, meson_mediated, meson_width,
 from .mesons.mixing import tex_codes as mixing_tex_codes
 from .leptons.decays import lepton_to_alp, lepton_nwa
 from .ee.cross_sections import xsections as xsections_ee, xsections_nwa as xsections_nwa_ee
+from .baryons.baryonic import baryon_to_alp, baryon_nwa
 import numpy as np
 
 def parse(transition: str) -> tuple[list[str], list[str]]:
@@ -151,6 +152,13 @@ def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: flo
     elif len(initial) == 1 and (initial[0], tuple(final)) in lepton_nwa.keys():
         lepton_process, channel = lepton_nwa[(initial[0], tuple(final))]
         br = lambda ma, couplings, fa, br_dark, **kwargs: lepton_to_alp[lepton_process](ma, couplings, fa, br_dark, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)[channel]
+    # Baryon decays in ALP
+    elif len(initial) ==1 and (initial[0], tuple(final)) in baryon_to_alp.keys():
+        br = baryon_to_alp[(initial[0], tuple(final))]
+    # Baryon decays in NWA
+    elif len(initial) == 1 and (initial[0], tuple(final)) in baryon_nwa.keys():
+        baryon_process, channel = baryon_nwa[(initial[0], tuple(final))]
+        br = lambda ma, couplings, fa, br_dark, **kwargs: baryon_to_alp[baryon_process](ma, couplings, fa, br_dark, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)[channel]
     else:
         raise NotImplementedError(f'Unknown branching ratio process {" ".join(initial)} -> {" ".join(final)}')
     
