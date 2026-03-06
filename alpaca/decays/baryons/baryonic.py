@@ -34,10 +34,10 @@ baryon_to_alp = {
     ('Sigma+', ('alp', 'proton')): lambda ma, couplings, fa, br_dark, **kwargs: decay_width_prod(ma, couplings, fa, 'Sigma+', 'proton', **kwargs)/GammaSigma_plus,
     ('Sigma0', ('alp', 'neutron')): lambda ma, couplings, fa, br_dark, **kwargs: decay_width_prod(ma, couplings, fa, 'Sigma0', 'neutron', **kwargs)/GammaSigma0,
     ('Lambda', ('alp', 'neutron')): lambda ma, couplings, fa, br_dark, **kwargs: decay_width_prod(ma, couplings, fa, 'Lambda', 'neutron', **kwargs)/GammaLambda,
-    ('Xi0', ('alp', 'Sigma0')): lambda ma, couplings, fa, br_dark, **kwargs: decay_width_prod(ma, couplings, fa, 'Xi0', 'Sigma0', **kwargs)/GammaXi0,
-    ('Xi-', ('alp', 'Sigma-')): lambda ma, couplings, fa, br_dark, **kwargs: decay_width_prod(ma, couplings, fa, 'Xi-', 'Sigma-', **kwargs)/GammaXi_minus,
-    ('Xi0', ('alp', 'Lambda')): lambda ma, couplings, fa, br_dark, **kwargs: decay_width_prod(ma, couplings, fa, 'Xi0', 'Lambda', **kwargs)/GammaXi0,
-    ('Sigma0', ('alp', 'Lambda')): lambda ma, couplings, fa, br_dark, **kwargs: decay_width_prod(ma, couplings, fa, 'Sigma0', 'Lambda', **kwargs)/GammaSigma0,
+    ('Xi0', ('Sigma0', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: decay_width_prod(ma, couplings, fa, 'Xi0', 'Sigma0', **kwargs)/GammaXi0,
+    ('Xi-', ('Sigma-', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: decay_width_prod(ma, couplings, fa, 'Xi-', 'Sigma-', **kwargs)/GammaXi_minus,
+    ('Xi0', ('Lambda', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: decay_width_prod(ma, couplings, fa, 'Xi0', 'Lambda', **kwargs)/GammaXi0,
+    ('Sigma0', ('Lambda', 'alp')): lambda ma, couplings, fa, br_dark, **kwargs: decay_width_prod(ma, couplings, fa, 'Sigma0', 'Lambda', **kwargs)/GammaSigma0,
 }
 
 baryon_nwa = {}

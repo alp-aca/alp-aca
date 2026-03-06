@@ -8,7 +8,7 @@ from ..constants import mUpsilon3S
 from .classes import MeasurementBase, MeasurementConstantBound, MeasurementInterpolatedBound, MeasurementInterpolated, MeasurementDisplacedVertexBound, MeasurementBinned, rmax_belle, rmax_besIII, MeasurementConstant
 from ..decays.particles import particle_aliases
 from ..decays.decays import parse
-from ..constants import mB, mB0, mBs, mK, mtau, mKst0, mKL, mpi0, mpi_pm, mphi, mZ, mDplus, mDs, mrho, mD0, meta, mUpsilon1S, mJpsi, me, mmu
+from ..constants import mB, mB0, mBs, mK, mtau, mKst0, mKL, mpi0, mpi_pm, mphi, mZ, mDplus, mDs, mrho, mD0, meta, mUpsilon1S, mJpsi, me, mmu, mSigma_plus, mproton, mXi0, mLambda
 # Get the directory of the current script
 current_dir = os.path.dirname(__file__)
 
@@ -2077,6 +2077,36 @@ dw_KS = MeasurementConstantBound(
     conf_level= 1/(1+np.sqrt(np.pi/2)*particles.K_S_0.width_upper/particles.K_S_0.width)
 )
 
+lhcb_Sigmapproton_mumu = MeasurementInterpolatedBound(
+    ['LHCb:2024fhb', 'Provenzano:2025cws'],
+    os.path.join(current_dir, visible, 'BR_Sigmapmumu.txt'),
+    'prompt',
+    rmin = 150e-4,
+    conf_level= 0.9,
+    mass_parent=mSigma_plus,
+    mass_sibling=mproton
+)
+
+besIII_Sigmap_inv =MeasurementInterpolatedBound(
+    'BESIII:2023utd',
+    os.path.join(current_dir, invisible, 'BR_Sigmap_inv.txt'),
+    'invisible',
+    rmax = rmax_besIII,
+    mass_parent=mSigma_plus,
+    mass_sibling=mproton,
+    lab_boost=11e-3
+)
+
+besIII_XiLambda_inv =MeasurementInterpolatedBound(
+    'BESIII:2026ztz',
+    os.path.join(current_dir, invisible, 'BR_XiLambda_inv.txt'),
+    'invisible',
+    rmax = rmax_besIII,
+    mass_parent=mXi0,
+    mass_sibling=mLambda,
+    lab_boost=11e-3
+)
+
 def get_measurements(process: str | tuple, exclude_projections: bool = True) -> dict[str, MeasurementBase]:
     """Retrieve measurements based on the given transition.
 
@@ -2447,5 +2477,11 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         return {'SINDRUM': sindrum_mu3e}
     elif initial == ['muon'] and final == sorted(['electron', 'photon', 'photon']):
         return {'Cristal Box': cristalbox_muegammagamma}
+    elif initial == ['Sigma+'] and final == sorted(['muon', 'muon', 'proton']):
+        return {'LHCb': lhcb_Sigmapproton_mumu}
+    elif initial == ['Sigma+'] and final == sorted(['alp', 'proton']):
+        return {'BESIII': besIII_Sigmap_inv}
+    elif initial == ['Xi0'] and final == sorted(['alp', 'Lambda']):
+        return {'BESIII': besIII_XiLambda_inv}
     else:
         raise KeyError(f"No measurements for {transition}")
