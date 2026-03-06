@@ -429,12 +429,6 @@ class ALPcouplings:
             self,
             scale_out: float,
             basis: str,
-            integrator: str='scipy',
-            beta: str='full',
-            match_tildecouplings = True,
-            scipy_method: str = 'RK45',
-            scipy_rtol: float = 1e-3,
-            scipy_atol: float = 1e-6,
             **kwargs
             ) -> 'ALPcouplings':
         """Match and run the couplings to another basis and energy scale.
@@ -492,7 +486,7 @@ class ALPcouplings:
         KeyError
             If attempting to translate to an unrecognized basis.
         """
-        return self._match_run(scale_out, basis, integrator, beta, match_tildecouplings, scipy_method, scipy_rtol, scipy_atol)
+        return self._match_run(scale_out, basis, **kwargs)
     
     @cache
     def _match_run(
@@ -519,11 +513,11 @@ class ALPcouplings:
                     betafunc = symbolic.beta_full
                 else:
                     raise KeyError(f'beta function {beta} not recognized')
-                return symbolic.run_leadinglog(self.translate('derivative_above'), betafunc, scale_out).match_run(scale_out, basis, integrator)
+                return symbolic.run_leadinglog(self.translate('derivative_above'), betafunc, scale_out).match_run(scale_out, basis, integrator=integrator)
             if self.basis in bases_above and basis in bases_below:
-                couplings_ew = self.match_run(self.ew_scale, 'massbasis_ew', integrator, beta)
+                couplings_ew = self.match_run(self.ew_scale, 'massbasis_ew', integrator=integrator, beta=beta)
                 couplings_below = symbolic.match(couplings_ew, match_tildecouplings)
-                return couplings_below.match_run(scale_out, basis, integrator)
+                return couplings_below.match_run(scale_out, basis, integrator=integrator)
             if self.basis in bases_below and basis in bases_below:
                 return symbolic.run_leadinglog(self.translate('RL_below'), symbolic.beta_low, scale_out).translate(basis)
             if self.basis in bases_below and basis in bases_above:
@@ -535,18 +529,18 @@ class ALPcouplings:
             return self.translate(basis)
         if self.basis.startswith('sp_') and basis.startswith('sp_'):
             separated = self.separate_expressions()
-            a = {k: v.match_run(scale_out, basis[3:], integrator, beta, match_tildecouplings, scipy_method=scipy_method, scipy_rtol=scipy_rtol, scipy_atol=scipy_atol) for k, v in separated.items()}
+            a = {k: v.match_run(scale_out, basis[3:], integrator=integrator, beta=beta, match_tildecouplings=match_tildecouplings, scipy_method=scipy_method, scipy_rtol=scipy_rtol, scipy_atol=scipy_atol) for k, v in separated.items()}
             return ALPcouplings.join_expressions(a)
         if self.scale > self.ew_scale and scale_out < self.ew_scale:
             if self.basis in bases_above and basis in bases_below:
-                couplings_ew = self.match_run(self.ew_scale, 'massbasis_ew', integrator, beta, scipy_method=scipy_method, scipy_rtol=scipy_rtol, scipy_atol=scipy_atol)
+                couplings_ew = self.match_run(self.ew_scale, 'massbasis_ew', integrator=integrator, beta=beta, scipy_method=scipy_method, scipy_rtol=scipy_rtol, scipy_atol=scipy_atol)
                 couplings_below = matching.match(couplings_ew, match_tildecouplings)
-                return couplings_below.match_run(scale_out, basis, integrator, beta, scipy_method=scipy_method, scipy_rtol=scipy_rtol, scipy_atol=scipy_atol)
+                return couplings_below.match_run(scale_out, basis, integrator=integrator, beta=beta, scipy_method=scipy_method, scipy_rtol=scipy_rtol, scipy_atol=scipy_atol)
             else:
                 raise KeyError(basis)
         if self.scale == self.ew_scale and self.basis in bases_above and basis in bases_below:
                 couplings_below = matching.match(self, match_tildecouplings)
-                return couplings_below.match_run(scale_out, basis, integrator, beta, scipy_method=scipy_method, scipy_rtol=scipy_rtol, scipy_atol=scipy_atol)
+                return couplings_below.match_run(scale_out, basis, integrator=integrator, beta=beta, scipy_method=scipy_method, scipy_rtol=scipy_rtol, scipy_atol=scipy_atol)
         if scale_out < self.ew_scale:
             if integrator == 'scipy':
                 scipy_options = {'method': scipy_method, 'rtol': scipy_rtol, 'atol': scipy_atol}
