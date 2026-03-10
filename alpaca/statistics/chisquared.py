@@ -14,6 +14,7 @@ from ..rge import ALPcouplings
 from ..sectors import Sector, combine_sectors
 from ..biblio import citation_report
 from typing import Optional
+from .functions import nsigmas
 class ChiSquared:
     def __init__(self, sector: Sector,
                  chi2_dict: dict[tuple[str, str], np.ndarray[float]],
@@ -26,9 +27,7 @@ class ChiSquared:
     def significance(self) -> np.ndarray[float]:
         chi2 = np.nansum([v for v in self.chi2_dict.values()], axis=0)
         ndof = np.sum([v for v in self.dofs_dict.values()], axis=0)
-        p = 1 - scipy.stats.chi2.cdf(np.where(ndof == 0, np.nan, chi2), ndof)
-        p = np.clip(p, 2e-16, 1)
-        return np.nan_to_num(scipy.stats.norm.ppf(1 - p/2))
+        return np.nan_to_num(nsigmas(chi2, ndof))
         
     def get_measurements(self) -> list[tuple[str, str]]:
         return list( set(self.chi2_dict.keys()) & set(self.dofs_dict.keys()) )
