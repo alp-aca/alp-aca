@@ -1,5 +1,6 @@
 import numpy as np 
 import scipy.stats
+from scipy.special import gammaln
 
 def tensor_meshgrid(*arrays):
     dims = [np.array(a).shape for a in arrays]
@@ -17,11 +18,22 @@ def tensor_meshgrid(*arrays):
         result.append(np.broadcast_to(np.array(a).reshape(*dim_reshape), dims_final))
     return tuple(result)
 
-def nsigmas(chi2: np.ndarray[float], ndof: np.ndarray[float]) -> np.ndarray[float]:
+@np.vectorize
+def nsigmas(chi2: float, ndof: float) -> float:
     r"""Compute the pull in Gaussian standard deviations corresponding to
     a $\chi^2$ with `ndof` degrees of freedom.
-
-    Example: For `dof=2` and `delta_chi2=2.3`, the result is roughly 1.0."""
-    p = 1 - scipy.stats.chi2.cdf(np.where(ndof == 0, np.nan, chi2), ndof)
-    p = np.clip(p, 2e-16, 1)
-    return scipy.stats.norm.ppf(1 - p/2)
+    """
+    if ndof == 0:
+        return np.nan
+    if ndof == 1:
+        return np.sqrt(chi2)
+    logsf = scipy.stats.chi2.logsf(chi2, ndof) - np.log(2)
+    if np.isinf(logsf):
+        logsf = -chi2/2 + (ndof-1) * np.log(chi2) - ndof/2 * np.log(2) - gammaln(ndof/2) - np.log(2)
+    if logsf > -720:
+        return scipy.stats.norm.isf(np.exp(logsf))
+    else:
+        z = np.sqrt(-2* logsf)
+        for _ in range(5):
+            z = np.sqrt(-2*(logsf + 0.5*np.log(2*np.pi) + np.log(z)))
+        return z
