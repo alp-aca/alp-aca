@@ -28,6 +28,9 @@ class ChiSquared:
         chi2 = np.nansum([v for v in self.chi2_dict.values()], axis=0)
         ndof = np.sum([v for v in self.dofs_dict.values()], axis=0)
         return np.nan_to_num(nsigmas(chi2, ndof))
+    
+    def chi2_tot(self) -> np.ndarray[float]:
+        return np.nan_to_num(np.nansum([v for v in self.chi2_dict.values()], axis=0))
         
     def get_measurements(self) -> list[tuple[str, str]]:
         return list( set(self.chi2_dict.keys()) & set(self.dofs_dict.keys()) )
@@ -339,6 +342,9 @@ class ChiSquared:
 class ChiSquaredList(list[ChiSquared]):
     """A list of ChiSquared objects with additional methods for combining and manipulating them."""
     
+    def chi2_tot(self):
+        return np.sum([c.chi2_tot() for c in self], axis=0)
+
     def combine(self, name: str, tex: str, description: str = '') -> ChiSquared:
         """Combine the chi-squared values from the list into a single ChiSquared object."""
         return combine_chi2(self, name, tex, description)
