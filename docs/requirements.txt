@@ -20,7 +20,7 @@ docutils==0.21.2
     # via
     #   sphinx
     #   sphinx-rtd-theme
-fonttools==4.59.0
+fonttools==4.60.2
     # via matplotlib
 idna==3.10
     # via requests
@@ -42,7 +42,7 @@ packaging==25.0
     # via
     #   matplotlib
     #   sphinx
-pillow==11.3.0
+pillow==12.1.1
     # via matplotlib
 pygments==2.19.2
     # via sphinx
@@ -79,5 +79,5 @@ sphinxcontrib-qthelp==2.0.0
     # via sphinx
 sphinxcontrib-serializinghtml==2.0.0
     # via sphinx
-urllib3==2.5.0
+urllib3==2.6.3
     # via requests
