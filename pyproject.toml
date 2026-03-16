@@ -28,7 +28,7 @@ packages = [{ include = "alpaca" }]
 [tool.poetry.dependencies]
 python = ">=3.11"
 contourpy = ">=1.3.3"
-flavio = {git = "https://github.com/flavio-io/flavio.git", rev="048f40354436d51aa8fbf09462e3856728df5a9a"}
+flavio = {git = "https://github.com/alp-aca/flavio.git", rev="530a569ee842b851d451716ec6ec7e0b541732fa"}
 vegas = "^6.1.1"
 requests = "^2.32.3"
 sympy = "1.13.3"
