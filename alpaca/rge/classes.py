@@ -14,13 +14,16 @@ from io import TextIOBase
 import wilson
 from ..common import svd, diagonalise_yukawas
 
-numeric = (int, float, complex, Expr, np.float128, np.float64, np.float32, np.float16, np.int64, np.int32, np.int16, np.int8, np.complex128, np.complex64, np.complex256)
+numeric = (int, float, complex, Expr,
+           np.byte, np.ubyte, np.short, np.ushort, np.intc, np.uintc, np.int_, np.uint, np.longlong, np.ulonglong,
+           np.half, np.single, np.double, np.longdouble, np.csingle, np.cdouble, np.clongdouble)
+numeric_complex = (complex, Expr, np.csingle, np.cdouble, np.clongdouble)
 matricial = (np.ndarray, np.matrix, Matrix, list)
 
 def format_number(x):
     if isinstance(x, sp.Expr):
         return str(x)
-    if isinstance(x, complex):
+    if isinstance(x, numeric_complex):
         if x.imag == 0:
             return format_number(x.real)
         if x.real == 0:
