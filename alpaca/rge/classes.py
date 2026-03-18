@@ -14,7 +14,7 @@ from io import TextIOBase
 import wilson
 from ..common import svd, diagonalise_yukawas
 
-numeric = (int, float, complex, Expr)
+numeric = (int, float, complex, Expr, np.float128, np.float64, np.float32, np.float16, np.int64, np.int32, np.int16, np.int8, np.complex128, np.complex64, np.complex256)
 matricial = (np.ndarray, np.matrix, Matrix, list)
 
 def format_number(x):
