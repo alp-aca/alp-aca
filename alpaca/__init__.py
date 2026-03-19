@@ -66,10 +66,6 @@ class info:
         out += "Please cite arXiv:2508.08354 https://arxiv.org/abs/2508.08354"
         return out
     def _repr_markdown_(self):
-        import os
-        import pathlib
-        current_dir = os.path.dirname(__file__)
-        readme_path = pathlib.Path(current_dir).parent / "README.md"
-        with open(readme_path, "r") as f:
-            readme_content = f.read()
+        from importlib.metadata import metadata
+        readme_content = metadata("alpaca-alps")['Description']
         return readme_content

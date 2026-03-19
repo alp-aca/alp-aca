@@ -24,6 +24,7 @@ Documentation = "https://alpaca-alps.readthedocs.io/latest/"
 
 [tool.poetry]
 packages = [{ include = "alpaca" }]
+include = ["README.md"]
 
 [tool.poetry.dependencies]
 python = ">=3.11"
