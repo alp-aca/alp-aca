@@ -132,7 +132,7 @@ def coupling_mixing(couplings: ALPcouplings):
     cuA = couplings['cuA']
     cdA = couplings['cdA']
     cqA = np.array([[cuA[0,0], 0, 0], [0, cdA[0,0], cdA[0,1]], [0, cdA[1,0], cdA[1,1]]])/2
-    return fit_results['B0mq'] @ cqA + cqA @ fit_results['B0mq'] - fit_results['m02']/3 * np.eye(3) * couplings['cG']
+    return -fit_results['B0mq'] @ cqA - cqA @ fit_results['B0mq'] - fit_results['m02']/3 * np.eye(3) * (couplings['cG'] + np.trace(cqA))
 
 def mixing_shift(couplings: ALPcouplings, ma: float):
     # This is \mathbb{M}_a^{-1}(C)

@@ -1,5 +1,5 @@
 from ..rge import ALPcouplings
-from ..common import B0disc_equalmass, ckm_xi
+from ..common import B0disc_equalmass, ckm_xi, alpha_s
 from ..constants import GF, mu, md, ms, mc, mb, me, mmu, mtau, s2w, mW, mZ
 from ..constants import Deltau_U3, Deltad_U3, Deltas_U3
 import numpy as np
@@ -7,6 +7,7 @@ from ..common import g_photonloop, alpha_em, alpha_s, B3
 from ..biblio.biblio import citations
 from ..chiPT.pseudoscalar_diag import mixing_shift
 from ..chiPT.u3reprs import baryons
+from .particles import particle_aliases
 
 def effcoupling_ff(ma, couplings: ALPcouplings, fermion, **kwargs):
     mass = {'e': me, 'mu': mmu, 'tau': mtau, 'c': mc, 'b': mb}[fermion]
@@ -102,7 +103,13 @@ def effcoupling_baryons_A(couplings: ALPcouplings, ma: float, b1: str, b2: str, 
     lambda1 = baryons[b1].T
     lambda2 = baryons[b2]
     mix_shift = mixing_shift(couplings, ma)
-    return DB * np.trace(mix_shift @ lambda1 @ lambda2 + mix_shift @ lambda2 @ lambda1) - FB * np.trace(mix_shift @ lambda1 @ lambda2 - mix_shift @ lambda2 @ lambda1) + SB * np.trace(mix_shift) *np.trace(lambda1 @ lambda2)
+    if ma < 1.5:
+        bl_corr = 1.0
+    else:
+        citations.register_inspire('Brodsky:1974vy')
+        citations.register_inspire('Lepage:1980fj')
+        bl_corr = alpha_s(ma)**2/alpha_s(1.5)**2
+    return bl_corr*(DB * np.trace(mix_shift @ lambda1 @ lambda2 + mix_shift @ lambda2 @ lambda1) - FB * np.trace(mix_shift @ lambda1 @ lambda2 - mix_shift @ lambda2 @ lambda1) + SB * np.trace(mix_shift) *np.trace(lambda1 @ lambda2))
 
 def effcoupling_baryons_V(couplings: ALPcouplings, ma: float, b1: str, b2: str, **kwargs):
     couplings = couplings.match_run(ma, 'VA_below', **kwargs)
@@ -111,4 +118,31 @@ def effcoupling_baryons_V(couplings: ALPcouplings, ma: float, b1: str, b2: str, 
     cqV = np.array([[cuV[0,0], 0, 0], [0, cdV[0,0], cdV[0,1]], [0, cdV[1,0], cdV[1,1]]])/2
     lambda1 = baryons[b1].T
     lambda2 = baryons[b2]
-    return - np.trace(cqV @ lambda1 @ lambda2 - cqV @ lambda2 @ lambda1)
+    if ma < 1.5:
+        bl_corr = 1.0
+    else:
+        citations.register_inspire('Brodsky:1974vy')
+        citations.register_inspire('Lepage:1980fj')
+        bl_corr = alpha_s(ma)**2/alpha_s(1.5)**2 * 1.5**2/ma**2
+    return bl_corr*(- np.trace(cqV @ lambda1 @ lambda2 - cqV @ lambda2 @ lambda1))
+
+@np.vectorize
+def _effective_coupling(ma: float, couplings: ALPcouplings, particles: str, chirality: str, **kwargs):
+    particles = particles.split()
+    if len(particles) == 2:
+        p1, p2 = particles
+        if particle_aliases[p1] in ['proton', 'neutron', 'Sigma0', 'Sigma+', 'Sigma-', 'Lambda', 'Xi0', 'Xi-'] and particle_aliases[p2] in ['proton', 'neutron', 'Sigma0', 'Sigma+', 'Sigma-', 'Lambda', 'Xi0', 'Xi-']:
+            if chirality == 'A':
+                return effcoupling_baryons_A(couplings, ma, particle_aliases[p1], particle_aliases[p2], **kwargs)
+            elif chirality == 'V':
+                return effcoupling_baryons_V(couplings, ma, particle_aliases[p1], particle_aliases[p2], **kwargs)
+            elif chirality == 'R':
+                return 0.5 * (effcoupling_baryons_A(couplings, ma, particle_aliases[p1], particle_aliases[p2], **kwargs) + effcoupling_baryons_V(couplings, ma, particle_aliases[p1], particle_aliases[p2], **kwargs))
+            elif chirality == 'L':
+                return 0.5 * (effcoupling_baryons_A(couplings, ma, particle_aliases[p1], particle_aliases[p2], **kwargs) + effcoupling_baryons_V(couplings, ma, particle_aliases[p1], particle_aliases[p2], **kwargs))
+            else:
+                raise ValueError(f"Invalid chirality {chirality}.")
+    raise ValueError(f"Invalid particles {particles}.")
+
+def effective_coupling(ma: float, couplings: ALPcouplings, particles: list[str], chirality: str = '', **kwargs):
+    return _effective_coupling(ma, couplings, particles, chirality, **kwargs)
