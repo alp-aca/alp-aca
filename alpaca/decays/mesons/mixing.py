@@ -77,34 +77,54 @@ def run_coeffs(coeffs: np.ndarray, mq1: float, scale: float) -> np.ndarray:
     return eta_matrix @ coeffs
 
 def coeffs_heavyALP(meson: str, couplings: ALPcouplings, ma, fa, **kwargs) -> np.ndarray:
-    if ma < couplings.ew_scale:
-        coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
-    else:
-        coup_low = couplings.match_run(ma, 'massbasis_ew', **kwargs)
     if meson == 'K0':
         from ...constants import md, ms
         mq1 = ms
         mq2 = md
-        cL = coup_low['cdL'][0,1]
-        cR = coup_low['cdR'][0,1]
+        if ma < couplings.ew_scale:
+            coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
+            cL = coup_low['cdL'][0,1]
+            cR = coup_low['cdR'][0,1]
+        else:
+            coup_low = couplings.match_run(ma, 'derivative_above', **kwargs)
+            cL = coup_low['cqL'][0,1]
+            cR = coup_low['cdR'][0,1]
     if meson == 'B0':
         from ...constants import md, mb
         mq1 = mb
         mq2 = md
-        cL = coup_low['cdL'][0,2]
-        cR = coup_low['cdR'][0,2]
+        if ma < couplings.ew_scale:
+            coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
+            cL = coup_low['cdL'][0,2]
+            cR = coup_low['cdR'][0,2]
+        else:
+            coup_low = couplings.match_run(ma, 'derivative_above', **kwargs)
+            cL = coup_low['cqL'][0,2]
+            cR = coup_low['cdR'][0,2]
     if meson == 'Bs':
         from ...constants import ms, mb
         mq1 = mb
         mq2 = ms
-        cL = coup_low['cdL'][1,2]
-        cR = coup_low['cdR'][1,2]
+        if ma < couplings.ew_scale:
+            coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
+            cL = coup_low['cdL'][1,2]
+            cR = coup_low['cdR'][1,2]
+        else:
+            coup_low = couplings.match_run(ma, 'derivative_above', **kwargs)
+            cL = coup_low['cqL'][1,2]
+            cR = coup_low['cdR'][1,2]
     if meson == 'D0':
         from ...constants import mu, mc
         mq1 = mc
         mq2 = mu
-        cL = coup_low['cuL'][0,1]
-        cR = coup_low['cuR'][0,1]
+        if ma < couplings.ew_scale:
+            coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
+            cL = coup_low['cuL'][0,1]
+            cR = coup_low['cuR'][0,1]
+        else:
+            coup_low = couplings.match_run(ma, 'derivative_above', **kwargs)
+            cL = coup_low['cqL'][0,1]
+            cR = coup_low['cuR'][0,1]
     c2 = (cR*mq1-cL*mq2)**2/(2*ma**2*fa**2)
     c2tilde = (cL*mq1-cR*mq2)**2/(2*ma**2*fa**2)
     c4 = (cR*mq1-cL*mq2)*(cL*mq1-cR*mq2)/(ma**2*fa**2)

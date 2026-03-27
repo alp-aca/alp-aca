@@ -1,4 +1,5 @@
 from ..rge import ALPcouplings
+from ..rge.runSM import runSM
 from ..common import B0disc_equalmass, ckm_xi
 from ..constants import GF, mu, md, ms, mc, mb, me, mmu, mtau, s2w, mW, mZ
 import numpy as np
@@ -33,13 +34,17 @@ def effcoupling_ff(ma, couplings: ALPcouplings, fermion, **kwargs):
             ceff -= 12 * (4/3) * a_s**2 * cG * (np.log(ma**2/mass**2) + delta1+g)
         return ceff
     else:
-        cc = couplings.translate('massbasis_ew')
-        cgamma = cc['cgamma']
-        cgammaZ = cc['cgammaZ']
-        cZ = cc['cZ']
+        cc = couplings.translate('derivative_above')
+        smpars = runSM(ma)
+        s2w = smpars['s2w']
+        c2w = 1-s2w
+        cgamma = cc['cB'] + cc['cW']
+        cgammaZ = c2w * cc['cW'] - s2w * cc['cB']
+        cZ = c2w**2 * cc['cW'] + s2w**2 * cc['cB']
         cW = cc['cW']
         cG = cc['cG']
-        cf = cc[f'k{ftype}'][gen, gen]-cc[f'k{ftype.upper()}'][gen, gen]
+        doublet = {'e': 'l', 'd': 'q', 'u': 'q'}[ftype]
+        cf = cc[f'c{ftype}R'][gen, gen]-cc[f'c{doublet}L'][gen, gen]
         if cgamma != 0 or (cG!=0 and Nc == 3):
             g = g_photonloop(4*mass**2/ma**2)
         else:

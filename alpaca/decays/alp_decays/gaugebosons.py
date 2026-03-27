@@ -38,16 +38,17 @@ def cgamma_twoloops(ma: float, couplings: ALPcouplings, fa: float) -> float:
 def decay_width_2gamma(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
     cgamma_eff = 0
     if ma > couplings.ew_scale:
-        cc = couplings.match_run(ma, 'massbasis_ew', **kwargs)
-        cgamma_eff += 2*alpha_em/np.pi*cc['cW']/s2w*B2(4*mW**2/ma**2)
-        cuA = cc['cuR'] - cc['cuL']
-        cdA = cc['cdR'] - cc['cdL']
-        ceA = cc['ceR'] - cc['ceL']
+        cc = couplings.match_run(ma, 'derivative_above', **kwargs)
+        cgamma_eff += 2*alpha_em(ma)/np.pi*cc['cW']/s2w*B2(4*mW**2/ma**2)
+        cuA = cc['cuR'] - cc['cqL']
+        cdA = cc['cdR'] - cc['cqL']
+        ceA = cc['ceR'] - cc['clL']
         masses = [me, mmu, mtau, mc, mb, mt]
         charges = [-1, -1, -1, 2/3, -1/3, 2/3]
         Nc = [1, 1, 1, 3, 3, 3]
         coups = [ceA[0,0], ceA[1,1], ceA[2,2], cuA[1,1], cdA[2,2], cuA[2,2]]
         cgamma_eff += sum(Nc[i]*charges[i]**2*coups[i]*B1(4*masses[i]**2/ma**2) for i in range(6))
+        cgamma_eff += cc['cW'] + cc['cB']
     else:
         cc = couplings.match_run(ma, 'VA_below', **kwargs)
         cuA = cc['cuA']
@@ -58,7 +59,7 @@ def decay_width_2gamma(ma: float, couplings: ALPcouplings, fa: float, **kwargs) 
         Nc = [1, 1, 1, 3, 3]
         coups = [ceA[0,0], ceA[1,1], ceA[2,2], cuA[1,1], cdA[2,2]]
         cgamma_eff += sum(Nc[i]*charges[i]**2*coups[i]*B1(4*masses[i]**2/ma**2) for i in range(5))
-    cgamma_eff += cc['cgamma'] 
+        cgamma_eff += cc['cgamma'] 
     
     if ma > 2.5:
         masses = [mu, md, ms]
@@ -86,9 +87,9 @@ def decay_width_2gluons(ma: float, couplings: ALPcouplings, fa: float, **kwargs)
 
     match_scale = couplings.ew_scale
     if ma > match_scale:
-        cc = couplings.match_run(ma, 'massbasis_ew', **kwargs)
-        cuA = cc['cuR'] - cc['cuL']
-        cdA = cc['cdR'] - cc['cdL']
+        cc = couplings.match_run(ma, 'derivative_above', **kwargs)
+        cuA = cc['cuR'] - cc['cqL']
+        cdA = cc['cdR'] - cc['cqL']
         mq = [mu, md, ms, mc, mb, mt]
         coupl = [cuA[0,0], cdA[0,0], cdA[1,1], cuA[1,1], cdA[2,2], cuA[2,2]]
         cG_eff = cc['cG'] + 0.5 * sum(coupl[i]*B1(4*mq[i]**2/ma**2) for i in range(6))

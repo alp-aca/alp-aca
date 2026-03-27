@@ -378,16 +378,10 @@ def brBplusKa(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     kwargs = {k: v for k, v in kwargs.items() if k not in ['diagrams', 'args_tree']}
     if ma > mB-mK:
         return 0
-    if ma < couplings.ew_scale:
-        clow = couplings.match_run(ma, 'RL_below', **kwargs)
-        csb = clow['cdL'][1,2]+clow['cdR'][1,2]
-        cbb = clow['cdR'][2,2]-clow['cdL'][2,2]
-        css = clow['cdR'][1,1]-clow['cdL'][1,1]
-    else:
-        clow = couplings.match_run(ma, 'massbasis_ew', **kwargs)
-        csb = clow['cdL'][1,2]+clow['cdR'][1,2]+effcouplings_cq1q2_W(clow, ma**2, 's', 'b')
-        cbb = clow['cdR'][2,2]-clow['cdL'][2,2]
-        css = clow['cdR'][1,1]-clow['cdL'][1,1]
+    clow = couplings.match_run(ma, 'RL_below', **kwargs)
+    csb = clow['cdL'][1,2]+clow['cdR'][1,2]
+    cbb = clow['cdR'][2,2]-clow['cdL'][2,2]
+    css = clow['cdR'][1,1]-clow['cdL'][1,1]
     amp = 0
     if diags != 'tree':
         amp += transition_fv.amp_PtoP(mB, mK, f0_BK(ma**2), f_a, csb)
@@ -401,12 +395,8 @@ def brB0Ka(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     from ...common import f0_BK
     if ma > mB0-mK0:
         return 0
-    if ma < couplings.ew_scale:
-        clow = couplings.match_run(ma, 'RL_below', **kwargs)
-        csb = clow['cdL'][1,2]+clow['cdR'][1,2]
-    else:
-        clow = couplings.match_run(ma, 'massbasis_ew', **kwargs)
-        csb = clow['cdL'][1,2]+clow['cdR'][1,2]+effcouplings_cq1q2_W(clow, ma**2, 's', 'b')
+    clow = couplings.match_run(ma, 'RL_below', **kwargs)
+    csb = clow['cdL'][1,2]+clow['cdR'][1,2]
     amp = transition_fv.amp_PtoP(mB0, mK0, f0_BK(ma**2), f_a, csb)/2
     return dwPtoPa(np.abs(amp)**2, mB0, mK0, ma)/GammaB0
 
@@ -418,17 +408,10 @@ def brBplusKsta(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     kwargs = {k: v for k, v in kwargs.items() if k not in ['diagrams', 'args_tree']}
     if ma > mB-mKst_plus:
         return 0
-    if ma < couplings.ew_scale:
-        clow = couplings.match_run(ma, 'RL_below', **kwargs)
-        csb = clow['cdL'][1,2]+clow['cdR'][1,2]
-        cbb = clow['cdR'][2,2]-clow['cdL'][2,2]
-        css = clow['cdR'][1,1]-clow['cdL'][1,1]
-    else:
-        clow = couplings.match_run(ma, 'massbasis_ew', **kwargs)
-        csb = clow['cdL'][1,2]+clow['cdR'][1,2]+effcouplings_cq1q2_W(clow, ma**2, 's', 'b')
-        cbb = clow['cdR'][2,2]-clow['cdL'][2,2]
-        css = clow['cdR'][1,1]-clow['cdL'][1,1]
-    amp = 0
+    clow = couplings.match_run(ma, 'RL_below', **kwargs)
+    csb = clow['cdL'][1,2]+clow['cdR'][1,2]
+    cbb = clow['cdR'][2,2]-clow['cdL'][2,2]
+    css = clow['cdR'][1,1]-clow['cdL'][1,1]
     if diags != 'tree':
         amp += transition_fv.amp_PtoV(mKst_plus, A0_BKst(ma**2), f_a, csb)
     if diags != 'fv':
@@ -442,11 +425,7 @@ def brB0Ksta(ma: float, couplings: ALPcouplings, f_a: float=1000, **kwargs):
     kwargs = {k: v for k, v in kwargs.items() if k not in ['diagrams', 'args_tree']}
     if ma > mB0-mKst0:
         return 0
-    if ma < couplings.ew_scale:
-        clow = couplings.match_run(ma, 'RL_below', **kwargs)
-        csb = clow['cdL'][1,2]+clow['cdR'][1,2]
-    else:
-        clow = couplings.match_run(ma, 'massbasis_ew', **kwargs)
-        csb = clow['cdL'][1,2]+clow['cdR'][1,2]+effcouplings_cq1q2_W(clow, ma**2, 's', 'b')
+    clow = couplings.match_run(ma, 'RL_below', **kwargs)
+    csb = clow['cdL'][1,2]+clow['cdR'][1,2]
     amp = transition_fv.amp_PtoV(mKst0, A0_BKst(ma**2), f_a, csb)/2
     return dwPtoVa(np.abs(amp)**2, mB0, mKst0, ma)/GammaB0
