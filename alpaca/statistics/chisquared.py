@@ -326,7 +326,7 @@ class ChiSquared:
 
         Parameters
         ----------
-        *idx : tuple[slice|int]
+        * idx : tuple[slice|int]
             The indices to slice the ChiSquared object.
             At each index, you can specify a slice or an integer.
             If a slice is provided, it will slice the data along that dimension.
@@ -505,7 +505,7 @@ class ChiSquaredList(list[ChiSquared]):
 
         Parameters
         ----------
-        *idx : tuple[slice|int]
+        * idx : tuple[slice|int]
             The indices to slice the ChiSquaredList.
             At each index, you can specify a slice or an integer.
             If a slice is provided, it will slice the data along that dimension.

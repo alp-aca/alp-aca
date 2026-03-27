@@ -132,6 +132,7 @@ class ModelBase:
         """Return the couplings of the model as a symbolic ALPcouplings object.
 
         Arguments
+        ---------
         scale : float
             The scale at which the couplings are evaluated, in GeV.
         ew_scale : float
