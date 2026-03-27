@@ -22,6 +22,7 @@ save_html
 
 import plotly.graph_objects as go
 import plotly
+import base64
 
 from .palettes import trafficlights
 from ..statistics import ChiSquared, combine_chi2
@@ -56,6 +57,53 @@ def prepare_nb():
         '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_SVG"></script>'
     ))
 
+def _get_logo():
+    current_dir = os.path.dirname(__file__)
+    logo_path = os.path.join(current_dir, 'logo.png')
+    with open(logo_path, 'rb') as f:
+        encoded_logo = base64.b64encode(f.read()).decode('utf-8')
+    logo_str = f'data:image/png;base64,{encoded_logo}'
+    return logo_str
+
+def add_logo(fig: go.Figure, logo_position: int | str | None = 0):
+    if logo_position is None:
+        return fig
+    logo_str = _get_logo()
+    margin = 0.01
+    if logo_position == 0 or logo_position == 1 or logo_position == 'upper right':
+        x = 1 - margin
+        y = 1 - margin
+        xanchor = 'right'
+        yanchor = 'top'
+    elif logo_position == 2 or logo_position == 'upper left':
+        x = margin
+        y = 1 - margin
+        xanchor = 'left'
+        yanchor = 'top'
+    elif logo_position == 3 or logo_position == 'lower left':
+        x = margin
+        y = margin
+        xanchor = 'left'
+        yanchor = 'bottom'
+    elif logo_position == 4 or logo_position == 'lower right':
+        x = 1 - margin
+        y = margin
+        xanchor = 'right'
+        yanchor = 'bottom'
+    else:
+        raise ValueError(f'Invalid logo location: {logo_position}')
+    fig.add_layout_image(
+        dict(
+            source=logo_str,
+            xref="paper", yref="paper",
+            x=x, y=y,
+            sizex=0.1, sizey=0.1,
+            xanchor=xanchor, yanchor=yanchor,
+            layer="above"
+        )
+    )
+    return fig
+
 def exclusionplot(
         x: np.typing.ArrayLike | Axis,
         y: np.typing.ArrayLike | Axis,
@@ -68,7 +116,9 @@ def exclusionplot(
         xvar: str | None = None,
         yvar: str | None = None,
         xunits: str | None = None,
-        yunits: str | None = None) -> go.Figure:
+        yunits: str | None = None,
+        logo_position: int | str | None = 0
+    ) -> go.Figure:
     """
     Create an exclusion plot.
 
@@ -99,6 +149,14 @@ def exclusionplot(
         The units for the x-axis when hovering over the plot (default is None, which uses the Axis units if available). Formatting with HTML is supported.
     yunits : str | None, optional
         The units for the y-axis when hovering over the plot (default is None, which uses the Axis units if available). Formatting with HTML is supported.
+    logo_position : int | str | None, optional
+        The location of the ALP-aca logo on the plot (default is 0, which corresponds to the upper right corner). Valid values are:
+        - 0 or 'upper right': upper right corner
+        - 1 or 'upper right': upper right corner
+        - 2 or 'upper left': upper left corner
+        - 3 or 'lower left': lower left corner
+        - 4 or 'lower right': lower right corner
+        - None: no logo will be added
 
     """
     citations.register_bibtex('plotly', ref_plotly)
@@ -240,6 +298,8 @@ def exclusionplot(
 
     fig.update_xaxes(showspikes=True)
     fig.update_yaxes(showspikes=True)
+
+    fig = add_logo(fig, logo_position)
     return fig
 
 def alp_channels_plot(
@@ -253,7 +313,8 @@ def alp_channels_plot(
         xvar: str | None = None,
         yvar: str = 'y',
         xunits: str | None = None,
-        yunits: str = ''
+        yunits: str = '',
+        logo_position: int | str | None = 0
 ) -> go.Figure:
     """
     Create a plot for ALP decay channels.
@@ -274,6 +335,22 @@ def alp_channels_plot(
         The title of the plot (default is None).
     fig : go.Figure | None, optional
         The Plotly Figure object to plot on (default is None, which creates a new figure).
+    xvar : str | None, optional
+        The variable name for the x-axis when hovering over the plot (default is None, which uses the Axis name if available). Formatting with HTML is supported.
+    yvar : str, optional
+        The variable name for the y-axis when hovering over the plot (default is 'y'). Formatting with HTML is supported.
+    xunits : str | None, optional
+        The units for the x-axis when hovering over the plot (default is None, which uses the Axis units if available). Formatting with HTML is supported.
+    yunits : str, optional
+         The units for the y-axis when hovering over the plot (default is ''). Formatting with HTML is supported.
+    logo_position : int | str | None, optional
+        The location of the ALP-aca logo on the plot (default is 0, which corresponds to the upper right corner). Valid values are:
+        - 0 or 'upper right': upper right corner
+        - 1 or 'upper right': upper right corner
+        - 2 or 'upper left': upper left corner
+        - 3 or 'lower left': lower left corner
+        - 4 or 'lower right': lower right corner
+        - None: no logo will be added
 
     """
     citations.register_bibtex('plotly', ref_plotly)
@@ -334,6 +411,7 @@ def alp_channels_plot(
     
     fig.update_xaxes(showspikes=True, type='log', range=[np.log10(np.min(x_vals)), np.log10(np.max(x_vals))], exponentformat='power')
     fig.update_yaxes(showspikes=True, type='log', exponentformat='power')
+    fig = add_logo(fig, logo_position)
     return fig
 
 def save_html(fig: go.Figure, filename: str, title: str, template: str = 'basic'):
