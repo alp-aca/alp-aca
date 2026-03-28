@@ -5,6 +5,7 @@ API
 
    ALPcouplings
    processes
+   alpaca.benchmarks
    alpaca.biblio
    alpaca.experimental_data
    alpaca.plotting
