@@ -1,6 +1,6 @@
 # ALP-aca
 
-[![Version](https://img.shields.io/badge/version-1.1.0-teal?logo=GitHub)](https://github.com/alp-aca/alp-aca/tree/v1.1.0)
+[![Version](https://img.shields.io/badge/version-1.2.0-teal?logo=GitHub)](https://github.com/alp-aca/alp-aca/tree/v1.2.0-alpha.1)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16447036.svg)](https://doi.org/10.5281/zenodo.16447036) [![arxiv](https://img.shields.io/badge/arXiv-2508.08354_[hep--ph]-B31B1B.svg?style=flat&logo=arxiv&logoColor=B31B1B)](https://arxiv.org/abs/2508.08354)
 
 Welcome to the ALP Automated Computed Algorithm (ALP-aca)!
@@ -130,6 +130,7 @@ If you use ALP-aca, please cite
 The ALPaca manual for v1.0.0 is available on [arXiv](https://arxiv.org/abs/2508.08354). For newer versions, check the changelogs:
 
 * [v1.1.0 (31 October 2025)](https://github.com/alp-aca/alp-aca/blob/main/changelogs/v1-1.md)
+* [v1.2.0-alpha.1 (28 March 2026)](https://github.com/alp-aca/alp-aca/blob/main/changelogs/v1-2.md)
 
 You can also check the [automatically-generated documentation](https://alpaca-alps.readthedocs.io/latest/).
 
