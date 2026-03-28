@@ -648,7 +648,7 @@ def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma:
     exclude_projections (bool, optional):
         Whether to exclude projections from measurements. Default is True.
         
-    **kwargs:
+    `**kwargs`:
         Additional keyword arguments passed to chi2_obs.
 
     Returns

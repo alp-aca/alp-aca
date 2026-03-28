@@ -163,7 +163,7 @@ def add_logo_avoiding_legend(fig, ax, logo_path, logo_size=0.15, margin=0.02, al
 
 def exclusionplot(x: Container[float] | Axis, y: Container[float] | Axis, chi2: list[ChiSquared] | ChiSquared, xlabel: str | None = None, ylabel: str | None = None, title: str | None = None, ax: Axes | None = None, global_chi2: ChiSquared | bool = True, logo_position = 0) -> Axes:
     """
-    Create an exclusion plot.
+    Create a static exclusion plot.
 
     Parameters
     ----------
@@ -184,6 +184,14 @@ def exclusionplot(x: Container[float] | Axis, y: Container[float] | Axis, chi2: 
     global_chi2 : ChiSquared | bool, optional
         A ChiSquared object representing the global exclusion significance (default is True, which uses the combined chi squared).
         If set to False, no global significance will be plotted.
+    logo_position : int | str | None, optional
+        The location of the ALP-aca logo on the plot (default is 0, which corresponds to the upper right corner). Valid values are:
+            * 0 or 'best': avoids legend
+            * 1 or 'upper right': upper right corner
+            * 2 or 'upper left': upper left corner
+            * 3 or 'lower left': lower left corner
+            * 4 or 'lower right': lower right corner
+            * None: no logo will be added
 
     """
     citations.register_bibtex('matplotlib', ref_matplotlib)
@@ -275,7 +283,7 @@ def exclusionplot(x: Container[float] | Axis, y: Container[float] | Axis, chi2: 
 
 def alp_channels_plot(x: Container[float] | Axis, channels: dict[str, Container[float]], xlabel: str | None = None, ylabel: str | None = None, ymin: float | None = None, title: str | None = None, ax: Axes | None = None, logo_position = 0) -> Axes:
     """
-    Create a plot for ALP decay channels.
+    Create a static plot for ALP decay channels.
 
     Parameters
     ----------
@@ -293,6 +301,14 @@ def alp_channels_plot(x: Container[float] | Axis, channels: dict[str, Container[
         The title of the plot (default is None).
     ax : plt.Axes | None, optional
         The matplotlib Axes object to plot on (default is None, which creates a new figure).
+    logo_position : int | str | None, optional
+        The location of the ALP-aca logo on the plot (default is 0, which corresponds to the upper right corner). Valid values are:
+            - 0 or 'best': avoids legend
+            - 1 or 'upper right': upper right corner
+            - 2 or 'upper left': upper left corner
+            - 3 or 'lower left': lower left corner
+            - 4 or 'lower right': lower right corner
+            - None: no logo will be added
 
     """
     citations.register_bibtex('matplotlib', ref_matplotlib)

@@ -120,7 +120,7 @@ def exclusionplot(
         logo_position: int | str | None = 0
     ) -> go.Figure:
     """
-    Create an exclusion plot.
+    Create an interactive exclusion plot.
 
     Parameters
     ----------
@@ -151,12 +151,12 @@ def exclusionplot(
         The units for the y-axis when hovering over the plot (default is None, which uses the Axis units if available). Formatting with HTML is supported.
     logo_position : int | str | None, optional
         The location of the ALP-aca logo on the plot (default is 0, which corresponds to the upper right corner). Valid values are:
-        - 0 or 'upper right': upper right corner
-        - 1 or 'upper right': upper right corner
-        - 2 or 'upper left': upper left corner
-        - 3 or 'lower left': lower left corner
-        - 4 or 'lower right': lower right corner
-        - None: no logo will be added
+            - 0 or 'upper right': upper right corner
+            - 1 or 'upper right': upper right corner
+            - 2 or 'upper left': upper left corner
+            - 3 or 'lower left': lower left corner
+            - 4 or 'lower right': lower right corner
+            - None: no logo will be added
 
     """
     citations.register_bibtex('plotly', ref_plotly)
@@ -317,7 +317,7 @@ def alp_channels_plot(
         logo_position: int | str | None = 0
 ) -> go.Figure:
     """
-    Create a plot for ALP decay channels.
+    Create an interactive plot for ALP decay channels.
 
     Parameters
     ----------
@@ -345,12 +345,12 @@ def alp_channels_plot(
          The units for the y-axis when hovering over the plot (default is ''). Formatting with HTML is supported.
     logo_position : int | str | None, optional
         The location of the ALP-aca logo on the plot (default is 0, which corresponds to the upper right corner). Valid values are:
-        - 0 or 'upper right': upper right corner
-        - 1 or 'upper right': upper right corner
-        - 2 or 'upper left': upper left corner
-        - 3 or 'lower left': lower left corner
-        - 4 or 'lower right': lower right corner
-        - None: no logo will be added
+            - 0 or 'upper right': upper right corner
+            - 1 or 'upper right': upper right corner
+            - 2 or 'upper left': upper left corner
+            - 3 or 'lower left': lower left corner
+            - 4 or 'lower right': lower right corner
+            - None: no logo will be added
 
     """
     citations.register_bibtex('plotly', ref_plotly)

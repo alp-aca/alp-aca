@@ -64,47 +64,20 @@ class Scan:
 
     Parameters
     ----------
-    model : ALPcouplings | ModelBase | Benchmark
+    `model` : ALPcouplings | ModelBase | Benchmark
         The ALP model to use in the scan. Can be an ALPcouplings object, a ModelBase object, or a Benchmark object.
-    ma : float | Axis, optional
+    `ma` : float | Axis, optional
         The ALP mass or Axis for the x-axis, by default 1.0 GeV.
-    fa : float | Axis, optional
+    `fa` : float | Axis, optional
         The ALP decay constant or Axis for the y-axis, by default 1e3 GeV.
-    lambda_scale : float | Axis | None, optional
+    `lambda_scale` : float | Axis | None, optional
         The UV scale or Axis where the ALP couplings are defined, by default None. Must be provided only for ModelBase objects.
-    mu_scale : float | Axis | None, optional
+    `mu_scale` : float | Axis | None, optional
         The scale or Axis where the ALP couplings are evaluated, by default None (i.e. no running).
-    brdark : float | Axis, optional
+    `brdark` : float | Axis, optional
         The branching ratio of the ALP into dark sector particles, by default 0.0.
-    model_pars : dict, optional
+    `model_pars` : dict, optional
         A dictionary of model parameters for ModelBase and Benchmark objects.
-
-    Methods
-    -------
-    compute_grid(verbose: bool = False, **kwargs) -> np.ndarray
-        Computes the grid of ALPcouplings over the scan parameter space. 
-
-    get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, exclude_projections: bool=True, **kwargs) -> ChiSquaredList
-        Computes the chi-squared values over the scan parameter space for the given transitions.
-
-    decay_width(transition: str, **kwargs)
-        Computes the decay width for the given transition over the scan parameter space.
-
-    branching_ratio(transition: str, **kwargs)
-        Computes the branching ratio for the given transition over the scan parameter space.
-
-    cross_section(transition: str, s: float, **kwargs)
-        Computes the cross section for the given transition over the scan parameter space.
-
-    alp_channels_decay_widths(**kwargs)
-        Computes the decay widths for all ALP channels over the scan parameter space.
-
-    alp_channels_branching_ratios(**kwargs)
-        Computes the branching ratios for all ALP channels over the scan parameter space.
-
-    meson_mixing(obs: str, **kwargs)
-        Computes the meson mixing observable over the scan parameter space.
-
     '''
     def __init__(self,
                  model: ALPcouplings | ModelBase | Benchmark,
@@ -164,14 +137,14 @@ class Scan:
 
         Parameters
         ----------
-        verbose : bool, optional
+        `verbose` : bool, optional
             Whether to display a progress bar, by default False.
-        **kwargs
+        `**kwargs`
             Additional keyword arguments to pass to the matching and running methods.
 
         Returns
         -------
-        np.ndarray
+        `np.ndarray`
             The computed grid of ALPcouplings.
         '''
         if self.couplings is not None:
@@ -413,18 +386,18 @@ class Scan:
 
     Parameters
     ----------
-    transitions (list[str])
+    `transitions` (`list[str]`)
         List of transition identifiers.
 
-    exclude_projections (bool, optional):
+    `exclude_projections` (`bool`, optional):
         Whether to exclude projections from measurements. Default is True.
         
-    **kwargs:
+    `**kwargs`:
         Additional keyword arguments passed to the matching and running routines.
 
     Returns
     -------
-    chi2_dict : ChiSquaredList
+    `chi2_dict` : `ChiSquaredList`
         Chi-squared values for each transition over the scan parameter space.
     """
         ma, fa, br_dark = self._prepare_scan_params()
@@ -437,7 +410,7 @@ class Scan:
         ----------
         transition (str) :
             The particle transition in the form 'initial -> final'.
-        **kwargs:
+        `**kwargs`:
             Additional parameters for the decay width calculation.
 
         Returns
@@ -459,7 +432,7 @@ class Scan:
         ----------
         transition (str) :
             The particle transition in the form 'initial -> final'.
-        **kwargs:
+        `**kwargs`:
             Additional parameters for the branching ratio calculation.
 
         Returns
@@ -483,7 +456,7 @@ class Scan:
             The transition process in the form 'initial -> final'.
         s (float) :
             The Mandelstam variable s, representing the square of the center-of-mass energy, in Gev^2.
-        **kwargs:
+        `**kwargs`:
             Additional keyword arguments for specific cross section calculations.
 
         Returns
@@ -503,7 +476,7 @@ class Scan:
 
         Parameters
         ----------
-        **kwargs:
+        `**kwargs`:
             Additional parameters for the decay width calculation.
 
         Returns
@@ -519,7 +492,7 @@ class Scan:
 
         Parameters
         ----------
-        **kwargs:
+        `**kwargs`:
             Additional parameters for the branching ratio calculation.
 
         Returns

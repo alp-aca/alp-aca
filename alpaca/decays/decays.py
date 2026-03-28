@@ -75,7 +75,7 @@ def decay_width(transition: str, ma: float, couplings: ALPcouplings, fa: float, 
         The decay constant of the ALP, in GeV.
     br_dark (float, optional):
         The branching ratio to dark sector particles. Default is 0.0.
-    **kwargs:
+    `**kwargs`:
         Additional parameters for the decay width calculation.
 
     Returns
@@ -118,7 +118,7 @@ def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: flo
         The decay constant of the ALP, in GeV.
     br_dark (float, optional):
         The branching ratio to dark sector particles. Default is 0.0.
-    **kwargs:
+    `**kwargs`:
         Additional parameters for the branching ratio calculation.
 
     Returns
@@ -173,7 +173,7 @@ def cross_section(transition: str, ma: float, couplings: ALPcouplings, s: float,
         The decay constant of the ALP, in GeV.
     br_dark (float, optional) :
         The branching ratio to dark sector particles. Default is 0.
-    **kwargs:
+    `**kwargs`:
         Additional keyword arguments for specific cross section calculations.
 
     Returns
@@ -211,7 +211,7 @@ def alp_channels_decay_widths(ma: float, couplings: ALPcouplings, fa: float, br_
         The decay constant of the ALP, in GeV.
     br_dark (float, optional):
         The branching ratio to dark sector particles. Default is 0.0.
-    **kwargs:
+    `**kwargs`:
         Additional parameters for the decay width calculation.
 
     Returns
@@ -234,7 +234,7 @@ def alp_channels_branching_ratios(ma: float, couplings: ALPcouplings, fa: float,
         The decay constant of the ALP, in GeV.
     br_dark (float, optional):
         The branching ratio to dark sector particles. Default is 0.0.
-    **kwargs:
+    `**kwargs`:
         Additional parameters for the branching ratio calculation.
 
     Returns
