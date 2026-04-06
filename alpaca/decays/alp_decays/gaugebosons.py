@@ -37,6 +37,7 @@ def cgamma_twoloops(ma: float, couplings: ALPcouplings, fa: float) -> float:
 
 def decay_width_2gamma(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
     cgamma_eff = 0
+    ma=np.double(ma)
     if ma > couplings.ew_scale:
         cc = couplings.match_run(ma, 'derivative_above', **kwargs)
         cgamma_eff += 2*alpha_em(ma)/np.pi*cc['cW']/s2w*B2(4*mW**2/ma**2)
@@ -82,6 +83,7 @@ def decay_width_2gamma(ma: float, couplings: ALPcouplings, fa: float, **kwargs) 
 
 def decay_width_2gluons(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
     citations.register_inspire('Bauer:2017ris')
+    ma=np.double(ma)
     if ma < 0.6:
         return 0.0
 
