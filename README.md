@@ -39,6 +39,10 @@ ALP-aca has been used in the following publications:
 
 * J. Alda, M. Fuentes Zamoro, L. Merlo, X. Ponce Díaz, S. Rigolin: *Comprehensive ALP searches in Meson Decays*. [arXiv:2507.19578](https://arxiv.org/abs/2507.19578)
 
+* M. Fuentes Zamoro, J. Alda, L. Merlo, X. Ponce Diaz, S. Rigolin: *Tackling ALP searches in meson decays with ALPaca: a phenomenological approach*. [PoS(COSMICWISPers2025) (2026) 057](https://pos.sissa.it/507/057)
+
+* J. Alda: *Lecture notes on Machine Learning applications for global fits*. [arXiv:2604.07520](https://arxiv.org/abs/2604.07520)
+
 If you have used ALP-aca in your publication and want to be featured in this list, please [contact us](https://github.com/alp-aca/alp-aca/issues/new?template=publication-using-alpaca.md).
 
 ## Installation
