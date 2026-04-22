@@ -381,7 +381,7 @@ class Scan:
             br_dark = self.args['br_dark']
         return ma, fa, br_dark
 
-    def get_chi2(self, transitions: list[Sector | str | tuple] | Sector | str | tuple, exclude_projections: bool=True, **kwargs) -> ChiSquaredList:
+    def get_chi2(self, transitions: list[Sector | str | tuple] | Sector | str | tuple, exclude_projections: bool=True, callback: callable | None = None, **kwargs) -> ChiSquaredList:
         """Calculate the chi-squared values for a set of transitions.
 
     Parameters
@@ -391,6 +391,9 @@ class Scan:
 
     `exclude_projections` (`bool`, optional):
         Whether to exclude projections from measurements. Default is True.
+
+    `callback` (`callable`, optional):
+        A callback function to execute before returning the chi-squared values.
         
     `**kwargs`:
         Additional keyword arguments passed to the matching and running routines.
@@ -401,15 +404,17 @@ class Scan:
         Chi-squared values for each transition over the scan parameter space.
     """
         ma, fa, br_dark = self._prepare_scan_params()
-        return get_chi2(transitions, ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, exclude_projections=exclude_projections, **kwargs)
-    
-    def decay_width(self, transition: str, **kwargs) -> np.typing.NDArray:
+        return get_chi2(transitions, ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, exclude_projections=exclude_projections, callback=callback, **kwargs)
+
+    def decay_width(self, transition: str, callback: callable | None = None, **kwargs) -> np.typing.NDArray:
         """ Calculate the decay width for a given transition.
 
         Parameters
         ----------
         transition (str) :
             The particle transition in the form 'initial -> final'.
+        callback (callable, optional):
+            A callback function to execute before returning the decay width.
         `**kwargs`:
             Additional parameters for the decay width calculation.
 
@@ -423,15 +428,17 @@ class Scan:
             NotImplementedError: If the decay process is unknown.
         """
         ma, fa, br_dark = self._prepare_scan_params()
-        return decay_width(transition, ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, **kwargs)
-    
-    def branching_ratio(self, transition: str, **kwargs) -> np.typing.NDArray:
+        return decay_width(transition, ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, callback=callback, **kwargs)
+
+    def branching_ratio(self, transition: str, callback: callable | None = None, **kwargs) -> np.typing.NDArray:
         """ Calculate the branching ratio for a given transition.
 
         Parameters
         ----------
         transition (str) :
             The particle transition in the form 'initial -> final'.
+        callback (callable, optional):
+            A callback function to execute before returning the branching ratio.
         `**kwargs`:
             Additional parameters for the branching ratio calculation.
 
@@ -445,9 +452,9 @@ class Scan:
             NotImplementedError: If the decay process is unknown.
         """
         ma, fa, br_dark = self._prepare_scan_params()
-        return branching_ratio(transition, ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, **kwargs)
+        return branching_ratio(transition, ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, callback=callback, **kwargs)
 
-    def cross_section(self, transition: str, s: float, **kwargs) -> np.typing.NDArray:
+    def cross_section(self, transition: str, s: float, callback: callable | None = None, **kwargs) -> np.typing.NDArray:
         """Calculate the cross section for a given transition process involving an ALP
 
         Parameters
@@ -456,6 +463,8 @@ class Scan:
             The transition process in the form 'initial -> final'.
         s (float) :
             The Mandelstam variable s, representing the square of the center-of-mass energy, in Gev^2.
+        callback (callable, optional):
+            A callback function to execute before returning the cross section.
         `**kwargs`:
             Additional keyword arguments for specific cross section calculations.
 
@@ -469,13 +478,15 @@ class Scan:
         NotImplementedError: If the transition process is not recognized or implemented.
         """
         ma, fa, br_dark = self._prepare_scan_params()
-        return cross_section(transition, ma, self.compute_grid(**kwargs), fa=fa, br_dark=br_dark, s=s, **kwargs)
-    
-    def alp_channels_decay_widths(self, **kwargs):
+        return cross_section(transition, ma, self.compute_grid(**kwargs), fa=fa, br_dark=br_dark, s=s, callback=callback, **kwargs)
+
+    def alp_channels_decay_widths(self, callback: callable | None = None, **kwargs):
         """Calculate the decay widths for all ALP decay channels.
 
         Parameters
         ----------
+        callback (callable, optional):
+            A callback function to execute before returning each decay width.
         `**kwargs`:
             Additional parameters for the decay width calculation.
 
@@ -485,13 +496,15 @@ class Scan:
             A dictionary with decay channels as keys and their corresponding widths as values.
         """
         ma, fa, br_dark = self._prepare_scan_params()
-        return alp_channels_decay_widths(ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, **kwargs)
-    
-    def alp_channels_branching_ratios(self, **kwargs):
+        return alp_channels_decay_widths(ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, callback=callback, **kwargs)
+
+    def alp_channels_branching_ratios(self, callback: callable | None = None, **kwargs):
         """Calculate the branching ratios for all ALP decay channels.
 
         Parameters
         ----------
+        callback (callable, optional):
+            A callback function to execute before returning each branching ratio.
         `**kwargs`:
             Additional parameters for the branching ratio calculation.
 
@@ -501,9 +514,9 @@ class Scan:
             A dictionary with decay channels as keys and their corresponding branching ratios as values.
         """
         ma, fa, br_dark = self._prepare_scan_params()
-        return alp_channels_branching_ratios(ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, **kwargs)
-    
-    def meson_mixing(self, obs: str, **kwargs):
+        return alp_channels_branching_ratios(ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, callback=callback, **kwargs)
+
+    def meson_mixing(self, obs: str, callback: callable | None = None, **kwargs):
         '''Obtains the value of a meson mixing observable.
 
         Parameters
@@ -516,6 +529,10 @@ class Scan:
             - 'phi12_D0': D0 mixing phase, in rad.
             - 'delta_mB0': The mass difference of the B0 meson, in ps^{-1}.
             - 'delta_mBs': The mass difference of the Bs meson, in ps^{-1}.
+        callback (callable, optional):
+            A callback function to execute before returning the value of the observable.
+        `**kwargs`:
+            Additional parameters for the meson mixing calculation.
         '''
         ma, fa, br_dark = self._prepare_scan_params()
-        return meson_mixing(obs, ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, **kwargs)
+        return meson_mixing(obs, ma, self.compute_grid(**kwargs), fa, br_dark=br_dark, callback=callback, **kwargs)

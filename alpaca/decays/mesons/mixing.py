@@ -230,7 +230,7 @@ mixing_observables = {
     'ASL_Bs': ASL_Bs,
 }
 
-def meson_mixing(obs: str, ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
+def meson_mixing(obs: str, ma: float, couplings: ALPcouplings, fa: float, callback: callable | None = None, **kwargs) -> float:
     '''Obtains the value of a meson mixing observable.
 
     Parameters
@@ -252,5 +252,17 @@ def meson_mixing(obs: str, ma: float, couplings: ALPcouplings, fa: float, **kwar
 
     fa : float
         The decay constant of the ALP, in GeV.
+
+    callback : callable, optional
+        A callback function to execute before returning the observable.
     '''
-    return np.vectorize(mixing_observables[obs], otypes=[float])(couplings, ma, fa, **kwargs)
+
+    def obs_call(ma, couplings, fa, **kwargs):
+        result = mixing_observables[obs](couplings, ma, fa, **kwargs)
+        pars = {'ma': ma, 'couplings': couplings, 'fa': fa, 'observable': obs, 'result': result, 'process': obs}
+        pars.update(kwargs)
+        if callback is not None:
+            callback(**pars)
+        return result
+
+    return np.vectorize(obs_call, otypes=[float])(ma, couplings, fa, **kwargs)

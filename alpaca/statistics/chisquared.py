@@ -557,7 +557,7 @@ class ChiSquaredList(list[ChiSquared]):
         """
         self.combine('', '').contour_to_csv(x, y, filename, sigma, xlabel, ylabel)
 
-def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, couplings, fa, min_probability=0.0, br_dark = 0.0, sm_pred=0, sm_uncert=0, **kwargs):
+def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, couplings, fa, min_probability=0.0, br_dark = 0.0, sm_pred=0, sm_uncert=0, callback: callable | None = None, **kwargs):
     kwargs_dw = {k: v for k, v in kwargs.items() if k != 'theta'}
     ma = np.atleast_1d(ma).astype(float)
     couplings = np.atleast_1d(couplings)
@@ -577,13 +577,13 @@ def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, coupling
         prob_decay = measurement.decay_probability(ctau, ma, theta=kwargs.get('theta', None), br_dark=br_dark)
         prob_decay = np.where(prob_decay < min_probability, np.nan, prob_decay)
     if transition in mixing_observables:
-        br = meson_mixing(transition, ma, couplings, fa, **kwargs_dw)
+        br = meson_mixing(transition, ma, couplings, fa, callback=callback, **kwargs_dw)
     elif particle_aliases.get(transition, '') in meson_widths.keys():
-        br = decay_width(transition, ma, couplings, fa, br_dark, **kwargs_dw)
+        br = decay_width(transition, ma, couplings, fa, br_dark, callback=callback, **kwargs_dw)
     elif isinstance(transition, str):
-        br = branching_ratio(transition, ma, couplings, fa, br_dark, **kwargs_dw)
+        br = branching_ratio(transition, ma, couplings, fa, br_dark, callback=callback, **kwargs_dw)
     else:
-        br = cross_section(transition[0], ma, couplings, transition[1], fa, br_dark, **kwargs_dw)
+        br = cross_section(transition[0], ma, couplings, transition[1], fa, br_dark, callback=callback, **kwargs_dw)
     sigma_left = measurement.get_sigma_left(ma, ctau)
     sigma_right = measurement.get_sigma_right(ma, ctau)
     central = measurement.get_central(ma, ctau)
@@ -619,7 +619,7 @@ def combine_chi2(chi2: list[ChiSquared], name: str, tex: str, description: str =
         dofs_dict |= c.dofs_dict
     return ChiSquared(sector, chi2_dict, dofs_dict)
 
-def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma: np.ndarray[float], couplings: np.ndarray[ALPcouplings], fa: np.ndarray[float], min_probability: float = 0.0, br_dark = 0.0, exclude_projections=True, **kwargs) -> ChiSquaredList:
+def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma: np.ndarray[float], couplings: np.ndarray[ALPcouplings], fa: np.ndarray[float], min_probability: float = 0.0, br_dark = 0.0, exclude_projections=True, callback: callable | None = None, **kwargs) -> ChiSquaredList:
     """Calculate the chi-squared values for a set of transitions.
 
     Parameters
@@ -647,7 +647,10 @@ def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma:
 
     exclude_projections (bool, optional):
         Whether to exclude projections from measurements. Default is True.
-        
+
+    callback (callable, optional):
+        A callback function to execute before returning the value of the observable.
+
     `**kwargs`:
         Additional keyword arguments passed to chi2_obs.
 
@@ -686,7 +689,7 @@ def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma:
         for experiment, measurement in measurements.items():
             sm_pred = get_th_value(t)
             sm_uncert = get_th_uncert(t)
-            dict_chi2[(t, experiment)] = chi2_obs(measurement, t, ma, couplings, fa, min_probability=min_probability, br_dark=br_dark, sm_pred=sm_pred, sm_uncert=sm_uncert, **kwargs)
+            dict_chi2[(t, experiment)] = chi2_obs(measurement, t, ma, couplings, fa, min_probability=min_probability, br_dark=br_dark, sm_pred=sm_pred, sm_uncert=sm_uncert, callback=callback, **kwargs)
     for t in obs_measurements.keys():
         if t not in dict_chi2:
             measurements = get_measurements(t, exclude_projections=exclude_projections)
@@ -694,8 +697,8 @@ def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma:
                 if experiment in obs_measurements[t]:
                     sm_pred = get_th_value(t)
                     sm_uncert = get_th_uncert(t)
-                    dict_chi2[(t, experiment)] = chi2_obs(measurement, t, ma, couplings, fa, min_probability=min_probability, br_dark=br_dark, sm_pred=sm_pred, sm_uncert=sm_uncert, **kwargs)
-            
+                    dict_chi2[(t, experiment)] = chi2_obs(measurement, t, ma, couplings, fa, min_probability=min_probability, br_dark=br_dark, sm_pred=sm_pred, sm_uncert=sm_uncert, callback=callback, **kwargs)
+
     results = []
     for s in sectors:
         chi2_dict = {}

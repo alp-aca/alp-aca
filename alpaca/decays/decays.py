@@ -60,7 +60,7 @@ def to_tex(transition: str) -> str:
     elif isinstance(transition, tuple):
         return to_tex(transition[0])[:-1] + f'\\ [s = {transition[1]:.2f}\\,\\mathrm{{GeV}}^2]$'
 
-def decay_width(transition: str, ma: float, couplings: ALPcouplings, fa: float, br_dark: float = 0.0, **kwargs) -> float:
+def decay_width(transition: str, ma: float, couplings: ALPcouplings, fa: float, br_dark: float = 0.0, callback: callable | None = None, **kwargs) -> float:
     """ Calculate the decay width for a given transition.
 
     Parameters
@@ -75,6 +75,8 @@ def decay_width(transition: str, ma: float, couplings: ALPcouplings, fa: float, 
         The decay constant of the ALP, in GeV.
     br_dark (float, optional):
         The branching ratio to dark sector particles. Default is 0.0.
+    callback (callable, optional):
+        A callback function to execute before returning the decay width.
     `**kwargs`:
         Additional parameters for the decay width calculation.
 
@@ -89,21 +91,28 @@ def decay_width(transition: str, ma: float, couplings: ALPcouplings, fa: float, 
     """
     if particle_aliases.get(transition.strip()) == 'alp':
         dw = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.total_decay_width(ma, couplings, fa, br_dark, **kwargs)['DW_tot']
-        return np.vectorize(dw)(ma, couplings, fa, br_dark, **kwargs)
-    if particle_aliases.get(transition.strip()) in meson_widths.keys():
+    elif particle_aliases.get(transition.strip()) in meson_widths.keys():
         meson = particle_aliases[transition.strip()]
         dw = lambda ma, couplings, fa, br_dark, **kwargs: meson_width(meson, ma, couplings, fa, br_dark=br_dark, **kwargs)
-        return np.vectorize(dw)(ma, couplings, fa, br_dark, **kwargs)
-    initial, final = parse(transition)
-    # ALP decays
-    if initial == ['alp']:
-        dw = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.total_decay_width(ma, couplings, fa, br_dark, **kwargs)['DW_tot'] * branching_ratio(transition, ma, couplings, fa, br_dark, **kwargs)
     else:
-        raise NotImplementedError(f'Unknown decay process {" ".join(initial)} -> {" ".join(final)}')
+        initial, final = parse(transition)
+        # ALP decays
+        if initial == ['alp']:
+            dw = lambda ma, couplings, fa, br_dark, **kwargs: branching_ratios.total_decay_width(ma, couplings, fa, br_dark, **kwargs)['DW_tot'] * branching_ratio(transition, ma, couplings, fa, br_dark, **kwargs)
+        else:
+            raise NotImplementedError(f'Unknown decay process {" ".join(initial)} -> {" ".join(final)}')
     
-    return np.vectorize(dw)(ma, couplings, fa, br_dark, **kwargs)
+    def dw_call(ma, couplings, fa, br_dark, **kwargs):
+        width = dw(ma, couplings, fa, br_dark, **kwargs)
+        pars = {'ma': ma, 'couplings': couplings, 'fa': fa, 'br_dark': br_dark, 'process': transition, 'result': width}
+        pars.update(kwargs)
+        if callback is not None:
+            callback(**pars)
+        return width
 
-def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: float, br_dark: float = 0.0, **kwargs) -> float:
+    return np.vectorize(dw_call, otypes=[float])(ma, couplings, fa, br_dark, **kwargs)
+
+def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: float, br_dark: float = 0.0, callback: callable | None = None, **kwargs) -> float:
     """ Calculate the branching ratio for a given transition.
 
     Parameters
@@ -118,6 +127,8 @@ def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: flo
         The decay constant of the ALP, in GeV.
     br_dark (float, optional):
         The branching ratio to dark sector particles. Default is 0.0.
+    callback (callable, optional):
+        A callback function to execute before returning the branching ratio.
     `**kwargs`:
         Additional parameters for the branching ratio calculation.
 
@@ -153,10 +164,18 @@ def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: flo
         br = lambda ma, couplings, fa, br_dark, **kwargs: lepton_to_alp[lepton_process](ma, couplings, fa, br_dark, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)[channel]
     else:
         raise NotImplementedError(f'Unknown branching ratio process {" ".join(initial)} -> {" ".join(final)}')
-    
-    return np.vectorize(br, otypes=[float])(ma, couplings, fa, br_dark, **kwargs)
 
-def cross_section(transition: str, ma: float, couplings: ALPcouplings, s: float, fa: float, br_dark=0, **kwargs) -> float:
+    def br_call(ma, couplings, fa, br_dark, **kwargs):
+        ratio = br(ma, couplings, fa, br_dark, **kwargs)
+        pars = {'ma': ma, 'couplings': couplings, 'fa': fa, 'br_dark': br_dark, 'process': transition, 'result': ratio}
+        pars.update(kwargs)
+        if callback is not None:
+            callback(**pars)
+        return ratio
+
+    return np.vectorize(br_call, otypes=[float])(ma, couplings, fa, br_dark, **kwargs)
+
+def cross_section(transition: str, ma: float, couplings: ALPcouplings, s: float, fa: float, br_dark=0, callback: callable | None = None, **kwargs) -> float:
     """Calculate the cross section for a given transition process involving an ALP
 
     Parameters
@@ -173,6 +192,8 @@ def cross_section(transition: str, ma: float, couplings: ALPcouplings, s: float,
         The decay constant of the ALP, in GeV.
     br_dark (float, optional) :
         The branching ratio to dark sector particles. Default is 0.
+    callback (callable, optional) :
+        A callback function to execute before returning the cross section.
     `**kwargs`:
         Additional keyword arguments for specific cross section calculations.
 
@@ -195,10 +216,18 @@ def cross_section(transition: str, ma: float, couplings: ALPcouplings, s: float,
         sigma = lambda ma, couplings, s, fa, br_dark, **kwargs: xsections_ee[production](ma, couplings, s, fa, br_dark, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)[decay]
     else:
         raise NotImplementedError(f'Unknown cross section process {" ".join(initial)} -> {" ".join(final)}')
-    
-    return np.vectorize(sigma, otypes=[float])(ma, couplings, s, fa, br_dark, **kwargs)
 
-def alp_channels_decay_widths(ma: float, couplings: ALPcouplings, fa: float, br_dark: float = 0.0, **kwargs) -> dict[str, float]:
+    def sigma_call(ma, couplings, s, fa, br_dark, **kwargs):
+        result = sigma(ma, couplings, s, fa, br_dark, **kwargs)
+        pars = {'ma': ma, 'couplings': couplings, 's': s, 'fa': fa, 'br_dark': br_dark, 'process': transition, 'result': result}
+        pars.update(kwargs)
+        if callback is not None:
+            callback(**pars)
+        return result
+
+    return np.vectorize(sigma_call, otypes=[float])(ma, couplings, s, fa, br_dark, **kwargs)
+
+def alp_channels_decay_widths(ma: float, couplings: ALPcouplings, fa: float, br_dark: float = 0.0, callback: callable | None = None, **kwargs) -> dict[str, float]:
     """Calculate the decay widths for all ALP decay channels.
 
     Parameters
@@ -211,6 +240,8 @@ def alp_channels_decay_widths(ma: float, couplings: ALPcouplings, fa: float, br_
         The decay constant of the ALP, in GeV.
     br_dark (float, optional):
         The branching ratio to dark sector particles. Default is 0.0.
+    callback (callable, optional):
+        A callback function to execute before returning each decay width.
     `**kwargs`:
         Additional parameters for the decay width calculation.
 
@@ -219,9 +250,9 @@ def alp_channels_decay_widths(ma: float, couplings: ALPcouplings, fa: float, br_
     dict[str, float] :
         A dictionary with decay channels as keys and their corresponding widths as values.
     """
-    return {'a -> ' + ' '.join(channel): decay_width('a -> ' + ' '.join(channel), ma, couplings, fa, br_dark, **kwargs) for channel in branching_ratios.decay_channels}
+    return {'a -> ' + ' '.join(channel): decay_width('a -> ' + ' '.join(channel), ma, couplings, fa, br_dark, callback=callback, **kwargs) for channel in branching_ratios.decay_channels}
 
-def alp_channels_branching_ratios(ma: float, couplings: ALPcouplings, fa: float, br_dark: float = 0.0, **kwargs) -> dict[str, float]:
+def alp_channels_branching_ratios(ma: float, couplings: ALPcouplings, fa: float, br_dark: float = 0.0, callback: callable | None = None, **kwargs) -> dict[str, float]:
     """Calculate the branching ratios for all ALP decay channels.
 
     Parameters
@@ -234,6 +265,8 @@ def alp_channels_branching_ratios(ma: float, couplings: ALPcouplings, fa: float,
         The decay constant of the ALP, in GeV.
     br_dark (float, optional):
         The branching ratio to dark sector particles. Default is 0.0.
+    callback (callable, optional):
+        A callback function to execute before returning each branching ratio.
     `**kwargs`:
         Additional parameters for the branching ratio calculation.
 
@@ -242,4 +275,4 @@ def alp_channels_branching_ratios(ma: float, couplings: ALPcouplings, fa: float,
     dict[str, float] :
         A dictionary with decay channels as keys and their corresponding branching ratios as values.
     """
-    return {'a -> ' + ' '.join(channel): branching_ratio('a -> ' + ' '.join(channel), ma, couplings, fa, br_dark, **kwargs) for channel in branching_ratios.decay_channels}
+    return {'a -> ' + ' '.join(channel): branching_ratio('a -> ' + ' '.join(channel), ma, couplings, fa, br_dark, callback=callback, **kwargs) for channel in branching_ratios.decay_channels}
