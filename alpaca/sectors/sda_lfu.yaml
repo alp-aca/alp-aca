@@ -11,4 +11,7 @@ observables:
 - K0S -> e e
 - K0S -> mu mu
 - K0L -> mu mu
+- Xi0 -> Lambda a
+- Sigma+ -> p a
+- Sigma+ -> p mu mu
 tex: '$s \to d a$'
