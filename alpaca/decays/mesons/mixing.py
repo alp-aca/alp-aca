@@ -201,11 +201,16 @@ def ASL_Bs(couplings: ALPcouplings, ma, fa, **kwargs) -> float:
 
 mixing_observables = {
     'delta_mK0': delta_mK0,
+    'ΔmK0': delta_mK0,
     'epsK': epsK,
+    'εK': epsK,
     'x_D0': x_D0,
     'phi12_D0': phi12_D0,
+    'φ12_D0': phi12_D0,
     'delta_mB0': delta_mB0,
+    'ΔmB0': delta_mB0,
     'delta_mBs': delta_mBs,
+    'ΔmBs': delta_mBs,
     'ASL_B0': ASL_Bd,
     'ASL_Bs': ASL_Bs,
 }
