@@ -3,6 +3,7 @@ from ...biblio.biblio import citations
 from ...common import alpha_s, pars
 from ...rge.classes import ALPcouplings
 from flavio.physics.mesonmixing.amplitude import M12_d_SM, M12_u_SM, G12_u_SM, G12_d_SM
+from typing import Callable
 
 tex_codes = {
     'delta_mK0': r'\Delta m_{K^0}',
@@ -230,7 +231,7 @@ mixing_observables = {
     'ASL_Bs': ASL_Bs,
 }
 
-def meson_mixing(obs: str, ma: float, couplings: ALPcouplings, fa: float, callback: callable | None = None, **kwargs) -> float:
+def meson_mixing(obs: str, ma: float, couplings: ALPcouplings, fa: float, callback: Callable | None = None, **kwargs) -> float:
     '''Obtains the value of a meson mixing observable.
 
     Parameters
@@ -253,7 +254,7 @@ def meson_mixing(obs: str, ma: float, couplings: ALPcouplings, fa: float, callba
     fa : float
         The decay constant of the ALP, in GeV.
 
-    callback : callable, optional
+    callback : Callable, optional
         A callback function to execute before returning the observable.
     '''
 
