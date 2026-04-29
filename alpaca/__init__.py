@@ -69,3 +69,10 @@ class info:
         from importlib.metadata import metadata
         readme_content = metadata("alpaca-alps")['Description']
         return readme_content
+
+from .config_class import config as config
+
+def clear_cache_dw():
+    """Clear the cache of decay widths."""
+    from .decays.alp_decays.branching_ratios import _total_decay_width
+    _total_decay_width.cache_clear()
