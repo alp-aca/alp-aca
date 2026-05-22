@@ -1,9 +1,10 @@
 from ...chiPT.chiral import a_U3_repr, kappa, ffunction
 from ...chiPT import u3reprs
 from ...rge import ALPcouplings, bases_above
-from ...constants import mpi0, metap, mK, mu, md, ms, mc, mb, mt, mW, s2w, me, mmu, mtau, fpi
+from ...constants import mpi0, metap, mK, mu, md, ms, mc, mb, mt, mW, s2w, me, mmu, mtau, fpi, mZ
 from ...common import alpha_s, alpha_em, B1, B2
 from ...biblio.biblio import citations
+from ..effcouplings import effcoupling_gammaZ
 import numpy as np
 
 
@@ -103,3 +104,10 @@ def decay_width_2gluons(ma: float, couplings: ALPcouplings, fa: float, **kwargs)
         coupl = [cuA[0,0], cdA[0,0], cdA[1,1], cuA[1,1], cdA[2,2]]
         cG_eff = cc['cG'] + 0.5 * sum(coupl[i]*B1(4*mq[i]**2/ma**2) for i in range(5))
     return alpha_s(ma)**2*ma**3/((4*np.pi)**3*fa**2)*np.abs(cG_eff)**2*(1+alpha_s(ma)/np.pi*83/4)#(1+alpha_s(ma)/48/np.pi*(291-sum(14 for i in range(5) if ma > mq[i])))
+
+def decay_width_gammaZ(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
+    if ma < mZ:
+        return 0.0
+    citations.register_inspire('Bonilla:2021ufe')
+    cgammaZ_eff = effcoupling_gammaZ(couplings, ma)
+    return alpha_em(ma)**2 * ma**3 * np.abs(cgammaZ_eff)**2 / (32*np.pi**3 * fa**2) * (1 - mZ**2/ma**2)**3

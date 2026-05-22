@@ -2,7 +2,7 @@ import numpy as np
 from ...rge import ALPcouplings
 from .fermion_decays import decay_width_electron, decay_width_muon, decay_width_tau, decay_width_charm, decay_width_bottom, decay_width_etau, decay_width_mutau, decay_width_mue
 from .hadronic_decays_def import decay_width_3pi000, decay_width_3pi0pm, decay_width_etapipi00, decay_width_etapipipm, decay_width_etappipi00, decay_width_etappipipm, decay_width_gammapipi, decay_width_2w
-from .gaugebosons import decay_width_2gamma, decay_width_2gluons
+from .gaugebosons import decay_width_2gamma, decay_width_2gluons, decay_width_gammaZ
 from functools import cache
 
 decay_channels =[
@@ -28,6 +28,7 @@ decay_channels =[
     ('omega', 'omega'),
     ('gluon', 'gluon'),
     ('photon', 'photon'),
+    ('Z', 'photon'),
     ('hadrons',),
     ('dark',),
 ]
@@ -60,6 +61,7 @@ def _total_decay_width (ma, couplings: ALPcouplings, fa, br_dark = 0.0, **kwargs
     DW_gammapipi = decay_width_gammapipi(ma, couplings, fa, **kwargs)
     DW_gluongluon = decay_width_2gluons(ma, couplings, fa, **kwargs_nointegral)
     DW_2photons = decay_width_2gamma(ma, couplings, fa, **kwargs_nointegral)
+    DW_gammaZ = decay_width_gammaZ(ma, couplings, fa, **kwargs_nointegral)
     DWhadr_nopert = DW_3pis + DW_etapipi + DW_etappipi + DW_gammapipi + DW_2w
     DWhadr_pert = DW_charm + DW_bottom + DW_gluongluon
     if (DWhadr_pert > DWhadr_nopert) and (ma > 1.4):
@@ -95,6 +97,7 @@ def _total_decay_width (ma, couplings: ALPcouplings, fa, br_dark = 0.0, **kwargs
         '2omega': DW_2w * nopert,
         'gluongluon': DW_gluongluon * (1.0-nopert),
         '2photons': DW_2photons,
+        'gammaZ': DW_gammaZ,
         'hadrons': DWhadr,
         'DW_SM': DW_sm,
         'DW_dark': DW_dark,
@@ -124,6 +127,7 @@ def total_decay_width(ma, couplings: ALPcouplings, fa, br_dark=0, **kwargs):
         - 'etappipi': Decay width to eta' and two pions.
         - '2omega': Decay width to two omegas.
         - 'gammapipi': Decay width to gamma and two pions.
+        - 'gammaZ': Decay width to gamma and Z.
         - 'gluongluon': Decay width to two gluons.
         - '2photons': Decay width to two photons.
         - 'DW_tot': Total decay width.
@@ -151,6 +155,7 @@ def BRsalp(ma, couplings: ALPcouplings, fa, br_dark = 0, **kwargs):
         - 'etapipi': Branching ratio to eta and two pions.
         - 'etappipi': Branching ratio to eta' and two pions.
         - 'gammapipi': Branching ratio to gamma and two pions.
+        - 'gammaZ': Branching ratio to gamma and Z.
         - '2omega': Branching ratio to two omegas.
         - 'gluongluon': Branching ratio to two gluons.
         - '2photons': Branching ratio to two photons.
@@ -184,6 +189,7 @@ def BRsalp(ma, couplings: ALPcouplings, fa, br_dark = 0, **kwargs):
         ('omega', 'omega'): DWs['2omega']/DWs['DW_tot'],
         ('gluon', 'gluon'): DWs['gluongluon']/DWs['DW_tot'],
         ('photon', 'photon'): DWs['2photons']/DWs['DW_tot'],
+        ('Z', 'photon'): DWs['gammaZ']/DWs['DW_tot'],
         ('hadrons',) :DWs['hadrons']/DWs['DW_tot'],
         ('dark',): br_dark
         }

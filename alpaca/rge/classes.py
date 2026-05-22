@@ -681,6 +681,9 @@ class ALPcouplings:
         UeL, me, UeR = svd(self.ye)
         return me * np.sqrt(wSM['m2']/wSM['Lambda'])
     
+    def copy(self) -> 'ALPcouplings':
+        return ALPcouplings.from_dict(self.to_dict())
+    
     def _ipython_key_completions_(self):
         return self.values.keys()
     

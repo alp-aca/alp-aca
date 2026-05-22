@@ -23,7 +23,12 @@ B2 = lambda x: 1-(x-1)*floop(x)**2
 B3 = lambda x, y: 1 + x*y/(x-y)*(floop(x)**2 - floop(y)**2)
 
 def B0disc_equalmass(q2: float, m: float) -> complex:
+    # DiscB0(q2, m, m)
     return 2j*np.sqrt(1+0j-4*m**2/q2)*floop(np.sqrt(4*m**2/q2))
+
+def B0disc_lim(m1, m2):
+    # DiscB0(m1**2, m1, m2)
+    return m2**2/m1**2 * np.sqrt(1+0j-4*m1**2/m2**2) * np.log((m2**2 + np.sqrt(m2**4-4*m1**2*m2**2+0j))/(2*m1*m2))
 
 @cache
 def g_photonloop(tau):

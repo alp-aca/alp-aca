@@ -1,9 +1,9 @@
 from ..rge import ALPcouplings
 from ..rge.runSM import runSM
 from ..common import B0disc_equalmass, ckm_xi
-from ..constants import GF, mu, md, ms, mc, mb, me, mmu, mtau, s2w, mW, mZ
+from ..constants import GF, mu, md, ms, mc, mb, mt, me, mmu, mtau, s2w, mW, mZ, mH
 import numpy as np
-from ..common import g_photonloop, alpha_em, alpha_s, B3
+from ..common import g_photonloop, alpha_em, alpha_s, B3, B0disc_lim, B0disc_equalmass, floop
 from ..biblio.biblio import citations
 
 def effcoupling_ff(ma, couplings: ALPcouplings, fermion, **kwargs):
@@ -94,4 +94,58 @@ def offshellphoton(couplings: ALPcouplings, ma: float, s: float) -> complex:
         ceff += 3 * (2/3)**2 * couplings['cuA'][i,i] * B3(4*muq**2/ma**2, 4*muq**2/s)
     for i, mdq in enumerate([md, ms, mb]):
         ceff += 3 * (-1/3)**2 * couplings['cdA'][i,i] * B3(4*mdq**2/ma**2, 4*mdq**2/s)
+    return ceff
+
+def effcoupling_gammaZ(couplings: ALPcouplings, ma: float) -> complex:
+    """Effective coupling of the ALP to one on-shell photon and one on-shell Z boson."""
+    if couplings.scale < couplings.ew_scale:
+        raise NotImplementedError("The effective coupling of the ALP to one on-shell photon and one on-shell Z boson is implemented only above the EW scale.")
+    citations.register_inspire('Bonilla:2021ufe')
+    couplings2 = couplings.copy().match_run(ma, 'derivative_above')
+    couplings2.ew_scale = ma
+    couplings2 = couplings2.translate('massbasis_ew')
+    ceff = couplings2['cgammaZ']
+    c2w = 1 - s2w
+
+    fermions = ['u', 'd', 's', 'c', 'b', 't', 'e', 'mu', 'tau']
+    nc = {q: 3 for q in ['u', 'd', 's', 'c', 'b', 't']} | {f: 1 for f in ['e', 'mu', 'tau']}
+    q = {q: 2/3 for q in ['u', 'c', 't']} | {q: -1/3 for q in ['d', 's', 'b']} | {f: -1 for f in ['e', 'mu', 'tau']}
+    t3 = {q: 1/2 for q in ['u', 'c', 't']} | {q: -1/2 for q in ['d', 's', 'b']} | {f: -1/2 for f in ['e', 'mu', 'tau']}
+    m = {**{f: eval(f'm{f}') for f in ['u', 'd', 's', 'c', 'b', 't']}, **{f: eval(f'm{f}') for f in ['e', 'mu', 'tau']}}
+    gen = {f: 0 for f in ['u', 'd', 'e']} | {f: 1 for f in ['s', 'c', 'mu']} | {f: 2 for f in ['b', 't', 'tau']}
+    ptype = {f: 'u' for f in ['u', 'c', 't']} | {f: 'd' for f in ['d', 's', 'b']} | {f: 'e' for f in ['e', 'mu', 'tau']}
+
+    a_Zgamma_gamma = 1 - 2*sum(q[f]**2 * nc[f] * np.log(ma**2/m[f]**2) for f in fermions) + 21/2 * np.log(ma**2/mW**2)
+
+    a_Zgamma_Zf = 0
+    for f in fermions:
+        a = (t3[f]**2/2 - t3[f]*q[f]*s2w + q[f]**2*s2w**2) * (np.log(ma**2/m[f]**2) +2/3 + (mZ**2 - 2*m[f]**2)/(mZ**2 - 4*m[f]**2) * B0disc_equalmass(mZ**2, m[f]))
+        a += m[f]**2/mZ**2 * (t3[f]**2/2 + 2*t3[f]*q[f]*s2w -2*q[f]**2*s2w**2) * (1-2*m[f]**2/(mZ**2-4*m[f]**2)*B0disc_equalmass(mZ**2, m[f]))
+        a -= c2w*q[f]*(t3[f]-2*q[f]*s2w) * (np.log(ma**2/m[f]**2) + (12*m[f]**2+5*mZ**2)/(3*mZ**2) + (mZ**2 + 2*m[f]**2)/mZ**2 * B0disc_equalmass(mZ**2, m[f]))
+        a_Zgamma_Zf -= 2*nc[f]*a
+
+    a_ZZ_h = (mZ**4-2*mZ**2*mH**2+mH**4)/mZ**4
+    a_ZZ_h += 0.25*(12*mZ**6-18*mZ**4*mH**2+9*mZ**2*mH**4-2*mH**6)/mZ**6 * np.log(mH**2/mZ**2)
+    a_ZZ_h -= (36*mZ**6-32*mZ**4*mH**2+13*mZ**2*mH**4-2*mH**6)/(2*mZ**4*(mH**2-4*mZ**2)) * B0disc_lim(mZ, mH)
+
+    a_Zgamma_gauge = 0.5*(42*mW**4+mZ**4)/mZ**4 * np.log(ma**2/mW**2)
+    a_Zgamma_gauge += 0.25*mW**4/mZ**4 * np.log(mW**2/mZ**2)
+    a_Zgamma_gauge += (180*mW**6+153*mW**4*mZ**2-12*mW**2*mZ**4-5*mZ**6)/mZ**6/3
+    a_Zgamma_gauge += 0.25*(120*mW**6+108*mW**4*mZ**2+2*mW**2*mZ**4+mZ**6)/mZ**6 * B0disc_equalmass(mZ**2, mW)
+    a_Zgamma_gauge *= -0.5
+
+    ceff *= 1 + alpha_em(ma)/(12*np.pi) *(a_Zgamma_gamma + (a_Zgamma_Zf + a_ZZ_h + a_Zgamma_gauge)/s2w/c2w)
+
+    a_WW = (42*mW**2+mZ**2)/(12*mW**2)*np.log(ma**2/mW**2)
+    a_WW += (36*mW**4+93*mW**2*mZ**2+2*mZ**4)/(9*mW**2*mZ**2)
+    a_WW += (24*mW**4+38*mW**2*mZ**2+mZ**4)/(12*mW**2*mZ**2) * B0disc_equalmass(mZ**2, mW)
+    a_WW -= 4*(4*mW**2-ma**2)/(ma**2-mZ**2)*(floop(4*mW**2/ma**2)**2 - floop(4*mW**2/mZ**2)**2)
+    for f in fermions:
+        a_WW -= nc[f]*q[f]*(t3[f]-2*q[f]*s2w)/(3*c2w) * (np.log(ma**2/m[f]**2) + (12*m[f]**2+5*mZ**2)/(3*mZ**2) + (mZ**2 + 2*m[f]**2)/mZ**2 * B0disc_equalmass(mZ**2, m[f]))
+
+    ceff += 0.5 * c2w/s2w * couplings2['cW'] * a_WW
+
+    for f in fermions:
+        ceff += (couplings2[f'c{ptype[f]}R'][gen[f],gen[f]] - couplings2[f'c{ptype[f]}L'][gen[f],gen[f]]) * q[f] * nc[f] *(2*q[f]*s2w + 4*(t3[f]-2*q[f]*s2w)*m[f]/(ma**2-mZ**2)*(floop(4*m[f]**2/ma**2)**2 - floop(4*m[f]**2/mZ**2)**2))
+
     return ceff
