@@ -101,9 +101,10 @@ def effcoupling_gammaZ(couplings: ALPcouplings, ma: float) -> complex:
     if couplings.scale < couplings.ew_scale:
         raise NotImplementedError("The effective coupling of the ALP to one on-shell photon and one on-shell Z boson is implemented only above the EW scale.")
     citations.register_inspire('Bonilla:2021ufe')
-    couplings2 = couplings.copy().match_run(ma, 'derivative_above')
-    couplings2.ew_scale = ma
-    couplings2 = couplings2.translate('massbasis_ew')
+    couplings2 = couplings.copy()
+    scale = max(ma, mZ)
+    couplings2.ew_scale = scale
+    couplings2 = couplings2.match_run(scale, 'massbasis_ew')
     ceff = couplings2['cgammaZ']
     c2w = 1 - s2w
 

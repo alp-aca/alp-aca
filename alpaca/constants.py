@@ -132,6 +132,7 @@ mDplus = Constant(particles.D_plus.mass/1000, 'particle')
 mDs = Constant(particles.D_s_plus.mass/1000, 'particle')
 
 # widths (in GeV)
+GammaZ = Constant(particles.Z_0.width/1000, 'particle')
 GammaB = Constant(particles.B_plus.width/1000, 'particle')
 GammaB0 = Constant(particles.B_0.width/1000, 'particle')
 GammaBs = Constant(particles.B_s_0.width/1000, 'particle')

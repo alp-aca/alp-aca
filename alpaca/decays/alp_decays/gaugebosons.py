@@ -110,4 +110,5 @@ def decay_width_gammaZ(ma: float, couplings: ALPcouplings, fa: float, **kwargs) 
         return 0.0
     citations.register_inspire('Bonilla:2021ufe')
     cgammaZ_eff = effcoupling_gammaZ(couplings, ma)
-    return alpha_em(ma)**2 * ma**3 * np.abs(cgammaZ_eff)**2 / (32*np.pi**3 * fa**2) * (1 - mZ**2/ma**2)**3
+    c2w = 1 - s2w
+    return alpha_em(ma)**2 * ma**3 * np.abs(cgammaZ_eff)**2 / (32*np.pi**3 * fa**2 * s2w * c2w) * (1 - mZ**2/ma**2)**3
