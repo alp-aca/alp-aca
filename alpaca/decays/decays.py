@@ -117,7 +117,7 @@ def decay_width(transition: str, ma: float, couplings: ALPcouplings, fa: float, 
 
     return np.vectorize(dw_call, otypes=[float])(ma, couplings, fa, br_dark, **kwargs)
 
-def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: float, br_dark: float = 0.0, callback: Callable | None = None, **kwargs) -> float:
+def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: float, br_dark: float = 0.0, callback: Callable | None = None, safemode=False, **kwargs) -> float:
     """ Calculate the branching ratio for a given transition.
 
     Parameters
@@ -134,6 +134,8 @@ def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: flo
         The branching ratio to dark sector particles. Default is 0.0.
     callback (Callable, optional):
         A callback function to execute before returning the branching ratio.
+    safemode (bool, optional):
+        If True, enables safe mode for the branching ratio calculation. Default is False.
     `**kwargs`:
         Additional parameters for the branching ratio calculation.
 
@@ -168,8 +170,7 @@ def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: flo
         lepton_process, channel = lepton_nwa[(initial[0], tuple(final))]
         br = lambda ma, couplings, fa, br_dark, **kwargs: lepton_to_alp[lepton_process](ma, couplings, fa, br_dark, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)[channel]
     elif len(initial) == 1 and (initial[0], tuple(final)) in gauge_to_alp.keys():
-        gauge_process, channel = gauge_to_alp[(initial[0], tuple(final))]
-        br = lambda ma, couplings, fa, br_dark, **kwargs: gauge_to_alp[gauge_process](ma, couplings, fa, br_dark, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)[channel]
+        br = gauge_to_alp[(initial[0], tuple(final))]
     elif len(initial) == 1 and (initial[0], tuple(final)) in gauge_nwa.keys():
         gauge_process, channel = gauge_nwa[(initial[0], tuple(final))]
         br = lambda ma, couplings, fa, br_dark, **kwargs: gauge_to_alp[gauge_process](ma, couplings, fa, br_dark, **kwargs) * branching_ratios.BRsalp(ma, couplings, fa, br_dark=br_dark, **kwargs)[channel]
@@ -177,7 +178,13 @@ def branching_ratio(transition: str, ma: float, couplings: ALPcouplings, fa: flo
         raise NotImplementedError(f'Unknown branching ratio process {" ".join(initial)} -> {" ".join(final)}')
 
     def br_call(ma, couplings, fa, br_dark, **kwargs):
-        ratio = br(ma, couplings, fa, br_dark, **kwargs)
+        try:
+            ratio = br(ma, couplings, fa, br_dark, **kwargs)
+        except Exception as e:
+            if safemode:
+                ratio = np.nan
+            else:
+                raise e
         pars = {'ma': ma, 'couplings': couplings, 'fa': fa, 'br_dark': br_dark, 'process': transition, 'result': ratio}
         pars.update(kwargs)
         if callback is not None:

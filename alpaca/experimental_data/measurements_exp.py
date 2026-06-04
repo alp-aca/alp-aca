@@ -8,7 +8,7 @@ from ..constants import mUpsilon3S
 from .classes import MeasurementBase, MeasurementConstantBound, MeasurementInterpolatedBound, MeasurementInterpolated, MeasurementDisplacedVertexBound, MeasurementBinned, rmax_belle, rmax_besIII, MeasurementConstant
 from ..decays.particles import particle_aliases
 from ..decays.decays import parse
-from ..constants import mB, mB0, mBs, mK, mtau, mKst0, mKL, mpi0, mpi_pm, mphi, mZ, mDplus, mDs, mrho, mD0, meta, mUpsilon1S, mJpsi, me, mmu
+from ..constants import mB, mB0, mBs, mK, mtau, mKst0, mKL, mpi0, mpi_pm, mphi, mZ, mDplus, mDs, mrho, mD0, meta, mUpsilon1S, mJpsi, me, mmu, mZ
 # Get the directory of the current script
 current_dir = os.path.dirname(__file__)
 
@@ -2077,6 +2077,16 @@ dw_KS = MeasurementConstantBound(
     conf_level= 1/(1+np.sqrt(np.pi/2)*particles.K_S_0.width_upper/particles.K_S_0.width)
 )
 
+l3_Zgammainv = MeasurementInterpolatedBound(
+    'L3:1997exg',
+    os.path.join(current_dir, invisible, 'l3_Zgammainv.txt'),
+    'invisible',
+    0.95,
+    rmax=100,
+    mass_parent=mZ,
+    mass_sibling=0
+)
+
 def get_measurements(process: str | tuple, exclude_projections: bool = True) -> dict[str, MeasurementBase]:
     """Retrieve measurements based on the given transition.
 
@@ -2447,5 +2457,7 @@ def get_measurements(process: str | tuple, exclude_projections: bool = True) -> 
         return {'SINDRUM': sindrum_mu3e}
     elif initial == ['muon'] and final == sorted(['electron', 'photon', 'photon']):
         return {'Cristal Box': cristalbox_muegammagamma}
+    elif initial == ['Z'] and final == sorted(['photon', 'alp']):
+        return {'L3': l3_Zgammainv}
     else:
         raise KeyError(f"No measurements for {transition}")

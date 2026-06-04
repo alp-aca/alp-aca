@@ -581,7 +581,7 @@ def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, coupling
     elif particle_aliases.get(transition, '') in meson_widths.keys():
         br = decay_width(transition, ma, couplings, fa, br_dark, callback=callback, **kwargs_dw)
     elif isinstance(transition, str):
-        br = branching_ratio(transition, ma, couplings, fa, br_dark, callback=callback, **kwargs_dw)
+        br = branching_ratio(transition, ma, couplings, fa, br_dark, callback=callback, safemode=True, **kwargs_dw)
     else:
         br = cross_section(transition[0], ma, couplings, transition[1], fa, br_dark, callback=callback, **kwargs_dw)
     sigma_left = measurement.get_sigma_left(ma, ctau)
