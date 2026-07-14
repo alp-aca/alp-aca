@@ -1,0 +1,61 @@
+(* FeynRules file generated automatically by ALPaca *)
+
+M$ModelName = (*ModelName*);
+
+M$Information = {
+  Authors      -> {"J. Alda", "M. Fuentes Zamoro", "L. Merlo", "X. Ponce Diaz", "S. Rigolin"}, 
+  Version      -> "1.0.0",
+  Date         -> (*date*),
+  Institutions -> {"U. Padova/INFN", "U.A.Madrid/IFT", "U.A.Madrid/IFT", "U. Basel", "U. Padova/INFN"},
+  Emails       -> {"jorge.alda@pd.infn.it", "marta.zamoro@uam.es", "luca.merlo@uam.es", "xavier.poncediaz@unibas.ch", "stefano.rigolin@pd.infn.it"},
+  URLs         -> "http://github.com/alp-aca/alp-aca"
+};
+
+(* ************************** *)
+(* **** Particle classes **** *)
+(* ************************** *)
+M$ClassesDescription = {
+    S[100] == {
+        ClassName       -> ALP,
+        SelfConjugate   -> True,
+        Mass            -> {mALP, (*ALPmass*)},
+        Width           -> {WALP, 0.0},
+        PropagatorType  -> D,
+        PropagatorLabel -> "alp",
+        PropagatorArrow -> None,
+        ParticleName    -> "alp",
+        FullName        -> "ALP"
+    }
+};
+
+M$InteractionOrderHierarchy = {
+  {ALP, 4}
+};
+
+(* ************************** *)
+(* ******* Parameters ******* *)
+(* ************************** *)
+M$Parameters = {
+    fa == {
+        ParameterType  -> External,
+        BlockName      -> ALPINPUTS,
+        Value          -> (*fa*),
+        TeX            -> Subscript[f, a],
+        Description    -> "ALP decay constant"
+    }(*ALPparameters*)
+};
+
+(* ************************** *)
+(* ******* Lagrangian ******* *)
+(* ************************** *)
+LALP4 := Block[{mu},
+    1/2 del[ALP, mu] del[ALP, mu] - 1/2 mALP^2 ALP^2
+];
+
+LALPint := Block[{mu,nu,rho,sigma,aa,sp1,sp2,sp3,ii,ff1,ff2,cc},
+    (*ALPlagrangian*)
+];
+
+LALP := LALP4 + LALPint;
+
+Ltot := LALP + LSM;

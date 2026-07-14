@@ -18,6 +18,8 @@ scan
     Contains functions to handle parameter space scans.
 benchmarks
     Contains the benchmarks defined in 1901.09966 [hep-ex] for ALPs.
+export
+    Contains functions to export ALP couplings to various formats.
 
 Classes
 -------

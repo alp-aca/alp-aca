@@ -26,4 +26,5 @@ from . import(
     scan as scan,
     plotting as plotting,
     benchmarks as benchmarks,
+    export as export,
 )
