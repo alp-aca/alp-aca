@@ -15,7 +15,7 @@ def sigmaNR_gammaALP(ma: float, couplings: ALPcouplings, s: float, f_a: float=10
     return hbarc2_GeV2pb*(((alpha_em(np.sqrt(s))*np.abs(gaphoton)**2)/24)*(1-(ma**2)/s)**3)
 
 xsections = {
-    (('electron', 'electron'), ('alp', 'photon')): lambda ma, couplings, s, fa, br_dark, **kwargs: sigmaNR_gammaALP(ma, couplings, s, fa, **kwargs),
+    (('electron', 'electron'), ('alp', 'photon')): lambda ma, couplings, s, fa, dark_matter, **kwargs: sigmaNR_gammaALP(ma, couplings, s, fa, **kwargs),
 }
 
 xsections_nwa = {}
