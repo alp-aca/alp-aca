@@ -499,6 +499,7 @@ class ALPcouplings:
             scipy_method: str = 'RK45',
             scipy_rtol: float = 1e-3,
             scipy_atol: float = 1e-6,
+            **kwargs
             ) -> 'ALPcouplings':
         from . import run_high, matching, run_low, symbolic
         if integrator == 'symbolic':

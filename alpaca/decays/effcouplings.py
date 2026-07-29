@@ -5,8 +5,9 @@ from ..constants import Deltau_U3, Deltad_U3, Deltas_U3
 import numpy as np
 from ..common import g_photonloop, alpha_em, alpha_s, B3
 from ..biblio.biblio import citations
-from ..chiPT.pseudoscalar_diag import mixing_shift
+from ..chiPT.pseudoscalar_diag import mixing_shift, cGA, cqV
 from ..chiPT.u3reprs import baryons
+from ..chiPT.formfactors import ff_BrodskyLepage
 from .particles import particle_aliases
 
 def effcoupling_ff(ma, couplings: ALPcouplings, fermion, **kwargs):
@@ -97,34 +98,22 @@ def offshellphoton(couplings: ALPcouplings, ma: float, s: float) -> complex:
 
 def effcoupling_baryons_A(couplings: ALPcouplings, ma: float, b1: str, b2: str, **kwargs):
     couplings = couplings.match_run(ma, 'VA_below', **kwargs)
+    sbtilde = kwargs.get('sbtilde', 0)
+    kwargs = {k: v for k, v in kwargs.items() if k != 'sbtilde'}
     DB = (Deltau_U3 - 2*Deltad_U3 + Deltas_U3)/2
     FB = (Deltau_U3 - Deltas_U3)/2
-    SB = Deltad_U3
+    SB = Deltad_U3 - sbtilde
     lambda1 = baryons[b1].T
     lambda2 = baryons[b2]
-    mix_shift = mixing_shift(couplings, ma)
-    if ma < 1.5:
-        bl_corr = 1.0
-    else:
-        citations.register_inspire('Brodsky:1974vy')
-        citations.register_inspire('Lepage:1980fj')
-        bl_corr = alpha_s(ma)**2/alpha_s(1.5)**2
-    return bl_corr*(DB * np.trace(mix_shift @ lambda1 @ lambda2 + mix_shift @ lambda2 @ lambda1) - FB * np.trace(mix_shift @ lambda1 @ lambda2 - mix_shift @ lambda2 @ lambda1) + SB * np.trace(mix_shift) *np.trace(lambda1 @ lambda2))
+    mix_shift = mixing_shift(couplings, ma) # \mathbb{M}_a^{-1}(\mathcal{C})
+    return ff_BrodskyLepage(ma, 0) * (-(DB + FB) * np.trace(lambda1 @ mix_shift @ lambda2) - (DB - FB) * np.trace(lambda1 @ lambda2 @ mix_shift) - (SB + sbtilde) * np.trace(lambda1 @ lambda2) * np.trace(mix_shift)) - ff_BrodskyLepage(ma, 2) * sbtilde * np.trace(lambda1 @ lambda2) * cGA(couplings)
 
 def effcoupling_baryons_V(couplings: ALPcouplings, ma: float, b1: str, b2: str, **kwargs):
     couplings = couplings.match_run(ma, 'VA_below', **kwargs)
-    cuV = couplings['cuV']
-    cdV = couplings['cdV']
-    cqV = np.array([[cuV[0,0], 0, 0], [0, cdV[0,0], cdV[0,1]], [0, cdV[1,0], cdV[1,1]]])/2
+    cqV_matrix = cqV(couplings)
     lambda1 = baryons[b1].T
     lambda2 = baryons[b2]
-    if ma < 1.5:
-        bl_corr = 1.0
-    else:
-        citations.register_inspire('Brodsky:1974vy')
-        citations.register_inspire('Lepage:1980fj')
-        bl_corr = alpha_s(ma)**2/alpha_s(1.5)**2 * 1.5**2/ma**2
-    return bl_corr*(- np.trace(cqV @ lambda1 @ lambda2 - cqV @ lambda2 @ lambda1))
+    return - np.trace(cqV_matrix @ lambda1 @ lambda2 - cqV_matrix @ lambda2 @ lambda1) * ff_BrodskyLepage(ma, 2)
 
 @np.vectorize
 def _effective_coupling(ma: float, couplings: ALPcouplings, particles: str, chirality: str, **kwargs):

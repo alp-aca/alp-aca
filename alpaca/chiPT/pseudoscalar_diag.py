@@ -127,12 +127,30 @@ class FitResults:
 
 fit_results = FitResults()
 
-def coupling_mixing(couplings: ALPcouplings):
+def cqA(couplings: ALPcouplings):
     couplings = couplings.translate('VA_below')
     cuA = couplings['cuA']
     cdA = couplings['cdA']
     cqA = np.array([[cuA[0,0], 0, 0], [0, cdA[0,0], cdA[0,1]], [0, cdA[1,0], cdA[1,1]]])/2
-    return -fit_results['B0mq'] @ cqA - cqA @ fit_results['B0mq'] - fit_results['m02']/3 * np.eye(3) * (couplings['cG'] + np.trace(cqA))
+    return cqA
+
+def cqV(couplings: ALPcouplings):
+    couplings = couplings.translate('VA_below')
+    cuV = couplings['cuV']
+    cdV = couplings['cdV']
+    cqV = np.array([[cuV[0,0], 0, 0], [0, cdV[0,0], cdV[0,1]], [0, cdV[1,0], cdV[1,1]]])/2
+    return cqV
+
+def cGA(couplings: ALPcouplings):
+    couplings = couplings.translate('VA_below')
+    cqA_matrix = cqA(couplings)
+    return couplings['cG'] + np.trace(cqA_matrix)
+
+def coupling_mixing(couplings: ALPcouplings):
+    # \mathcal{C} in the paper (when no pseudoscalar couplings are present) 
+    anticomm = lambda A, B: A @ B + B @ A
+    cqA_matrix = cqA(couplings)
+    return -anticomm(fit_results['B0mq'], cqA_matrix) - fit_results['m02']/3 * np.eye(3) * cGA(couplings)
 
 def mixing_shift(couplings: ALPcouplings, ma: float):
     # This is \mathbb{M}_a^{-1}(C)
