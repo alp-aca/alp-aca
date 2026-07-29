@@ -27,7 +27,7 @@ def decay_width_prod(ma: float, couplings: ALPcouplings, fa: float, b1: str, b2:
         return 0.0
     cA = effcoupling_baryons_A(couplings, ma, b1, b2, **kwargs)
     cV = effcoupling_baryons_V(couplings, ma, b1, b2, **kwargs)
-    amp_sq = (np.abs(cA)**2 * (m1+m2)**2 * ((m1-m2)**2-ma**2) + np.abs(cV)**2 * (m1-m2)**2 * ((m1+m2)**2-ma**2) ) / (4*fa**2)
+    amp_sq = (np.abs(cA)**2 * (m1+m2)**2 * ((m1-m2)**2-ma**2) + np.abs(cV)**2 * (m1-m2)**2 * ((m1+m2)**2-ma**2) ) / fa**2
     return amp_sq*np.sqrt(kallen(ma**2, m1**2, m2**2)) / (16*np.pi*m1**3)
 
 baryon_to_alp = {
