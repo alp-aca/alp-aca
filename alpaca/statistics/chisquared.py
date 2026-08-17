@@ -47,7 +47,8 @@ class ChiSquared:
         for m in self.get_measurements():
             obs, experiment = m
             meas_name = f'{obs} @ {experiment}'
-            meas_tex = f'${to_tex(obs).replace("$", "")} \\ \\mathrm{{({experiment.replace(" ", "\\ ")})}}$'
+            tex_space = '\\ '
+            meas_tex = f'${to_tex(obs).replace("$", "")} {tex_space}\\mathrm{{({experiment.replace(" ", tex_space)})}}$'
             s = Sector(meas_name, meas_tex, obs_measurements = {obs: set([experiment,])}, description=f'Measurement of {obs} at experiment {experiment}.')
             results.append(ChiSquared(s, {(obs, experiment): self.chi2_dict[m]}, {(obs, experiment): self.dofs_dict[m]}))
         return ChiSquaredList(results)
