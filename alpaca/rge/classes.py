@@ -526,7 +526,7 @@ class ALPcouplings:
             if self.basis in bases_below and basis in bases_above:
                 raise ValueError(f'Attempting to run from {self.basis} below the EW scale to {basis} above the EW scale')
             raise ValueError(f'basis {basis} not recognized')
-        if scale_out > self.scale:
+        if scale_out > self.scale and (scale_out > self.ew_scale or self.scale > self.ew_scale):
             raise ValueError("The final scale must be smaller than the initial scale.")
         if scale_out == self.scale:
             return self.translate(basis)
