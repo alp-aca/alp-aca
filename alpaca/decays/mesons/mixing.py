@@ -82,6 +82,7 @@ def coeffs_heavyALP(meson: str, couplings: ALPcouplings, ma, fa, **kwargs) -> np
         from ...constants import md, ms
         mq1 = ms
         mq2 = md
+        # This is for the case of a heavy ALP that has been inegrated out. So the couplings are matched at the ALP mass scale.
         if ma < couplings.ew_scale:
             coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
             cL = coup_low['cdL'][0,1]
@@ -132,23 +133,25 @@ def coeffs_heavyALP(meson: str, couplings: ALPcouplings, ma, fa, **kwargs) -> np
     return run_coeffs(np.array([0, 0, c2, c2tilde, 0, 0, c4, 0]), mq1, ma)
 
 def coeffs_lightALP(meson: str, couplings: ALPcouplings, ma, fa, **kwargs) -> np.ndarray:
+    # This is for the case of a light ALP that has not been integrated out. The matching scale is given in Bauer:2021mvw
     citations.register_inspire('Bauer:2021mvw')
-    coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
     if meson == 'B0':
         from ...constants import md, mb, mB0
         mq1 = mb
         mq2 = md
         mM = mB0
-        cL = coup_low['cdL'][0,2]
-        cR = coup_low['cdR'][0,2]
+        light_flavour = 0
     if meson == 'Bs':
         from ...constants import ms, mb, mBs
         mq1 = mb
         mq2 = ms
         mM = mBs
-        cL = coup_low['cdL'][1,2]
-        cR = coup_low['cdR'][1,2]
+        light_flavour = 1
     Lam = mM - mq1
+    matching_scale = np.sqrt((mb-Lam)**2 - ma**2)
+    coup_low = couplings.match_run(matching_scale, 'RL_below', **kwargs)
+    cL = coup_low['cdL'][light_flavour,2]
+    cR = coup_low['cdR'][light_flavour,2]
     prop_s = 1/(mM**2 - ma**2)
     prop_t = 1/((mq1-Lam)**2 - ma**2)
     Nc = 3
