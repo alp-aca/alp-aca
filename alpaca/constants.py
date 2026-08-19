@@ -194,7 +194,7 @@ sigmaW_BESIII = Constant(3.686*5e-4, 'Song:2022umk')
 #    for j in range(3):
 #        Vckm[i,j] = ComplexConstant(Vckm[i,j], 'flavio')
 
-g8 = Constant(3.61, 'Cirigliano:2011ny')
+g8 = Constant(4.99, 'Cirigliano:2011ny') # LO value
 g2732= Constant(0.165, 'Cirigliano:2011ny')
 g2712= Constant(0.033, 'Cirigliano:2011ny') #Isospin limit assumed
 epsisos = Constant(0.028,'Cornella:2023kjq')
