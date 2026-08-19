@@ -14,9 +14,9 @@ def effcoupling_ff(ma, couplings: ALPcouplings, fermion, **kwargs):
     qf = {'e': -1, 'mu': -1, 'tau': -1, 'c': 2/3, 'b': -1/3}[fermion]
     t3f = {'e': -0.5, 'mu': -0.5, 'tau': -0.5, 'c': 0.5, 'b': -0.5}[fermion]
     delta1 = -11/3
-    aem = alpha_em(mass**2)/4/np.pi
+    aem = alpha_em(mass)/4/np.pi
     if Nc == 3:
-        a_s = alpha_s(mass**2)/4/np.pi
+        a_s = alpha_s(mass)/4/np.pi
     else:
         a_s = 0
     if ma < couplings.ew_scale:
