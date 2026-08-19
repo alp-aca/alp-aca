@@ -1,6 +1,6 @@
 from ..rge import ALPcouplings
 from ..common import B0disc_equalmass, ckm_xi, alpha_s
-from ..constants import GF, mu, md, ms, mc, mb, me, mmu, mtau, s2w, mW, mZ
+from ..constants import GF, mu, md, ms, mc, mb, me, mmu, mtau, s2w, mW, mZ, mt
 from ..constants import Deltau_U3, Deltad_U3, Deltas_U3
 import numpy as np
 from ..common import g_photonloop, alpha_em, alpha_s, B3
@@ -11,12 +11,12 @@ from ..chiPT.formfactors import ff_BrodskyLepage
 from .particles import particle_aliases
 
 def effcoupling_ff(ma, couplings: ALPcouplings, fermion, **kwargs):
-    mass = {'e': me, 'mu': mmu, 'tau': mtau, 'c': mc, 'b': mb}[fermion]
-    ftype = {'e': 'e', 'mu': 'e', 'tau': 'e', 'c': 'u', 'b': 'd'}[fermion]
-    Nc = {'e': 1, 'mu': 1, 'tau': 1, 'c': 3, 'b': 3}[fermion]
-    gen = {'e': 0, 'mu': 1, 'tau': 2, 'c': 1, 'b': 2}[fermion]
-    qf = {'e': -1, 'mu': -1, 'tau': -1, 'c': 2/3, 'b': -1/3}[fermion]
-    t3f = {'e': -0.5, 'mu': -0.5, 'tau': -0.5, 'c': 0.5, 'b': -0.5}[fermion]
+    mass = {'e': me, 'mu': mmu, 'tau': mtau, 'u': mu, 'd': md, 's': ms, 'c': mc, 'b': mb, 't': mt}[fermion]
+    ftype = {'e': 'e', 'mu': 'e', 'tau': 'e', 'u': 'u', 'd': 'd', 's': 'd', 'c': 'u', 'b': 'd', 't': 'u'}[fermion]
+    Nc = {'e': 1, 'mu': 1, 'tau': 1, 'u': 3, 'd': 3, 's': 3, 'c': 3, 'b': 3, 't': 3}[fermion]
+    gen = {'e': 0, 'mu': 1, 'tau': 2, 'u': 0, 'd': 0, 's': 1, 'c': 1, 'b': 2, 't': 2}[fermion]
+    qf = {'e': -1, 'mu': -1, 'tau': -1, 'u': 2/3, 'd': -1/3, 's': -1/3, 'c': 2/3, 'b': -1/3, 't': 2/3}[fermion]
+    t3f = {'e': -0.5, 'mu': -0.5, 'tau': -0.5, 'u': 0.5, 'd': -0.5, 's': -0.5, 'c': 0.5, 'b': -0.5, 't': 0.5}[fermion]
     delta1 = -11/3
     aem = alpha_em(mass**2)/4/np.pi
     if Nc == 3:
@@ -131,7 +131,41 @@ def _effective_coupling(ma: float, couplings: ALPcouplings, particles: str, chir
                 return 0.5 * (effcoupling_baryons_A(couplings, ma, particle_aliases[p1], particle_aliases[p2], **kwargs) + effcoupling_baryons_V(couplings, ma, particle_aliases[p1], particle_aliases[p2], **kwargs))
             else:
                 raise ValueError(f"Invalid chirality {chirality}.")
+        if particle_aliases[p1] == particle_aliases[p2]:
+            if particle_aliases[p1] in ['e', 'mu', 'tau', 'u', 'd', 's', 'c', 'b', 't']:
+                ceff = effcoupling_ff(ma, couplings, particle_aliases[p1], **kwargs)
+                if chirality == 'A':
+                    return ceff
+                elif chirality == 'V':
+                    return 0
+                elif chirality == 'R':
+                    return 0.5 * ceff
+                elif chirality == 'L':
+                    return 0.5 * ceff
+                else:
+                    raise ValueError(f"Invalid chirality {chirality}.")
     raise ValueError(f"Invalid particles {particles}.")
 
 def effective_coupling(ma: float, couplings: ALPcouplings, particles: list[str], chirality: str = '', **kwargs):
+    """
+    Effective coupling for given particles and chirality.
+
+    Parameters
+    ----------
+    ma : float
+        ALP mass.
+    couplings : ALPcouplings
+        ALP couplings.
+    particles : list[str]
+        List of particle names.
+    chirality : str, optional
+        Chirality ('A', 'V', 'R', 'L'), by default ''.
+    **kwargs
+        Additional keyword arguments.
+
+    Returns
+    -------
+    float
+        Effective coupling.
+    """
     return _effective_coupling(ma, couplings, particles, chirality, **kwargs)

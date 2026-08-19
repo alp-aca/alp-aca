@@ -1,0 +1,7 @@
+name: baryonic
+description: Baryonic decays
+observables:
+- Xi0 -> Lambda a
+- Sigma+ -> p a
+- Sigma+ -> p mu mu
+tex: 'baryons'
