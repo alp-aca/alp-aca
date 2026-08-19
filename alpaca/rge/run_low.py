@@ -4,6 +4,7 @@ from . import ALPcouplings, runSM
 from typing import Callable
 from scipy.integrate import solve_ivp
 from ..biblio.biblio import citations
+from ..chiPT.chiral import alphas_tilde
 
 def cGtilde(couplings: ALPcouplings) -> complex:
     citations.register_particle()
@@ -43,9 +44,10 @@ def cgammatilde(couplings: ALPcouplings) -> complex:
 
 def beta(couplings: ALPcouplings) -> ALPcouplings:
     parsSM = runSM(couplings.scale)
+    alpha_s_tilde = alphas_tilde(couplings.scale)
 
-    beta_d = parsSM['alpha_s']**2/np.pi**2*cGtilde(couplings)+0.75*parsSM['alpha_em']**2/np.pi**2*(-1/3)**2*cgammatilde(couplings)
-    beta_u = parsSM['alpha_s']**2/np.pi**2*cGtilde(couplings)+0.75*parsSM['alpha_em']**2/np.pi**2*(2/3)**2*cgammatilde(couplings)
+    beta_d = alpha_s_tilde**2/np.pi**2*cGtilde(couplings)+0.75*parsSM['alpha_em']**2/np.pi**2*(-1/3)**2*cgammatilde(couplings)
+    beta_u = alpha_s_tilde**2/np.pi**2*cGtilde(couplings)+0.75*parsSM['alpha_em']**2/np.pi**2*(2/3)**2*cgammatilde(couplings)
     beta_e = 0.75*parsSM['alpha_em']**2/np.pi**2*cgammatilde(couplings)
 
     return ALPcouplings({'cdR': beta_d*np.eye(3), 'cdL': -beta_d*np.eye(3), 'cuR': beta_u*np.eye(2), 'cuL': -beta_u*np.eye(2), 'ceR': beta_e * np.eye(3), 'ceL': beta_e*np.eye(3), 'cnuL': np.zeros((3,3)), 'cG': 0, 'cgamma': 0}, scale=couplings.scale, basis='RL_below', ew_scale=couplings.ew_scale)

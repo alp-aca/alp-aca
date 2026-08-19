@@ -5,6 +5,7 @@ from cmath import phase
 from ..biblio.biblio import citations
 from functools import lru_cache
 from ..common import svd, diagonalise_yukawas
+import warnings
 
 def runSM(scale: float) -> dict:
     """SM parameters at an energy scale
@@ -25,7 +26,9 @@ def runSM(scale: float) -> dict:
 def _runSM(scale):
     citations.register_inspire('Aebischer:2018bkb') #wilson
     citations.register_inspire('Straub:2018kue') # ckmutil is inside flavio's repo
-    wSM = wilson.classes.SMEFT(wilson.wcxf.WC('SMEFT', 'Warsaw', scale, {})).C_in # For the moment we reuse wilson's code for the SM case, i.e, with all Wilson coefficients set to zero. Maybe at some point we should implement our own version.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        wSM = wilson.classes.SMEFT(wilson.wcxf.WC('SMEFT', 'Warsaw', scale, {})).C_in # For the moment we reuse wilson's code for the SM case, i.e, with all Wilson coefficients set to zero. Maybe at some point we should implement our own version.
 
     d_y = diagonalise_yukawas(wSM['Gu'], wSM['Gd'], wSM['Ge'])
     UuL, mu, UuR = d_y['u']
