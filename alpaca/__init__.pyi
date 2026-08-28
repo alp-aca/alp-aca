@@ -12,6 +12,10 @@ from .decays.decays import (
     alp_channels_branching_ratios as alp_channels_branching_ratios,
 )
 
+from .decays.effcouplings import (
+    effective_coupling as effective_coupling,
+)
+
 from .decays.mesons.mixing import (
     meson_mixing as meson_mixing,
 )

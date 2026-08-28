@@ -79,6 +79,8 @@ def effcouplings_cq1q2_W(couplings: ALPcouplings, pa2: float, q1: str, q2: str) 
         for iq, qloop in enumerate(['u', 'c']):
             cqloop = couplings['cuL'][iq, iq] - couplings['cuR'][iq, iq]
             ceff += GF/np.sqrt(2)/np.pi**2*ckm_xi(qloop, q1+q2) * cqloop * mq[qloop]**2 * (1 + B0disc_equalmass(pa2, mq[qloop]) + np.log(couplings.scale**2/mq[qloop]**2))
+    else:
+        raise ValueError(f"Invalid quark flavors {q1} and {q2}.")
     return ceff
 
 def offshellphoton(couplings: ALPcouplings, ma: float, s: float) -> complex:
@@ -144,9 +146,31 @@ def _effective_coupling(ma: float, couplings: ALPcouplings, particles: str, chir
                     return 0.5 * ceff
                 else:
                     raise ValueError(f"Invalid chirality {chirality}.")
+        if particle_aliases[p1] in ['d', 's', 'b'] and particle_aliases[p2] in ['d', 's', 'b']:
+            flavours = {'d': 0, 's': 1, 'b': 2}
+            if chirality == 'R':
+                return couplings.translate('RL_below')['cdR'][flavours[particle_aliases[p1]], flavours[particle_aliases[p2]]]
+            delta_cL = effcouplings_cq1q2_W(couplings, ma**2, particle_aliases[p1], particle_aliases[p2])
+            if chirality == 'L':
+                return couplings.translate('RL_below')['cdL'][flavours[particle_aliases[p1]], flavours[particle_aliases[p2]]] + delta_cL
+            if chirality == 'A':
+                return couplings.translate('VA_below')['cdA'][flavours[particle_aliases[p1]], flavours[particle_aliases[p2]]] + delta_cL
+            if chirality == 'V':
+                return couplings.translate('VA_below')['cdV'][flavours[particle_aliases[p1]], flavours[particle_aliases[p2]]] + delta_cL
+        if particle_aliases[p1] in ['u', 'c'] and particle_aliases[p2] in ['u', 'c']:
+            flavours = {'u': 0, 'c': 1}
+            if chirality == 'R':
+                return couplings.translate('RL_below')['cuR'][flavours[particle_aliases[p1]], flavours[particle_aliases[p2]]]
+            delta_cL = effcouplings_cq1q2_W(couplings, ma**2, particle_aliases[p1], particle_aliases[p2])
+            if chirality == 'L':
+                return couplings.translate('RL_below')['cuL'][flavours[particle_aliases[p1]], flavours[particle_aliases[p2]]] + delta_cL
+            if chirality == 'A':
+                return couplings.translate('VA_below')['cuA'][flavours[particle_aliases[p1]], flavours[particle_aliases[p2]]] + delta_cL
+            if chirality == 'V':
+                return couplings.translate('VA_below')['cuV'][flavours[particle_aliases[p1]], flavours[particle_aliases[p2]]] - delta_cL
     raise ValueError(f"Invalid particles {particles}.")
 
-def effective_coupling(ma: float, couplings: ALPcouplings, particles: list[str], chirality: str = '', **kwargs):
+def effective_coupling(ma: float, couplings: ALPcouplings, particles: str, chirality: str = '', **kwargs):
     """
     Effective coupling for given particles and chirality.
 
@@ -156,8 +180,8 @@ def effective_coupling(ma: float, couplings: ALPcouplings, particles: list[str],
         ALP mass.
     couplings : ALPcouplings
         ALP couplings.
-    particles : list[str]
-        List of particle names.
+    particles : str
+        Particle names.
     chirality : str, optional
         Chirality ('A', 'V', 'R', 'L'), by default ''.
     **kwargs
