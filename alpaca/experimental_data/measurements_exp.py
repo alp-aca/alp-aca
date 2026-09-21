@@ -2078,8 +2078,8 @@ dw_KS = MeasurementConstantBound(
 )
 
 lhcb_Sigmapproton_mumu = MeasurementInterpolatedBound(
-    ['LHCb:2024fhb', 'Provenzano:2025cws'],
-    os.path.join(current_dir, visible, 'BR_Sigmapmumu.txt'),
+    ['LHCb:2024fhb', 'Provenzano:2025cws', 'LHCb:2025evf'],
+    os.path.join(current_dir, visible, 'Sigmapmumu_LHCb.txt'),
     'prompt',
     rmin = 150e-4,
     conf_level= 0.9,
