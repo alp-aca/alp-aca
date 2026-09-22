@@ -107,15 +107,28 @@ def effcoupling_baryons_A(couplings: ALPcouplings, ma: float, b1: str, b2: str, 
     SB = Deltad_U3 - sbtilde
     lambda1 = baryons[b1].T
     lambda2 = baryons[b2]
-    mix_shift = mixing_shift(couplings, ma) # \mathbb{M}_a^{-1}(\mathcal{C})
-    return ff_BrodskyLepage(ma, 0) * (-(DB + FB) * np.trace(lambda1 @ mix_shift @ lambda2) - (DB - FB) * np.trace(lambda1 @ lambda2 @ mix_shift) - (SB + sbtilde) * np.trace(lambda1 @ lambda2) * np.trace(mix_shift)) - ff_BrodskyLepage(ma, 2) * sbtilde * np.trace(lambda1 @ lambda2) * cGA(couplings)
+
+    couplings_scaled_umu = ALPcouplings({
+        'cG': couplings['cG'] * ff_BrodskyLepage(ma, 3, 1),
+        'cuA': couplings['cuA'] * ff_BrodskyLepage(ma, 2, 1),
+        'cdA': couplings['cdA'] * ff_BrodskyLepage(ma, 2, 1),
+    }, couplings.scale, couplings.basis, couplings.ew_scale)
+
+    couplings_scaled_dX = ALPcouplings({
+        'cG': couplings['cG'] * ff_BrodskyLepage(ma, 3, 2),
+        'cuA': couplings['cuA'] * ff_BrodskyLepage(ma, 2, 1),
+        'cdA': couplings['cdA'] * ff_BrodskyLepage(ma, 2, 1),
+    }, couplings.scale, couplings.basis, couplings.ew_scale)
+
+    mix_shift = mixing_shift(couplings_scaled_umu, ma) # \mathbb{M}_a^{-1}(\mathcal{C})
+    return (-(DB + FB) * np.trace(lambda1 @ mix_shift @ lambda2) - (DB - FB) * np.trace(lambda1 @ lambda2 @ mix_shift) - (SB + sbtilde) * np.trace(lambda1 @ lambda2) * np.trace(mix_shift)) - sbtilde * np.trace(lambda1 @ lambda2) * cGA(couplings_scaled_dX)
 
 def effcoupling_baryons_V(couplings: ALPcouplings, ma: float, b1: str, b2: str, **kwargs):
     couplings = couplings.match_run(ma, 'VA_below', **kwargs)
     cqV_matrix = cqV(couplings)
     lambda1 = baryons[b1].T
     lambda2 = baryons[b2]
-    return - np.trace(cqV_matrix @ lambda1 @ lambda2 - cqV_matrix @ lambda2 @ lambda1) * ff_BrodskyLepage(ma, 2)
+    return - np.trace(cqV_matrix @ lambda1 @ lambda2 - cqV_matrix @ lambda2 @ lambda1) * ff_BrodskyLepage(ma, 2, 2)
 
 @np.vectorize
 def _effective_coupling(ma: float, couplings: ALPcouplings, particles: str, chirality: str, **kwargs):
