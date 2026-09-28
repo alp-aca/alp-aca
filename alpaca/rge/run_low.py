@@ -23,24 +23,24 @@ def cGtilde(couplings: ALPcouplings) -> complex:
 
 def cgammatilde(couplings: ALPcouplings) -> complex:
     citations.register_particle()
-    cG = couplings['cG']
+    cgamma = couplings['cgamma']
     if couplings.scale > particle.literals.u.mass/1000:
-        cG += 3*(2/3)**2*(couplings['cuR'][0,0]-couplings['cuL'][0,0])
+        cgamma += 3*(2/3)**2*(couplings['cuR'][0,0]-couplings['cuL'][0,0])
     if couplings.scale > particle.literals.d.mass/1000:
-        cG += 3*(-1/3)**2*(couplings['cdR'][0,0]-couplings['cdL'][0,0])
+        cgamma += 3*(-1/3)**2*(couplings['cdR'][0,0]-couplings['cdL'][0,0])
     if couplings.scale > particle.literals.c.mass/1000:
-        cG += 3*(2/3)**2*(couplings['cuR'][1,1]-couplings['cuL'][1,1])
+        cgamma += 3*(2/3)**2*(couplings['cuR'][1,1]-couplings['cuL'][1,1])
     if couplings.scale > particle.literals.s.mass/1000:
-        cG += 3*(-1/3)**2*(couplings['cdR'][1,1]-couplings['cdL'][1,1])
+        cgamma += 3*(-1/3)**2*(couplings['cdR'][1,1]-couplings['cdL'][1,1])
     if couplings.scale > particle.literals.b.mass/1000:
-        cG += 3*(-1/3)**2*(couplings['cdR'][2,2]-couplings['cdL'][2,2])
+        cgamma += 3*(-1/3)**2*(couplings['cdR'][2,2]-couplings['cdL'][2,2])
     if couplings.scale > particle.literals.e_minus.mass/1000:
-        cG += (couplings['ceR'][0,0]-couplings['ceL'][0,0])
+        cgamma += (couplings['ceR'][0,0]-couplings['ceL'][0,0])
     if couplings.scale > particle.literals.mu_minus.mass/1000:
-        cG += (couplings['ceR'][1,1]-couplings['ceL'][1,1])
+        cgamma += (couplings['ceR'][1,1]-couplings['ceL'][1,1])
     if couplings.scale > particle.literals.tau_minus.mass/1000:
-        cG += (couplings['ceR'][2,2]-couplings['ceL'][2,2])
-    return cG
+        cgamma += (couplings['ceR'][2,2]-couplings['ceL'][2,2])
+    return cgamma
 
 def beta(couplings: ALPcouplings) -> ALPcouplings:
     parsSM = runSM(couplings.scale)
@@ -50,7 +50,7 @@ def beta(couplings: ALPcouplings) -> ALPcouplings:
     beta_u = alpha_s_tilde**2/np.pi**2*cGtilde(couplings)+0.75*parsSM['alpha_em']**2/np.pi**2*(2/3)**2*cgammatilde(couplings)
     beta_e = 0.75*parsSM['alpha_em']**2/np.pi**2*cgammatilde(couplings)
 
-    return ALPcouplings({'cdR': beta_d*np.eye(3), 'cdL': -beta_d*np.eye(3), 'cuR': beta_u*np.eye(2), 'cuL': -beta_u*np.eye(2), 'ceR': beta_e * np.eye(3), 'ceL': beta_e*np.eye(3), 'cnuL': np.zeros((3,3)), 'cG': 0, 'cgamma': 0}, scale=couplings.scale, basis='RL_below', ew_scale=couplings.ew_scale)
+    return ALPcouplings({'cdR': beta_d*np.eye(3), 'cdL': -beta_d*np.eye(3), 'cuR': beta_u*np.eye(2), 'cuL': -beta_u*np.eye(2), 'ceR': beta_e * np.eye(3), 'ceL': -beta_e*np.eye(3), 'cnuL': np.zeros((3,3)), 'cG': 0, 'cgamma': 0}, scale=couplings.scale, basis='RL_below', ew_scale=couplings.ew_scale)
 
 
 def run_leadinglog(couplings: ALPcouplings, scale_out: float) -> ALPcouplings:
