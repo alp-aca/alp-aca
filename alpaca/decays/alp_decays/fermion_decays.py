@@ -46,9 +46,9 @@ def decay_width_mue(ma, couplings: ALPcouplings, fa,**kwargs):
         cV = cc['ceV'][0,1]
         cA = cc['ceA'][0,1]
     else:
-        cc = couplings.match_run(ma, 'massbasis_ew', **kwargs)
-        cV = cc['ceL'][0,1]-cc['ceL'][1,0]
-        cA = cc['ceL'][0,1]+cc['ceL'][1,0]
+        cc = couplings.match_run(ma, 'derivative_above', **kwargs)
+        cV = cc['clL'][0,1]-cc['clL'][1,0]
+        cA = cc['clL'][0,1]+cc['clL'][1,0]
     return dw_lfv(ma, fa, cV, cA, me, mmu)
 
 def decay_width_mutau(ma, couplings: ALPcouplings, fa,**kwargs):
@@ -57,9 +57,9 @@ def decay_width_mutau(ma, couplings: ALPcouplings, fa,**kwargs):
         cV = cc['ceV'][1,2]
         cA = cc['ceA'][1,2]
     else:
-        cc = couplings.match_run(ma, 'massbasis_ew', **kwargs)
-        cV = cc['ceL'][1,2]-cc['ceL'][2,1]
-        cA = cc['ceL'][1,2]+cc['ceL'][2,1]
+        cc = couplings.match_run(ma, 'derivative_above', **kwargs)
+        cV = cc['clL'][1,2]-cc['clL'][2,1]
+        cA = cc['clL'][1,2]+cc['clL'][2,1]
     return dw_lfv(ma, fa, cV, cA, mmu, mtau)
 
 def decay_width_etau(ma, couplings: ALPcouplings, fa,**kwargs):
@@ -68,7 +68,7 @@ def decay_width_etau(ma, couplings: ALPcouplings, fa,**kwargs):
         cV = cc['ceV'][0,2]
         cA = cc['ceA'][0,2]
     else:
-        cc = couplings.match_run(ma, 'massbasis_ew', **kwargs)
-        cV = cc['ceL'][0,2]-cc['ceL'][0,2]
-        cA = cc['ceL'][0,2]+cc['ceL'][0,2]
+        cc = couplings.match_run(ma, 'derivative_above', **kwargs)
+        cV = cc['clL'][0,2]-cc['clL'][0,2]
+        cA = cc['clL'][0,2]+cc['clL'][0,2]
     return dw_lfv(ma, fa, cV, cA, mtau, me)

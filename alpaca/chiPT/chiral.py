@@ -16,8 +16,12 @@ kappa = np.diag([1/m for m in [mu, md, ms]])/sum(1/m for m in [mu, md, ms])
 #kappa = np.diag([0,1,0])
 
 def cqhat(couplings: ALPcouplings, ma: float, **kwargs) -> np.ndarray:
-    cc = couplings.match_run(ma, 'VA_below', **kwargs)
-    cq = np.array([[cc['cuA'][0,0], 0, 0], [0, cc['cdA'][0,0], cc['cdA'][0,1]], [0, cc['cdA'][1,0], cc['cdA'][1,1]]])
+    if ma < couplings.ew_scale:
+        cc = couplings.match_run(ma, 'VA_below', **kwargs)
+        cq = np.array([[cc['cuA'][0,0], 0, 0], [0, cc['cdA'][0,0], cc['cdA'][0,1]], [0, cc['cdA'][1,0], cc['cdA'][1,1]]])
+    else:
+        cc = couplings.match_run(ma, 'derivative_above', **kwargs)
+        cq = np.array([[cc['cuR'][0,0]-cc['cqL'][0,0], 0, 0], [0, cc['cdR'][0,0]-cc['cqL'][0,0], cc['cdR'][0,1]-cc['cqL'][0,1]], [0, cc['cdR'][1,0]-cc['cqL'][1,0], cc['cdR'][1,1]-cc['cqL'][1,1]]])
     return cq + 2 * cc['cG'] * kappa
 
 def mesonmass_chiPT():

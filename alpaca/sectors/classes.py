@@ -1,6 +1,6 @@
 import yaml
 from ..decays.decays import to_tex, canonical_transition
-from ..experimental_data import get_measurements
+from ..experimental_data import get_measurements, MeasurementBase
 import os
 import copy
 
@@ -205,6 +205,27 @@ class Sector:
                     if not s.obs_measurements[canonical_transition(observable)]:
                         del s.obs_measurements[canonical_transition(observable)]
         return s
+
+    def get_measurements(self) -> dict[tuple[str, str], MeasurementBase]:
+        """
+        Get all measurements associated with the sector.
+
+        Returns
+        -------
+        dict[tuple[str, str], MeasurementBase]
+            A dictionary mapping (observable, measurement) tuples to MeasurementBase instances.
+        """
+        measurements = {}
+        if self.observables is not None:
+            for obs in self.observables:
+                meas = get_measurements(obs)
+                for measurement in meas:
+                    measurements[(obs, measurement)] = meas[measurement]
+        if self.obs_measurements is not None:
+            for obs in self.obs_measurements.keys():
+                for measurement in self.obs_measurements[obs]:
+                    measurements[(obs, measurement)] = get_measurements(obs)[measurement]
+        return measurements
 
 
 def combine_sectors(sectors: list[Sector], name: str, tex: str, description: str = "") -> Sector:

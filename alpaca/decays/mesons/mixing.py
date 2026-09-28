@@ -3,6 +3,7 @@ from ...biblio.biblio import citations
 from ...common import alpha_s, pars
 from ...rge.classes import ALPcouplings
 from flavio.physics.mesonmixing.amplitude import M12_d_SM, M12_u_SM, G12_u_SM, G12_d_SM
+from typing import Callable
 
 tex_codes = {
     'delta_mK0': r'\Delta m_{K^0}',
@@ -77,57 +78,80 @@ def run_coeffs(coeffs: np.ndarray, mq1: float, scale: float) -> np.ndarray:
     return eta_matrix @ coeffs
 
 def coeffs_heavyALP(meson: str, couplings: ALPcouplings, ma, fa, **kwargs) -> np.ndarray:
-    if ma < couplings.ew_scale:
-        coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
-    else:
-        coup_low = couplings.match_run(ma, 'massbasis_ew', **kwargs)
     if meson == 'K0':
         from ...constants import md, ms
         mq1 = ms
         mq2 = md
-        cL = coup_low['cdL'][0,1]
-        cR = coup_low['cdR'][0,1]
+        # This is for the case of a heavy ALP that has been inegrated out. So the couplings are matched at the ALP mass scale.
+        if ma < couplings.ew_scale:
+            coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
+            cL = coup_low['cdL'][0,1]
+            cR = coup_low['cdR'][0,1]
+        else:
+            coup_low = couplings.match_run(ma, 'derivative_above', **kwargs)
+            cL = coup_low['cqL'][0,1]
+            cR = coup_low['cdR'][0,1]
     if meson == 'B0':
         from ...constants import md, mb
         mq1 = mb
         mq2 = md
-        cL = coup_low['cdL'][0,2]
-        cR = coup_low['cdR'][0,2]
+        if ma < couplings.ew_scale:
+            coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
+            cL = coup_low['cdL'][0,2]
+            cR = coup_low['cdR'][0,2]
+        else:
+            coup_low = couplings.match_run(ma, 'derivative_above', **kwargs)
+            cL = coup_low['cqL'][0,2]
+            cR = coup_low['cdR'][0,2]
     if meson == 'Bs':
         from ...constants import ms, mb
         mq1 = mb
         mq2 = ms
-        cL = coup_low['cdL'][1,2]
-        cR = coup_low['cdR'][1,2]
+        if ma < couplings.ew_scale:
+            coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
+            cL = coup_low['cdL'][1,2]
+            cR = coup_low['cdR'][1,2]
+        else:
+            coup_low = couplings.match_run(ma, 'derivative_above', **kwargs)
+            cL = coup_low['cqL'][1,2]
+            cR = coup_low['cdR'][1,2]
     if meson == 'D0':
         from ...constants import mu, mc
         mq1 = mc
         mq2 = mu
-        cL = coup_low['cuL'][0,1]
-        cR = coup_low['cuR'][0,1]
+        if ma < couplings.ew_scale:
+            coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
+            cL = coup_low['cuL'][0,1]
+            cR = coup_low['cuR'][0,1]
+        else:
+            coup_low = couplings.match_run(ma, 'derivative_above', **kwargs)
+            cL = coup_low['cqL'][0,1]
+            cR = coup_low['cuR'][0,1]
     c2 = (cR*mq1-cL*mq2)**2/(2*ma**2*fa**2)
     c2tilde = (cL*mq1-cR*mq2)**2/(2*ma**2*fa**2)
     c4 = (cR*mq1-cL*mq2)*(cL*mq1-cR*mq2)/(ma**2*fa**2)
     return run_coeffs(np.array([0, 0, c2, c2tilde, 0, 0, c4, 0]), mq1, ma)
 
 def coeffs_lightALP(meson: str, couplings: ALPcouplings, ma, fa, **kwargs) -> np.ndarray:
+    # This is for the case of a light ALP that has not been integrated out. The matching scale is given in Bauer:2021mvw
     citations.register_inspire('Bauer:2021mvw')
-    coup_low = couplings.match_run(ma, 'RL_below', **kwargs)
     if meson == 'B0':
         from ...constants import md, mb, mB0
         mq1 = mb
         mq2 = md
         mM = mB0
-        cL = coup_low['cdL'][0,2]
-        cR = coup_low['cdR'][0,2]
+        light_flavour = 0
     if meson == 'Bs':
         from ...constants import ms, mb, mBs
         mq1 = mb
         mq2 = ms
         mM = mBs
-        cL = coup_low['cdL'][1,2]
-        cR = coup_low['cdR'][1,2]
+        light_flavour = 1
     Lam = mM - mq1
+    matching_scale = np.sqrt((mb-Lam)**2 - ma**2)
+    coup_low = couplings.match_run(matching_scale, 'RL_below', **kwargs)
+    cL = coup_low['cdL'][light_flavour,2]
+    cR = coup_low['cdR'][light_flavour,2]
     prop_s = 1/(mM**2 - ma**2)
     prop_t = 1/((mq1-Lam)**2 - ma**2)
     Nc = 3
@@ -215,7 +239,7 @@ mixing_observables = {
     'ASL_Bs': ASL_Bs,
 }
 
-def meson_mixing(obs: str, ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float:
+def meson_mixing(obs: str, ma: float, couplings: ALPcouplings, fa: float, callback: Callable | None = None, **kwargs) -> float:
     '''Obtains the value of a meson mixing observable.
 
     Parameters
@@ -237,5 +261,17 @@ def meson_mixing(obs: str, ma: float, couplings: ALPcouplings, fa: float, **kwar
 
     fa : float
         The decay constant of the ALP, in GeV.
+
+    callback : Callable, optional
+        A callback function to execute before returning the observable.
     '''
-    return np.vectorize(mixing_observables[obs], otypes=[float])(couplings, ma, fa, **kwargs)
+
+    def obs_call(ma, couplings, fa, **kwargs):
+        result = mixing_observables[obs](couplings, ma, fa, **kwargs)
+        pars = {'ma': ma, 'couplings': couplings, 'fa': fa, 'observable': obs, 'result': result, 'process': obs}
+        pars.update(kwargs)
+        if callback is not None:
+            callback(**pars)
+        return result
+
+    return np.vectorize(obs_call, otypes=[float])(ma, couplings, fa, **kwargs)

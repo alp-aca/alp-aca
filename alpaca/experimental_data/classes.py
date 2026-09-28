@@ -346,7 +346,7 @@ class MeasurementDisplacedVertexBound(MeasurementBase):
         self.max_ma = np.max(ma)
         self.min_tau = 10**np.min(logtau)
         self.max_tau = 10**np.max(logtau)
-        self.interpolator = RegularGridInterpolator((ma, logtau), np.nan_to_num(br.T, nan=1000), method='linear', bounds_error=False)
+        self.interpolator = RegularGridInterpolator((ma, logtau), np.nan_to_num(br.T, nan=1000), method='linear', bounds_error=False, fill_value=None)
 
     def get_central(self, ma: float, ctau: float) -> float:
         self.initiate()

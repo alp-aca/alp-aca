@@ -14,13 +14,16 @@ from io import TextIOBase
 import wilson
 from ..common import svd, diagonalise_yukawas
 
-numeric = (int, float, complex, Expr)
+numeric = (int, float, complex, Expr,
+           np.byte, np.ubyte, np.short, np.ushort, np.intc, np.uintc, np.int_, np.uint, np.longlong, np.ulonglong,
+           np.half, np.single, np.double, np.longdouble, np.csingle, np.cdouble, np.clongdouble)
+numeric_complex = (complex, Expr, np.csingle, np.cdouble, np.clongdouble)
 matricial = (np.ndarray, np.matrix, Matrix, list)
 
 def format_number(x):
     if isinstance(x, sp.Expr):
         return str(x)
-    if isinstance(x, complex):
+    if isinstance(x, numeric_complex):
         if x.imag == 0:
             return format_number(x.real)
         if x.real == 0:
@@ -524,7 +527,7 @@ class ALPcouplings:
             if self.basis in bases_below and basis in bases_above:
                 raise ValueError(f'Attempting to run from {self.basis} below the EW scale to {basis} above the EW scale')
             raise ValueError(f'basis {basis} not recognized')
-        if scale_out > self.scale:
+        if scale_out > self.scale and (scale_out > self.ew_scale or self.scale > self.ew_scale):
             raise ValueError("The final scale must be smaller than the initial scale.")
         if scale_out == self.scale:
             return self.translate(basis)
@@ -540,7 +543,8 @@ class ALPcouplings:
             else:
                 raise KeyError(basis)
         if self.scale == self.ew_scale and self.basis in bases_above and basis in bases_below:
-                couplings_below = matching.match(self, match_tildecouplings)
+                couplings_ew = self.translate('massbasis_ew')
+                couplings_below = matching.match(couplings_ew, match_tildecouplings)
                 return couplings_below.match_run(scale_out, basis, integrator=integrator, beta=beta, scipy_method=scipy_method, scipy_rtol=scipy_rtol, scipy_atol=scipy_atol)
         if scale_out < self.ew_scale:
             if integrator == 'scipy':
@@ -565,7 +569,9 @@ class ALPcouplings:
             elif integrator == 'leadinglog':
                 return run_high.run_leadinglog(self, betafunc, scale_out).translate(basis)
             elif integrator == 'no_rge':
-                return ALPcouplings(self.values, scale_out, self.basis).translate(basis)
+                c = self.to_dict()
+                c['scale'] = scale_out
+                return ALPcouplings.from_dict(c).translate(basis)
             else:
                 raise KeyError(f'Integrator {integrator} not recognized')
         else:

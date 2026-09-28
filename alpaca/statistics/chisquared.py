@@ -13,7 +13,7 @@ from ..experimental_data.theoretical_predictions import get_th_uncert, get_th_va
 from ..rge import ALPcouplings
 from ..sectors import Sector, combine_sectors
 from ..biblio import citation_report
-from typing import Optional
+from typing import Optional, Callable
 from .functions import nsigmas
 class ChiSquared:
     def __init__(self, sector: Sector,
@@ -28,6 +28,9 @@ class ChiSquared:
         chi2 = np.nansum([v for v in self.chi2_dict.values()], axis=0)
         ndof = np.sum([v for v in self.dofs_dict.values()], axis=0)
         return np.nan_to_num(nsigmas(chi2, ndof))
+    
+    def chi2_tot(self) -> np.ndarray[float]:
+        return np.nan_to_num(np.nansum([v for v in self.chi2_dict.values()], axis=0))
         
     def get_measurements(self) -> list[tuple[str, str]]:
         return list( set(self.chi2_dict.keys()) & set(self.dofs_dict.keys()) )
@@ -44,7 +47,8 @@ class ChiSquared:
         for m in self.get_measurements():
             obs, experiment = m
             meas_name = f'{obs} @ {experiment}'
-            meas_tex = f'${to_tex(obs).replace("$", "")} \\ \\mathrm{{({experiment.replace(" ", "\\ ")})}}$'
+            tex_space = '\\ '
+            meas_tex = f'${to_tex(obs).replace("$", "")} {tex_space}\\mathrm{{({experiment.replace(" ", tex_space)})}}$'
             s = Sector(meas_name, meas_tex, obs_measurements = {obs: set([experiment,])}, description=f'Measurement of {obs} at experiment {experiment}.')
             results.append(ChiSquared(s, {(obs, experiment): self.chi2_dict[m]}, {(obs, experiment): self.dofs_dict[m]}))
         return ChiSquaredList(results)
@@ -323,7 +327,7 @@ class ChiSquared:
 
         Parameters
         ----------
-        *idx : tuple[slice|int]
+        * idx : tuple[slice|int]
             The indices to slice the ChiSquared object.
             At each index, you can specify a slice or an integer.
             If a slice is provided, it will slice the data along that dimension.
@@ -339,6 +343,9 @@ class ChiSquared:
 class ChiSquaredList(list[ChiSquared]):
     """A list of ChiSquared objects with additional methods for combining and manipulating them."""
     
+    def chi2_tot(self):
+        return np.sum([c.chi2_tot() for c in self], axis=0)
+
     def combine(self, name: str, tex: str, description: str = '') -> ChiSquared:
         """Combine the chi-squared values from the list into a single ChiSquared object."""
         return combine_chi2(self, name, tex, description)
@@ -499,7 +506,7 @@ class ChiSquaredList(list[ChiSquared]):
 
         Parameters
         ----------
-        *idx : tuple[slice|int]
+        * idx : tuple[slice|int]
             The indices to slice the ChiSquaredList.
             At each index, you can specify a slice or an integer.
             If a slice is provided, it will slice the data along that dimension.
@@ -551,7 +558,7 @@ class ChiSquaredList(list[ChiSquared]):
         """
         self.combine('', '').contour_to_csv(x, y, filename, sigma, xlabel, ylabel)
 
-def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, couplings, fa, min_probability=0.0, br_dark = 0.0, sm_pred=0, sm_uncert=0, **kwargs):
+def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, couplings, fa, min_probability=0.0, br_dark = 0.0, sm_pred=0, sm_uncert=0, callback: Callable | None = None, **kwargs):
     kwargs_dw = {k: v for k, v in kwargs.items() if k != 'theta'}
     ma = np.atleast_1d(ma).astype(float)
     couplings = np.atleast_1d(couplings)
@@ -571,13 +578,13 @@ def chi2_obs(measurement: MeasurementBase, transition: str | tuple, ma, coupling
         prob_decay = measurement.decay_probability(ctau, ma, theta=kwargs.get('theta', None), br_dark=br_dark)
         prob_decay = np.where(prob_decay < min_probability, np.nan, prob_decay)
     if transition in mixing_observables:
-        br = meson_mixing(transition, ma, couplings, fa, **kwargs_dw)
+        br = meson_mixing(transition, ma, couplings, fa, callback=callback, **kwargs_dw)
     elif particle_aliases.get(transition, '') in meson_widths.keys():
-        br = decay_width(transition, ma, couplings, fa, br_dark, **kwargs_dw)
+        br = decay_width(transition, ma, couplings, fa, br_dark, callback=callback, **kwargs_dw)
     elif isinstance(transition, str):
-        br = branching_ratio(transition, ma, couplings, fa, br_dark, **kwargs_dw)
+        br = branching_ratio(transition, ma, couplings, fa, br_dark, callback=callback, **kwargs_dw)
     else:
-        br = cross_section(transition[0], ma, couplings, transition[1], fa, br_dark, **kwargs_dw)
+        br = cross_section(transition[0], ma, couplings, transition[1], fa, br_dark, callback=callback, **kwargs_dw)
     sigma_left = measurement.get_sigma_left(ma, ctau)
     sigma_right = measurement.get_sigma_right(ma, ctau)
     central = measurement.get_central(ma, ctau)
@@ -613,7 +620,7 @@ def combine_chi2(chi2: list[ChiSquared], name: str, tex: str, description: str =
         dofs_dict |= c.dofs_dict
     return ChiSquared(sector, chi2_dict, dofs_dict)
 
-def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma: np.ndarray[float], couplings: np.ndarray[ALPcouplings], fa: np.ndarray[float], min_probability: float = 0.0, br_dark = 0.0, exclude_projections=True, **kwargs) -> ChiSquaredList:
+def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma: np.ndarray[float], couplings: np.ndarray[ALPcouplings], fa: np.ndarray[float], min_probability: float = 0.0, br_dark = 0.0, exclude_projections=True, callback: Callable | None = None, **kwargs) -> ChiSquaredList:
     """Calculate the chi-squared values for a set of transitions.
 
     Parameters
@@ -641,8 +648,11 @@ def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma:
 
     exclude_projections (bool, optional):
         Whether to exclude projections from measurements. Default is True.
-        
-    **kwargs:
+
+    callback (Callable, optional):
+        A callback function to execute before returning the value of the observable.
+
+    `**kwargs`:
         Additional keyword arguments passed to chi2_obs.
 
     Returns
@@ -680,7 +690,7 @@ def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma:
         for experiment, measurement in measurements.items():
             sm_pred = get_th_value(t)
             sm_uncert = get_th_uncert(t)
-            dict_chi2[(t, experiment)] = chi2_obs(measurement, t, ma, couplings, fa, min_probability=min_probability, br_dark=br_dark, sm_pred=sm_pred, sm_uncert=sm_uncert, **kwargs)
+            dict_chi2[(t, experiment)] = chi2_obs(measurement, t, ma, couplings, fa, min_probability=min_probability, br_dark=br_dark, sm_pred=sm_pred, sm_uncert=sm_uncert, callback=callback, **kwargs)
     for t in obs_measurements.keys():
         if t not in dict_chi2:
             measurements = get_measurements(t, exclude_projections=exclude_projections)
@@ -688,8 +698,8 @@ def get_chi2(transitions: list[Sector | str | tuple] | Sector | str | tuple, ma:
                 if experiment in obs_measurements[t]:
                     sm_pred = get_th_value(t)
                     sm_uncert = get_th_uncert(t)
-                    dict_chi2[(t, experiment)] = chi2_obs(measurement, t, ma, couplings, fa, min_probability=min_probability, br_dark=br_dark, sm_pred=sm_pred, sm_uncert=sm_uncert, **kwargs)
-            
+                    dict_chi2[(t, experiment)] = chi2_obs(measurement, t, ma, couplings, fa, min_probability=min_probability, br_dark=br_dark, sm_pred=sm_pred, sm_uncert=sm_uncert, callback=callback, **kwargs)
+
     results = []
     for s in sectors:
         chi2_dict = {}
