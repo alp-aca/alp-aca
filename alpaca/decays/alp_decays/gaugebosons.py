@@ -102,4 +102,4 @@ def decay_width_2gluons(ma: float, couplings: ALPcouplings, fa: float, **kwargs)
         mq = [mu, md, ms, mc, mb]
         coupl = [cuA[0,0], cdA[0,0], cdA[1,1], cuA[1,1], cdA[2,2]]
         cG_eff = cc['cG'] + 0.5 * sum(coupl[i]*B1(4*mq[i]**2/ma**2) for i in range(5))
-    return alpha_s(ma)**2*ma**3/((4*np.pi)**3*fa**2)*np.abs(cG_eff)**2*(1+alpha_s(ma)/np.pi*83/4)#(1+alpha_s(ma)/48/np.pi*(291-sum(14 for i in range(5) if ma > mq[i])))
+    return 8 * alpha_s(ma)**2*ma**3/((4*np.pi)**3*fa**2)*np.abs(cG_eff)**2*(1+alpha_s(ma)/np.pi*83/4)#(1+alpha_s(ma)/48/np.pi*(291-sum(14 for i in range(5) if ma > mq[i])))
