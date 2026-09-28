@@ -42,6 +42,8 @@ alp_channels_decay_widths
     Calculates the decay widths for all ALP channels.
 alp_channels_branching_ratios
     Calculates the branching ratios for all ALP channels.
+effective_coupling
+    Calculates the effective coupling for given particles and chirality.
 """
 
 import lazy_loader as lazy

@@ -128,6 +128,14 @@ momega = Constant(particles.omega_782.mass/1000, 'particle')
 mD0 = Constant(particles.D_0.mass/1000, 'particle')
 mDplus = Constant(particles.D_plus.mass/1000, 'particle')
 mDs = Constant(particles.D_s_plus.mass/1000, 'particle')
+mproton = Constant(particles.proton.mass/1000, 'particle')
+mneutron = Constant(particles.neutron.mass/1000, 'particle')
+mSigma0 = Constant(particles.Sigma_0.mass/1000, 'particle')
+mSigma_plus = Constant(particles.Sigma_plus.mass/1000, 'particle')
+mSigma_minus = Constant(particles.Sigma_minus.mass/1000, 'particle')
+mLambda = Constant(particles.Lambda.mass/1000, 'particle')
+mXi0 = Constant(particles.Xi_0.mass/1000, 'particle')
+mXi_minus = Constant(particles.Xi_minus.mass/1000, 'particle')
 
 # widths (in GeV)
 GammaB = Constant(particles.B_plus.width/1000, 'particle')
@@ -153,6 +161,12 @@ GammaDplus = Constant(particles.D_plus.width/1000, 'particle')
 GammaDs = Constant(particles.D_s_plus.width/1000, 'particle')
 Gammatau = Constant(particles.tau_minus.width/1000, 'particle')
 Gammamu = Constant(particles.mu_minus.width/1000, 'particle')
+GammaSigma0 = Constant(particles.Sigma_0.width/1000, 'particle')
+GammaSigma_plus = Constant(particles.Sigma_plus.width/1000, 'particle')
+GammaSigma_minus = Constant(particles.Sigma_minus.width/1000, 'particle')
+GammaLambda = Constant(particles.Lambda.width/1000, 'particle')
+GammaXi0 = Constant(particles.Xi_0.width/1000, 'particle')
+GammaXi_minus = Constant(particles.Xi_minus.width/1000, 'particle')
 
 # Mixing angle
 theta_eta_etap = Constant(-14.1/180*np.pi, 'Christ:2010dd')
@@ -246,3 +260,8 @@ O2_D0 = Constant(-0.1561, 'Bazavov:2017weg') #GeV^4
 O3_D0 = Constant(0.0464, 'Bazavov:2017weg') #GeV^4
 O4_D0 = Constant(0.2747, 'Bazavov:2017weg') #GeV^4
 O5_D0 = Constant(0.1035, 'Bazavov:2017weg') #GeV^4
+
+# Baryon ChiPT constants
+Deltau_U3 = Constant(0.832, 'Alexandrou:2024ozj')
+Deltad_U3 = Constant(-0.417, 'Alexandrou:2024ozj')
+Deltas_U3 = Constant(-0.037, 'Alexandrou:2024ozj')
