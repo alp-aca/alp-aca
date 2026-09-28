@@ -74,7 +74,7 @@ def decay_width_2gamma(ma: float, couplings: ALPcouplings, fa: float, **kwargs) 
         pQCD = sum(charges[i]**2*coups[i]*B1(4*masses[i]**2/ma**2) for i in range(3))*3 + cgamma_twoloops(ma, couplings, fa)
         vmd = cgamma_VMD(ma, couplings, fa, **kwargs)
         interp = -ma + 2.5
-        cgamma_eff += interp*vmd - (1-interp)*pQCD
+        cgamma_eff += interp*vmd + (1-interp)*pQCD
     elif ma > metap:
         cgamma_eff += cgamma_VMD(ma, couplings, fa, **kwargs)
     else:
