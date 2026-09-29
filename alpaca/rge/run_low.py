@@ -68,7 +68,7 @@ def run_leadinglog(couplings: ALPcouplings, scale_out: float) -> ALPcouplings:
         Final energy scale, in GeV
     """
 
-    result = couplings + beta(couplings) * np.log(scale_out/couplings.scale)
+    result = couplings + beta(couplings) * np.log(scale_out/couplings.scale)/(16*np.pi**2)
     result.scale = scale_out
     return result
 
