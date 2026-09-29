@@ -21,7 +21,7 @@ def cgamma_VMD(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float
     if ma > 3.0:
         return 0
     a = a_U3_repr(ma, couplings, fa, **kwargs)
-    return ffunction(ma)*(3*np.trace(a @ u3reprs.rho0 @ u3reprs.rho0) + 1/3*np.trace(a @ u3reprs.omega @ u3reprs.omega) + 2/3*np.trace(a @ u3reprs.phi @ u3reprs.phi) + 2*np.trace(a @ u3reprs.rho0 @ u3reprs.omega))*fa/fpi
+    return -2*np.sqrt(2)*ffunction(ma)*(3*np.trace(a @ u3reprs.rho0 @ u3reprs.rho0) + 1/3*np.trace(a @ u3reprs.omega @ u3reprs.omega) + 2/3*np.trace(a @ u3reprs.phi @ u3reprs.phi) + 2*np.trace(a @ u3reprs.rho0 @ u3reprs.omega))*fa/fpi
 
 def cgamma_twoloops(ma: float, couplings: ALPcouplings, fa: float) -> float:
     citations.register_inspire('Bauer:2017ris')
