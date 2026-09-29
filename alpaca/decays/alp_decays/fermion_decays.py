@@ -69,6 +69,6 @@ def decay_width_etau(ma, couplings: ALPcouplings, fa,**kwargs):
         cA = cc['ceA'][0,2]
     else:
         cc = couplings.match_run(ma, 'derivative_above', **kwargs)
-        cV = cc['clL'][0,2]-cc['clL'][0,2]
-        cA = cc['clL'][0,2]+cc['clL'][0,2]
+        cV = cc['clL'][0,2]-cc['clL'][2,0]
+        cA = cc['clL'][0,2]+cc['clL'][2,0]
     return dw_lfv(ma, fa, cV, cA, mtau, me)
