@@ -104,6 +104,7 @@ def offshellphoton(couplings: ALPcouplings, ma: float, s: float) -> complex:
     return ceff
 
 def effcoupling_baryons_A(couplings: ALPcouplings, ma: float, b1: str, b2: str, **kwargs):
+    citations.register_baryons()
     sbtilde = kwargs.get('sbtilde', 0)
     mu_scale = kwargs.get('mu_pQCD_baryons', 1.9)
     ff_spline = kwargs.get('formfactors_baryons_spline', False)
@@ -140,6 +141,7 @@ def effcoupling_baryons_A(couplings: ALPcouplings, ma: float, b1: str, b2: str, 
     return (-(DB + FB) * np.trace(lambda1 @ mix_shift @ lambda2) - (DB - FB) * np.trace(lambda1 @ lambda2 @ mix_shift) - (SB + sbtilde) * np.trace(lambda1 @ lambda2) * np.trace(mix_shift)) - sbtilde * np.trace(lambda1 @ lambda2) * cGA(couplings_scaled_dX)
 
 def effcoupling_baryons_V(couplings: ALPcouplings, ma: float, b1: str, b2: str, **kwargs):
+    citations.register_baryons()
     mu_scale = kwargs.get('mu_pQCD_baryons', 1.9)
     ff_spline = kwargs.get('formfactors_baryons_spline', False)
     kwargs = {k: v for k, v in kwargs.items() if k not in ['mu_pQCD_baryons', 'formfactors_baryons_spline']}

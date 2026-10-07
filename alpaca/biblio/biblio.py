@@ -44,6 +44,15 @@ class Citations:
         self.register_bibtex('particle', bibtex)
         self.register_inspire('ParticleDataGroup:2024cfk')
 
+    def register_baryons(self):
+        bibtex = r"""@article{Alda:baryons,
+    author = {Alda, Jorge and Rigolin, Stefano},
+    title = {{ALP interactions with mesons and baryons at O(1/fa): a general field redefinition invariant approach}},
+    year = {2026},
+    journal = {To be published}
+}"""
+        self.register_bibtex('baryons', bibtex)
+
     def inspires_ids(self):
         return list(self.citations)
     
@@ -161,6 +170,8 @@ class Constant(float):
             citations.register_inspire('Straub:2018kue')
         elif self.source == 'particle':
             citations.register_particle()
+        elif self.source == 'Alda:baryons':
+            citations.register_baryons()
         else:
             citations.register_inspire(self.source)
 
