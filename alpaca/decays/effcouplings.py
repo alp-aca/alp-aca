@@ -8,7 +8,7 @@ from ..common import g_photonloop, alpha_em, alpha_s, B3
 from ..biblio.biblio import citations
 from ..chiPT.pseudoscalar_diag import mixing_shift, cGA, cqV
 from ..chiPT.u3reprs import baryons
-from ..chiPT.formfactors import ff_BrodskyLepage
+from ..chiPT.formfactors import ff_BrodskyLepage, ff_BrodskyLepage_spline
 from .particles import particle_aliases
 
 def effcoupling_ff(ma, couplings: ALPcouplings, fermion, **kwargs):
@@ -106,7 +106,8 @@ def offshellphoton(couplings: ALPcouplings, ma: float, s: float) -> complex:
 def effcoupling_baryons_A(couplings: ALPcouplings, ma: float, b1: str, b2: str, **kwargs):
     sbtilde = kwargs.get('sbtilde', 0)
     mu_scale = kwargs.get('mu_pQCD_baryons', 1.9)
-    kwargs = {k: v for k, v in kwargs.items() if k not in ['sbtilde', 'mu_pQCD_baryons']}
+    ff_spline = kwargs.get('formfactors_baryons_spline', False)
+    kwargs = {k: v for k, v in kwargs.items() if k not in ['sbtilde', 'mu_pQCD_baryons', 'formfactors_baryons_spline']}
     couplings = couplings.match_run(ma, 'VA_below', **kwargs)
     DB = (Deltau_U3 - 2*Deltad_U3 + Deltas_U3)/2
     FB = (Deltau_U3 - Deltas_U3)/2
@@ -114,16 +115,25 @@ def effcoupling_baryons_A(couplings: ALPcouplings, ma: float, b1: str, b2: str, 
     lambda1 = baryons[b1].T
     lambda2 = baryons[b2]
 
+    if ff_spline:
+        ff_cqA = ff_BrodskyLepage_spline(exp_alpha=2, exp_scale=1, mu_pQCD=mu_scale)
+        ff_cG_umu = ff_BrodskyLepage_spline(exp_alpha=3, exp_scale=1, mu_pQCD=mu_scale)
+        ff_cG_dX = ff_BrodskyLepage_spline(exp_alpha=3, exp_scale=2, mu_pQCD=mu_scale)
+    else:
+        ff_cqA = lambda ma: ff_BrodskyLepage(ma, 2, 1, mu_pQCD=mu_scale)
+        ff_cG_umu = lambda ma: ff_BrodskyLepage(ma, 3, 1, mu_pQCD=mu_scale)
+        ff_cG_dX = lambda ma: ff_BrodskyLepage(ma, 3, 2, mu_pQCD=mu_scale)
+
     couplings_scaled_umu = ALPcouplings({
-        'cG': couplings['cG'] * ff_BrodskyLepage(ma, 3, 1, mu_pQCD=mu_scale),
-        'cuA': couplings['cuA'] * ff_BrodskyLepage(ma, 2, 1, mu_pQCD=mu_scale),
-        'cdA': couplings['cdA'] * ff_BrodskyLepage(ma, 2, 1, mu_pQCD=mu_scale),
+        'cG': couplings['cG'] * ff_cG_umu(ma),
+        'cuA': couplings['cuA'] * ff_cqA(ma),
+        'cdA': couplings['cdA'] * ff_cqA(ma),
     }, couplings.scale, couplings.basis, couplings.ew_scale)
 
     couplings_scaled_dX = ALPcouplings({
-        'cG': couplings['cG'] * ff_BrodskyLepage(ma, 3, 2, mu_pQCD=mu_scale),
-        'cuA': couplings['cuA'] * ff_BrodskyLepage(ma, 2, 1, mu_pQCD=mu_scale),
-        'cdA': couplings['cdA'] * ff_BrodskyLepage(ma, 2, 1, mu_pQCD=mu_scale),
+        'cG': couplings['cG'] * ff_cG_dX(ma),
+        'cuA': couplings['cuA'] * ff_cqA(ma),
+        'cdA': couplings['cdA'] * ff_cqA(ma),
     }, couplings.scale, couplings.basis, couplings.ew_scale)
 
     mix_shift = mixing_shift(couplings_scaled_umu, ma) # \mathbb{M}_a^{-1}(\mathcal{C})
@@ -131,12 +141,17 @@ def effcoupling_baryons_A(couplings: ALPcouplings, ma: float, b1: str, b2: str, 
 
 def effcoupling_baryons_V(couplings: ALPcouplings, ma: float, b1: str, b2: str, **kwargs):
     mu_scale = kwargs.get('mu_pQCD_baryons', 1.9)
-    kwargs = {k: v for k, v in kwargs.items() if k != 'mu_pQCD_baryons'}
+    ff_spline = kwargs.get('formfactors_baryons_spline', False)
+    kwargs = {k: v for k, v in kwargs.items() if k not in ['mu_pQCD_baryons', 'formfactors_baryons_spline']}
     couplings = couplings.match_run(ma, 'VA_below', **kwargs)
     cqV_matrix = cqV(couplings)
     lambda1 = baryons[b1].T
     lambda2 = baryons[b2]
-    return - np.trace(cqV_matrix @ lambda1 @ lambda2 - cqV_matrix @ lambda2 @ lambda1) * ff_BrodskyLepage(ma, 2, 2, mu_pQCD=mu_scale)
+    if ff_spline:
+        ff = ff_BrodskyLepage_spline(exp_alpha=2, exp_scale=2, mu_pQCD=mu_scale)
+    else:
+        ff = lambda ma: ff_BrodskyLepage(ma, 2, 2, mu_pQCD=mu_scale)
+    return - np.trace(cqV_matrix @ lambda1 @ lambda2 - cqV_matrix @ lambda2 @ lambda1) * ff(ma)
 
 @np.vectorize
 def _effective_coupling(ma: float, couplings: ALPcouplings, particles: str, chirality: str, **kwargs):
