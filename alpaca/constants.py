@@ -265,3 +265,4 @@ O5_D0 = Constant(0.1035, 'Bazavov:2017weg') #GeV^4
 Deltau_U3 = Constant(0.832, 'Alexandrou:2024ozj')
 Deltad_U3 = Constant(-0.417, 'Alexandrou:2024ozj')
 Deltas_U3 = Constant(-0.037, 'Alexandrou:2024ozj')
+sbtilde_baryons = Constant(0.025, 'Alda:baryons')

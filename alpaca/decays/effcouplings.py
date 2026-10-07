@@ -2,7 +2,7 @@ from ..rge import ALPcouplings
 from ..rge.runSM import runSM
 from ..common import B0disc_equalmass, ckm_xi, alpha_s
 from ..constants import GF, mu, md, ms, mc, mb, me, mmu, mtau, s2w, mW, mZ, mt
-from ..constants import Deltau_U3, Deltad_U3, Deltas_U3
+from ..constants import Deltau_U3, Deltad_U3, Deltas_U3, sbtilde_baryons
 import numpy as np
 from ..common import g_photonloop, alpha_em, alpha_s, B3
 from ..biblio.biblio import citations
@@ -105,7 +105,7 @@ def offshellphoton(couplings: ALPcouplings, ma: float, s: float) -> complex:
 
 def effcoupling_baryons_A(couplings: ALPcouplings, ma: float, b1: str, b2: str, **kwargs):
     citations.register_baryons()
-    sbtilde = kwargs.get('sbtilde', 0)
+    sbtilde = kwargs.get('sbtilde', sbtilde_baryons)
     mu_scale = kwargs.get('mu_pQCD_baryons', 1.9)
     ff_spline = kwargs.get('formfactors_baryons_spline', False)
     kwargs = {k: v for k, v in kwargs.items() if k not in ['sbtilde', 'mu_pQCD_baryons', 'formfactors_baryons_spline']}
