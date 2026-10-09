@@ -112,7 +112,7 @@ def effcoupling_baryons_A(couplings: ALPcouplings, ma: float, b1: str, b2: str, 
     couplings = couplings.match_run(ma, 'VA_below', **kwargs)
     DB = (Deltau_U3 - 2*Deltad_U3 + Deltas_U3)/2
     FB = (Deltau_U3 - Deltas_U3)/2
-    SB = Deltad_U3 - sbtilde
+    SB = Deltad_U3
     lambda1 = baryons[b1].T
     lambda2 = baryons[b2]
 
