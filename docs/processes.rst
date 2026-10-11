@@ -15,3 +15,5 @@ Functions
 .. autofunction:: alpaca.alp_channels_branching_ratios
 
 .. autofunction:: alpaca.alp_channels_decay_widths
+
+.. autofunction:: alpaca.effective_coupling
