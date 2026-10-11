@@ -1,6 +1,6 @@
 # ALP-aca
 
-[![Version](https://img.shields.io/badge/version-1.1.0-teal?logo=GitHub)](https://github.com/alp-aca/alp-aca/tree/v1.1.0)
+[![Version](https://img.shields.io/badge/version-1.2.0-teal?logo=GitHub)](https://github.com/alp-aca/alp-aca/tree/v1.2.0)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16447036.svg)](https://doi.org/10.5281/zenodo.16447036) [![arxiv](https://img.shields.io/badge/arXiv-2508.08354_[hep--ph]-B31B1B.svg?style=flat&logo=arxiv&logoColor=B31B1B)](https://arxiv.org/abs/2508.08354)
 
 Welcome to the ALP Automated Computed Algorithm (ALP-aca)!
@@ -41,7 +41,12 @@ ALP-aca has been used in the following publications:
 
 * M. Fuentes Zamoro, J. Alda, L. Merlo, X. Ponce Diaz, S. Rigolin: *Tackling ALP searches in meson decays with ALPaca: a phenomenological approach*. [PoS(COSMICWISPers2025) (2026) 057](https://pos.sissa.it/507/057)
 
-* J. Alda: *Lecture notes on Machine Learning applications for global fits*. [arXiv:2604.07520](https://arxiv.org/abs/2604.07520)
+* J. Alda: *Lecture notes on Machine Learning applications for global fits*. [arXiv:2604.07520](https://arxiv.org/abs/2604.07520) SciPost Phys.Lect.Notes 135 (2026) 1.
+
+* J. Alda, J. Asorey, A. Mir, S. Peñaranda, *Physically Consistent Parameter Inference: Transparent Machine-Learning Emulation in High Energy Physics and Cosmology*. [arXiv:2607.12726](https://arxiv.org/abs/2607.12726), Universe 12 (2026) 8, 238.
+
+* J. Alda, S. Rigolin, *ALP interactions with mesons and baryons at $\mathcal{O}(1/f_a)$ a general
+field redefinition invariant approach*
 
 If you have used ALP-aca in your publication and want to be featured in this list, please [contact us](https://github.com/alp-aca/alp-aca/issues/new?template=publication-using-alpaca.md).
 
@@ -134,6 +139,7 @@ If you use ALP-aca, please cite
 The ALPaca manual for v1.0.0 is available on [arXiv](https://arxiv.org/abs/2508.08354). For newer versions, check the changelogs:
 
 * [v1.1.0 (31 October 2025)](https://github.com/alp-aca/alp-aca/blob/main/changelogs/v1-1.md)
+* [v1.2.0 (11 October 2026)](https://github.com/alp-aca/alp-aca/blob/main/changelogs/v1-2.md)
 
 You can also check the [automatically-generated documentation](https://alpaca-alps.readthedocs.io/latest/).
 
