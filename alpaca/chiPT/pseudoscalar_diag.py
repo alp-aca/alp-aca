@@ -89,7 +89,7 @@ class FitResults:
         if self.initialized:
             return
         self.initialized = True
-        citations.register_baryons()
+        citations.register_inspire('Alda:2026nrd')
         current_path = os.path.dirname(__file__)
         fit_res = gvar.load(os.path.join(current_path, 'mesonfit.pickle'))
 
@@ -130,7 +130,7 @@ class FitResults:
 fit_results = FitResults()
 
 def cqA(couplings: ALPcouplings):
-    citations.register_baryons()
+    citations.register_inspire('Alda:2026nrd')
     couplings = couplings.translate('VA_below')
     cuA = couplings['cuA']
     cdA = couplings['cdA']
@@ -138,7 +138,7 @@ def cqA(couplings: ALPcouplings):
     return cqA
 
 def cqV(couplings: ALPcouplings):
-    citations.register_baryons()
+    citations.register_inspire('Alda:2026nrd')
     couplings = couplings.translate('VA_below')
     cuV = couplings['cuV']
     cdV = couplings['cdV']
@@ -146,13 +146,13 @@ def cqV(couplings: ALPcouplings):
     return cqV
 
 def cGA(couplings: ALPcouplings):
-    citations.register_baryons()
+    citations.register_inspire('Alda:2026nrd')
     couplings = couplings.translate('VA_below')
     cqA_matrix = cqA(couplings)
     return couplings['cG'] + np.trace(cqA_matrix)
 
 def coupling_mixing(couplings: ALPcouplings):
-    citations.register_baryons()
+    citations.register_inspire('Alda:2026nrd')
     # \mathcal{C} in the paper (when no pseudoscalar couplings are present) 
     anticomm = lambda A, B: A @ B + B @ A
     cqA_matrix = cqA(couplings)
@@ -160,7 +160,7 @@ def coupling_mixing(couplings: ALPcouplings):
 
 def mixing_shift(couplings: ALPcouplings, ma: float):
     # This is \mathbb{M}_a^{-1}(C)
-    citations.register_baryons()
+    citations.register_inspire('Alda:2026nrd')
     C = coupling_mixing(couplings)
     B0mq = fit_results['B0mq']
     m02 = fit_results['m02']

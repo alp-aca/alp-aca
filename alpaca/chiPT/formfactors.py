@@ -42,7 +42,10 @@ class ff_BrodskyLepage_spline:
         self.exp_scale = exp_scale
 
     def __call__(self, ma):
-        citations.register_baryons()
+        citations.register_inspire('Alda:2026nrd')
+        citations.register_inspire('Brodsky:1974vy')
+        citations.register_inspire('Lepage:1980fj')
+        citations.register_inspire('Brodsky:1980sx')
         if ma < 0.4 * self.matching_scale:
             return 1.0
         elif ma > 2.5 * self.matching_scale:

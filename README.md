@@ -46,7 +46,7 @@ ALP-aca has been used in the following publications:
 * J. Alda, J. Asorey, A. Mir, S. Peñaranda, *Physically Consistent Parameter Inference: Transparent Machine-Learning Emulation in High Energy Physics and Cosmology*. [arXiv:2607.12726](https://arxiv.org/abs/2607.12726), Universe 12 (2026) 8, 238.
 
 * J. Alda, S. Rigolin, *ALP interactions with mesons and baryons at $\mathcal{O}(1/f_a)$ a general
-field redefinition invariant approach*
+field redefinition invariant approach* [arXiv:2610.13671](https://arxiv.org/abs/2610.13671)
 
 If you have used ALP-aca in your publication and want to be featured in this list, please [contact us](https://github.com/alp-aca/alp-aca/issues/new?template=publication-using-alpaca.md).
 
