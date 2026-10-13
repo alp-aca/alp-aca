@@ -57,7 +57,9 @@ class DMMajorana(DMCandidate):
 
     def decay_width(self, ma: float, fa: float) -> float:
         # Decay width for Majorana DM candidate
-        return np.abs(self.coupling)**2 * self.mass**2 * ma / (8 * np.pi * fa**2) * np.sqrt(1 - (2*ma/self.mass)**2)
+        if ma < self.mass * 2:
+            return 0.0
+        return np.abs(self.coupling)**2 * self.mass**2 * ma / (8 * np.pi * fa**2) * np.sqrt(1 - (2*self.mass/ma)**2)
     
     def __repr__(self) -> str:
         return f"DMMajorana(mass={self.mass}, coupling={self.coupling})"

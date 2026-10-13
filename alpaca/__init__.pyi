@@ -31,4 +31,5 @@ from . import(
     plotting as plotting,
     benchmarks as benchmarks,
     export as export,
+    dm as dm,
 )
