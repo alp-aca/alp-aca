@@ -59,6 +59,9 @@ ALPaca has been used in the following publications:
 
 - J. Alda, M. Fuentes Zamoro, L. Merlo, X. Ponce Díaz, S. Rigolin:
   *Comprehensive ALP searches in Meson Decays* `arXiv:2507.19578 [hep-ph] <https://arxiv.org/abs/2507.19578>`__.
+- J. Alda: *Lecture notes on Machine Learning applications for global fits*. `[arXiv:2604.07520] <https://arxiv.org/abs/2604.07520>`__ SciPost Phys.Lect.Notes 135 (2026) 1.
+- J. Alda, J. Asorey, A. Mir, S. Peñaranda, *Physically Consistent Parameter Inference: Transparent Machine-Learning Emulation in High Energy Physics and Cosmology*. `[arXiv:2607.12726] <https://arxiv.org/abs/2607.12726>`__, Universe 12 (2026) 8, 238.
+- J. Alda, S. Rigolin, *ALP interactions with mesons and baryons at O(1/fa): a general field redefinition invariant approach*  
 
 If you have used ALPaca in your publication and want to be featured in
 this list, please `contact

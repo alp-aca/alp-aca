@@ -1,22 +1,27 @@
 from ..rge import ALPcouplings
 from ..rge.runSM import runSM
-from ..common import B0disc_equalmass, ckm_xi
-from ..constants import GF, mu, md, ms, mc, mb, me, mmu, mtau, s2w, mW, mZ
+from ..common import B0disc_equalmass, ckm_xi, alpha_s
+from ..constants import GF, mu, md, ms, mc, mb, me, mmu, mtau, s2w, mW, mZ, mt
+from ..constants import Deltau_U3, Deltad_U3, Deltas_U3, sbtilde_baryons
 import numpy as np
 from ..common import g_photonloop, alpha_em, alpha_s, B3
 from ..biblio.biblio import citations
+from ..chiPT.pseudoscalar_diag import mixing_shift, cGA, cqV
+from ..chiPT.u3reprs import baryons
+from ..chiPT.formfactors import ff_BrodskyLepage, ff_BrodskyLepage_spline
+from .particles import particle_aliases
 
 def effcoupling_ff(ma, couplings: ALPcouplings, fermion, **kwargs):
-    mass = {'e': me, 'mu': mmu, 'tau': mtau, 'c': mc, 'b': mb}[fermion]
-    ftype = {'e': 'e', 'mu': 'e', 'tau': 'e', 'c': 'u', 'b': 'd'}[fermion]
-    Nc = {'e': 1, 'mu': 1, 'tau': 1, 'c': 3, 'b': 3}[fermion]
-    gen = {'e': 0, 'mu': 1, 'tau': 2, 'c': 1, 'b': 2}[fermion]
-    qf = {'e': -1, 'mu': -1, 'tau': -1, 'c': 2/3, 'b': -1/3}[fermion]
-    t3f = {'e': -0.5, 'mu': -0.5, 'tau': -0.5, 'c': 0.5, 'b': -0.5}[fermion]
+    mass = {'e': me, 'mu': mmu, 'tau': mtau, 'u': mu, 'd': md, 's': ms, 'c': mc, 'b': mb, 't': mt}[fermion]
+    ftype = {'e': 'e', 'mu': 'e', 'tau': 'e', 'u': 'u', 'd': 'd', 's': 'd', 'c': 'u', 'b': 'd', 't': 'u'}[fermion]
+    Nc = {'e': 1, 'mu': 1, 'tau': 1, 'u': 3, 'd': 3, 's': 3, 'c': 3, 'b': 3, 't': 3}[fermion]
+    gen = {'e': 0, 'mu': 1, 'tau': 2, 'u': 0, 'd': 0, 's': 1, 'c': 1, 'b': 2, 't': 2}[fermion]
+    qf = {'e': -1, 'mu': -1, 'tau': -1, 'u': 2/3, 'd': -1/3, 's': -1/3, 'c': 2/3, 'b': -1/3, 't': 2/3}[fermion]
+    t3f = {'e': -0.5, 'mu': -0.5, 'tau': -0.5, 'u': 0.5, 'd': -0.5, 's': -0.5, 'c': 0.5, 'b': -0.5, 't': 0.5}[fermion]
     delta1 = -11/3
-    aem = alpha_em(mass**2)/4/np.pi
+    aem = alpha_em(mass)/4/np.pi
     if Nc == 3:
-        a_s = alpha_s(mass**2)/4/np.pi
+        a_s = alpha_s(mass)/4/np.pi
     else:
         a_s = 0
     if ma < couplings.ew_scale:
@@ -79,6 +84,8 @@ def effcouplings_cq1q2_W(couplings: ALPcouplings, pa2: float, q1: str, q2: str) 
         for iq, qloop in enumerate(['u', 'c']):
             cqloop = couplings['cuL'][iq, iq] - couplings['cuR'][iq, iq]
             ceff += GF/np.sqrt(2)/np.pi**2*ckm_xi(qloop, q1+q2) * cqloop * mq[qloop]**2 * (1 + B0disc_equalmass(pa2, mq[qloop]) + np.log(couplings.scale**2/mq[qloop]**2))
+    else:
+        raise ValueError(f"Invalid quark flavors {q1} and {q2}.")
     return ceff
 
 def offshellphoton(couplings: ALPcouplings, ma: float, s: float) -> complex:
@@ -95,3 +102,132 @@ def offshellphoton(couplings: ALPcouplings, ma: float, s: float) -> complex:
     for i, mdq in enumerate([md, ms, mb]):
         ceff += 3 * (-1/3)**2 * couplings['cdA'][i,i] * B3(4*mdq**2/ma**2, 4*mdq**2/s)
     return ceff
+
+def effcoupling_baryons_A(couplings: ALPcouplings, ma: float, b1: str, b2: str, **kwargs):
+    citations.register_inspire('Alda:2026nrd')
+    sbtilde = kwargs.get('sbtilde', sbtilde_baryons)
+    mu_scale = kwargs.get('mu_pQCD_baryons', 1.9)
+    ff_spline = kwargs.get('formfactors_baryons_spline', False)
+    kwargs = {k: v for k, v in kwargs.items() if k not in ['sbtilde', 'mu_pQCD_baryons', 'formfactors_baryons_spline']}
+    couplings = couplings.match_run(ma, 'VA_below', **kwargs)
+    DB = (Deltau_U3 - 2*Deltad_U3 + Deltas_U3)/2
+    FB = (Deltau_U3 - Deltas_U3)/2
+    SB = Deltad_U3
+    lambda1 = baryons[b1].T
+    lambda2 = baryons[b2]
+
+    if ff_spline:
+        ff_cqA = ff_BrodskyLepage_spline(exp_alpha=2, exp_scale=1, mu_pQCD=mu_scale)
+        ff_cG_umu = ff_BrodskyLepage_spline(exp_alpha=3, exp_scale=1, mu_pQCD=mu_scale)
+        ff_cG_dX = ff_BrodskyLepage_spline(exp_alpha=3, exp_scale=2, mu_pQCD=mu_scale)
+    else:
+        ff_cqA = lambda ma: ff_BrodskyLepage(ma, 2, 1, mu_pQCD=mu_scale)
+        ff_cG_umu = lambda ma: ff_BrodskyLepage(ma, 3, 1, mu_pQCD=mu_scale)
+        ff_cG_dX = lambda ma: ff_BrodskyLepage(ma, 3, 2, mu_pQCD=mu_scale)
+
+    couplings_scaled_umu = ALPcouplings({
+        'cG': couplings['cG'] * ff_cG_umu(ma),
+        'cuA': couplings['cuA'] * ff_cqA(ma),
+        'cdA': couplings['cdA'] * ff_cqA(ma),
+    }, couplings.scale, couplings.basis, couplings.ew_scale)
+
+    couplings_scaled_dX = ALPcouplings({
+        'cG': couplings['cG'] * ff_cG_dX(ma),
+        'cuA': couplings['cuA'] * ff_cqA(ma),
+        'cdA': couplings['cdA'] * ff_cqA(ma),
+    }, couplings.scale, couplings.basis, couplings.ew_scale)
+
+    mix_shift = mixing_shift(couplings_scaled_umu, ma) # \mathbb{M}_a^{-1}(\mathcal{C})
+    return (-(DB + FB) * np.trace(lambda1 @ mix_shift @ lambda2) - (DB - FB) * np.trace(lambda1 @ lambda2 @ mix_shift) - (SB + sbtilde) * np.trace(lambda1 @ lambda2) * np.trace(mix_shift)) - sbtilde * np.trace(lambda1 @ lambda2) * cGA(couplings_scaled_dX)
+
+def effcoupling_baryons_V(couplings: ALPcouplings, ma: float, b1: str, b2: str, **kwargs):
+    citations.register_inspire('Alda:2026nrd')
+    mu_scale = kwargs.get('mu_pQCD_baryons', 1.9)
+    ff_spline = kwargs.get('formfactors_baryons_spline', False)
+    kwargs = {k: v for k, v in kwargs.items() if k not in ['mu_pQCD_baryons', 'formfactors_baryons_spline']}
+    couplings = couplings.match_run(ma, 'VA_below', **kwargs)
+    cqV_matrix = cqV(couplings)
+    lambda1 = baryons[b1].T
+    lambda2 = baryons[b2]
+    if ff_spline:
+        ff = ff_BrodskyLepage_spline(exp_alpha=2, exp_scale=2, mu_pQCD=mu_scale)
+    else:
+        ff = lambda ma: ff_BrodskyLepage(ma, 2, 2, mu_pQCD=mu_scale)
+    return - np.trace(cqV_matrix @ lambda1 @ lambda2 - cqV_matrix @ lambda2 @ lambda1) * ff(ma)
+
+@np.vectorize
+def _effective_coupling(ma: float, couplings: ALPcouplings, particles: str, chirality: str, **kwargs):
+    particles = particles.split()
+    if len(particles) == 2:
+        p1, p2 = particles
+        if particle_aliases[p1] in ['proton', 'neutron', 'Sigma0', 'Sigma+', 'Sigma-', 'Lambda', 'Xi0', 'Xi-'] and particle_aliases[p2] in ['proton', 'neutron', 'Sigma0', 'Sigma+', 'Sigma-', 'Lambda', 'Xi0', 'Xi-']:
+            if chirality == 'A':
+                return effcoupling_baryons_A(couplings, ma, particle_aliases[p1], particle_aliases[p2], **kwargs)
+            elif chirality == 'V':
+                return effcoupling_baryons_V(couplings, ma, particle_aliases[p1], particle_aliases[p2], **kwargs)
+            elif chirality == 'R':
+                return 0.5 * (effcoupling_baryons_A(couplings, ma, particle_aliases[p1], particle_aliases[p2], **kwargs) + effcoupling_baryons_V(couplings, ma, particle_aliases[p1], particle_aliases[p2], **kwargs))
+            elif chirality == 'L':
+                return 0.5 * (effcoupling_baryons_A(couplings, ma, particle_aliases[p1], particle_aliases[p2], **kwargs) + effcoupling_baryons_V(couplings, ma, particle_aliases[p1], particle_aliases[p2], **kwargs))
+            else:
+                raise ValueError(f"Invalid chirality {chirality}.")
+        if particle_aliases[p1] == particle_aliases[p2]:
+            if particle_aliases[p1] in ['e', 'mu', 'tau', 'u', 'd', 's', 'c', 'b', 't']:
+                ceff = effcoupling_ff(ma, couplings, particle_aliases[p1], **kwargs)
+                if chirality == 'A':
+                    return ceff
+                elif chirality == 'V':
+                    return 0
+                elif chirality == 'R':
+                    return 0.5 * ceff
+                elif chirality == 'L':
+                    return 0.5 * ceff
+                else:
+                    raise ValueError(f"Invalid chirality {chirality}.")
+        if particle_aliases[p1] in ['d', 's', 'b'] and particle_aliases[p2] in ['d', 's', 'b']:
+            flavours = {'d': 0, 's': 1, 'b': 2}
+            if chirality == 'R':
+                return couplings.translate('RL_below')['cdR'][flavours[particle_aliases[p1]], flavours[particle_aliases[p2]]]
+            delta_cL = effcouplings_cq1q2_W(couplings, ma**2, particle_aliases[p1], particle_aliases[p2])
+            if chirality == 'L':
+                return couplings.translate('RL_below')['cdL'][flavours[particle_aliases[p1]], flavours[particle_aliases[p2]]] + delta_cL
+            if chirality == 'A':
+                return couplings.translate('VA_below')['cdA'][flavours[particle_aliases[p1]], flavours[particle_aliases[p2]]] + delta_cL
+            if chirality == 'V':
+                return couplings.translate('VA_below')['cdV'][flavours[particle_aliases[p1]], flavours[particle_aliases[p2]]] + delta_cL
+        if particle_aliases[p1] in ['u', 'c'] and particle_aliases[p2] in ['u', 'c']:
+            flavours = {'u': 0, 'c': 1}
+            if chirality == 'R':
+                return couplings.translate('RL_below')['cuR'][flavours[particle_aliases[p1]], flavours[particle_aliases[p2]]]
+            delta_cL = effcouplings_cq1q2_W(couplings, ma**2, particle_aliases[p1], particle_aliases[p2])
+            if chirality == 'L':
+                return couplings.translate('RL_below')['cuL'][flavours[particle_aliases[p1]], flavours[particle_aliases[p2]]] + delta_cL
+            if chirality == 'A':
+                return couplings.translate('VA_below')['cuA'][flavours[particle_aliases[p1]], flavours[particle_aliases[p2]]] + delta_cL
+            if chirality == 'V':
+                return couplings.translate('VA_below')['cuV'][flavours[particle_aliases[p1]], flavours[particle_aliases[p2]]] - delta_cL
+    raise ValueError(f"Invalid particles {particles}.")
+
+def effective_coupling(ma: float, couplings: ALPcouplings, particles: str, chirality: str = '', **kwargs):
+    """
+    Effective coupling for given particles and chirality.
+
+    Parameters
+    ----------
+    ma : float
+        ALP mass.
+    couplings : ALPcouplings
+        ALP couplings.
+    particles : str
+        Particle names.
+    chirality : str, optional
+        Chirality ('A', 'V', 'R', 'L'), by default ''.
+    **kwargs
+        Additional keyword arguments.
+
+    Returns
+    -------
+    float
+        Effective coupling.
+    """
+    return _effective_coupling(ma, couplings, particles, chirality, **kwargs)

@@ -5,6 +5,7 @@ from .hadronic_decays_def import decay_width_3pi000, decay_width_3pi0pm, decay_w
 from .gaugebosons import decay_width_2gamma, decay_width_2gluons
 from ...dm import DMCandidate, DMBranchingRatio
 from functools import cache
+from .baryons import dw_baryons, channels_baryons
 
 decay_channels =[
     ('electron', 'electron'),
@@ -31,12 +32,12 @@ decay_channels =[
     ('photon', 'photon'),
     ('hadrons',),
     ('dark',),
-]
+] + channels_baryons
 
 @cache
 def _total_decay_width (ma, couplings: ALPcouplings, fa, dark_matter: DMCandidate | None = None, **kwargs):
     if dark_matter is not None and isinstance(dark_matter, DMBranchingRatio) and dark_matter.coupling == 1.0:
-        return {'e': 0.0, 'mu': 0.0, 'tau': 0.0, 'charm': 0.0, 'bottom': 0.0, '3pis': 0.0, 'etapipi': 0.0, 'etappipi': 0.0, 'gammapipi': 0.0, '2omega': 0.0, 'gluongluon': 0.0, '2photons': 0.0, 'DW_SM': 0.0, 'DW_dark': 1e30, 'DW_tot': 1e30}
+        return {'e': 0.0, 'mu': 0.0, 'tau': 0.0, 'charm': 0.0, 'bottom': 0.0, '3pis': 0.0, 'etapipi': 0.0, 'etappipi': 0.0, 'gammapipi': 0.0, '2omega': 0.0, 'gluongluon': 0.0, '2photons': 0.0, 'DW_SM': 0.0, 'DW_dark': 1e30, 'DW_tot': 1e30} | {b[0] + b[1]: 0.0 for b in channels_baryons   }
     kwargs_nointegral = {k: v for k, v in kwargs.items() if k not in ['nitn_adapt', 'neval_adapt', 'nitn', 'neval', 'cores']}
     DW_elec = decay_width_electron(ma, couplings, fa, **kwargs_nointegral)
     DW_muon = decay_width_muon(ma, couplings, fa, **kwargs_nointegral)
@@ -63,10 +64,8 @@ def _total_decay_width (ma, couplings: ALPcouplings, fa, dark_matter: DMCandidat
     DWhadr_pert = DW_charm + DW_bottom + DW_gluongluon
     if (DWhadr_pert > DWhadr_nopert) and (ma > 1.4):
         DWhadr = DWhadr_pert
-        nopert = 0.0
     else:
         DWhadr = DWhadr_nopert
-        nopert = 1.0
     DW_sm = DW_elec+DW_muon+DW_tau+DW_2photons+DWhadr+DW_emu+DW_mutau+DW_etau
     if dark_matter is not None:
         if isinstance(dark_matter, DMBranchingRatio):
@@ -83,25 +82,27 @@ def _total_decay_width (ma, couplings: ALPcouplings, fa, dark_matter: DMCandidat
         'emu': DW_emu,
         'mutau': DW_mutau,
         'etau': DW_etau,
-        'charm': DW_charm * (1.0-nopert),
-        'bottom': DW_bottom * (1.0-nopert),
-        '3pis': DW_3pis * nopert,
-        'pi0pippim': DW_3pi0pm * nopert,
-        'pi0pi0pi0': DW_3pi000 * nopert,
-        'etapipi': DW_etapipi * nopert,
-        'etapi0pi0': DW_etapi0pi0 * nopert,
-        'etapippim': DW_etapippim * nopert,
-        'etappipi': DW_etappipi * nopert,
-        'etappi0pi0': DW_etappi0pi0 * nopert,
-        'etappippim': DW_etappippim * nopert,
-        'gammapipi': DW_gammapipi * nopert,
-        '2omega': DW_2w * nopert,
-        'gluongluon': DW_gluongluon * (1.0-nopert),
+        'charm': DW_charm,
+        'bottom': DW_bottom,
+        '3pis': DW_3pis,
+        'pi0pippim': DW_3pi0pm,
+        'pi0pi0pi0': DW_3pi000,
+        'etapipi': DW_etapipi,
+        'etapi0pi0': DW_etapi0pi0,
+        'etapippim': DW_etapippim,
+        'etappipi': DW_etappipi,
+        'etappi0pi0': DW_etappi0pi0,
+        'etappippim': DW_etappippim,
+        'gammapipi': DW_gammapipi,
+        '2omega': DW_2w,
+        'gluongluon': DW_gluongluon,
         '2photons': DW_2photons,
         'hadrons': DWhadr,
         'DW_SM': DW_sm,
         'DW_dark': DW_dark,
         'DW_tot': DW_sm + DW_dark
+        } | {
+            b[0] + b[1]: dw_baryons(ma, couplings, fa, b[0], b[1], **kwargs_nointegral) for b in channels_baryons
         }
     return DWs
 
@@ -190,5 +191,7 @@ def BRsalp(ma, couplings: ALPcouplings, fa, dark_matter: DMCandidate | None = No
         ('photon', 'photon'): DWs['2photons']/DWs['DW_tot'],
         ('hadrons',) :DWs['hadrons']/DWs['DW_tot'],
         ('dark',): DWs['DW_dark']/DWs['DW_tot'],
+        } | {
+            b: DWs[b[0]+b[1]]/DWs['DW_tot'] for b in channels_baryons
         }
     return BRs

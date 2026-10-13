@@ -502,6 +502,7 @@ class ALPcouplings:
             scipy_method: str = 'RK45',
             scipy_rtol: float = 1e-3,
             scipy_atol: float = 1e-6,
+            **kwargs
             ) -> 'ALPcouplings':
         from . import run_high, matching, run_low, symbolic
         if integrator == 'symbolic':
@@ -526,7 +527,7 @@ class ALPcouplings:
             if self.basis in bases_below and basis in bases_above:
                 raise ValueError(f'Attempting to run from {self.basis} below the EW scale to {basis} above the EW scale')
             raise ValueError(f'basis {basis} not recognized')
-        if scale_out > self.scale:
+        if scale_out > self.scale and (scale_out > self.ew_scale or self.scale > self.ew_scale):
             raise ValueError("The final scale must be smaller than the initial scale.")
         if scale_out == self.scale:
             return self.translate(basis)
@@ -542,7 +543,8 @@ class ALPcouplings:
             else:
                 raise KeyError(basis)
         if self.scale == self.ew_scale and self.basis in bases_above and basis in bases_below:
-                couplings_below = matching.match(self, match_tildecouplings)
+                couplings_ew = self.translate('massbasis_ew')
+                couplings_below = matching.match(couplings_ew, match_tildecouplings)
                 return couplings_below.match_run(scale_out, basis, integrator=integrator, beta=beta, scipy_method=scipy_method, scipy_rtol=scipy_rtol, scipy_atol=scipy_atol)
         if scale_out < self.ew_scale:
             if integrator == 'scipy':
@@ -567,7 +569,9 @@ class ALPcouplings:
             elif integrator == 'leadinglog':
                 return run_high.run_leadinglog(self, betafunc, scale_out).translate(basis)
             elif integrator == 'no_rge':
-                return ALPcouplings(self.values, scale_out, self.basis).translate(basis)
+                c = self.to_dict()
+                c['scale'] = scale_out
+                return ALPcouplings.from_dict(c).translate(basis)
             else:
                 raise KeyError(f'Integrator {integrator} not recognized')
         else:

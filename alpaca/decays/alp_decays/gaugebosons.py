@@ -21,7 +21,7 @@ def cgamma_VMD(ma: float, couplings: ALPcouplings, fa: float, **kwargs) -> float
     if ma > 3.0:
         return 0
     a = a_U3_repr(ma, couplings, fa, **kwargs)
-    return ffunction(ma)*(3*np.trace(a @ u3reprs.rho0 @ u3reprs.rho0) + 1/3*np.trace(a @ u3reprs.omega @ u3reprs.omega) + 2/3*np.trace(a @ u3reprs.phi @ u3reprs.phi) + 2*np.trace(a @ u3reprs.rho0 @ u3reprs.omega))*fa/fpi
+    return -2*np.sqrt(2)*ffunction(ma)*(3*np.trace(a @ u3reprs.rho0 @ u3reprs.rho0) + 1/3*np.trace(a @ u3reprs.omega @ u3reprs.omega) + 2/3*np.trace(a @ u3reprs.phi @ u3reprs.phi) + 2*np.trace(a @ u3reprs.rho0 @ u3reprs.omega))*fa/fpi
 
 def cgamma_twoloops(ma: float, couplings: ALPcouplings, fa: float) -> float:
     citations.register_inspire('Bauer:2017ris')
@@ -74,7 +74,7 @@ def decay_width_2gamma(ma: float, couplings: ALPcouplings, fa: float, **kwargs) 
         pQCD = sum(charges[i]**2*coups[i]*B1(4*masses[i]**2/ma**2) for i in range(3))*3 + cgamma_twoloops(ma, couplings, fa)
         vmd = cgamma_VMD(ma, couplings, fa, **kwargs)
         interp = -ma + 2.5
-        cgamma_eff += interp*vmd - (1-interp)*pQCD
+        cgamma_eff += interp*vmd + (1-interp)*pQCD
     elif ma > metap:
         cgamma_eff += cgamma_VMD(ma, couplings, fa, **kwargs)
     else:
@@ -102,4 +102,4 @@ def decay_width_2gluons(ma: float, couplings: ALPcouplings, fa: float, **kwargs)
         mq = [mu, md, ms, mc, mb]
         coupl = [cuA[0,0], cdA[0,0], cdA[1,1], cuA[1,1], cdA[2,2]]
         cG_eff = cc['cG'] + 0.5 * sum(coupl[i]*B1(4*mq[i]**2/ma**2) for i in range(5))
-    return alpha_s(ma)**2*ma**3/((4*np.pi)**3*fa**2)*np.abs(cG_eff)**2*(1+alpha_s(ma)/np.pi*83/4)#(1+alpha_s(ma)/48/np.pi*(291-sum(14 for i in range(5) if ma > mq[i])))
+    return 8 * alpha_s(ma)**2*ma**3/((4*np.pi)**3*fa**2)*np.abs(cG_eff)**2*(1+alpha_s(ma)/np.pi*83/4)#(1+alpha_s(ma)/48/np.pi*(291-sum(14 for i in range(5) if ma > mq[i])))

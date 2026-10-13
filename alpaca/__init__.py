@@ -44,13 +44,15 @@ alp_channels_decay_widths
     Calculates the decay widths for all ALP channels.
 alp_channels_branching_ratios
     Calculates the branching ratios for all ALP channels.
+effective_coupling
+    Calculates the effective coupling for given particles and chirality.
 """
 
 import lazy_loader as lazy
 
 __getattr__, __dir__, __all__ = lazy.attach_stub(__name__, __file__)
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 
 class info:
     def __repr__(self):

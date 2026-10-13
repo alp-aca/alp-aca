@@ -34,3 +34,16 @@ rho0 = np.diag([1/2, -1/2, 0])
 omega = np.diag([1/2, 1/2, 0])
 
 phi = np.diag([0, 0, 1])/np.sqrt(2)
+
+
+###### Baryons #######
+
+proton = np.array([[0,0,1],[0,0,0],[0,0,0]])
+neutron = np.array([[0,0,0],[0,0,1],[0,0,0]])
+Sigma0 = np.diag([1,-1,0])/np.sqrt(2)
+Sigma_plus = np.array([[0,1,0],[0,0,0],[0,0,0]])
+Sigma_minus = np.array([[0,0,0],[1,0,0],[0,0,0]])
+Lambda0 = np.diag([1,1,-2])/np.sqrt(6)
+Xi0 = np.array([[0,0,0],[0,0,0],[0,1,0]])
+Xi_minus = np.array([[0,0,0],[0,0,0],[1,0,0]])
+baryons = {'proton': proton, 'neutron': neutron, 'Sigma0': Sigma0, 'Sigma+': Sigma_plus, 'Sigma-': Sigma_minus, 'Lambda': Lambda0, 'Xi0': Xi0, 'Xi-': Xi_minus}
