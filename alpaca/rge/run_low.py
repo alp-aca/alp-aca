@@ -50,7 +50,7 @@ def beta(couplings: ALPcouplings) -> ALPcouplings:
     beta_u = alpha_s_tilde**2/np.pi**2*cGtilde(couplings)+0.75*parsSM['alpha_em']**2/np.pi**2*(2/3)**2*cgammatilde(couplings)
     beta_e = 0.75*parsSM['alpha_em']**2/np.pi**2*cgammatilde(couplings)
 
-    return ALPcouplings({'cdR': beta_d*np.eye(3), 'cdL': -beta_d*np.eye(3), 'cuR': beta_u*np.eye(2), 'cuL': -beta_u*np.eye(2), 'ceR': beta_e * np.eye(3), 'ceL': -beta_e*np.eye(3), 'cnuL': np.zeros((3,3)), 'cG': 0, 'cgamma': 0}, scale=couplings.scale, basis='RL_below', ew_scale=couplings.ew_scale)
+    return ALPcouplings({'cdR': beta_d*np.eye(3)*16*np.pi**2, 'cdL': -beta_d*np.eye(3)*16*np.pi**2, 'cuR': beta_u*np.eye(2)*16*np.pi**2, 'cuL': -beta_u*np.eye(2)*16*np.pi**2, 'ceR': beta_e * np.eye(3)*16*np.pi**2, 'ceL': -beta_e*np.eye(3)*16*np.pi**2, 'cnuL': np.zeros((3,3)), 'cG': 0, 'cgamma': 0}, scale=couplings.scale, basis='RL_below', ew_scale=couplings.ew_scale)
 
 
 def run_leadinglog(couplings: ALPcouplings, scale_out: float) -> ALPcouplings:
